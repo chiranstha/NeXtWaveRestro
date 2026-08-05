@@ -1,0 +1,116 @@
+<div [@routerTransition] class="login-form">
+    <div class="pb-5 pt-lg-0 pt-5">
+        <h3 class="fw-bolder text-dark fs-h4 fs-h1-lg pb-5">
+            {{ 'PaymentInfo' | localize }}
+        </h3>
+    </div>
+    <form class="login-form form" method="post">
+        <span class="d-block text-muted pt-2 fs-sm">{{ 'Edition' | localize }}</span>
+        <h3 class="pb-10">
+            {{ edition.displayName }}
+        </h3>
+        <div class="radio-inline">
+            @if (edition.dailyPrice > 0) {
+                <div class="mb-5 me-5">
+                    <label class="form-check form-check-custom form-check-solid">
+                        <input
+                            (change)="onPaymentPeriodChangeChange(paymentPeriodType.Daily)"
+                            [checked]="selectedPaymentPeriodType == paymentPeriodType.Daily"
+                            [value]="paymentPeriodType.Daily"
+                            class="form-check-input"
+                            name="PaymentPeriodType"
+                            type="radio"
+                        />
+                        <span class="form-check-label">
+                            {{ 'DailyPrice' | localize }}: {{ appSession.application.currencySign
+                            }}{{ edition.dailyPrice | number: '1.2-2' }}
+                        </span>
+                    </label>
+                </div>
+            }
+            @if (edition.weeklyPrice > 0) {
+                <div class="mb-5">
+                    <label class="form-check form-check-custom form-check-solid">
+                        <input
+                            (change)="onPaymentPeriodChangeChange(paymentPeriodType.Weekly)"
+                            [checked]="selectedPaymentPeriodType == paymentPeriodType.Weekly"
+                            [value]="paymentPeriodType.Weekly"
+                            class="form-check-input"
+                            name="PaymentPeriodType"
+                            type="radio"
+                        />
+                        <span class="form-check-label">
+                            {{ 'WeeklyPrice' | localize }}: {{ appSession.application.currencySign
+                            }}{{ edition.weeklyPrice | number: '1.2-2' }}
+                        </span>
+                    </label>
+                </div>
+            }
+        </div>
+        <div class="radio-inline">
+            @if (edition.monthlyPrice > 0) {
+                <div class="mb-5 me-5">
+                    <label class="form-check form-check-custom form-check-solid">
+                        <input
+                            (change)="onPaymentPeriodChangeChange(paymentPeriodType.Monthly)"
+                            [checked]="selectedPaymentPeriodType == paymentPeriodType.Monthly"
+                            [value]="paymentPeriodType.Monthly"
+                            class="form-check-input"
+                            name="PaymentPeriodType"
+                            type="radio"
+                        />
+                        <span class="form-check-label">
+                            {{ 'MonthlyPrice' | localize }}: {{ appSession.application.currencySign
+                            }}{{ edition.monthlyPrice | number: '1.2-2' }}
+                        </span>
+                    </label>
+                </div>
+            }
+            @if (edition.annualPrice > 0) {
+                <div class="mb-5">
+                    <label class="form-check form-check-custom form-check-solid">
+                        <input
+                            (change)="onPaymentPeriodChangeChange(paymentPeriodType.Annual)"
+                            [checked]="selectedPaymentPeriodType == paymentPeriodType.Annual"
+                            [value]="paymentPeriodType.Annual"
+                            class="form-check-input"
+                            name="PaymentPeriodType"
+                            type="radio"
+                        />
+                        <span class="form-check-label">
+                            {{ 'AnnualPrice' | localize }}: {{ appSession.application.currencySign
+                            }}{{ edition.annualPrice | number: '1.2-2' }}
+                        </span>
+                    </label>
+                </div>
+            }
+        </div>
+        <div class="separator separator-border-dashed"></div>
+        @if (supportsRecurringPayments) {
+            <div class="mb-5">
+                <label class="form-check form-check-custom form-check-solid py-1">
+                    <input
+                        [(ngModel)]="recurringPaymentEnabled"
+                        class="form-check-input"
+                        name="RecurringPaymentEnabled"
+                        type="checkbox"
+                    />
+                    <span class="form-check-label">
+                        {{ 'AutomaticallyBillMyAccount' | localize }}
+                    </span>
+                </label>
+            </div>
+        }
+        <div class="pb-lg-0 pb-5">
+            @for (paymentGateway of paymentGateways; track paymentGateway) {
+                <div class="mb-2">
+                    @if (paymentGateway.supportsRecurringPayments || !recurringPaymentEnabled) {
+                        <button (click)="checkout(paymentGateway.gatewayType)" class="btn btn-success w-100">
+                            {{ 'CheckoutWith' + getPaymentGatewayType(paymentGateway.gatewayType) | localize }}
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+    </form>
+</div>

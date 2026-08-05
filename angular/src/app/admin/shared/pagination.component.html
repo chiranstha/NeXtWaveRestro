@@ -1,0 +1,55 @@
+<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 my-2">
+    <div class="d-flex align-items-center gap-2">
+        <label class="small text-muted mb-0" for="pageSize">Rows per page:</label>
+        <select (change)="onPageSizeChange($event)" class="form-select form-select-sm w-auto" id="pageSize">
+            @for (size of pageSizeOptions; track size) {
+                <option [selected]="size === pageSize" [value]="size">
+                    {{ size }}
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="d-flex align-items-center flex-wrap gap-1">
+        <button (click)="firstPage()" [disabled]="currentPageIndex === 0" class="btn btn-sm btn-light" type="button">
+            <i class="fa-duotone fa-angles-left"></i>
+        </button>
+        <button (click)="previousPage()" [disabled]="currentPageIndex === 0" class="btn btn-sm btn-light" type="button">
+            <i class="fa-duotone fa-chevron-left"></i>
+        </button>
+
+        @for (page of visiblePageNumbers; track page) {
+            @if (page === -1) {
+                <span class="px-2 text-muted">...</span>
+            } @else {
+                <button
+                    (click)="goToPage(page)"
+                    [class.active]="page - 1 === currentPageIndex"
+                    [class.btn-light]="page - 1 !== currentPageIndex"
+                    [class.btn-primary]="page - 1 === currentPageIndex"
+                    class="btn btn-sm"
+                    type="button"
+                >
+                    {{ page }}
+                </button>
+            }
+        }
+
+        <button
+            (click)="nextPage()"
+            [disabled]="totalPages === 0 || currentPageIndex >= totalPages - 1"
+            class="btn btn-sm btn-light"
+            type="button"
+        >
+            <i class="fa-duotone fa-angle-right"></i>
+        </button>
+        <button
+            (click)="lastPage()"
+            [disabled]="totalPages === 0 || currentPageIndex >= totalPages - 1"
+            class="btn btn-sm btn-light"
+            type="button"
+        >
+            <i class="fa-duotone fa-angles-right"></i>
+        </button>
+    </div>
+</div>

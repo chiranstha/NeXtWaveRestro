@@ -1,0 +1,89 @@
+<div
+    #modal="bs-modal"
+    (onShown)="onShown()"
+    [config]="{ backdrop: 'static', keyboard: !saving }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="createOrEditModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            @if (active) {
+                <form #editForm="ngForm" (ngSubmit)="save()" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            <span>{{ 'EditText' | localize }}</span>
+                        </h4>
+                        <button
+                            (click)="close()"
+                            [attr.aria-label]="l('Close')"
+                            [disabled]="saving"
+                            class="btn-close"
+                            type="button"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-5">
+                            <label class="form-label">{{ 'Key' | localize }}</label>
+                            <div>
+                                <strong>{{ model.key }}</strong>
+                            </div>
+                        </div>
+                        <div class="mb-5 form-md-line-input form-md-floating-label no-hint">
+                            <label class="form-label" for="BaseLanguageDisplayName">
+                                <i class="d-inline-block {{ baseLanguage.icon }}"></i>
+                                {{ baseLanguage.displayName }}
+                            </label>
+                            <textarea
+                                [ngModel]="baseText"
+                                class="form-control edited"
+                                id="BaseLanguageDisplayName"
+                                name="baseText"
+                                readonly
+                                rows="4"
+                            ></textarea>
+                        </div>
+                        <div class="mb-5 form-md-line-input form-md-floating-label no-hint">
+                            <label class="form-label" for="TargetLanguageDisplayName">
+                                <i class="d-inline-block {{ targetLanguage.icon }}"></i>
+                                {{ targetLanguage.displayName }}
+                            </label>
+                            <textarea
+                                #targetValueInput
+                                [(ngModel)]="model.value"
+                                [ngClass]="{ edited: model.value }"
+                                class="form-control"
+                                id="TargetLanguageDisplayName"
+                                name="value"
+                                rows="4"
+                            ></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            (click)="close()"
+                            [disabled]="saving"
+                            class="btn btn-sm btn-light-primary fw-bold"
+                            type="button"
+                        >
+                            {{ 'Cancel' | localize }}
+                        </button>
+                        <button
+                            [busyText]="l('SavingWithThreeDot')"
+                            [buttonBusy]="saving"
+                            [disabled]="!isFormValid"
+                            class="btn btn-sm btn-primary fw-bold"
+                            type="submit"
+                        >
+                            <i class="fa fa-save"></i>
+                            <span>{{ 'Save' | localize }}</span>
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>

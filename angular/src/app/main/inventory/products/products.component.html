@@ -1,0 +1,95 @@
+<div [@routerTransition]>
+    <sub-header [description]="" [title]="'Product' | localize">
+        <div role="search">
+            <div class="position-relative w-md-400px me-md-2">
+                <i
+                    class="fa-duotone fa-magnifying-glass fs-3 text-gray-500 position-absolute top-50 translate-middle ms-6"
+                >
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                </i>
+                <input
+                    (keyup.enter)="searchValueOnApiCall($event.target.value)"
+                    [(ngModel)]="filterText"
+                    [ngModelOptions]="{ standalone: true }"
+                    class="form-control form-control-solid ps-12 rounded-pill border-0 bg-light shadow-none"
+                    name="search"
+                    placeholder="Search"
+                    type="text"
+                    value=""
+                />
+            </div>
+        </div>
+        <div role="actions">
+            <div class="btn-group" dropdown placement="button right">
+                <button id="dropdownButtonExcelOperations" dropdownToggle type="button"
+                    class="btn btn-sm btn-outline btn-outline-success btn-active-light-success dropdown-toggle"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                    aria-controls="dropdownMenuExcelOperations">
+                    <i class="far fa-file-excel btn-md-icon"></i>
+                    <span class="d-none d-md-inline-block">
+                        {{ 'ExcelOperations' | localize }}
+                    </span>
+                </button>
+                <ul id="dropdownMenuExcelOperations"
+                    class="dropdown-menu dropdown-menu-right dropdown-excel-operations" role="menu" *dropdownMenu
+                    aria-labelledby="dropdownButtonExcelOperations">
+                    <li role="menuitem">
+                        <button type="button" class="dropdown-item text-dark" id="ExportUsersToExcelButton"
+                            (click)="this.exportToExcelfromAPI()">
+                            <i class="fa fa-download me-2 mt-1 text-dark" style="font-size: 1rem"></i>
+                            {{ 'ExportToExcel' | localize }}
+                        </button>
+                    </li>
+                    <li *ngIf="'Pages.Administration.Users.Create' | permission" role="menuitem">
+                        <button type="button" class="w-100 text-dark p-0 m-0 border-0">
+                            <span class="fileinput-button">
+                                <app-file-upload customUpload="true" name="ExcelFileUpload" #ExcelFileUpload
+                                    maxFileSize="10000000" auto="auto" accept=".csv,.xls,.xlsx"
+                                    (uploadHandler)="importexcelfromAPI($event)" (onError)="onUploadExcelError()"
+                                    chooseLabel="{{ 'ImportFromExcel' | localize }}"></app-file-upload>
+                            </span>
+                        </button>
+                    </li>
+
+                </ul>
+            </div>
+
+            <button (click)="addRoute()" *ngIf="('Pages.Products.Create' | permission)"
+                class="btn btn-sm btn-primary">
+                <i class="fa fa-plus btn-md-icon"></i>
+                <span class="d-none d-md-inline-block">
+                    {{ 'Create' | localize }}
+                </span>
+            </button>
+
+            <button (click)="deleteSelectedRows()"
+                *ngIf="('Pages.Products.Delete' | permission) && selectedRows.length>0"
+                class="btn btn-sm btn-danger">
+                <i class="fa fa-trash btn-md-icon"></i>
+                <span class="d-none d-md-inline-block">
+                    {{ 'Delete' | localize }}
+                </span>
+            </button>
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <div class="ag-theme-balham">
+                    <ag-grid-angular (cellDoubleClicked)="onCellDoubleClicked($event)" (gridReady)="onGridReady($event)"
+                        [rowSelection]="rowSelection" (selectionChanged)="onSelectionChanged()"
+                        [columnDefs]="columnDefs" [getContextMenuItems]="getCustomContextMenuItems"
+                        [groupDefaultExpanded]="groupDefaultExpanded" [rowData]="rowData"
+                        [rowGroupPanelShow]="rowGroupPanelShow" style="width: 100%; "
+                        [style.height.px]="screenHeight"></ag-grid-angular>
+                </div>
+
+                <app-pagination (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)"
+                    [currentPage]="currentPage" [pageSizeOptions]="pageSizeOptions" [pageSize]="pageSize"
+                    [totalRecords]="totalRecords"></app-pagination>
+            </div>
+        </div>
+    </div>
+    <viewProductModal #viewProductModal></viewProductModal>
+</div>

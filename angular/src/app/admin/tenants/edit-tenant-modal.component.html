@@ -1,0 +1,177 @@
+<div
+    #editModal="bs-modal"
+    (onShown)="onShown()"
+    [config]="{ backdrop: 'static', keyboard: !saving }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="editModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            @if (tenant && active) {
+                <form #tenantEditForm="ngForm" (submit)="save()" class="form-validation" novalidate role="form">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <span>{{ 'EditTenant' | localize }}: {{ tenant.tenancyName }}</span>
+                        </h5>
+                        <button
+                            (click)="close()"
+                            [attr.aria-label]="l('Close')"
+                            [disabled]="saving"
+                            class="btn-close"
+                            type="button"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-5">
+                            <label class="form-label required" for="Name">{{ 'TenantName' | localize }}</label>
+                            <input
+                                #nameInput="ngModel"
+                                [(ngModel)]="tenant.name"
+                                [ngClass]="{ edited: tenant.name }"
+                                class="form-control"
+                                id="Name"
+                                maxlength="128"
+                                name="Name"
+                                required
+                                type="text"
+                            />
+                            <validation-messages [formCtrl]="nameInput"></validation-messages>
+                        </div>
+                        @if (currentConnectionString) {
+                            <div class="mb-5">
+                                <label class="form-label required" for="DatabaseConnectionString">
+                                    {{ 'DatabaseConnectionString' | localize }}
+                                </label>
+                                <input
+                                    #connectionStringInput="ngModel"
+                                    [(ngModel)]="tenant.connectionString"
+                                    class="form-control"
+                                    id="DatabaseConnectionString"
+                                    maxlength="1024"
+                                    name="ConnectionString"
+                                    required
+                                    type="text"
+                                />
+                                <validation-messages [formCtrl]="connectionStringInput"></validation-messages>
+                            </div>
+                        }
+                        @if (currentConnectionString) {
+                            <div>
+                                <span class="help-block text-warning">
+                                    {{ 'TenantDatabaseConnectionStringChangeWarningMessage' | localize }}
+                                </span>
+                            </div>
+                        }
+                        <div class="mb-5">
+                            <label class="form-label" for="edition">{{ 'Edition' | localize }}</label>
+                            <select
+                                (change)="onEditionChange()"
+                                [(ngModel)]="tenant.editionId"
+                                class="form-select"
+                                id="edition"
+                                name="edition"
+                            >
+                                @for (edition of editions; track edition) {
+                                    <option [value]="edition.value">
+                                        {{ edition.displayText }}
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                        <label
+                            [hidden]="!isSubscriptionFieldsVisible"
+                            class="form-check form-check-custom form-check-solid py-1"
+                        >
+                            <input
+                                (ngModelChange)="onUnlimitedChange()"
+                                [(ngModel)]="isUnlimited"
+                                class="form-check-input"
+                                id="CreateTenant_IsUnlimited"
+                                name="IsUnlimited"
+                                type="checkbox"
+                            />
+                            <span class="form-check-label">
+                                {{ 'UnlimitedTimeSubscription' | localize }}
+                            </span>
+                        </label>
+                        <div
+                            [hidden]="isUnlimited || !isSubscriptionFieldsVisible"
+                            [ngClass]="{ 'has-error': !subscriptionEndDateUtcIsValid }"
+                            class="mb-5"
+                        >
+                            <label class="form-label" for="SubscriptionEndDateUtc">
+                                {{ 'SubscriptionEndDateUtc' | localize }}
+                            </label>
+                            <input
+                                #SubscriptionEndDateUtc
+                                (dateChange)="subscriptionEndDateChange($event)"
+                                [(date)]="tenant.subscriptionEndDateUtc"
+                                [bsConfig]="{ adaptivePosition: true }"
+                                [isUtc]="true"
+                                [required]="!isUnlimited"
+                                bsDatepicker
+                                class="form-control"
+                                datePickerLuxonModifier
+                                id="SubscriptionEndDateUtc"
+                                name="SubscriptionEndDateUtc"
+                                type="datetime"
+                            />
+                        </div>
+                        <label
+                            [hidden]="isUnlimited || !isSubscriptionFieldsVisible"
+                            class="form-check form-check-custom form-check-solid py-1"
+                        >
+                            <input
+                                [(ngModel)]="tenant.isInTrialPeriod"
+                                [disabled]="selectedEditionIsFree()"
+                                class="form-check-input"
+                                id="CreateTenant_IsInTrialPeriod"
+                                name="IsInTrialPeriod"
+                                type="checkbox"
+                            />
+                            <span class="form-check-label">
+                                {{ 'IsInTrialPeriod' | localize }}
+                            </span>
+                        </label>
+                        <label class="form-check form-check-custom form-check-solid py-1">
+                            <input
+                                [(ngModel)]="tenant.isActive"
+                                class="form-check-input"
+                                id="EditTenant_IsActive"
+                                name="IsActive"
+                                type="checkbox"
+                            />
+                            <span class="form-check-label">
+                                {{ 'Active' | localize }}
+                            </span>
+                        </label>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            (click)="close()"
+                            [disabled]="saving"
+                            class="btn btn-sm btn-light-primary fw-bold"
+                            type="button"
+                        >
+                            {{ 'Cancel' | localize }}
+                        </button>
+                        <button
+                            [busyText]="l('SavingWithThreeDot')"
+                            [buttonBusy]="saving"
+                            [disabled]="!isFormValid || saving || !subscriptionEndDateUtcIsValid"
+                            class="btn btn-sm btn-primary fw-bold"
+                            type="submit"
+                        >
+                            <i class="fa fa-save"></i>
+                            <span>{{ 'Save' | localize }}</span>
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>

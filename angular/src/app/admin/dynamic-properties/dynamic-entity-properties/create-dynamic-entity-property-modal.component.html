@@ -1,0 +1,75 @@
+<div
+    #createModal="bs-modal"
+    [config]="{ backdrop: 'static', keyboard: !saving }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="createModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    @if (initialized) {
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                @if (initialized) {
+                    <div>
+                        <div class="modal-header">
+                            <h4 class="modal-title">
+                                <span>{{ 'AddNewDynamicEntityProperty' | localize }}</span>
+                            </h4>
+                            <button
+                                (click)="close()"
+                                [attr.aria-label]="l('Close')"
+                                [disabled]="saving"
+                                class="btn-close"
+                                type="button"
+                            ></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-5 col-12">
+                                <div class="mb-5">
+                                    <label class="form-label required" for="Name">{{ 'Parameter' | localize }}</label>
+                                    <select
+                                        [(ngModel)]="dynamicEntityProperty.dynamicPropertyId"
+                                        class="form-select"
+                                        required
+                                    >
+                                        <option value="">{{ 'SelectADynamicProperty' | localize }}</option>
+                                        @for (parameter of allDynamicProperties; track parameter) {
+                                            <option [value]="parameter.id">
+                                                {{ parameter.propertyName }}
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button
+                                (click)="close()"
+                                [disabled]="saving"
+                                class="btn btn-sm btn-light-primary fw-bold"
+                                type="button"
+                            >
+                                {{ 'Cancel' | localize }}
+                            </button>
+                            <button
+                                (click)="save()"
+                                [busyText]="l('SavingWithThreeDot')"
+                                [buttonBusy]="saving"
+                                [disabled]="
+                                    !dynamicEntityProperty.entityFullName || !dynamicEntityProperty.dynamicPropertyId
+                                "
+                                class="btn btn-sm btn-primary fw-bold"
+                                type="button"
+                            >
+                                <i class="fa fa-save"></i>
+                                <span>{{ 'Save' | localize }}</span>
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

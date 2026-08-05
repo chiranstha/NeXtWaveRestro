@@ -1,0 +1,17 @@
+.alert-height {
+    min-height: 38px;
+    padding: 8px 12px;
+    margin-bottom: 0;
+}
+
+.alert-div {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+}
+
+.alert-danger {
+    border: 1px solid #f5c6cb;
+    background-color: #f8d7da;
+    color: #721c24;
+}

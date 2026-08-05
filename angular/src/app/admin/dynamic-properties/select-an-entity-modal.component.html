@@ -1,0 +1,60 @@
+<div
+    #createModal="bs-modal"
+    [config]="{ backdrop: 'true' }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="createModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    @if (initialized) {
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                @if (initialized) {
+                    <div>
+                        <div class="modal-header">
+                            <h4 class="modal-title">
+                                <span>{{ 'SelectAnEntity' | localize }}</span>
+                            </h4>
+                            <button
+                                (click)="close()"
+                                aria-hidden="true"
+                                class="btn-close"
+                                data-dismiss="modal"
+                                type="button"
+                            ></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-5 col-12">
+                                <div class="mb-5">
+                                    <label class="form-label required" for="Name">{{ 'Entity' | localize }}</label>
+                                    <select [(ngModel)]="entityFullName" class="form-select" required>
+                                        <option value="">{{ 'SelectAnEntity' | localize }}</option>
+                                        @for (entity of allEntities; track entity) {
+                                            <option [value]="entity">{{ entity }}</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button
+                                (click)="close()"
+                                [disabled]="saving"
+                                class="btn btn-sm btn-light-primary fw-bold"
+                                type="button"
+                            >
+                                {{ 'Cancel' | localize }}
+                            </button>
+                            <button (click)="save()" class="btn btn-sm btn-primary fw-bold" type="button">
+                                <i class="fa fa-save"></i>
+                                <span>{{ 'Save' | localize }}</span>
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

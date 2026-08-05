@@ -1,0 +1,88 @@
+<div [@routerTransition]>
+    <sub-header [title]="'Notifications' | localize">
+        <div role="actions">
+            <button (click)="openNotificationSettingsModal()" class="btn btn-sm btn-success">
+                <i class="fa fa-cog btn-md-icon"></i>
+                <span class="d-none d-md-inline-block">
+                    {{ 'NotificationSettings' | localize }}
+                </span>
+            </button>
+            <button (click)="setAllNotificationsAsRead()" class="btn btn-sm btn-primary">
+                <i class="fa fa-check btn-md-icon"></i>
+                <span class="d-none d-md-inline-block">
+                    {{ 'SetAllAsRead' | localize }}
+                </span>
+            </button>
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom">
+            <div class="card-body">
+                <div class="form">
+                    <div class="row mb-4">
+                        <div class="col-xl-6">
+                            <input
+                                #drp="bsDaterangepicker"
+                                [(date)]="dateRange"
+                                bsDaterangepicker
+                                class="form-control"
+                                dateRangePickerLuxonModifier
+                                id="StartEndRange"
+                                name="StartEndRange"
+                                readonly="readonly"
+                            />
+                        </div>
+                        <div class="col-xl-6">
+                            <div class="mb-5">
+                                <select
+                                    #TargetValueFilterSelectionCombobox
+                                    [(ngModel)]="readStateFilter"
+                                    class="form-control"
+                                    name="readStateFilter"
+                                >
+                                    <option value="ALL">{{ 'All' | localize }}</option>
+                                    <option value="UNREAD">{{ 'Unread' | localize }}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xl-12 text-end">
+                            <div class="mb-5">
+                                <button (click)="deleteNotifications()" class="btn btn-danger">
+                                    <i class="fa-duotone fa-regular fa-xmark"></i>
+                                    {{ 'DeleteListedNotifications' | localize }}
+                                </button>
+                                <button (click)="getNotifications()" class="btn btn-sm btn-primary">
+                                    <i class="fa fa-sync"></i>
+                                    {{ 'Refresh' | localize }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row align-items-center">
+                    <!--<AG-Grid-Start>-->
+                    <div [busyIf]="isLoading" class="col ag-grid-container">
+                        <ag-grid-angular
+                            #agGrid
+                            (gridReady)="onGridReady($event)"
+                            (sortChanged)="onSortChanged($event)"
+                            [columnDefs]="columnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [domLayout]="'autoHeight'"
+                            [rowData]="rowData"
+                            class="ag-theme-balham"
+                        ></ag-grid-angular>
+                        @if (totalRecordsCount == 0) {
+                            <div class="no-data">
+                                {{ 'NoData' | localize }}
+                            </div>
+                        }
+                    </div>
+                    <!--<AG-Grid-End>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

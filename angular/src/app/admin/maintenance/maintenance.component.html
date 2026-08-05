@@ -1,0 +1,79 @@
+<div (window:resize)="onResize($event)" [@routerTransition]>
+    <sub-header [title]="'Maintenance' | localize">
+        <div role="actions">
+            @if ('Pages.Administration.NewVersion.Create' | permission) {
+                <button
+                    (click)="sendNewVersionAvailableNotification()"
+                    class="btn btn-sm btn-primary"
+                    id="SendNewVersionNotification"
+                >
+                    {{ 'SendNewVersionNotification' | localize }}
+                </button>
+            }
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <tabset>
+                    <tab heading=" {{ 'Caches' | localize }}">
+                        <div class="row m-3">
+                            <div class="col-xl-6">
+                                <p class="mt-5">{{ 'CachesHeaderInfo' | localize }}</p>
+                            </div>
+                            <div class="col-xl-6 text-end">
+                                @if (canClearAllCaches) {
+                                    <button (click)="clearAllCaches()" class="btn btn-sm btn-primary float-end">
+                                        <i class="fa fa-recycle"></i>
+                                        {{ 'ClearAll' | localize }}
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                        <div class="row m-3">
+                            <div class="col-xl-12">
+                                <ag-grid-angular
+                                    class="ag-theme-balham"
+                                    style="width: 100%; height: 420px;"
+                                    [columnDefs]="cacheColumnDefs"
+                                    [defaultColDef]="cacheDefaultColDef"
+                                    [rowData]="caches"
+                                    (cellClicked)="onCacheCellClicked($event)"
+                                ></ag-grid-angular>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="{{ 'WebSiteLogs' | localize }}">
+                        <div class="row m-3">
+                            <div class="col-xl-6">
+                                <p class="mt-5">{{ 'WebSiteLogsHeaderInfo' | localize }}</p>
+                            </div>
+                            <div class="col-xl-6 text-end">
+                                <button (click)="downloadWebLogs()" class="btn btn-secondary me-2">
+                                    <i class="fa fa-download"></i>
+                                    {{ 'DownloadAll' | localize }}
+                                </button>
+                                <button (click)="getWebLogs()" class="btn btn-sm btn-primary">
+                                    <i class="fa fa-sync"></i>
+                                    {{ 'Refresh' | localize }}
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row m-3">
+                            <div class="col-xl-12">
+                                <div class="web-log-view full-height">
+                                    @for (log of logs; track log) {
+                                        <span class="log-line">
+                                            <span [class]="getLogClass(log)">{{ getLogType(log) }}</span>
+                                            {{ getRawLogContent(log) }}
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </tab>
+                </tabset>
+            </div>
+        </div>
+    </div>
+</div>

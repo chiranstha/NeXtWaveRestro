@@ -1,0 +1,93 @@
+<div [class]="containerClass">
+    <div class="card">
+        <div class="form-title">
+            <div class="row">
+                <div class="col-lg-6 col-xl-6 col-md-6 col-xs-12">
+                    <h3 class="style-this mt-2 mb-0">{{ l('MergeLedger') }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <form [formGroup]="form" autocomplete="off">
+                <div class="row">
+                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
+                        <div class="mb-1 form-item">
+                            <label class="required form-label" for="requestLedgerId">{{ l('RequestLedger') }}</label>
+                            <ng-select
+                                #requestledger
+                                (keyup)="gotoAccountLedger($event)"
+                                [items]="requestData"
+                                appendTo="body"
+                                bindLabel="displayName"
+                                bindValue="id"
+                                formControlName="requestLedgerId"
+                                id="requestLedgerId"
+                                name="requestLedgerId"
+                                placeholder="Select items"
+                                required
+                            ></ng-select>
+                            @if (
+                                this.form.get('requestLedgerId').invalid &&
+                                (this.form.get('requestLedgerId').dirty || this.form.get('requestLedgerId').touched)
+                            ) {
+                                <div>
+                                    <div class="alert alert-danger alert-height mt-1" role="alert">
+                                        <div class="alert-div">Request Ledger is required!</div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="jusV-center" class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
+                        <div class="mb-1 form-item">
+                            <div class="form-label">{{ l('To') }}</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
+                        <div class="mb-1 form-item">
+                            <label class="required form-label" for="ledgerId">{{ l('AccountLedger') }}</label>
+                            <ng-select
+                                #accountledger
+                                (change)="toggleEnable()"
+                                (keyup)="gotoRequestLEdger($event)"
+                                [items]="ledgerData"
+                                appendTo="body"
+                                bindLabel="displayName"
+                                bindValue="id"
+                                formControlName="ledgerId"
+                                id="ledgerId"
+                                name="ledgerId"
+                                placeholder="Select items"
+                                required
+                            ></ng-select>
+                            @if (
+                                this.form.get('ledgerId').invalid &&
+                                (this.form.get('ledgerId').dirty || this.form.get('ledgerId').touched)
+                            ) {
+                                <div>
+                                    <div class="alert alert-danger alert-height mt-1" role="alert">
+                                        <div class="alert-div">Account Ledger is required!</div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="mt-27px" class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
+                        <div class="mb-1 form-item">
+                            <button
+                                (click)="postData()"
+                                [buttonBusy]="saving"
+                                [disabled]="form.invalid || enabled"
+                                class="w-40"
+                                class="btn btn-sm fw-bold"
+                                id="save"
+                                label="Post"
+                                type="submit"
+                            ></button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

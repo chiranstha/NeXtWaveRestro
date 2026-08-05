@@ -1,0 +1,258 @@
+<div [@routerTransition]>
+    <div [class]="containerClass">
+        <div class="restaurant-page restaurant-kds-page">
+            <div class="restaurant-kds-command">
+                <div class="restaurant-kds-command-main">
+                    <div class="restaurant-kds-live-dot" [class.loading]="loading"></div>
+                    <div>
+                        <div class="restaurant-kds-eyebrow">{{ selectedStationName() }}</div>
+                        <div class="restaurant-kds-board-title">{{ 'Kitchen Display' | localize }}</div>
+                    </div>
+                </div>
+                <div class="restaurant-kds-metrics">
+                    <div class="restaurant-kds-metric restaurant-kds-metric-total">
+                        <span>{{ 'Tickets' | localize }}</span>
+                        <strong>{{ tickets.length }}</strong>
+                    </div>
+                    <div class="restaurant-kds-metric restaurant-kds-metric-warning">
+                        <span>{{ 'Pending' | localize }}</span>
+                        <strong>{{ pendingTicketCount() }}</strong>
+                    </div>
+                    <div class="restaurant-kds-metric restaurant-kds-metric-active">
+                        <span>{{ 'In Progress' | localize }}</span>
+                        <strong>{{ inProgressTicketCount() }}</strong>
+                    </div>
+                    <div class="restaurant-kds-metric restaurant-kds-metric-success">
+                        <span>{{ 'Ready' | localize }}</span>
+                        <strong>{{ readyTicketCount() }}</strong>
+                    </div>
+                    <div class="restaurant-kds-metric restaurant-kds-metric-danger">
+                        <span>{{ 'Rush' | localize }}</span>
+                        <strong>{{ rushTicketCount() }}</strong>
+                    </div>
+                </div>
+                <div class="restaurant-kds-refresh-pill">
+                    <i class="fa fa-rotate" [class.fa-spin]="loading"></i>
+                    <span>{{ loading ? ('Loading' | localize) : ('15s' | localize) }}</span>
+                </div>
+            </div>
+
+            <div class="restaurant-kds-filter-panel">
+                <div class="restaurant-kds-filter">
+                    <ng-select
+                        class="restaurant-kds-select"
+                        [items]="stations"
+                        bindLabel="name"
+                        bindValue="id"
+                        [(ngModel)]="selectedStationId"
+                        [clearable]="true"
+                        [placeholder]="'Station' | localize"
+                        [attr.aria-label]="'Station' | localize"
+                        (change)="refresh()"
+                        appendTo="body"
+                    ></ng-select>
+                </div>
+                <div class="restaurant-kds-filter">
+                    <select
+                        class="form-select restaurant-kds-select"
+                        [(ngModel)]="selectedTicketType"
+                        [attr.aria-label]="'Ticket Type' | localize"
+                        (ngModelChange)="updateFilteredTickets()"
+                    >
+                        <option value="">KOT + BOT</option>
+                        <option value="0">KOT</option>
+                        <option value="1">BOT</option>
+                    </select>
+                </div>
+                <div class="restaurant-kds-filter">
+                    <select
+                        class="form-select restaurant-kds-select"
+                        [(ngModel)]="selectedStatus"
+                        [attr.aria-label]="'Status' | localize"
+                        (ngModelChange)="updateFilteredTickets()"
+                    >
+                        <option value="">All status</option>
+                        <option value="0">Pending</option>
+                        <option value="1">In Progress</option>
+                        <option value="2">Ready</option>
+                    </select>
+                </div>
+                <button class="btn btn-sm btn-primary restaurant-kds-filter-button" [buttonBusy]="loading" (click)="refresh()">
+                    <i class="fa fa-rotate"></i>
+                    {{ 'Refresh' | localize }}
+                </button>
+            </div>
+
+            <div class="restaurant-kds-board" *ngIf="filteredTickets.length; else noTickets">
+                <section
+                    class="restaurant-kds-card"
+                    [ngClass]="ticketUrgencyClass(ticket)"
+                    *ngFor="let ticket of filteredTickets; trackBy: trackTicket"
+                >
+                    <header class="restaurant-kds-card-header">
+                        <div class="restaurant-kds-card-heading">
+                            <div class="restaurant-kds-title-row">
+                                <h3 class="restaurant-kds-ticket-no">{{ ticket.ticketNo }}</h3>
+                                <span class="restaurant-status restaurant-status-primary">
+                                    {{ ticketTypeText(ticket) }}
+                                </span>
+                                <span
+                                    class="restaurant-status restaurant-status-danger"
+                                    *ngIf="ticket.purpose === 1"
+                                >
+                                    {{ 'Cancellation' | localize }}
+                                </span>
+                                <span
+                                    class="restaurant-status restaurant-status-warning"
+                                    *ngIf="ticket.purpose === 2"
+                                >
+                                    {{ 'AddOn' | localize }}
+                                </span>
+                            </div>
+                            <div class="restaurant-kds-meta">
+                                <span>
+                                    <i class="fa fa-receipt"></i>
+                                    {{ ticket.orderNo }}
+                                </span>
+                                <span>
+                                    <i class="fa fa-table-cells-large"></i>
+                                    {{ ticket.tableName || ticket.orderType }}
+                                </span>
+                                <span>
+                                    <i class="fa fa-location-dot"></i>
+                                    {{ ticket.stationName }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="restaurant-kds-timebox">
+                            <strong>{{ elapsed(ticket) || '0m' }}</strong>
+                            <span class="restaurant-status" [ngClass]="ticketStatusClass(ticket.status)">
+                                {{ ticketStatusText(ticket.status) }}
+                            </span>
+                        </div>
+                    </header>
+
+                    <div class="restaurant-kds-context">
+                        <span>{{ purposeText(ticket) }}</span>
+                        <span>{{ ticket.items?.length || 0 }} {{ 'Items' | localize }}</span>
+                    </div>
+
+                    <div class="restaurant-kds-items">
+                        <article
+                            class="restaurant-kds-item"
+                            *ngFor="let item of ticket.items || []; trackBy: trackTicketItem"
+                        >
+                            <div class="restaurant-kds-item-main">
+                                <div class="restaurant-kds-item-top">
+                                    <div class="restaurant-kds-item-name">
+                                        {{ item.itemNameSnapshot || item.productName }}
+                                    </div>
+                                    <div class="restaurant-kds-qty">x{{ item.qty }}</div>
+                                </div>
+                                <div class="restaurant-kds-item-subline">
+                                    <span class="restaurant-status" [ngClass]="ticketRouteClass(ticket)">
+                                        {{ ticketRouteText(ticket) }}
+                                    </span>
+                                    <span class="restaurant-status" [ngClass]="itemStatusClass(item.status)">
+                                        {{ itemStatusText(item.status) }}
+                                    </span>
+                                </div>
+                                <div class="restaurant-kds-item-note" *ngIf="item.variantNameSnapshot">
+                                    {{ item.variantNameSnapshot }}
+                                </div>
+                                <div class="restaurant-kds-item-note" *ngIf="item.modifierSummary">
+                                    {{ item.modifierSummary }}
+                                </div>
+                                <div class="restaurant-kds-item-note restaurant-kds-item-note-alert" *ngIf="item.notes || item.cancelReason">
+                                    {{ item.notes || item.cancelReason }}
+                                </div>
+                            </div>
+                            <div class="restaurant-kds-item-actions" *ngIf="ticket.purpose !== 1">
+                                <button
+                                    class="btn btn-xs btn-light-warning"
+                                    (click)="setItemStatus(item, 2)"
+                                    [disabled]="item.status !== 1"
+                                    tooltip="{{ 'Start' | localize }}"
+                                >
+                                    <i class="fa fa-fire"></i>
+                                </button>
+                                <button
+                                    class="btn btn-xs btn-light-success"
+                                    (click)="setItemStatus(item, 3)"
+                                    [disabled]="item.status !== 1 && item.status !== 2"
+                                    tooltip="{{ 'Ready' | localize }}"
+                                >
+                                    <i class="fa fa-check"></i>
+                                </button>
+                                <button
+                                    class="btn btn-xs btn-light-primary"
+                                    (click)="setItemStatus(item, 4)"
+                                    [disabled]="item.status !== 3"
+                                    tooltip="{{ 'Served' | localize }}"
+                                >
+                                    <i class="fa fa-bell-concierge"></i>
+                                </button>
+                                <button
+                                    class="btn btn-xs btn-light-danger"
+                                    (click)="setItemStatus(item, 5)"
+                                    [disabled]="item.status >= 4"
+                                    tooltip="{{ 'Cancel' | localize }}"
+                                >
+                                    <i class="fa fa-ban"></i>
+                                </button>
+                            </div>
+                            <div class="restaurant-kds-item-void" *ngIf="ticket.purpose === 1">
+                                <span class="restaurant-status restaurant-status-danger">
+                                    {{ 'Void' | localize }}
+                                </span>
+                            </div>
+                        </article>
+                    </div>
+
+                    <footer class="restaurant-kds-actions">
+                        <button
+                            class="btn btn-sm btn-warning"
+                            (click)="setTicketStatus(ticket, 1)"
+                            [disabled]="ticket.status !== 0"
+                        >
+                            <i class="fa fa-fire"></i>
+                            {{ 'Start' | localize }}
+                        </button>
+                        <button
+                            class="btn btn-sm btn-success"
+                            (click)="setTicketStatus(ticket, 2)"
+                            [disabled]="ticket.status !== 0 && ticket.status !== 1"
+                        >
+                            <i class="fa fa-check"></i>
+                            {{ 'Ready' | localize }}
+                        </button>
+                        <button
+                            class="btn btn-sm btn-primary"
+                            (click)="setTicketStatus(ticket, 3)"
+                            [disabled]="ticket.status !== 2"
+                        >
+                            <i class="fa fa-bell-concierge"></i>
+                            {{ 'Served' | localize }}
+                        </button>
+                        <button
+                            class="btn btn-sm btn-danger ms-auto"
+                            *ngIf="ticket.purpose !== 1"
+                            (click)="setTicketStatus(ticket, 4)"
+                            [disabled]="ticket.status >= 3"
+                        >
+                            <i class="fa fa-ban"></i>
+                            {{ 'Cancel' | localize }}
+                        </button>
+                    </footer>
+                </section>
+            </div>
+
+            <ng-template #noTickets>
+                <div class="restaurant-kds-empty">
+                    <i class="fa fa-circle-check"></i>
+                    <span>{{ 'No kitchen/stock items' | localize }}</span>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</div>

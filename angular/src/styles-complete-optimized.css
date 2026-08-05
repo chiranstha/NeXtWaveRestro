@@ -1,0 +1,958 @@
+@import "@ng-select/ng-select/themes/default.theme.css";
+@import './assets/common/styles/nepali-datepicker-dark-mode.css';
+@import './assets/common/styles/ngx-extended-pdf-viewer-dark-theme.css';
+
+/* Compact ng-select controls globally */
+.ng-select .ng-select-container {
+    min-height: 32px !important;
+}
+
+.ng-select.ng-select-single .ng-select-container {
+    height: 32px !important;
+}
+
+.ng-select .ng-select-container .ng-value-container {
+    align-items: center;
+    padding-top: 0;
+}
+
+.ng-select.ng-select-single .ng-select-container .ng-value-container .ng-input {
+    top: 3px;
+}
+
+.ng-select .ng-clear-wrapper,
+.ng-select .ng-arrow-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+
+/* Consolidated ng-dropdown-panel styles */
+.ng-dropdown-panel {
+    position: absolute !important;
+    /* Keep page-level ng-select panels below fixed header mega-menu */
+    z-index: 101 !important;
+    width: 100%;
+    background-color: var(--bs-body-bg, white);
+    border-color: var(--bs-border-color, #e4e6ef);
+    min-height: 30px;
+    height: 30;
+}
+
+
+
+/* NG-Select Dark Mode - Using data-attribute selector only (consolidated below) */
+
+/* You can add global styles to this file, and also import other style files */
+
+.margin-right-5 {
+    margin-right: 5px !important;
+}
+
+/* Global fix for datepicker z-index issues */
+
+body>.ne-datepicker-dropdown,
+body>.ne-datepicker-popup {
+    position: fixed !important;
+    z-index: 999999 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+}
+
+.form-icon {
+    font-size: 1.25rem;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem;
+    line-height: 1;
+}
+
+/* Form icon specific enhancements */
+.form-icon.fas,
+.form-icon.far,
+.form-icon.fab,
+.form-icon.fa {
+    font-family: "Font Awesome 5 Free", "Font Awesome 5 Pro", "Font Awesome 6 Free", "Font Awesome 6 Pro" !important;
+}
+
+/* Ensure proper alignment with labels */
+.form-label .form-icon {
+    margin-right: 0.75rem;
+}
+
+
+
+/* Enhanced btn-clear positioning for all input types */
+.btn-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all 0.2s ease;
+}
+
+.btn-clear:hover {
+    color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.btn-clear:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+}
+
+/* Special positioning for textarea clear buttons */
+.input-wrapper textarea+.btn-clear {
+    top: 12px;
+    transform: none;
+}
+
+/* Ensure input-wrapper has proper positioning context */
+.input-wrapper {
+    position: relative;
+    display: block;
+}
+
+/* Adjust input padding to make room for clear button */
+.input-wrapper input,
+.input-wrapper textarea {
+    padding-right: 35px !important;
+}
+
+/* Dark mode support for btn-clear */
+html[data-bs-theme=dark] .btn-clear {
+    color: #adb5bd;
+}
+
+html[data-bs-theme=dark] .btn-clear:hover {
+    color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.2);
+}
+
+.form-header-icon {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+    color: #3699FF;
+}
+
+.alert-wrapper {
+    margin-top: 0.5rem;
+}
+
+.alert-danger {
+    background-color: rgba(253, 57, 122, 0.1);
+    border-color: rgba(253, 57, 122, 0.2);
+    color: #fd397a;
+}
+
+
+.fd-timeline-wrapper {
+    background-color: #1f2937;
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+/* Ensure calendars pop over everything */
+.ne-calendar-container,
+.ne-calendar-header {
+    z-index: 999999 !important;
+    position: relative;
+}
+
+/* Quill editor toolbar & content background fix (applies globally for all components) */
+.ql-toolbar {
+    background-color: var(--bs-body-bg, #ffffff);
+    border-color: var(--bs-border-color, #e4e6ef);
+    border-radius: var(--border-radius, 0);
+}
+
+.ql-toolbar {
+    border-bottom: 1px solid var(--bs-border-color, #e4e6ef);
+    box-shadow: 0 1px 4px rgba(16, 24, 40, 0.08);
+}
+
+.ql-toolbar button {
+    border-color: transparent;
+    background-color: transparent;
+    color: var(--bs-body-color, #3f4254);
+}
+
+.ql-toolbar button svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    fill: currentColor;
+}
+
+.ql-toolbar button:hover {
+    background-color: rgba(22, 89, 239, 0.08);
+    color: var(--primary-color, #3699ff);
+}
+
+html[data-bs-theme=dark] .ql-toolbar {
+    background-color: #1f1f2b;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+html[data-bs-theme=dark] .ql-toolbar button {
+    color: #d7d7e0;
+}
+
+html[data-bs-theme=dark] .ql-toolbar button svg {
+    stroke: currentColor;
+    fill: currentColor;
+}
+
+html[data-bs-theme=dark] .ql-toolbar button:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.width-percent-100 {
+    width: 100%;
+}
+
+
+
+@keyframes glowing {
+    0% {
+        opacity: 0.3;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.3;
+    }
+}
+
+.glowing {
+    animation: glowing 2s infinite;
+}
+
+.root-initial-loader .overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(51, 51, 51, 0.8);
+    z-index: 99999 !important;
+    width: 100%;
+    height: 100%;
+}
+
+.root-initial-loader i {
+    position: absolute;
+    color: rgb(91, 167, 234);
+    z-index: 100000 !important;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.root-initial-loader .fa-spin-2x {
+    -webkit-animation: fa-spin 1s infinite linear;
+    animation: fa-spin 1s infinite linear;
+}
+
+ngx-spinner .loading-text {
+    font-weight: bold;
+    color: white;
+    font-size: 1.3em;
+}
+
+@media (max-width: 768px) {
+    .btn-md-icon {
+        margin-right: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    .app-container,
+    .container,
+    .container-fluid {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    .card.card-custom,
+    .card.gutter-b {
+        border-radius: 10px !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .card.card-custom > .card-body,
+    .card.gutter-b > .card-body,
+    .card-body {
+        padding: 0.85rem !important;
+    }
+
+    sub-header + div .card-body {
+        padding-top: 0.85rem !important;
+    }
+}
+
+
+html[data-bs-theme=dark] {
+    --kt-text-muted: #9D9DA6;
+    color: #ffffff;
+}
+
+html[data-bs-theme=dark] p,
+html[data-bs-theme=dark] span:not(.badge):not(.svg-icon):not(.menu-title),
+html[data-bs-theme=dark] div:not(.badge),
+html[data-bs-theme=dark] h1,
+html[data-bs-theme=dark] h2,
+html[data-bs-theme=dark] h3,
+html[data-bs-theme=dark] h4,
+html[data-bs-theme=dark] h5,
+html[data-bs-theme=dark] h6,
+html[data-bs-theme=dark] label,
+html[data-bs-theme=dark] .form-label {
+    color: #ffffff !important;
+}
+
+/* Fix for inner navigation menu in dark mode */
+html[data-bs-theme=dark] .menu-sub .menu-item .menu-link .menu-title {
+    color: #ffffff !important;
+}
+
+html[data-bs-theme=dark] .menu-sub .menu-item .menu-link .menu-text {
+    color: #ffffff !important;
+}
+
+html[data-bs-theme=dark] .aside-menu .menu-item .menu-link .menu-title,
+html[data-bs-theme=dark] .aside-menu .menu-item .menu-title {
+    color: #ffffff !important;
+}
+
+html[data-bs-theme=dark] .menu-item .menu-link .menu-title {
+    color: #ffffff !important;
+}
+
+html[data-bs-theme=dark] .menu-item .menu-title {
+    color: #ffffff !important;
+}
+
+html[data-bs-theme=dark] .menu-item .menu-section {
+    color: #ffffff !important;
+}
+
+html[data-bs-theme=dark] .form-control,
+html[data-bs-theme=dark] input,
+html[data-bs-theme=dark] select,
+html[data-bs-theme=dark] textarea {
+    color: #ffffff !important;
+}
+
+
+
+[data-kt-app-sidebar-hoverable=true][data-kt-app-sidebar-minimize=on] .app-sidebar:not(.animating) .menuSearchBarInput {
+    opacity: 0;
+}
+
+[data-kt-app-sidebar-hoverable=true][data-kt-app-sidebar-minimize=on] .app-sidebar:hover:not(.animating) .menuSearchBarInput {
+    opacity: 1;
+}
+
+/* Dark mode dropdown menu styles */
+html[data-bs-theme=dark] .dropdown-menu {
+    background-color: #1e1e2d !important;
+    border-color: #2b2b40 !important;
+    color: #ffffff !important;
+}
+
+
+html[data-bs-theme=dark] .dropdown-menu .dropdown-item {
+    color: #ffffff !important;
+}
+
+label.required:after {
+    content: "*";
+    color: var(--kt-form-label-color) !important;
+}
+
+
+li.breadcrumb-item::after {
+    padding-left: 0.5rem;
+}
+
+/*Style for Excel Operations Buttons */
+
+.dropdown-excel-operations a.no-padding {
+    padding: 0px !important;
+}
+
+.overflow-x-auto {
+    overflow-x: auto !important;
+    white-space: nowrap;
+}
+
+
+
+
+
+.app-dropdown {
+    background: #ffffff;
+    border: 1px solid rgb(206 198 198);
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, background-size 0.2s cubic-bezier(0.64, 0.09, 0.08, 1);
+    border-radius: 5px;
+}
+
+
+
+
+.app-paginator {
+    background: #ffffff;
+    color: rgba(0, 0, 0, 0.87);
+    border: solid #e4e4e4;
+    border-width: 0;
+    padding: 0.375rem 0.75rem;
+    border-radius: 4px;
+}
+
+
+.app-paginator .app-dropdown {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    height: 3rem;
+    width: 80px;
+    padding: 10px;
+}
+
+
+
+.mx-auto {
+    margin-right: auto !important;
+}
+
+.form-title {
+    padding: 1rem 4rem;
+    border-bottom: 1px solid #c1c1c1;
+}
+
+.default-container {
+    padding: 0px 10px 0px 10px !important;
+    margin: -45px 0px 0px 0px;
+}
+
+
+.table td>i {
+    color: var(--bs-green);
+    font-size: 18px;
+}
+
+
+
+
+
+
+.btnaction {
+
+    color: #102607a3;
+    border: 0px;
+    cursor: pointer;
+    font-size: 18px;
+    background-color: #ffffff00;
+}
+
+.btnaction:hover {
+    color: #102607;
+    background-color: #ffffff00;
+}
+
+.btnaction:focus {
+    color: #102607;
+    background-color: #ffffff00;
+}
+
+.btnaction:active {
+    color: #102607;
+    background-color: #ffffff00;
+}
+
+.btnaction:visited {
+    color: #102607;
+    background-color: #ffffff00;
+}
+
+.btnaction:link {
+    color: #102607;
+    background-color: #ffffff00;
+}
+
+/* Dark mode pagination styles */
+html[data-bs-theme=dark] .app-paginator {
+    background-color: #1e1e2d !important;
+    color: #ffffff !important;
+    border-color: #2b2b40 !important;
+}
+
+html[data-bs-theme=dark] .app-paginator .app-dropdown {
+    background-color: #1e1e2d !important;
+    border-color: #2b2b40 !important;
+}
+
+/* More specific pagination dark mode styles */
+html[data-bs-theme=dark] .page-numbers button,
+html[data-bs-theme=dark] .pagination-controls button {
+    background-color: #1e1e2d !important;
+    border-color: #2b2b40 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5) !important;
+}
+
+html[data-bs-theme=dark] .page-numbers button:hover:not(.active),
+html[data-bs-theme=dark] .pagination-controls button:hover:not(:disabled):not(.active) {
+    background-color: #2b2b40 !important;
+    color: #ffffff !important;
+}
+
+html[data-bs-theme=dark] .page-numbers button.active,
+html[data-bs-theme=dark] .pagination-controls button.active {
+    background-color: #009ef7 !important;
+    color: #ffffff !important;
+    border-color: #009ef7 !important;
+}
+
+html[data-bs-theme=dark] select,
+html[data-bs-theme=dark] #pageSize {
+    background-color: #1e1e2d !important;
+    border-color: #2b2b40 !important;
+    color: #ffffff !important;
+}
+
+/* Suktas Paginator Dark Mode (text/icons) */
+
+
+html[data-bs-theme=dark] .fs-16px,
+html[data-bs-theme=dark] .fs-16px .fw-bold {
+    color: #ffffff !important;
+}
+
+/* Additional specific pagination text colors for dark mode */
+html[data-bs-theme=dark] .pagination-controls label,
+html[data-bs-theme=dark] .pagination-controls span,
+html[data-bs-theme=dark] #pageSize option {
+    color: #ffffff !important;
+}
+
+html[data-bs-theme=dark] .pagination-controls .fa-duotone {
+    color: #ffffff !important;
+}
+
+/* Dark mode scrollbar styles */
+html[data-bs-theme=dark] ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+html[data-bs-theme=dark] ::-webkit-scrollbar-track {
+    background: #1e1e2d;
+    border-radius: 4px;
+}
+
+html[data-bs-theme=dark] ::-webkit-scrollbar-thumb {
+    background: #6b6b80;
+    /* Lighter color for better visibility */
+    border-radius: 4px;
+    border: 2px solid #1e1e2d;
+}
+
+html[data-bs-theme=dark] ::-webkit-scrollbar-thumb:hover {
+    background: #9898a3;
+    /* Even lighter on hover */
+}
+
+html[data-bs-theme=dark] ::-webkit-scrollbar-corner {
+    background: #1e1e2d;
+}
+
+html[data-bs-theme=dark] {
+    scrollbar-color: #6b6b80 #1e1e2d;
+    scrollbar-width: thin;
+}
+
+
+
+/* Form Control Spacing */
+
+/* Button Action Utilities - Common in many components */
+.btn-action {
+    color: #102607a3 !important;
+    border: 0px !important;
+    cursor: pointer !important;
+    font-size: 18px !important;
+    background-color: transparent !important;
+}
+
+.btn-action:hover,
+.btn-action:focus,
+.btn-action:active {
+    color: #102607 !important;
+    background-color: transparent !important;
+}
+
+/* Loading State Utilities */
+
+/* Animation Utilities */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    0% {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    0% {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideRight {
+    0% {
+        transform: translateX(-10px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideLeft {
+    0% {
+        transform: translateX(10px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes selectmove {
+    0% {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Visibility Utilities */
+.visible {
+    visibility: visible !important;
+}
+
+/* Float Utilities */
+.float-start {
+    float: left !important;
+}
+
+.float-end {
+    float: right !important;
+}
+
+/* Clearfix */
+
+
+/* AG Grid container */
+.ag-grid-container {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--ag-border-color, #dfe4ea);
+    border-radius: 8px;
+    background: var(--ag-background-color, #ffffff);
+}
+
+/* AG Grid Balham theme */
+
+
+.ag-theme-balham .ag-root-wrapper {
+    border: 1px solid var(--ag-border-color);
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.ag-theme-balham .ag-header {
+    border-bottom: 1px solid #cfd8e3;
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.ag-theme-balham .ag-header-cell,
+.ag-theme-balham .ag-header-group-cell {
+    border-right: 1px solid var(--ag-border-color);
+    font-weight: 700;
+}
+
+.ag-theme-balham .ag-header-cell-label {
+    gap: 0.25rem;
+}
+
+.ag-theme-balham .ag-header-cell-text {
+    color: var(--ag-header-foreground-color);
+    line-height: 1.2;
+    white-space: normal;
+}
+
+.ag-theme-balham .ag-cell {
+    align-items: center;
+    border-right: 1px solid var(--ag-row-border-color);
+    display: flex;
+    line-height: 1.35;
+}
+
+.ag-theme-balham .ag-row-hover {
+    color: #1f2937;
+}
+
+.ag-theme-balham .ag-row-selected::before {
+    background-color: var(--ag-selected-row-background-color);
+}
+
+.ag-theme-balham .ag-pinned-left-header,
+.ag-theme-balham .ag-pinned-left-cols-container,
+.ag-theme-balham .ag-pinned-right-header,
+.ag-theme-balham .ag-pinned-right-cols-container {
+    border-color: #cfd8e3;
+}
+
+.ag-theme-balham .ag-column-drop-horizontal,
+.ag-theme-balham .ag-header-cell-menu-button,
+.ag-theme-balham .ag-header-cell-filter-button {
+    display: none !important;
+}
+
+.ag-theme-balham .btnaction,
+.ag-theme-balham .btn-action {
+    align-items: center;
+    border-radius: 6px;
+    color: #475467 !important;
+    display: inline-flex;
+    height: 30px;
+    justify-content: center;
+    width: 30px;
+}
+
+.ag-theme-balham .btnaction:hover,
+.ag-theme-balham .btn-action:hover {
+    background-color: #eef7ff !important;
+    color: #1b84ff !important;
+}
+
+.ag-theme-balham .ag-paging-panel {
+    border-top: 1px solid var(--ag-border-color);
+    color: var(--ag-secondary-foreground-color);
+    min-height: 38px;
+}
+
+.ag-theme-balham .ag-body-horizontal-scroll,
+.ag-theme-balham .ag-body-vertical-scroll {
+    scrollbar-color: #aab4c2 #eef2f6;
+    scrollbar-width: thin;
+}
+
+.ag-theme-balham .ag-body-horizontal-scroll::-webkit-scrollbar,
+.ag-theme-balham .ag-body-vertical-scroll::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+}
+
+.ag-theme-balham .ag-body-horizontal-scroll::-webkit-scrollbar-track,
+.ag-theme-balham .ag-body-vertical-scroll::-webkit-scrollbar-track {
+    background: #eef2f6;
+}
+
+.ag-theme-balham .ag-body-horizontal-scroll::-webkit-scrollbar-thumb,
+.ag-theme-balham .ag-body-vertical-scroll::-webkit-scrollbar-thumb {
+    background: #aab4c2;
+    border: 2px solid #eef2f6;
+    border-radius: 8px;
+}
+
+.ag-theme-balham .ag-body-horizontal-scroll::-webkit-scrollbar-thumb:hover,
+.ag-theme-balham .ag-body-vertical-scroll::-webkit-scrollbar-thumb:hover {
+    background: #7d8898;
+}
+
+html[data-bs-theme=dark] .ag-grid-container {
+    border-color: #2b3445;
+    background: #151923;
+}
+
+html[data-bs-theme=dark] .ag-theme-balham {
+    --ag-border-color: #2b3445;
+    --ag-row-border-color: #242c3a;
+    --ag-header-background-color: #202838;
+    --ag-header-foreground-color: #f4f7fb;
+    --ag-background-color: #151923;
+    --ag-foreground-color: #e6eaf0;
+    --ag-secondary-foreground-color: #b5bfcc;
+    --ag-data-color: #e6eaf0;
+    --ag-odd-row-background-color: #181e29;
+    --ag-row-hover-color: #223149;
+    --ag-selected-row-background-color: #12392f;
+    --ag-range-selection-border-color: #1bc5bd;
+    --ag-input-focus-border-color: #60a5fa;
+    --ag-checkbox-checked-color: #1bc5bd;
+}
+
+html[data-bs-theme=dark] .ag-theme-balham .ag-root-wrapper {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+}
+
+html[data-bs-theme=dark] .ag-theme-balham .ag-header {
+    border-bottom-color: #354052;
+    box-shadow: none;
+}
+
+html[data-bs-theme=dark] .ag-theme-balham .ag-row-hover {
+    color: #ffffff;
+}
+
+html[data-bs-theme=dark] .ag-theme-balham .btnaction,
+html[data-bs-theme=dark] .ag-theme-balham .btn-action {
+    color: #cbd5e1 !important;
+}
+
+html[data-bs-theme=dark] .ag-theme-balham .btnaction:hover,
+html[data-bs-theme=dark] .ag-theme-balham .btn-action:hover {
+    background-color: #223149 !important;
+    color: #93c5fd !important;
+}
+
+html[data-bs-theme=dark] .ag-theme-balham .ag-body-horizontal-scroll,
+html[data-bs-theme=dark] .ag-theme-balham .ag-body-vertical-scroll {
+    scrollbar-color: #64748b #1f2937;
+}
+
+html[data-bs-theme=dark] .ag-theme-balham .ag-body-horizontal-scroll::-webkit-scrollbar-track,
+html[data-bs-theme=dark] .ag-theme-balham .ag-body-vertical-scroll::-webkit-scrollbar-track {
+    background: #1f2937;
+}
+
+html[data-bs-theme=dark] .ag-theme-balham .ag-body-horizontal-scroll::-webkit-scrollbar-thumb,
+html[data-bs-theme=dark] .ag-theme-balham .ag-body-vertical-scroll::-webkit-scrollbar-thumb {
+    background: #64748b;
+    border-color: #1f2937;
+}
+
+html[data-bs-theme=dark] .ag-theme-balham .ag-body-horizontal-scroll::-webkit-scrollbar-thumb:hover,
+html[data-bs-theme=dark] .ag-theme-balham .ag-body-vertical-scroll::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .ag-grid-container,
+    .ag-theme-balham,
+    .ag-theme-balham .ag-root-wrapper {
+        border-radius: 6px;
+    }
+
+    .ag-theme-balham {
+        --ag-font-size: 12px;
+        --ag-header-height: 40px;
+        --ag-row-height: 38px;
+        max-width: 100%;
+    }
+
+    .ag-theme-balham .ag-header-cell,
+    .ag-theme-balham .ag-cell {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .ag-theme-balham .ag-header-cell-text {
+        font-size: 12px !important;
+        line-height: 1.2;
+    }
+
+    .ag-theme-balham .ag-cell {
+        font-size: 12px;
+        line-height: 1.25;
+    }
+
+    .ag-theme-balham .ag-selection-checkbox {
+        margin-right: 0 !important;
+    }
+
+    .ag-theme-balham .btnaction,
+    .ag-theme-balham .btn-action {
+        font-size: 16px;
+        height: 32px;
+        width: 32px;
+    }
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+    -webkit-appearance: textfield;
+    appearance: textfield;
+    -webkit-text-security: none;
+    -moz-text-security: none;
+    -ms-text-security: none;
+    -o-text-security: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -ms-appearance: none;
+    -o-appearance: none;
+    -webkit-text-security: none;
+    -moz-text-security: none;
+    -ms-text-security: none;
+    -o-text-security: none;
+}

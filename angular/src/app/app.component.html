@@ -1,0 +1,61 @@
+<div [ngClass]="{ 'subscription-bar-visible': subscriptionStatusBarVisible() }" class="d-flex flex-column flex-root">
+    @if (theme == 'default') {
+        <default-layout></default-layout>
+    }
+    @if (theme == 'theme2') {
+        <theme2-layout></theme2-layout>
+    }
+    @if (theme == 'theme3') {
+        <theme3-layout></theme3-layout>
+    }
+    @if (theme == 'theme4') {
+        <theme4-layout></theme4-layout>
+    }
+    @if (theme == 'theme5') {
+        <theme5-layout></theme5-layout>
+    }
+    @if (theme == 'theme6') {
+        <theme6-layout></theme6-layout>
+    }
+    @if (theme == 'theme7') {
+        <theme7-layout></theme7-layout>
+    }
+    @if (theme == 'theme8') {
+        <theme8-layout class="d-flex flex-column flex-row-fluid"></theme8-layout>
+    }
+    @if (theme == 'theme9') {
+        <theme9-layout></theme9-layout>
+    }
+    @if (theme == 'theme10') {
+        <theme10-layout class="d-flex flex-column flex-row-fluid"></theme10-layout>
+    }
+    @if (theme == 'theme11') {
+        <theme11-layout></theme11-layout>
+    }
+    @if (theme == 'theme12') {
+        <theme12-layout class="d-flex flex-column flex-row-fluid"></theme12-layout>
+    }
+    @if (theme == 'theme13') {
+        <theme13-layout class="d-flex flex-column flex-row-fluid"></theme13-layout>
+    }
+</div>
+<kt-scroll-top></kt-scroll-top>
+@if (!installationMode) {
+    <linkedAccountsModal #linkedAccountsModal (modalClose)="getRecentlyLinkedUsers()"></linkedAccountsModal>
+}
+<userDelegationsModal #userDelegationsModal></userDelegationsModal>
+<changePasswordModal #changePasswordModal></changePasswordModal>
+<changeProfilePictureModal #changeProfilePictureModal></changeProfilePictureModal>
+<mySettingsModal #mySettingsModal (modalSave)="onMySettingsModalSaved()"></mySettingsModal>
+<notificationSettingsModal #notificationSettingsModal></notificationSettingsModal>
+<addFriendModal #addFriendModal></addFriendModal>
+@if (!installationMode) {
+    <chat-bar #chatBarComponent [addFriendModal]="addFriendModal"></chat-bar>
+}
+@if (!installationMode && isQuickThemeSelectEnabled) {
+    <theme-selection-panel #themeSelectionPanelComponent></theme-selection-panel>
+}
+@if (IsSessionTimeOutEnabled) {
+    <session-timeout #sessionTimeout></session-timeout>
+}
+<app-update-notification></app-update-notification>

@@ -1,0 +1,185 @@
+<div *ngIf="dialog && active">
+    <div
+        #createOrEditModal="bs-modal"
+        (onHidden)="onModalHidden()"
+        [config]="{ backdrop: 'static', keyboard: false }"
+        bsModal
+        class="modal fade"
+        role="dialog"
+        tabindex="-1"
+    >
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header px-6 py-3">
+                    <h5 class="modal-title fw-bold mb-0">{{ l(this.id ? 'Edit Tax' : 'Create Tax') }}</h5>
+                    <button
+                        (click)="close()"
+                        [disabled]="saving"
+                        aria-label="Close"
+                        class="btn-close"
+                        type="button"
+                    ></button>
+                </div>
+                <div class="modal-body px-6 py-4">
+                    <ng-container *ngTemplateOutlet="taxFormContent"></ng-container>
+                </div>
+                <ng-container *ngTemplateOutlet="dialogActions"></ng-container>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div [@routerTransition] *ngIf="!dialog && serialNumber === 0">
+    <sub-header [description]="" [title]="title | localize">
+        <div role="actions">
+            <button *ngIf="this.id" (click)="clearForm(id)" class="btn btn-sm btn-light-danger fw-bold me-2">
+                <i class="fa-duotone fa-trash fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                    <span class="path4"></span>
+                </i>
+            </button>
+            <button
+                (click)="save()"
+                [buttonBusy]="saving"
+                [disabled]="taxForm.invalid"
+                class="btn btn-sm fw-bold btn-primary me-2"
+                id="save"
+                type="submit"
+            >
+                <i class="fa-duotone fa-circle-plus fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l(this.id ? 'Update' : 'Save') }}
+            </button>
+            <button (click)="close()" class="btn btn-sm fw-bold btn-light-success" id="cancel">
+                <i class="fa-duotone fa-circle-xmark fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l('Cancel') }}
+            </button>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <ng-container *ngTemplateOutlet="taxFormContent"></ng-container>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #taxFormContent>
+    <form [formGroup]="taxForm" autocomplete="off">
+        <div class="row">
+            <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
+                <div>
+                    <label class="required form-label" for="name">{{ l('Name') }}</label>
+                    <input
+                        #names
+                        (input)="titleCase(taxForm, $event.target.value, 'name')"
+                        (keyup)="gotoRate($event)"
+                        [ngClass]="
+                            taxForm.get('name').invalid &&
+                            (taxForm.get('name').dirty || taxForm.get('name').touched)
+                                ? 'is-danger'
+                                : 'is-success'
+                        "
+                        class="form-control"
+                        formControlName="name"
+                        id="name"
+                        name="name"
+                        type="text"
+                    />
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
+                <div>
+                    <label class="required form-label" for="rate">{{ l('Rate') }}</label>
+                    <input
+                        #rate
+                        (focus)="$event.target.select()"
+                        (keyup)="gotoDescription($event)"
+                        [ngClass]="
+                            taxForm.get('rate').invalid &&
+                            (taxForm.get('rate').dirty || taxForm.get('rate').touched)
+                                ? 'is-danger'
+                                : 'is-success'
+                        "
+                        class="form-control"
+                        formControlName="rate"
+                        id="rate"
+                        min="0"
+                        name="rate"
+                        onkeydown="return event.keyCode !== 69 && event.keyCode !== 189"
+                        type="number"
+                    />
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-6 col-md-6 col-12 mb-3">
+                <div>
+                    <label class="form-label" for="description">{{ l('Description') }}</label>
+                    <textarea
+                        #description
+                        (keyup)="onSaveOnInput($event)"
+                        class="form-control"
+                        formControlName="description"
+                        id="description"
+                        name="description"
+                        type="textbox"
+                    ></textarea>
+                </div>
+            </div>
+            <div class="col-12 mb-2">
+                <div class="form-check form-switch form-check-custom form-check-solid">
+                    <input
+                        class="form-check-input"
+                        formControlName="isActive"
+                        id="isActive"
+                        name="isActive"
+                        type="checkbox"
+                    />
+                    <label class="form-check-label ms-2" for="isActive">{{ l('Active') }}</label>
+                </div>
+            </div>
+        </div>
+    </form>
+</ng-template>
+
+<ng-template #dialogActions>
+    <div class="modal-footer justify-content-between px-6 py-4">
+        <button *ngIf="this.id" (click)="clearForm(id)" class="btn btn-sm btn-light-danger fw-bold" type="button">
+            <i class="fas fa-trash-alt me-1"></i>
+            {{ l('Delete') }}
+        </button>
+        <div class="d-flex flex-wrap gap-2 ms-auto">
+            <button
+                (click)="save()"
+                [buttonBusy]="saving"
+                [disabled]="!taxForm || taxForm.invalid"
+                class="btn btn-sm fw-bold btn-primary"
+                type="submit"
+            >
+                <i class="fas fa-save me-1"></i>
+                {{ l(this.id ? 'Update' : 'Save') }}
+            </button>
+            <button (click)="close()" class="btn btn-sm fw-bold btn-light-success" type="button">
+                <i class="fas fa-times-circle me-1"></i>
+                {{ l('Cancel') }}
+            </button>
+        </div>
+    </div>
+</ng-template>
+
+<erp-key-event
+    (closeEvent)="keyClose($event)"
+    (deletEvent)="clearForm($event)"
+    (saveEvent)="keySave($event)"
+    [id]="this.id ? this.id : null"
+></erp-key-event>

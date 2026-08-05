@@ -1,0 +1,232 @@
+<div [@routerTransition]>
+    <sub-header [description]="" [title]="title | localize">
+        <div role="actions">
+            <button
+                class="btn btn-sm fw-bold btn-primary me-2"
+                id="save"
+                type="button"
+                [buttonBusy]="saving"
+                [disabled]="form.invalid || saving"
+                (click)="save()"
+            >
+                <i class="fa-duotone fa-circle-plus fs-2"></i>
+                {{ l('Save') }}
+            </button>
+
+            <button class="btn btn-sm fw-bold btn-light-success" id="cancel" type="button" (click)="close()">
+                <i class="fa-duotone fa-circle-xmark fs-2"></i>
+                {{ l('Cancel') }}
+            </button>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <form [formGroup]="form" autocomplete="off">
+                    <div class="container-fluid px-0">
+                        <div class="row">
+                            <div class="col-lg-3 col-xl-3 col-md-4 col-sm-12">
+                                <div class="mb-3">
+                                    <label class="required form-label" for="dateMiti">{{ l('Date-Miti') }}</label>
+                                    <ne-datepicker
+                                        [dateFormat]="'yyyy/MM/dd'"
+                                        [formControl]="form.controls['dateMiti']"
+                                        [placeholder]="'yyyy/MM/dd'"
+                                        [todayBtn]="true"
+                                        id="dateMiti"
+                                        language="en"
+                                    ></ne-datepicker>
+                                    <div
+                                        *ngIf="
+                                            form.get('dateMiti').invalid &&
+                                            (form.get('dateMiti').dirty || form.get('dateMiti').touched)
+                                        "
+                                    >
+                                        <div class="alert alert-danger alert-height mt-1" role="alert">
+                                            <div class="alert-div">DateMiti is required!</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-xl-3 col-md-4 col-sm-12">
+                                <div class="mb-3">
+                                    <label class="form-label" for="voucherNo">{{ l('Voucher No') }}</label>
+                                    <input class="form-control" id="voucherNo" formControlName="voucherNo" readonly />
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-xl-6 col-md-4 col-sm-12">
+                                <div class="mb-3">
+                                    <label class="form-label" for="description">{{ l('Description') }}</label>
+                                    <input
+                                        class="form-control"
+                                        id="description"
+                                        type="text"
+                                        formControlName="description"
+                                        maxlength="250"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card shadow-sm my-4 p-2 stock-used-detail-card">
+                            <div class="card-header">
+                                <h3 class="card-title fw-bold">{{ l('Stock Used Details') }}</h3>
+                                <div class="card-toolbar">
+                                    <button
+                                        class="btn btn-sm btn-outline btn-outline-success btn-active-light-success"
+                                        id="add"
+                                        type="button"
+                                        [disabled]="linesArray.invalid"
+                                        (click)="addLine()"
+                                    >
+                                        <i class="fa-duotone fa-grid-2-plus fs-2"></i>
+                                        {{ l('Add') }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive stock-used-table-wrap">
+                                <table
+                                    class="table table-row-dashed table-row-gray-300 table-striped stock-used-table"
+                                    formArrayName="lines"
+                                >
+                                    <thead class="bg-tableHead">
+                                        <tr class="text-center">
+                                            <th class="min-w-50px ps-2">S.N.</th>
+                                            <th class="min-w-250px">{{ l('Raw Material') }}</th>
+                                            <th class="min-w-180px">{{ l('Unit') }}</th>
+                                            <th class="min-w-120px">{{ l('Qty') }}</th>
+                                            <th class="min-w-120px">{{ l('Rate') }}</th>
+                                            <th class="min-w-130px">{{ l('Amount') }}</th>
+                                            <th class="min-w-220px">{{ l('Reason') }}</th>
+                                            <th class="min-w-60px">{{ l('Del') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr
+                                            *ngFor="let line of lineControls; let i = index"
+                                            [formGroupName]="i"
+                                            class="text-center tablebordered"
+                                        >
+                                            <td class="sn_css">{{ i + 1 }}</td>
+                                            <td>
+                                                <ng-select
+                                                    [items]="rawMaterials"
+                                                    bindLabel="displayName"
+                                                    bindValue="id"
+                                                    appendTo="body"
+                                                    class="text-capitalize"
+                                                    formControlName="productId"
+                                                    placeholder="Select raw material"
+                                                    required
+                                                ></ng-select>
+                                                <div *ngIf="isInvalid(line, 'productId')">
+                                                    <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                        <div class="alert-div">Required!</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <ng-select
+                                                    [items]="units"
+                                                    bindLabel="displayName"
+                                                    bindValue="id"
+                                                    appendTo="body"
+                                                    formControlName="unitId"
+                                                    placeholder="Select unit"
+                                                    required
+                                                ></ng-select>
+                                                <div *ngIf="isInvalid(line, 'unitId')">
+                                                    <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                        <div class="alert-div">Required!</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    class="form-control text-end"
+                                                    type="number"
+                                                    min="0.000001"
+                                                    formControlName="qty"
+                                                />
+                                                <div *ngIf="isInvalid(line, 'qty')">
+                                                    <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                        <div class="alert-div">Qty must be greater than zero!</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    class="form-control text-end"
+                                                    type="number"
+                                                    min="0"
+                                                    formControlName="rate"
+                                                />
+                                                <div *ngIf="isInvalid(line, 'rate')">
+                                                    <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                        <div class="alert-div">Rate cannot be negative!</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input
+                                                    class="form-control text-end"
+                                                    type="text"
+                                                    [value]="getLineAmount(line) | number: '1.2-2'"
+                                                    readonly
+                                                />
+                                            </td>
+                                            <td>
+                                                <input class="form-control" type="text" formControlName="reason" />
+                                            </td>
+                                            <td>
+                                                <button
+                                                    class="btn btn-sm btn-light-danger"
+                                                    type="button"
+                                                    (click)="removeLine(i)"
+                                                    tooltip="{{ 'Delete' | localize }}"
+                                                >
+                                                    <i class="fa-duotone fa-trash fs-4"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-lg-8 col-xl-8 col-md-7 col-sm-12">
+                                <div class="stock-used-note">
+                                    <span class="restaurant-status restaurant-status-primary">
+                                        {{ l('Stock Issue') }}
+                                    </span>
+                                    <span class="restaurant-muted">
+                                        {{ l('Raw material stock will be reduced after saving.') }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-xl-4 col-md-5 col-sm-12">
+                                <div class="stock-used-total-box">
+                                    <div>
+                                        <span class="restaurant-label">{{ l('Total Qty') }}</span>
+                                        <strong>{{ totalQty | number: '1.2-3' }}</strong>
+                                    </div>
+                                    <div>
+                                        <span class="restaurant-label">{{ l('Total Amount') }}</span>
+                                        <strong>{{ totalAmount | number: '1.2-2' }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-keyboard-shortcuts [shortcuts]="shortcuts"></ng-keyboard-shortcuts>

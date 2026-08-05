@@ -1,0 +1,145 @@
+<div [@routerTransition]>
+    <sub-header [description]="'TenantsHeaderInfo' | localize" [title]="'Tenants' | localize">
+        <div role="actions">
+            @if ('Pages.Tenants.Create' | permission) {
+                <button (click)="createTenant()" class="btn btn-sm btn-primary">
+                    <i class="fa fa-plus btn-md-icon"></i>
+                    <span class="d-none d-md-inline-block">
+                        {{ 'CreateNewTenant' | localize }}
+                    </span>
+                </button>
+            }
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <div class="form">
+                    <form (submit)="$event.preventDefault(); loadPage(currentPage)" autocomplete="new-password">
+                        <div class="form-body">
+                            <div class="row mb-4">
+                                <div class="col-xl-6">
+                                    <label class="form-label" for="TenantNameOrTenancyCode">
+                                        {{ 'TenantNameOrTenancyCode' | localize }}
+                                    </label>
+                                    <div class="input-group">
+                                        <input
+                                            [(ngModel)]="filters.filterText"
+                                            class="form-control"
+                                            id="TenantNameOrTenancyCode"
+                                            name="filterText"
+                                            placeholder="{{ 'SearchWithThreeDot' | localize }}"
+                                            type="text"
+                                        />
+                                        <button class="btn btn-sm btn-primary" type="submit">
+                                            <i [attr.aria-label]="l('Search')" class="fa-solid fa-magnifying-glass"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <label class="form-label" for="EditionDropdown">{{ 'Edition' | localize }}</label>
+                                    <edition-combo [(selectedEdition)]="filters.selectedEditionId"></edition-combo>
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col-xl-6">
+                                    <label class="form-check form-check-solid form-label py-1 mb-1">
+                                        <input
+                                            [(ngModel)]="filters.subscriptionEndDateRangeActive"
+                                            class="form-check-input"
+                                            id="TenantsTable_SubscriptionEndDateRangeActive"
+                                            name="SubscriptionEndDateRangeActive"
+                                            type="checkbox"
+                                            value="true"
+                                        />
+                                        <span class="form-check-label">
+                                            {{ 'SubscriptionEndDate' | localize }}
+                                        </span>
+                                    </label>
+                                    <input
+                                        #drpSubscriptionEndDateRange="bsDaterangepicker"
+                                        [(date)]="subscriptionDateRange"
+                                        [attr.disabled]="!filters.subscriptionEndDateRangeActive ? 'disabled' : null"
+                                        bsDaterangepicker
+                                        class="form-control"
+                                        dateRangePickerLuxonModifier
+                                        name="SubscriptionEndDateRange"
+                                    />
+                                </div>
+                                <div class="col-xl-6">
+                                    <label class="form-check form-check-solid form-label py-1 mb-1">
+                                        <input
+                                            [(ngModel)]="filters.creationDateRangeActive"
+                                            class="form-check-input"
+                                            id="TenantsTable_CreationDateRangeActive"
+                                            name="CreationDateRangeActive"
+                                            type="checkbox"
+                                            value="true"
+                                        />
+                                        <span class="form-check-label">
+                                            {{ 'CreationTime' | localize }}
+                                        </span>
+                                    </label>
+                                    <input
+                                        #drpCreationDateRange="bsDaterangepicker"
+                                        [(date)]="creationDateRange"
+                                        [attr.disabled]="!filters.creationDateRangeActive ? 'disabled' : null"
+                                        bsDaterangepicker
+                                        class="form-control"
+                                        dateRangePickerLuxonModifier
+                                        name="CreationDateRange"
+                                    />
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col-xl-12 text-end">
+                                    <button
+                                        (click)="loadPage(currentPage)"
+                                        class="btn btn-sm btn-primary"
+                                        name="RefreshButton"
+                                        type="button"
+                                    >
+                                        <i class="fa fa-sync btn-md-icon"></i>
+                                        <span class="d-none d-md-inline-block">
+                                            {{ 'Refresh' | localize }}
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="row align-items-center">
+                    <div class="ag-theme-balham">
+                        <ag-grid-angular
+                            [autoGroupColumnDef]="autoGroupColumnDef"
+                            [columnDefs]="columnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [enableBrowserTooltips]="true"
+                            [getContextMenuItems]="getCustomContextMenuItems"
+                            [gridOptions]="gridOptions"
+                            [groupDefaultExpanded]="groupDefaultExpanded"
+                            [rowData]="rowData"
+                            [rowGroupPanelShow]="rowGroupPanelShow"
+                            [style.height.px]="screenHeight"
+                            style="width: 100%"
+                        ></ag-grid-angular>
+                    </div>
+                    <app-pagination
+                        (pageChange)="onPageChange($event)"
+                        (pageSizeChange)="onPageSizeChange($event)"
+                        [currentPage]="currentPage"
+                        [pageSizeOptions]="pageSizeOptions"
+                        [pageSize]="pageSize"
+                        [totalRecords]="totalRecords"
+                    ></app-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+    <createTenantModal #createTenantModal (modalSave)="loadPage(currentPage)"></createTenantModal>
+    <editTenantModal #editTenantModal (modalSave)="loadPage(currentPage)"></editTenantModal>
+    <tenantFeaturesModal #tenantFeaturesModal></tenantFeaturesModal>
+    <commonLookupModal #impersonateUserLookupModal (itemSelected)="impersonateUser($event)"></commonLookupModal>
+    <entityTypeHistoryModal #entityTypeHistoryModal></entityTypeHistoryModal>
+</div>

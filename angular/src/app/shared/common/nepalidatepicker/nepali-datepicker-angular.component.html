@@ -1,0 +1,265 @@
+<div #nepaliDatePicker [ngClass]="{ dark: darkTheme }" class="nepali-date-picker">
+    <input
+        (blur)="validateManualInput()"
+        (focus)="!dateReadonly && open()"
+        (keyup.enter)="validateManualInput()"
+        [(ngModel)]="formattedDate"
+        [disabled]="dateReadonly"
+        [ngClass]="{
+            'np_datepicker_input--error': isError,
+            'np_datepicker_input--active': isOpen,
+        }"
+        [placeholder]="placeholder"
+        [readonly]="dateReadonly"
+        aria-hidden="true"
+        class="np_datepicker_input"
+        type="text"
+    />
+    <a
+        (click)="!dateReadonly && toggleOpen()"
+        [ngClass]="{
+            active: isOpen,
+            disabled: dateReadonly,
+        }"
+        [style.opacity]="dateReadonly ? '0.5' : '1'"
+        [style.pointer-events]="dateReadonly ? 'none' : 'auto'"
+        class="form-icon"
+    >
+        <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M152 64H296V24C296 10.75 306.7 0 320 0C333.3 0 344 10.75 344 24V64H384C419.3 64 448 92.65 448 128V448C448 483.3 419.3 512 384 512H64C28.65 512 0 483.3 0 448V128C0 92.65 28.65 64 64 64H104V24C104 10.75 114.7 0 128 0C141.3 0 152 10.75 152 24V64zM48 448C48 456.8 55.16 464 64 464H384C392.8 464 400 456.8 400 448V192H48V448z"
+            />
+        </svg>
+    </a>
+    <ng-container *ngIf="isOpen" [ngTemplateOutlet]="datePicker"></ng-container>
+</div>
+<!--.nepali-date-picker-->
+<ng-template #datePicker>
+    <div class="datepicker__container">
+        <div class="datepicker__options-container">
+            <a (click)="prevMonth()" class="prev-month">
+                <svg viewBox="0 0 320 512" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M224 480c-8.188 0-16.38-3.125-22.62-9.375l-192-192c-12.5-12.5-12.5-32.75 0-45.25l192-192c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25L77.25 256l169.4 169.4c12.5 12.5 12.5 32.75 0 45.25C240.4 476.9 232.2 480 224 480z"
+                    />
+                </svg>
+            </a>
+            <span class="datepicker__options-month-container">
+                <select (change)="selectMonth($event)" class="datepicker__container__select">
+                    <option
+                        *ngFor="let month of monthsMapping[language][monthDisplayType]; index as i"
+                        [selected]="i === selectedMonthIndex"
+                        [value]="month"
+                    >
+                        {{ month }}
+                    </option>
+                </select>
+            </span>
+            <span class="datepicker__options-year-container">
+                <select (change)="selectYear($event)" class="datepicker__container__select">
+                    <option *ngFor="let year of years; index as i" [selected]="year === selectedYear" [value]="year">
+                        {{ year | toNp: language : 'number' }}
+                    </option>
+                </select>
+            </span>
+            <span *ngIf="hasMultipleCalendarView" class="datepicker__options-year-container">
+                <select (change)="selectCalendarView($event)" class="datepicker__container__select">
+                    <option
+                        *ngFor="let type of calendarType"
+                        [selected]="type.value === calendarView"
+                        [value]="type.value"
+                    >
+                        {{ type.label }}
+                    </option>
+                </select>
+            </span>
+            <a (click)="nextMonth()" class="next-month">
+                <svg viewBox="0 0 320 512" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M96 480c-8.188 0-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L242.8 256L73.38 86.63c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l192 192c12.5 12.5 12.5 32.75 0 45.25l-192 192C112.4 476.9 104.2 480 96 480z"
+                    />
+                </svg>
+            </a>
+        </div>
+        <div class="datepicker__days-container">
+            <div *ngFor="let day of daysMapping[language][dayDisplayType]; index as i" class="datepicker__days">
+                <div class="datepicker__weekday">{{ day }}</div>
+                <ng-container
+                    [ngTemplateOutlet]="calendarView === CalendarType.BS ? dateView : englishCalendar"
+                ></ng-container>
+                <ng-template #dateView>
+                    <div *ngFor="let date of currentMonthData[i]" class="datepicker__date-container">
+                        <div *ngIf="!maxDate && !minDate; else viewWithDisabledDate">
+                            <div
+                                (click)="selectDate(date)"
+                                *ngIf="date"
+                                [class.datepicker__date--active]="
+                                    selectedDate &&
+                                    date === selectedDate.day &&
+                                    currentNepaliDate.month === selectedDate.month &&
+                                    currentNepaliDate.year === selectedDate.year
+                                "
+                                [class.datepicker__date--current-day]="
+                                    date === nepaliDateToday.day &&
+                                    currentNepaliDate.month === nepaliDateToday.month &&
+                                    currentNepaliDate.year === nepaliDateToday.year
+                                "
+                                class="datepicker__date"
+                            >
+                                {{ date | toNp: language : 'number' }}
+                            </div>
+                            <div *ngIf="!date" class="datepicker__date--initial-empty">
+                                <span>&nbsp;</span>
+                            </div>
+                        </div>
+                        <ng-template #viewWithDisabledDate>
+                            <div
+                                (click)="selectDate(date)"
+                                *ngIf="
+                                    date &&
+                                        ((minDate &&
+                                            !maxDate &&
+                                            nepaliMinDate.year * 365 + nepaliMinDate.month * 30 + nepaliMinDate.day <=
+                                                this.currentNepaliDate.year * 365 +
+                                                    this.currentNepaliDate.month * 30 +
+                                                    date) ||
+                                            (maxDate &&
+                                                !minDate &&
+                                                nepaliMaxDate.year * 365 +
+                                                    nepaliMaxDate.month * 30 +
+                                                    nepaliMaxDate.day >=
+                                                    this.currentNepaliDate.year * 365 +
+                                                        this.currentNepaliDate.month * 30 +
+                                                        date) ||
+                                            (maxDate &&
+                                                minDate &&
+                                                nepaliMaxDate.year * 365 +
+                                                    nepaliMaxDate.month * 30 +
+                                                    nepaliMaxDate.day >=
+                                                    this.currentNepaliDate.year * 365 +
+                                                        this.currentNepaliDate.month * 30 +
+                                                        date &&
+                                                nepaliMinDate.year * 365 +
+                                                    nepaliMinDate.month * 30 +
+                                                    nepaliMinDate.day <=
+                                                    this.currentNepaliDate.year * 365 +
+                                                        this.currentNepaliDate.month * 30 +
+                                                        date));
+                                    else disabledDates
+                                "
+                                [class.datepicker__date--active]="
+                                    selectedDate &&
+                                    date === selectedDate.day &&
+                                    currentNepaliDate.month === selectedDate.month &&
+                                    currentNepaliDate.year === selectedDate.year
+                                "
+                                [class.datepicker__date--current-day]="
+                                    date === nepaliDateToday.day &&
+                                    currentNepaliDate.month === nepaliDateToday.month &&
+                                    currentNepaliDate.year === nepaliDateToday.year
+                                "
+                                class="datepicker__date"
+                            >
+                                {{ date | toNp: language : 'number' }}
+                            </div>
+                            <ng-template #disabledDates>
+                                <div *ngIf="date" class="datepicker__date datepicker__date--disabled">
+                                    {{ date | toNp: language : 'number' }}
+                                </div>
+                                <div *ngIf="!date">
+                                    <span>&nbsp;</span>
+                                </div>
+                            </ng-template>
+                        </ng-template>
+                    </div>
+                </ng-template>
+                <ng-template #englishCalendar>
+                    <div *ngFor="let date of currentMonthData[i]" class="datepicker__date-container">
+                        <div *ngIf="!maxDate && !minDate; else viewWithDisabledDate">
+                            <div
+                                (click)="selectDate(date)"
+                                *ngIf="date"
+                                [class.datepicker__date--active]="
+                                    englishSelectedDate &&
+                                    date === englishSelectedDate.day &&
+                                    englishCurrentDate.month === englishSelectedDate.month &&
+                                    englishCurrentDate.year === englishSelectedDate.year
+                                "
+                                [class.datepicker__date--current-day]="
+                                    date === englishDateToday.day &&
+                                    englishCurrentDate.month === englishDateToday.month &&
+                                    englishCurrentDate.year === englishDateToday.year
+                                "
+                                class="datepicker__date"
+                            >
+                                {{ date | toNp: language : 'number' }}
+                            </div>
+                            <div *ngIf="!date" class="datepicker__date--initial-empty">
+                                <span>&nbsp;</span>
+                            </div>
+                        </div>
+                        <ng-template #viewWithDisabledDate>
+                            <div
+                                (click)="selectDate(date)"
+                                *ngIf="
+                                    date &&
+                                        ((minDate &&
+                                            !maxDate &&
+                                            englishMinDate.year * 365 +
+                                                englishMinDate.month * 30 +
+                                                englishMinDate.day <=
+                                                englishCurrentDate.year * 365 + englishCurrentDate.month * 30 + date) ||
+                                            (maxDate &&
+                                                !minDate &&
+                                                englishMaxDate.year * 365 +
+                                                    englishMaxDate.month * 30 +
+                                                    englishMaxDate.day >=
+                                                    englishCurrentDate.year * 365 +
+                                                        englishCurrentDate.month * 30 +
+                                                        date) ||
+                                            (maxDate &&
+                                                minDate &&
+                                                englishMaxDate.year * 365 +
+                                                    englishMaxDate.month * 30 +
+                                                    englishMaxDate.day >=
+                                                    englishCurrentDate.year * 365 +
+                                                        englishCurrentDate.month * 30 +
+                                                        date &&
+                                                englishMinDate.year * 365 +
+                                                    englishMinDate.month * 30 +
+                                                    englishMinDate.day <=
+                                                    englishCurrentDate.year * 365 +
+                                                        englishCurrentDate.month * 30 +
+                                                        date));
+                                    else disabledDates
+                                "
+                                [class.datepicker__date--active]="
+                                    englishSelectedDate &&
+                                    date === englishSelectedDate.day &&
+                                    englishCurrentDate.month === englishSelectedDate.month &&
+                                    englishCurrentDate.year === englishSelectedDate.year
+                                "
+                                [class.datepicker__date--current-day]="
+                                    date === englishDateToday.day &&
+                                    englishCurrentDate.month === englishDateToday.month &&
+                                    englishCurrentDate.year === englishDateToday.year
+                                "
+                                class="datepicker__date"
+                            >
+                                {{ date | toNp: language : 'number' }}
+                            </div>
+                            <ng-template #disabledDates>
+                                <div *ngIf="date" class="datepicker__date datepicker__date--disabled">
+                                    {{ date | toNp: language : 'number' }}
+                                </div>
+                                <div *ngIf="!date">
+                                    <span>&nbsp;</span>
+                                </div>
+                            </ng-template>
+                        </ng-template>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</ng-template>

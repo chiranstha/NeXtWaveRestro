@@ -1,0 +1,106 @@
+<div
+    #createOrEditModal="bs-modal"
+    [config]="{ backdrop: 'static', keyboard: !saving }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="createOrEditModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            @if (active) {
+                <form #editForm="ngForm" (ngSubmit)="save()" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            @if (language.id) {
+                                <span>{{ 'EditLanguage' | localize }}: {{ language.name }}</span>
+                            }
+                            @if (!language.id) {
+                                <span>{{ 'CreateNewLanguage' | localize }}</span>
+                            }
+                        </h4>
+                        <button
+                            (click)="close()"
+                            [attr.aria-label]="l('Close')"
+                            [disabled]="saving"
+                            class="btn-close"
+                            type="button"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-5">
+                            <app-select
+                                #languageCombobox
+                                [(ngModel)]="language.name"
+                                [appendTo]="null"
+                                [filter]="true"
+                                [options]="languageNamesSelectItems"
+                                [style]="{ width: '100%' }"
+                                [virtualScrollItemSize]="30"
+                                [virtualScroll]="true"
+                                name="languageName"
+                            ></app-select>
+                            <validation-messages [formCtrl]="languageCombobox"></validation-messages>
+                        </div>
+                        <div class="mb-5">
+                            <app-select
+                                #iconCombobox
+                                [(ngModel)]="language.icon"
+                                [appendTo]="null"
+                                [filter]="true"
+                                [options]="flagsSelectItems"
+                                [style]="{ width: '100%' }"
+                                [virtualScrollItemSize]="30"
+                                [virtualScroll]="true"
+                                name="languageIcon"
+                            >
+                                <ng-template let-item appTemplate="selectedItem">
+                                    <i [ngClass]="item.value" class="margin-right-5 d-inline-block"></i>
+                                    <span style="vertical-align: middle">{{ item.label }}</span>
+                                </ng-template>
+                                <ng-template let-flag appTemplate="item">
+                                    <i [ngClass]="flag.value" class="margin-right-5 d-inline-block"></i>
+                                    <span style="vertical-align: middle">{{ flag.label }}</span>
+                                </ng-template>
+                            </app-select>
+                        </div>
+                        <label class="form-check form-check-custom form-check-solid py-1">
+                            <input
+                                [(ngModel)]="language.isEnabled"
+                                class="form-check-input"
+                                id="EditLanguage_IsEnabled"
+                                name="languageIsEnabled"
+                                type="checkbox"
+                            />
+                            <span class="form-check-label">
+                                {{ 'IsEnabled' | localize }}
+                            </span>
+                        </label>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            (click)="close()"
+                            [disabled]="saving"
+                            class="btn btn-sm btn-light-primary fw-bold"
+                            type="button"
+                        >
+                            {{ 'Cancel' | localize }}
+                        </button>
+                        <button
+                            [busyText]="l('SavingWithThreeDot')"
+                            [buttonBusy]="saving"
+                            [disabled]="!isFormValid"
+                            class="btn btn-sm btn-primary fw-bold"
+                            type="submit"
+                        >
+                            <i class="fa fa-save"></i>
+                            <span>{{ 'Save' | localize }}</span>
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>

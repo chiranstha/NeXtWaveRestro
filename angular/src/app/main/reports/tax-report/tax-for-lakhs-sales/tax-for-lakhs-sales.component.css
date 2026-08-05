@@ -1,0 +1,38 @@
+th {
+    padding: 0em;
+    outline: initial;
+    text-align: center;
+    height: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+
+}
+
+td {
+    padding: 0.15em;
+    word-wrap: break-word;
+    font-size: 13px;
+    font-weight: 500;
+    outline: initial;
+    white-space: initial
+}
+
+/* AG Grid Theme Customization */
+.ag-theme-balham {
+    --ag-font-size: 13px;
+    --ag-row-height: 35px;
+    --ag-header-height: 40px;
+}
+
+.ag-theme-balham .ag-cell {
+    padding: 0.15em;
+    font-weight: 500;
+}
+
+.ag-theme-balham .ag-header-cell {
+    font-weight: bold;
+    text-align: center;
+}
+
+.ag-theme-balham .fw-bold {
+    font-weight: bold;
+}

@@ -1,0 +1,95 @@
+<div
+    #tenantChangeModal="bs-modal"
+    (onShown)="onShown()"
+    [config]="{ backdrop: 'true' }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="tenantChangeModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @if (active) {
+                <form #changeTenantForm="ngForm" (ngSubmit)="save()" class="form form-label-right" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <span>{{ 'ChangeTenant' | localize }}</span>
+                        </h5>
+                        <button
+                            (click)="close()"
+                            aria-hidden="true"
+                            class="btn-close"
+                            data-dismiss="modal"
+                            type="button"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row text-left mb-0">
+                            <label class="col-4 col-form-label">{{ 'SwitchToTenant' | localize }}</label>
+                            <div class="col">
+                                <label class="form-check form-check-custom form-check-solid form-switch py-1">
+                                    <input
+                                        (change)="switchToTenant($event)"
+                                        [(ngModel)]="isSwitchToTenant"
+                                        checked="checked"
+                                        class="form-check-input"
+                                        name="SwitchToTenant"
+                                        type="checkbox"
+                                        value="{{ isSwitchToTenant ? 'true' : 'false' }}"
+                                    />
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row mb-0">
+                            <label class="col-4 col-form-label">
+                                {{ 'TenancyName' | localize }}
+                            </label>
+                            <label class="col">
+                                <input
+                                    #tenancyNameInput="ngModel"
+                                    [(ngModel)]="tenancyName"
+                                    [disabled]="!isSwitchToTenant"
+                                    [ngClass]="{ edited: tenancyName }"
+                                    class="form-control"
+                                    id="tenancyNameInput"
+                                    maxlength="64"
+                                    name="tenancyNameInput"
+                                    placeholder="{{ isSwitchToTenant ? ('EnterTenancyName' | localize) : '' }}"
+                                    required
+                                    type="text"
+                                />
+                                @if (isSwitchToTenant && !tenancyNameInput.pristine && !tenancyName) {
+                                    <span class="form-text text-danger text-left">
+                                        {{ 'TenancyNameRequired' | localize }}
+                                    </span>
+                                }
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            (click)="close()"
+                            [disabled]="saving"
+                            class="btn btn-sm btn-light-primary fw-bold"
+                            type="button"
+                        >
+                            {{ 'Cancel' | localize }}
+                        </button>
+                        <button
+                            [busyText]="l('ProcessingWithThreeDot')"
+                            [buttonBusy]="saving"
+                            [disabled]="!changeTenantForm.form.valid"
+                            class="btn btn-sm btn-primary fw-bold save-button"
+                            type="submit"
+                        >
+                            <i class="fa fa-arrow-circle-right"></i>
+                            <span>{{ submitButtonText }}</span>
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>

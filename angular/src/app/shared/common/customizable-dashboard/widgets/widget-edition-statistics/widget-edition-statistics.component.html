@@ -1,0 +1,28 @@
+<div class="card card-custom h-100">
+    <div class="card-header align-items-center border-0">
+        <div class="card-title">
+            <span class="card-icon">
+                <i class="la la-pie-chart text-success"></i>
+            </span>
+            <h3 class="card-label text-success">
+                {{ 'EditionStatistics' | localize }}
+                <small class="text-muted">
+                    {{ selectedDateRange[0] | luxonFormat: 'D' }} - {{ selectedDateRange[1] | luxonFormat: 'D' }}
+                </small>
+            </h3>
+        </div>
+    </div>
+    <div class="card-body" perfectScrollbar>
+        @if (editionStatisticsHasData) {
+            <ngx-charts-pie-chart
+                [arcWidth]="0.75"
+                [doughnut]="true"
+                [legend]="true"
+                [results]="editionStatisticsData"
+            ></ngx-charts-pie-chart>
+        }
+        <div [hidden]="editionStatisticsHasData" class="note note-info text-center chart">
+            <small class="text-muted">{{ 'NoData' | localize }}</small>
+        </div>
+    </div>
+</div>

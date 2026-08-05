@@ -1,0 +1,32 @@
+<div>
+    <sub-header [description]="" [title]="'PDC Payables' | localize">
+        <div class="d-flex justify-content-between align-items-center w-100">
+            <div role="actions" class="d-flex justify-content-end w-100">
+                <button (click)="addRoute()" *ngIf="('Pages.PDCPayables.Create' | permission)"
+                    class="btn btn-sm btn-primary">
+                    <i class="fa fa-plus btn-md-icon"></i>
+                    <span class="d-none d-md-inline-block">
+                        {{ 'Create' | localize }}
+                    </span>
+                </button>
+            </div>
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <div class="ag-theme-balham">
+                    <ag-grid-angular (cellDoubleClicked)="onCellDoubleClicked($event)" (gridReady)="onGridReady($event)"
+                        [columnDefs]="columnDefs" [getContextMenuItems]="getCustomContextMenuItems"
+                        [groupDefaultExpanded]="groupDefaultExpanded" [rowData]="rowData"
+                        [rowGroupPanelShow]="rowGroupPanelShow" style="width: 100%; "
+                        [style.height.px]="screenHeight"></ag-grid-angular>
+                </div>
+                <app-pagination (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)"
+                    [currentPage]="currentPage" [pageSizeOptions]="pageSizeOptions" [pageSize]="pageSize"
+                    [totalRecords]="totalRecords"></app-pagination>
+            </div>
+        </div>
+    </div>
+    <viewPdcPayableModal #viewPdcPayableModal></viewPdcPayableModal>
+</div>

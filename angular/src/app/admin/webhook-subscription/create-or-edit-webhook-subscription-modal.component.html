@@ -1,0 +1,100 @@
+<div
+    #createOrEditModal="bs-modal"
+    [config]="{ backdrop: 'static', keyboard: !saving }"
+    aria-hidden="true"
+    aria-labelledby="createOrEditModal"
+    bsModal
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            @if (active) {
+                <div>
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            @if (webhookSubscriptionId) {
+                                <span>{{ 'EditWebhookSubscription' | localize }}</span>
+                            }
+                            @if (!webhookSubscriptionId) {
+                                <span>{{ 'AddNewWebhookSubscription' | localize }}</span>
+                            }
+                        </h4>
+                        <button
+                            (click)="close()"
+                            [attr.aria-label]="l('Close')"
+                            [disabled]="saving"
+                            class="btn-close"
+                            type="button"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-5 col-12">
+                            <div class="mb-5">
+                                <label class="form-label required" for="Name">{{ 'WebhookEndpoint' | localize }}</label>
+                                <input
+                                    #endPointUrl="ngModel"
+                                    [(ngModel)]="webhookSubscription.webhookUri"
+                                    class="form-control"
+                                    id="WebhookEndpointURL"
+                                    name="Name"
+                                    pattern="https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"
+                                    placeholder="https://example.com/postreceive"
+                                    required
+                                    type="text"
+                                />
+                                <validation-messages [formCtrl]="endPointUrl"></validation-messages>
+                            </div>
+                            <div class="mb-5">
+                                <label class="form-label required" for="Name">{{ 'WebhookEvents' | localize }}</label>
+                                <app-autocomplete
+                                    (completeMethod)="filterWebhooks($event)"
+                                    [(ngModel)]="webhooks"
+                                    [minLength]="1"
+                                    [multiple]="true"
+                                    [size]="34"
+                                    [style]="{ width: '100%' }"
+                                    [suggestions]="filteredWebhooks"
+                                    field="name"
+                                    id="MultiSelectInput"
+                                    name="MultiSelectInput"
+                                ></app-autocomplete>
+                            </div>
+                            <div class="mb-2">
+                                <key-value-list-manager
+                                    #headerKeyValueManager
+                                    [header]="l('AdditionalWebhookHeaders')"
+                                    [items]="headers"
+                                    [keyPlaceHolder]="l('HeaderKey')"
+                                    [valuePlaceHolder]="l('HeaderValue')"
+                                ></key-value-list-manager>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            (click)="close()"
+                            [disabled]="saving"
+                            class="btn btn-sm btn-light-primary fw-bold"
+                            type="button"
+                        >
+                            {{ 'Cancel' | localize }}
+                        </button>
+                        <button
+                            (click)="save()"
+                            [busyText]="l('SavingWithThreeDot')"
+                            [buttonBusy]="saving"
+                            [disabled]="!webhookSubscription.webhookUri || !webhooks || webhooks.length == 0"
+                            class="btn btn-sm btn-primary fw-bold"
+                            type="button"
+                        >
+                            <i class="fa fa-save"></i>
+                            <span>{{ 'Save' | localize }}</span>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

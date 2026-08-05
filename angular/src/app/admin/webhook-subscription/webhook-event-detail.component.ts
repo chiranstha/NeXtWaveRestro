@@ -1,0 +1,215 @@
+import { Component, OnInit, ViewChild, inject, ChangeDetectionStrategy } from '@angular/core';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-enterprise';
+import { DateTime } from 'luxon';
+import { AppComponentBase } from '@shared/common/app-component-base';
+import {
+    WebhookEvent,
+    WebhookEventServiceProxy,
+    WebhookSendAttemptServiceProxy,
+    WebhookSubscription,
+} from '@shared/service-proxies/service-proxies';
+import { appModuleAnimation } from '@shared/animations/routerTransition';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ModalDirective } from 'ngx-bootstrap/modal';
+import { SubHeaderComponent } from '../../shared/common/sub-header/sub-header.component';
+import { BusyIfDirective } from '../../../shared/utils/busy-if.directive';
+import { AgGridAngular } from 'ag-grid-angular';
+import { CreateOrEditWebhookSubscriptionModalComponent } from './create-or-edit-webhook-subscription-modal.component';
+import { LuxonFormatPipe } from '../../../shared/utils/luxon-format.pipe';
+import { LocalizePipe } from '@shared/common/pipes/localize.pipe';
+@Component({
+    templateUrl: './webhook-event-detail.component.html',
+    styleUrls: ['./webhook-event-detail.component.css'],
+    animations: [appModuleAnimation],
+    imports: [
+        SubHeaderComponent,
+        BusyIfDirective,
+        AgGridAngular,
+        CreateOrEditWebhookSubscriptionModalComponent,
+        ModalDirective,
+        LuxonFormatPipe,
+        LocalizePipe,
+    ],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    schemas: [NO_ERRORS_SCHEMA],
+})
+export class WebhookEventDetailComponent extends AppComponentBase implements OnInit {
+    private _webhookEventService = inject(WebhookEventServiceProxy);
+    private _webhookSendAttemptService = inject(WebhookSendAttemptServiceProxy);
+    private _router = inject(Router);
+    private _activatedRoute = inject(ActivatedRoute);
+    @ViewChild('detailModal', { static: true }) detailModal: ModalDirective;
+    subscription: WebhookSubscription;
+    loading = true;
+    webhookEventId: string;
+    webhookEvent: WebhookEvent;
+    maxDataLength = 300;
+    listMaxResponseLength = 100;
+    detailModalText = '';
+    // AG Grid properties
+    gridApi!: GridApi;
+    rowData: any[] = [];
+    gridLoading = false;
+    columnDefs: ColDef[] = [
+        {
+            headerName: this.l('Actions'),
+            field: 'actions',
+            cellRenderer: (params: any) => {
+                const container = document.createElement('div');
+                container.className = 'btn-group dropdown';
+                const button = document.createElement('button');
+                button.className = 'btn btn-sm btn-primary dropdown-toggle';
+                button.setAttribute('data-bs-toggle', 'dropdown');
+                button.innerHTML = '<i class="fa fa-cog"></i> <span class="caret"></span>';
+                container.appendChild(button);
+                const menu = document.createElement('ul');
+                menu.className = 'dropdown-menu';
+                // Resend option
+                const resendItem = document.createElement('li');
+                const resendLink = document.createElement('a');
+                resendLink.className = 'dropdown-item';
+                resendLink.href = 'javascript:;';
+                resendLink.innerText = this.l('Resend');
+                resendLink.onclick = () => this.resend(params.data.id);
+                resendItem.appendChild(resendLink);
+                menu.appendChild(resendItem);
+                // Go to subscription option
+                const subscriptionItem = document.createElement('li');
+                const subscriptionLink = document.createElement('a');
+                subscriptionLink.className = 'dropdown-item';
+                subscriptionLink.href = 'javascript:;';
+                subscriptionLink.innerText = this.l('GoToSubscription');
+                subscriptionLink.onclick = () => this.goToWebhookSubscriptionDetail(params.data.webhookSubscriptionId);
+                subscriptionItem.appendChild(subscriptionLink);
+                menu.appendChild(subscriptionItem);
+                container.appendChild(menu);
+                return container;
+            },
+            width: 100,
+            sortable: false,
+            filter: false,
+            suppressMovable: true,
+        },
+        {
+            headerName: this.l('WebhookSubscriptionId'),
+            field: 'webhookSubscriptionId',
+            sortable: false,
+            filter: false,
+            width: 320,
+        },
+        {
+            headerName: this.l('WebhookEndpoint'),
+            field: 'webhookUri',
+            sortable: false,
+            filter: false,
+            minWidth: 200,
+        },
+        {
+            headerName: this.l('CreationTime'),
+            field: 'creationTime',
+            sortable: false,
+            filter: false,
+            width: 180,
+            valueFormatter: (params) => {
+                if (!params.value) {
+                    return '';
+                }
+                return DateTime.fromISO(params.value).toFormat('yyyy-LL-dd HH:mm:ss');
+            },
+        },
+        {
+            headerName: this.l('HttpStatusCode'),
+            field: 'responseStatusCode',
+            sortable: false,
+            filter: false,
+            width: 130,
+            cellStyle: { textAlign: 'center' },
+        },
+        {
+            headerName: this.l('Response'),
+            field: 'response',
+            cellRenderer: (params: any) => {
+                if (!params.value) {
+                    return '';
+                }
+                if (params.value.length <= this.listMaxResponseLength) {
+                    const span = document.createElement('span');
+                    span.innerText = params.value;
+                    return span;
+                } else {
+                    const button = document.createElement('button');
+                    button.className = 'btn btn-sm btn-outline-primary';
+                    button.innerText = this.l('ShowResponse');
+                    button.onclick = () => this.showDetailModal(params.value);
+                    return button;
+                }
+            },
+            sortable: false,
+            filter: false,
+            minWidth: 150,
+        },
+    ];
+    defaultColDef: ColDef = {
+        resizable: true,
+        suppressMovable: true,
+    };
+
+    ngOnInit() {
+        this.webhookEventId = this._activatedRoute.snapshot.queryParams['id'];
+        this.getDetail();
+    }
+    onGridReady(params: GridReadyEvent) {
+        this.gridApi = params.api;
+        this.getSendAttempts();
+    }
+    getSendAttempts(): void {
+        this.gridLoading = true;
+        this._webhookSendAttemptService.getAllSendAttemptsOfWebhookEvent(this.webhookEventId).subscribe((result) => {
+            this.rowData = result.items || [];
+            this.gridLoading = false;
+        });
+    }
+    getDetail(): void {
+        this._webhookEventService.get(this.webhookEventId).subscribe((webhookEvent) => {
+            this.webhookEvent = webhookEvent;
+            this.loading = false;
+        });
+    }
+    goToWebhookSubscriptionDetail(subscriptionId: string): void {
+        this._router.navigate(['app/admin/webhook-subscriptions-detail'], {
+            queryParams: {
+                id: subscriptionId,
+            },
+        });
+    }
+    resend(id: string): void {
+        this.message.confirm(
+            this.l('WebhookEventWillBeSendWithSameParameters'),
+            this.l('AreYouSure'),
+            (isConfirmed) => {
+                if (isConfirmed) {
+                    this.showMainSpinner();
+                    this._webhookSendAttemptService.resend(id).subscribe(
+                        () => {
+                            abp.notify.success(this.l('WebhookSendAttemptInQueue'));
+                            this.hideMainSpinner();
+                        },
+                        () => {
+                            this.hideMainSpinner();
+                        },
+                    );
+                }
+            },
+        );
+    }
+    showDetailModal(text): void {
+        this.detailModalText = text;
+        this.detailModal.show();
+    }
+    showMoreData(): void {
+        document.getElementById('dataDots').classList.add('d-none');
+        document.getElementById('dataShowMoreBtn').classList.add('d-none');
+        document.getElementById('dataMore').classList.remove('d-none');
+    }
+}

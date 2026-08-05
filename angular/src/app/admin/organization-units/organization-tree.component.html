@@ -1,0 +1,54 @@
+<div class="card card-custom gutter-b">
+    <div class="card-header align-items-center border-0">
+        <h3 class="card-title align-items-start flex-column">
+            <span class="fw-bolder text-dark">
+                {{ 'OrganizationTree' | localize }}
+            </span>
+        </h3>
+        <div class="card-toolbar">
+            @if ('Pages.Administration.OrganizationUnits.ManageOrganizationTree' | permission) {
+                <button (click)="addUnit(null)" class="btn btn-sm btn-outline btn-outline-primary btn-sm">
+                    <i class="fa fa-plus btn-md-icon"></i>
+                    <span class="d-none d-md-inline-block">
+                        {{ 'AddRootUnit' | localize }}
+                    </span>
+                </button>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        <app-tree
+            (onNodeDrop)="nodeDrop($event)"
+            (onNodeSelect)="nodeSelect($event)"
+            [(selection)]="selectedOu"
+            [contextMenu]="ouContextMenu"
+            [draggableNodes]="canManageOrganizationUnits"
+            [droppableNodes]="canManageOrganizationUnits"
+            [value]="treeData"
+            selectionMode="single"
+        >
+            <ng-template let-node appTemplate="default">
+                <div>
+                    <span>
+                        {{ node.label }}
+                    </span>
+                    <small style="font-size: 0.82em; opacity: 0.5">
+                        {{ node.memberCount }} {{ 'Members' | localize }}, {{ node.roleCount }} {{ 'Roles' | localize }}
+                    </small>
+                </div>
+            </ng-template>
+        </app-tree>
+        <app-context-menu #ouContextMenu [model]="ouContextMenuItems" appendTo="body" baseZIndex="99999"></app-context-menu>
+        @if (!totalUnitCount) {
+            <div class="text-muted">
+                {{ 'NoOrganizationUnitDefinedYet' | localize }}
+            </div>
+        }
+    </div>
+</div>
+<createOrEditOrganizationUnitModal
+    #createOrEditOrganizationUnitModal
+    (unitCreated)="unitCreated($event)"
+    (unitUpdated)="unitUpdated($event)"
+></createOrEditOrganizationUnitModal>
+<entityTypeHistoryModal #entityTypeHistoryModal></entityTypeHistoryModal>

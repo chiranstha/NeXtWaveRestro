@@ -1,0 +1,625 @@
+<div [@routerTransition]>
+    <sub-header [title]="'Restaurant Setup' | localize">
+        <div role="actions">
+            <button
+                class="btn btn-sm btn-light-primary"
+                [buttonBusy]="loading"
+                (click)="refresh()"
+                tooltip="{{ 'Refresh' | localize }}"
+            >
+                <i class="fa fa-rotate"></i>
+            </button>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="restaurant-page">
+            <div class="restaurant-nav">
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/pos" routerLinkActive="active">
+                    <i class="fa fa-cash-register"></i>
+                    {{ 'POS' | localize }}
+                </a>
+                <a class="restaurant-nav-link active" routerLink="/app/main/restaurant/setup">
+                    <i class="fa fa-sliders"></i>
+                    {{ 'Setup' | localize }}
+                </a>
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/menu" routerLinkActive="active">
+                    <i class="fa fa-utensils"></i>
+                    {{ 'Menu' | localize }}
+                </a>
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/inventory" routerLinkActive="active">
+                    <i class="fa fa-boxes-stacked"></i>
+                    {{ 'Inventory' | localize }}
+                </a>
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/channels" routerLinkActive="active">
+                    <i class="fa fa-store"></i>
+                    {{ 'Channels' | localize }}
+                </a>
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/kds" routerLinkActive="active">
+                    <i class="fa fa-tv"></i>
+                    {{ 'KDS' | localize }}
+                </a>
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/reports" routerLinkActive="active">
+                    <i class="fa fa-chart-line"></i>
+                    {{ 'Reports' | localize }}
+                </a>
+            </div>
+
+            <div class="restaurant-metric-row">
+                <div class="restaurant-metric">
+                    <span class="restaurant-metric-label">{{ 'Dining Areas' | localize }}</span>
+                    <span class="restaurant-metric-value">{{ areas.length }}</span>
+                </div>
+                <div class="restaurant-metric">
+                    <span class="restaurant-metric-label">{{ 'Tables' | localize }}</span>
+                    <span class="restaurant-metric-value">{{ tables.length }}</span>
+                </div>
+                <div class="restaurant-metric">
+                    <span class="restaurant-metric-label">{{ 'Stations' | localize }}</span>
+                    <span class="restaurant-metric-value">{{ stations.length }}</span>
+                </div>
+                <div class="restaurant-metric">
+                    <span class="restaurant-metric-label">{{ 'Devices' | localize }}</span>
+                    <span class="restaurant-metric-value">{{ devices.length }}</span>
+                </div>
+            </div>
+
+            <ul class="nav restaurant-section-tabs">
+                <li class="nav-item">
+                    <button
+                        class="nav-link"
+                        [class.active]="activeSection === 'areas'"
+                        (click)="activeSection = 'areas'"
+                    >
+                        {{ 'Dining Areas' | localize }}
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button
+                        class="nav-link"
+                        [class.active]="activeSection === 'tables'"
+                        (click)="activeSection = 'tables'"
+                    >
+                        {{ 'Tables' | localize }}
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button
+                        class="nav-link"
+                        [class.active]="activeSection === 'stations'"
+                        (click)="activeSection = 'stations'"
+                    >
+                        {{ 'Kitchen / Bar Stations' | localize }}
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button
+                        class="nav-link"
+                        [class.active]="activeSection === 'devices'"
+                        (click)="activeSection = 'devices'"
+                    >
+                        {{ 'Mobile Devices' | localize }}
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button
+                        class="nav-link"
+                        [class.active]="activeSection === 'settings'"
+                        (click)="activeSection = 'settings'"
+                    >
+                        {{ 'Operational Settings' | localize }}
+                    </button>
+                </li>
+            </ul>
+
+            <div class="restaurant-grid-2" *ngIf="activeSection === 'areas'">
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            {{ areaForm.value.id ? ('Edit Area' | localize) : ('New Area' | localize) }}
+                        </div>
+                    </div>
+                    <form class="card-body" [formGroup]="areaForm" autocomplete="off">
+                        <div class="mb-3">
+                            <label class="required form-label">{{ 'Name' | localize }}</label>
+                            <input class="form-control" formControlName="name" />
+                            <div class="text-danger mt-1" *ngIf="isInvalid(areaForm, 'name')">
+                                {{ 'ThisFieldIsRequired' | localize }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ 'Description' | localize }}</label>
+                            <input class="form-control" formControlName="description" />
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="required form-label">{{ 'Sort Order' | localize }}</label>
+                                <input class="form-control" type="number" formControlName="sortOrder" />
+                                <div class="text-danger mt-1" *ngIf="isInvalid(areaForm, 'sortOrder')">
+                                    {{ 'InvalidValue' | localize }}
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3 d-flex align-items-end">
+                                <label class="form-check form-check-sm">
+                                    <input class="form-check-input" type="checkbox" formControlName="isActive" />
+                                    <span class="form-check-label">{{ 'Active' | localize }}</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="restaurant-actionbar restaurant-actionbar-end">
+                            <button type="button" class="btn btn-sm btn-light" (click)="resetArea()">
+                                {{ 'Clear' | localize }}
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-primary"
+                                [buttonBusy]="saving"
+                                (click)="saveArea()"
+                            >
+                                <i class="fa fa-save"></i>
+                                {{ areaForm.value.id ? ('Update' | localize) : ('Save' | localize) }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Dining Areas' | localize }}</div>
+                    </div>
+                    <div class="card-body p-0 restaurant-table-wrap">
+                        <table class="restaurant-table" *ngIf="areas.length; else noAreas">
+                            <thead>
+                                <tr>
+                                    <th>{{ 'Name' | localize }}</th>
+                                    <th>{{ 'Description' | localize }}</th>
+                                    <th class="text-end">{{ 'Status' | localize }}</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let area of areas">
+                                    <td class="fw-bold">{{ area.name }}</td>
+                                    <td>{{ area.description || '-' }}</td>
+                                    <td class="text-end">
+                                        <span
+                                            class="restaurant-status"
+                                            [class.restaurant-status-success]="area.isActive"
+                                            [class.restaurant-status-neutral]="!area.isActive"
+                                        >
+                                            {{ area.isActive ? ('Active' | localize) : ('Inactive' | localize) }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <button
+                                            class="btn btn-xs btn-light-primary"
+                                            (click)="editArea(area)"
+                                            tooltip="{{ 'Edit' | localize }}"
+                                        >
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <ng-template #noAreas>
+                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+
+            <div class="restaurant-grid-2" *ngIf="activeSection === 'tables'">
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            {{ tableForm.value.id ? ('Edit Table' | localize) : ('New Table' | localize) }}
+                        </div>
+                    </div>
+                    <form class="card-body" [formGroup]="tableForm" autocomplete="off">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="required form-label">{{ 'Name' | localize }}</label>
+                                <input class="form-control" formControlName="name" />
+                                <div class="text-danger mt-1" *ngIf="isInvalid(tableForm, 'name')">
+                                    {{ 'ThisFieldIsRequired' | localize }}
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ 'Code' | localize }}</label>
+                                <input class="form-control" formControlName="code" />
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="required form-label">{{ 'Dining Area' | localize }}</label>
+                                <ng-select
+                                    [items]="areas"
+                                    bindLabel="name"
+                                    bindValue="id"
+                                    formControlName="areaId"
+                                    appendTo="body"
+                                ></ng-select>
+                                <div class="text-danger mt-1" *ngIf="isInvalid(tableForm, 'areaId')">
+                                    {{ 'ThisFieldIsRequired' | localize }}
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="required form-label">{{ 'Capacity' | localize }}</label>
+                                <input class="form-control" type="number" formControlName="capacity" />
+                                <div class="text-danger mt-1" *ngIf="isInvalid(tableForm, 'capacity')">
+                                    {{ 'InvalidValue' | localize }}
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="required form-label">{{ 'Sort Order' | localize }}</label>
+                                <input class="form-control" type="number" formControlName="sortOrder" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="required form-label">{{ 'Status' | localize }}</label>
+                                <select class="form-select" formControlName="status">
+                                    <option [ngValue]="0">Available</option>
+                                    <option [ngValue]="1">Occupied</option>
+                                    <option [ngValue]="2">Reserved</option>
+                                    <option [ngValue]="3">Maintenance</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label class="form-check form-check-sm">
+                                    <input class="form-check-input" type="checkbox" formControlName="isActive" />
+                                    <span class="form-check-label">{{ 'Active' | localize }}</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="restaurant-actionbar restaurant-actionbar-end">
+                            <button type="button" class="btn btn-sm btn-light" (click)="resetTable()">
+                                {{ 'Clear' | localize }}
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-primary"
+                                [buttonBusy]="saving"
+                                (click)="saveTable()"
+                            >
+                                <i class="fa fa-save"></i>
+                                {{ tableForm.value.id ? ('Update' | localize) : ('Save' | localize) }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Tables' | localize }}</div>
+                    </div>
+                    <div class="card-body p-0 restaurant-scroll restaurant-table-wrap">
+                        <table class="restaurant-table" *ngIf="tables.length; else noTables">
+                            <thead>
+                                <tr>
+                                    <th>{{ 'Table' | localize }}</th>
+                                    <th>{{ 'Area' | localize }}</th>
+                                    <th>{{ 'Capacity' | localize }}</th>
+                                    <th>{{ 'Status' | localize }}</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let table of tables">
+                                    <td class="fw-bold">{{ table.name }}</td>
+                                    <td>{{ table.areaName }}</td>
+                                    <td>{{ table.capacity }}</td>
+                                    <td>
+                                        <span class="restaurant-status restaurant-status-primary">
+                                            {{ tableStatusText(table.status) }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <button
+                                            class="btn btn-xs btn-light-primary"
+                                            (click)="editTable(table)"
+                                            tooltip="{{ 'Edit' | localize }}"
+                                        >
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <ng-template #noTables>
+                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+
+            <div class="restaurant-grid-2" *ngIf="activeSection === 'stations'">
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            {{ stationForm.value.id ? ('Edit Station' | localize) : ('New Station' | localize) }}
+                        </div>
+                    </div>
+                    <form class="card-body" [formGroup]="stationForm" autocomplete="off">
+                        <div class="mb-3">
+                            <label class="required form-label">{{ 'Name' | localize }}</label>
+                            <input class="form-control" formControlName="name" />
+                            <div class="text-danger mt-1" *ngIf="isInvalid(stationForm, 'name')">
+                                {{ 'ThisFieldIsRequired' | localize }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="required form-label">{{ 'Station Type' | localize }}</label>
+                            <select class="form-select" formControlName="stationType">
+                                <option [ngValue]="0">Kitchen</option>
+                                <option [ngValue]="1">Bar</option>
+                                <option [ngValue]="2">Counter</option>
+                                <option [ngValue]="3">Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-check form-check-sm">
+                                <input class="form-check-input" type="checkbox" formControlName="isActive" />
+                                <span class="form-check-label">{{ 'Active' | localize }}</span>
+                            </label>
+                        </div>
+                        <div class="restaurant-actionbar restaurant-actionbar-end">
+                            <button type="button" class="btn btn-sm btn-light" (click)="resetStation()">
+                                {{ 'Clear' | localize }}
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-primary"
+                                [buttonBusy]="saving"
+                                (click)="saveStation()"
+                            >
+                                <i class="fa fa-save"></i>
+                                {{ stationForm.value.id ? ('Update' | localize) : ('Save' | localize) }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Kitchen / Bar Stations' | localize }}</div>
+                    </div>
+                    <div class="card-body p-0 restaurant-table-wrap">
+                        <table class="restaurant-table" *ngIf="stations.length; else noStations">
+                            <thead>
+                                <tr>
+                                    <th>{{ 'Station' | localize }}</th>
+                                    <th>{{ 'Type' | localize }}</th>
+                                    <th>{{ 'Status' | localize }}</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let station of stations">
+                                    <td class="fw-bold">{{ station.name }}</td>
+                                    <td>
+                                        <span class="restaurant-status restaurant-status-primary">
+                                            {{ stationTypeText(station.stationType) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span
+                                            class="restaurant-status"
+                                            [class.restaurant-status-success]="station.isActive"
+                                            [class.restaurant-status-neutral]="!station.isActive"
+                                        >
+                                            {{ station.isActive ? ('Active' | localize) : ('Inactive' | localize) }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <button
+                                            class="btn btn-xs btn-light-primary"
+                                            (click)="editStation(station)"
+                                            tooltip="{{ 'Edit' | localize }}"
+                                        >
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <ng-template #noStations>
+                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+
+            <div class="restaurant-grid-2" *ngIf="activeSection === 'devices'">
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            {{ deviceForm.value.id ? ('Edit Device' | localize) : ('Register Device' | localize) }}
+                        </div>
+                    </div>
+                    <form class="card-body" [formGroup]="deviceForm" autocomplete="off">
+                        <div class="mb-3">
+                            <label class="required form-label">{{ 'Device Code' | localize }}</label>
+                            <input class="form-control" formControlName="deviceCode" />
+                            <div class="text-danger mt-1" *ngIf="isInvalid(deviceForm, 'deviceCode')">
+                                {{ 'ThisFieldIsRequired' | localize }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="required form-label">{{ 'Device Name' | localize }}</label>
+                            <input class="form-control" formControlName="name" />
+                            <div class="text-danger mt-1" *ngIf="isInvalid(deviceForm, 'name')">
+                                {{ 'ThisFieldIsRequired' | localize }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ 'User Id' | localize }}</label>
+                            <input class="form-control" type="number" formControlName="userId" />
+                        </div>
+                        <div class="restaurant-actionbar restaurant-actionbar-end">
+                            <button type="button" class="btn btn-sm btn-light" (click)="resetDevice()">
+                                {{ 'Clear' | localize }}
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-primary"
+                                [buttonBusy]="saving"
+                                (click)="registerDevice()"
+                            >
+                                <i class="fa fa-save"></i>
+                                {{ 'Save' | localize }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Mobile Devices' | localize }}</div>
+                    </div>
+                    <div class="card-body p-0 restaurant-table-wrap">
+                        <table class="restaurant-table" *ngIf="devices.length; else noDevices">
+                            <thead>
+                                <tr>
+                                    <th>{{ 'Device' | localize }}</th>
+                                    <th>{{ 'Code' | localize }}</th>
+                                    <th>{{ 'User' | localize }}</th>
+                                    <th>{{ 'Status' | localize }}</th>
+                                    <th>{{ 'Sync' | localize }}</th>
+                                    <th>{{ 'Cursor' | localize }}</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let device of devices">
+                                    <td class="fw-bold">{{ device.name }}</td>
+                                    <td>{{ device.deviceCode }}</td>
+                                    <td>{{ device.userId || '-' }}</td>
+                                    <td>
+                                        <span
+                                            class="restaurant-status"
+                                            [class.restaurant-status-success]="device.status === 0"
+                                            [class.restaurant-status-danger]="device.status === 1"
+                                        >
+                                            {{ deviceStatusText(device.status) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span
+                                            class="restaurant-status"
+                                            [class.restaurant-status-success]="!device.hasConflict && device.lastSyncAt"
+                                            [class.restaurant-status-warning]="!device.hasConflict && !device.lastSyncAt"
+                                            [class.restaurant-status-danger]="device.hasConflict"
+                                        >
+                                            {{ syncStatusText(device) }}
+                                        </span>
+                                        <div class="restaurant-muted" *ngIf="device.lastSyncError">
+                                            {{ device.lastSyncError }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>{{ 'Pulled' | localize }}: {{ device.lastPulledSeq || 0 }}</div>
+                                        <div>{{ 'Ack' | localize }}: {{ device.lastAcknowledgedSeq || 0 }}</div>
+                                    </td>
+                                    <td class="text-end">
+                                        <button
+                                            class="btn btn-xs btn-light-primary"
+                                            (click)="editDevice(device)"
+                                            tooltip="{{ 'Edit' | localize }}"
+                                        >
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <ng-template #noDevices>
+                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+
+            <div class="restaurant-grid-2" *ngIf="activeSection === 'settings'">
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Operational Settings' | localize }}</div>
+                    </div>
+                    <form class="card-body" [formGroup]="settingsForm" autocomplete="off">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="required form-label">{{ 'VAT %' | localize }}</label>
+                                <input class="form-control" type="number" min="0" max="100" formControlName="vatPercent" />
+                                <div class="text-danger mt-1" *ngIf="isInvalid(settingsForm, 'vatPercent')">
+                                    {{ 'InvalidValue' | localize }}
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="required form-label">{{ 'Service Charge %' | localize }}</label>
+                                <input
+                                    class="form-control"
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    formControlName="serviceChargePercent"
+                                />
+                                <div class="text-danger mt-1" *ngIf="isInvalid(settingsForm, 'serviceChargePercent')">
+                                    {{ 'InvalidValue' | localize }}
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="required form-label">{{ 'Negative Stock' | localize }}</label>
+                                <select class="form-select" formControlName="negativeStockStatus">
+                                    <option *ngFor="let option of negativeStockOptions" [ngValue]="option">{{ option }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="required form-label">{{ 'Table Workflow' | localize }}</label>
+                                <select class="form-select" formControlName="tableWorkflow">
+                                    <option *ngFor="let option of tableWorkflowOptions" [ngValue]="option">{{ option }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ 'Manager PIN' | localize }}</label>
+                                <input class="form-control" type="password" formControlName="managerPin" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label d-block">{{ 'Manager Approval' | localize }}</label>
+                                <label class="form-check form-switch form-check-custom form-check-solid">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        formControlName="requireManagerPinForSensitiveActions"
+                                    />
+                                    <span class="form-check-label">{{ 'Require PIN for sensitive POS actions' | localize }}</span>
+                                </label>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label d-block">{{ 'Ticket Printing' | localize }}</label>
+                                <label class="form-check form-switch form-check-custom form-check-solid">
+                                    <input class="form-check-input" type="checkbox" formControlName="ticketPrintingEnabled" />
+                                    <span class="form-check-label">{{ 'Enabled' | localize }}</span>
+                                </label>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label d-block">{{ 'Channel Availability' | localize }}</label>
+                                <label class="form-check form-switch form-check-custom form-check-solid">
+                                    <input class="form-check-input" type="checkbox" formControlName="channelAvailabilityEnabled" />
+                                    <span class="form-check-label">{{ 'Online ordering/channel availability enabled' | localize }}</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="restaurant-actionbar restaurant-actionbar-end">
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-primary"
+                                [buttonBusy]="saving"
+                                (click)="saveOperationalSettings()"
+                            >
+                                <i class="fa fa-save"></i>
+                                {{ 'Save' | localize }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

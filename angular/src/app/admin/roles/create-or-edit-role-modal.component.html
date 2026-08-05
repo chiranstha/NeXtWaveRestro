@@ -1,0 +1,110 @@
+<!-- Updated create-or-edit-role-modal.component.html -->
+<div
+    #createOrEditModal="bs-modal"
+    (onShown)="onShown()"
+    [config]="{ backdrop: 'static', keyboard: !saving }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="createOrEditModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <!-- Changed to modal-xl for better grid view -->
+        <div class="modal-content">
+            @if (active) {
+                <form (ngSubmit)="save()" [formGroup]="roleForm" autocomplete="new-password" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            @if (role.id) {
+                                <span>
+                                    <i class="fas fa-user-tag me-2"></i>
+                                    {{ 'EditRole' | localize }}: {{ role.displayName }}
+                                </span>
+                            }
+                            @if (!role.id) {
+                                <span>
+                                    <i class="fas fa-plus-circle me-2"></i>
+                                    {{ 'CreateNewRole' | localize }}
+                                </span>
+                            }
+                        </h4>
+                        <button
+                            (click)="close()"
+                            [attr.aria-label]="l('Close')"
+                            [disabled]="saving"
+                            class="btn-close"
+                            type="button"
+                        ></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <!-- Removed padding for full-width grid -->
+                        <tabset class="tab-container tabbable-line">
+                            <tab class="p-5" heading="{{ 'RoleName' | localize }}">
+                                <div class="mb-5">
+                                    <label class="form-label required">{{ 'RoleName' | localize }}</label>
+                                    <input
+                                        class="form-control"
+                                        formControlName="displayName"
+                                        id="RoleDisplayName"
+                                        maxlength="64"
+                                        type="text"
+                                    />
+                                    <validation-messages [formCtrl]="roleForm.get('displayName')"></validation-messages>
+                                </div>
+                                <label class="form-check form-check-custom form-check-solid py-1">
+                                    <input
+                                        class="form-check-input"
+                                        formControlName="isDefault"
+                                        id="EditRole_IsDefault"
+                                        type="checkbox"
+                                    />
+                                    <span class="form-check-label">
+                                        {{ 'Default' | localize }}
+                                        <small class="form-text text-muted ms-3">
+                                            ({{ 'DefaultRole_Description' | localize }})
+                                        </small>
+                                    </span>
+                                </label>
+                            </tab>
+                            <tab class="p-0" heading="{{ 'Permissions' | localize }}">
+                                <!-- Removed padding for full-width grid -->
+                                <div class="p-3">
+                                    <!-- Add padding container -->
+                                    <!-- Replace the old permission-tree with permission-grid -->
+                                    <permission-grid #permissionGrid></permission-grid>
+                                    <div class="alert alert-warning mt-3" style="margin-bottom: 0">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <em>{{ 'Note_RefreshPageForPermissionChanges' | localize }}</em>
+                                    </div>
+                                </div>
+                            </tab>
+                        </tabset>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            (click)="close()"
+                            [disabled]="saving"
+                            class="btn btn-sm btn-light-secondary fw-bold me-2"
+                            type="button"
+                        >
+                            <i class="fas fa-times me-1"></i>
+                            {{ 'Cancel' | localize }}
+                        </button>
+                        <button
+                            [busyText]="l('SavingWithThreeDot')"
+                            [buttonBusy]="saving"
+                            [disabled]="!roleForm.valid"
+                            class="btn btn-sm btn-primary fw-bold"
+                            type="submit"
+                        >
+                            <i class="fa fa-save me-1"></i>
+                            <span>{{ 'Save' | localize }}</span>
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,99 @@
+<div [@routerTransition]>
+    <sub-header [description]="" [title]="'Sales Return' | localize">
+        <div role="search">
+            <div class="position-relative w-md-400px me-md-2">
+                <i
+                    class="fa-duotone fa-magnifying-glass fs-3 text-gray-500 position-absolute top-50 translate-middle ms-6"
+                >
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                </i>
+                <input
+                    (keyup.enter)="searchValueOnApiCall($event.target.value)"
+                    [(ngModel)]="filterText"
+                    [ngModelOptions]="{ standalone: true }"
+                    class="form-control form-control-solid ps-12 rounded-pill border-0 bg-light shadow-none"
+                    name="search"
+                    placeholder="Search"
+                    type="text"
+                    value=""
+                />
+            </div>
+        </div>
+        <div role="actions">
+            <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown" *ngIf="!advancedFiltersAreShown"
+                class="btn btn-sm btn-outline-secondary clickable-item">
+                <i class="fa fa-angle-down"></i>
+                {{ 'ShowAdvancedFilters' | localize }}
+            </span>
+            <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown" *ngIf="advancedFiltersAreShown"
+                class="btn btn-sm btn-outline-secondary clickable-item">
+                <i class="fa fa-angle-up"></i>
+                {{ 'HideAdvancedFilters' | localize }}
+            </span>
+            <button (click)="addRoute()" *ngIf="('Pages.SalesReturnMasters.Create' | permission)"
+                class="btn btn-sm btn-primary">
+                <i class="fa fa-plus btn-md-icon"></i>
+                <span class="d-none d-md-inline-block">
+                    {{ 'Create' | localize }}
+                </span>
+            </button>
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <div [hidden]="!advancedFiltersAreShown" class="col-12 px-0 py-2">
+                    <div class="hidden-filter" [formGroup]="form">
+                        <div class="row g-2">
+                            <div class="col-md-3 col-lg-3 col-xs-12 col-sm-12">
+                                <div class="form-item">
+                                    <label class="form-label mb-1" for="fromMiti">{{ l('From-Miti') }}</label>
+                                    <ne-datepicker [dateFormat]="'yyyy/MM/dd'" (ngModelChange)="filterChange()"
+                                        [formControl]="form.controls['fromMiti']" [npDatePickerId]="'fromMiti'"
+                                        language="en" theme="light"></ne-datepicker>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-lg-3 col-xs-12 col-sm-12">
+                                <div class="form-item">
+                                    <label class="form-label mb-1" for="toMiti">{{ l('To-Miti') }}</label>
+                                    <ne-datepicker [dateFormat]="'yyyy/MM/dd'" (ngModelChange)="(currentPage)"
+                                        [formControl]="form.controls['toMiti']" [isfinancialYear]="true"
+                                        [npDatePickerId]="'toMiti'" [placeholder]="'yyyy/MM/dd'" [todayBtn]="true"
+                                        language="en" theme="light"></ne-datepicker>
+                                </div>
+                            </div>
+                            <div
+                                class="col-md-2 col-lg-2 col-xs-12 col-sm-12 d-flex align-items-end justify-content-end gap-2">
+                                <button (click)="filterChange()" class="btn btn-sm btn-primary">
+                                    <i class="fa fa-sync btn-md-icon"></i>
+                                    <span class="d-none d-md-inline-block">
+                                        {{ 'Refresh' | localize }}
+                                    </span>
+                                </button>
+                                <button (click)="exportToExcelfromAPI()" class="btn btn-sm btn-danger">
+                                    <i class="fa fa-sync btn-md-icon"></i>
+                                    <span class="d-none d-md-inline-block">
+                                        {{ 'Export' | localize }}
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ag-theme-balham">
+                    <ag-grid-angular (cellDoubleClicked)="onCellDoubleClicked($event)" (gridReady)="onGridReady($event)"
+                        [columnDefs]="columnDefs" [getContextMenuItems]="getCustomContextMenuItems"
+                        [groupDefaultExpanded]="groupDefaultExpanded" [rowData]="rowData"
+                        [rowGroupPanelShow]="rowGroupPanelShow" style="width: 100%; "
+                        [style.height.px]="screenHeight"></ag-grid-angular>
+                </div>
+
+                <app-pagination (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)"
+                    [currentPage]="currentPage" [pageSizeOptions]="pageSizeOptions" [pageSize]="pageSize"
+                    [totalRecords]="totalRecords"></app-pagination>
+            </div>
+        </div>
+    </div>
+    <viewsalesreturn #viewsalesreturn></viewsalesreturn>
+</div>

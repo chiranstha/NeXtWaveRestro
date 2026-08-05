@@ -1,0 +1,186 @@
+<div [@routerTransition]>
+    <sub-header [title]="'Sales Report'">
+        <div role="search">
+            <div class="position-relative w-md-400px me-md-2">
+                <i
+                    class="fa-duotone fa-magnifying-glass fs-3 text-gray-500 position-absolute top-50 translate-middle ms-6"
+                >
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                </i>
+                <input
+                    (input)="searchFilter($event)"
+                    [ngModelOptions]="{ standalone: true }"
+                    class="form-control form-control-solid ps-10 headerSearch"
+                    name="search"
+                    placeholder="Search"
+                    type="text"
+                />
+            </div>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="card card-bordered p-4">
+            <div [hidden]="!advancedFiltersAreShown" class="col-12 px-0">
+                <div class="hidden-filter">
+                    <div>
+                        <form [formGroup]="myForm">
+                            <div class="row">                                
+                                <div colLg="3" colMd="6" colXl="3">
+                                    <label class="form-label" for="fromMiti">From Miti</label>
+                                    <ne-datepicker [formControl]="myForm.controls['fromMiti']"
+                                        language="en"></ne-datepicker>
+                                </div>
+                                <div colLg="3" colMd="6" colXl="3">
+                                    <label class="form-label" for="toMiti">To Miti</label>
+                                    <ne-datepicker [formControl]="myForm.controls['toMiti']"
+                                        language="en"></ne-datepicker>
+                                </div>
+                                <div class="positionexcel">
+                                    <button (click)="refresh()" class="mr-2" class="btn btn-sm fw-bold btn-primary"
+                                        class="btn btn-sm btn-light-success" fd-toolbar-item glyph="refresh"
+                                        label="Refresh">Refresh
+                                    </button>
+                                    <button (click)="onAdvanceSearch(this.myForm.value)" class="mr-2"
+                                        class="btn btn-sm btn-light-success" label="Search">Search
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-sm-12">
+                    <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown" *ngIf="!advancedFiltersAreShown"
+                        class="clickable-item text-muted">
+                        <i class="fa fa-angle-down"></i>
+                        {{ 'ShowAdvancedFilters' | localize }}
+                    </span>
+                    <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown" *ngIf="advancedFiltersAreShown"
+                        class="clickable-item text-muted">
+                        <i class="fa fa-angle-up"></i>
+                        {{ 'HideAdvancedFilters' | localize }}
+                    </span>
+                </div>
+            </div>
+            <!-- <fd-toolbar [fdType]="'info'" [active]="true">
+                <label fd-toolbar-label>
+                    <p style="font-family: 'ProximaNova'; margin-bottom: 0 !important">Total ({{ totalItems }} items)</p>
+                </label>
+                <fd-toolbar-spacer></fd-toolbar-spacer>
+                <fd-input-group glyph="decline" placeholder="Search"  [button]="true" [disabled]="false"
+                    [(ngModel)]="searchTerm" (input)="searchFilter($event)" (addOnButtonClicked)="resetSearch()">
+                </fd-input-group>
+
+                <button fd-toolbar-itemclass="btn btn-sm fw-bold btn-primary" label="Refresh" (click)="refresh()"
+                    class="btn btn-sm btn-light-success" glyph="refresh"></button>
+                <ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }"></ngx-loading>
+
+            </fd-toolbar> -->
+
+            <!-- <div class="card" style="margin: 10px; padding: 15px;">
+                <form [formGroup]="myForm">
+                    <div class="row">
+                        <div  colMd="6" colLg="3" colXl="3">
+                           <div class="mb-1   ">
+                                <label class="form-label" for="branchId">{{l("Branch")}}</label>
+                                <ng-select [items]="allBranchs" name="branchId" id="branchId"
+                                    formControlName="branchId" bindLabel="displayName" bindValue="id"
+                                    placeholder="Select items" required>
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div  colMd="6" colLg="3" colXl="3">
+                            <label class="form-label" for="fromMiti">From Miti</label>
+                            <ne-datepicker language="en" [formControl]="myForm.controls['fromMiti']"
+                                ></ne-datepicker>
+                        </div>
+                        <div  colMd="6" colLg="3" colXl="3">
+                            <label class="form-label" for="toMiti">To Miti</label>
+                            <ne-datepicker language="en" [formControl]="myForm.controls['toMiti']"
+                                ></ne-datepicker>
+                        </div>
+                        <div  colMd="6" colLg="3" colXl="3" style="padding: 35px 30px 0px;">
+                            <button class="advsearch" (click)="onAdvanceSearch(this.myForm.value)">Search</button>
+                        </div>
+
+                     </div>
+                </form>
+            </div> -->
+
+            <div *ngFor="let data of displayedRows" class="card hamro-card mp-10px">
+                <div class="row hamroDiv padding-5px">
+                    <div colLg="3" colMd="6" colXl="3">
+                        <div class="mb-1   ">
+                            <label class="form-label">
+                                <span>{{ l("Date(Nepali) :") }}</span>
+                            </label>
+                            <h6>{{ data.dateMiti }}</h6>
+                        </div>
+                    </div>
+                    <div colLg="3" colMd="6" colXl="3">
+                        <div class="mb-1   ">
+                            <label class="form-label">
+                                <span>{{ l("BillNo. :") }}</span>
+                            </label>
+                            <h6>{{ data.billNo }}</h6>
+                        </div>
+                    </div>
+                    <div colLg="3" colMd="6" colXl="3">
+                        <div class="mb-1   ">
+                            <label class="form-label">
+                                <span>{{ l("Buyer's Name :") }}</span>
+                            </label>
+                            <h6 class="font-weight-bold" style="color: darkslateblue">{{ data.ledgerName }}</h6>
+                        </div>
+                    </div>
+                    <div colLg="3" colMd="6" colXl="3">
+                        <div class="mb-1   ">
+                            <label class="form-label">
+                                <span>{{ l("Buyer's Pan :") }}</span>
+                            </label>
+                            <h6>{{ data.paNumber }}</h6>
+                        </div>
+                    </div>
+                </div>
+                <ag-grid-angular
+                    class="ag-theme-balham"
+                    style="width: 100%;"
+                    domLayout="autoHeight"
+                    [columnDefs]="detailColumnDefs"
+                    [defaultColDef]="detailGridDefaultColDef"
+                    [rowData]="data.details"
+                ></ag-grid-angular>
+                <div class="row hamroDiv padding-5px">
+                    <div class="col-lg-4 col-xl-6 col-xs-12 col-sm-12">
+                        <div class="mb-1   ">
+                            <label class="form-label">
+                                <span>{{ l("Net Total :") }}</span>
+                            </label>
+                            <h6>{{ data.total }}</h6>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-xl-6 col-xs-12 col-sm-12">
+                        <div class="mb-1   ">
+                            <label class="form-label">
+                                <span>{{ l("Total tax. :") }}</span>
+                            </label>
+                            <h6>{{ data.taxAmount }}</h6>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-xl-6 col-xs-12 col-sm-12">
+                        <div class="mb-1   ">
+                            <label class="form-label">
+                                <span>{{ l("Grand Total :") }}</span>
+                            </label>
+                            <h6 class="font-weight-bold" style="color: forestgreen">{{ data.grandTotal }}</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

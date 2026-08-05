@@ -1,0 +1,38 @@
+<div class="header-logo me-5 me-md-10 flex-grow-1 flex-lg-grow-0">
+    <a href="/">
+        <!-- Default Logos -->
+        @if (!appSession.tenant || !appSession.tenant.HasLogo()) {
+            <img [src]="defaultLogo" alt="Logo" class="d-none d-lg-block h-30px" />
+        }
+        @if (!appSession.tenant || !appSession.tenant.HasLogo()) {
+            <img [src]="defaultLogo" alt="Logo" class="d-lg-none h-25px" />
+        }
+        <!-- Tenant Logos -->
+        @if (appSession.tenant && appSession.tenant.HasLogo()) {
+            <img
+                [src]="
+                    remoteServiceBaseUrl +
+                    '/TenantCustomization/GetTenantLogo?skin=' +
+                    skin +
+                    '&tenantId=' +
+                    appSession.tenant.id
+                "
+                alt="Logo"
+                class="d-none d-lg-block h-30px"
+            />
+        }
+        @if (appSession.tenant && appSession.tenant.HasLogo()) {
+            <img
+                [src]="
+                    remoteServiceBaseUrl +
+                    '/TenantCustomization/GetTenantLogo?skin=' +
+                    skin +
+                    '&tenantId=' +
+                    appSession.tenant.id
+                "
+                alt="Logo"
+                class="d-lg-none h-25px"
+            />
+        }
+    </a>
+</div>

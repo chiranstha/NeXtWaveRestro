@@ -1,0 +1,81 @@
+<!-- Updated edit-user-permissions-modal.component.html -->
+<div
+    #editModal="bs-modal"
+    [config]="{ backdrop: 'static', keyboard: !saving }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="editModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <!-- Changed to modal-xl for better grid view -->
+        <div class="modal-content">
+            <form #userForm="ngForm" (ngSubmit)="save()" novalidate>
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span>
+                            <i class="fas fa-user-shield me-2"></i>
+                            {{ 'Permissions' | localize }}
+                            @if (userName) {
+                                <span class="text-muted">- {{ userName }}</span>
+                            }
+                        </span>
+                    </h4>
+                    <button
+                        (click)="close()"
+                        [attr.aria-label]="l('Close')"
+                        [disabled]="saving"
+                        class="btn-close"
+                        type="button"
+                    ></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="p-2">
+                        <!-- Reduced from p-3 -->
+                        <!-- Replace the old permission-grid with the new modern permission-tree -->
+                        <permission-tree #permissionTree></permission-tree>
+                        <div class="alert alert-warning py-1 px-2 mt-2" style="margin-bottom: 0; font-size: 0.8rem">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            <em>{{ 'Note_RefreshPageForPermissionChanges' | localize }}</em>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button
+                        (click)="resetPermissions()"
+                        [busyText]="l('SavingWithThreeDot')"
+                        [buttonBusy]="resettingPermissions"
+                        [disabled]="saving"
+                        [title]="l('ResetPermissionsTooltip')"
+                        class="btn btn-sm btn-light-primary fw-bold me-auto"
+                        type="button"
+                    >
+                        <i class="fas fa-undo me-1"></i>
+                        <span>{{ 'ResetSpecialPermissions' | localize }}</span>
+                    </button>
+                    <button
+                        (click)="close()"
+                        [disabled]="saving || resettingPermissions"
+                        class="btn btn-sm btn-light-secondary fw-bold me-2"
+                        type="button"
+                    >
+                        <i class="fas fa-times me-1"></i>
+                        {{ 'Cancel' | localize }}
+                    </button>
+                    <button
+                        [busyText]="l('SavingWithThreeDot')"
+                        [buttonBusy]="saving"
+                        [disabled]="resettingPermissions"
+                        class="btn btn-sm btn-primary fw-bold"
+                        type="submit"
+                    >
+                        <i class="fa fa-save me-1"></i>
+                        <span>{{ 'Save' | localize }}</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

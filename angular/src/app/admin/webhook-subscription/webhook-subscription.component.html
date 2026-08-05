@@ -1,0 +1,61 @@
+<div [@routerTransition]>
+    <sub-header [description]="'WebhookSubscriptionsInfo' | localize" [title]="'WebhookSubscriptions' | localize">
+        <div role="actions">
+            @if ('Pages.Administration.WebhookSubscription.Create' | permission) {
+                <button (click)="createSubscription()" class="btn btn-sm btn-primary">
+                    <i class="fa fa-plus btn-md-icon"></i>
+                    <span class="d-none d-md-inline-block">
+                        {{ 'AddNewWebhookSubscription' | localize }}
+                    </span>
+                </button>
+            }
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div #webhookAlertArea class="col-md-12">
+                        <div class="alert bg-light-primary alert-dismissible d-flex align-items-center p-5 mb-10">
+                            <span class="svg-icon svg-icon-2hx svg-icon-primary me-4">
+                                <svg aria-label="Warning:" class="flex-shrink-0 me-2" height="24" role="img" width="24">
+                                    <use xlink:href="#warning-icon" />
+                                </svg>
+                            </span>
+                            <div class="d-flex flex-column">
+                                <span>{{ 'WebhookPageInfo' | localize }}</span>
+                            </div>
+                            <button
+                                (click)="webhookAlertArea.remove()"
+                                class="btn-close position-absolute position-sm-relative m-2 m-sm-0 top-0 end-0 btn btn-icon ms-sm-auto"
+                                data-bs-dismiss="alert"
+                                type="button"
+                            ></button>
+                        </div>
+                    </div>
+                    <!--<AG-Grid-Start>-->
+                    <div [busyIf]="loading" class="col ag-grid-container">
+                        <ag-grid-angular
+                            (gridReady)="onGridReady($event)"
+                            [columnDefs]="columnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [domLayout]="'autoHeight'"
+                            [rowData]="rowData"
+                            class="ag-theme-balham"
+                        ></ag-grid-angular>
+                        @if (rowData.length == 0 && !loading) {
+                            <div class="app-no-data">
+                                {{ 'NoData' | localize }}
+                            </div>
+                        }
+                    </div>
+                    <!--<AG-Grid-End>-->
+                </div>
+            </div>
+        </div>
+        <create-or-edit-webhook-subscription
+            #createOrEditWebhookSubscriptionModal
+            (modalSave)="getSubscriptions()"
+        ></create-or-edit-webhook-subscription>
+    </div>
+</div>

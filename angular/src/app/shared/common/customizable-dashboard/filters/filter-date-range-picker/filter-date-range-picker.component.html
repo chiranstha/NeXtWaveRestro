@@ -1,0 +1,18 @@
+<div class="input-group">
+    <input
+        (dateChange)="onChange()"
+        [(date)]="selectedDateRange"
+        bsDaterangepicker
+        class="form-control date-range-filter"
+        dateRangePickerLuxonModifier
+        disabled="disabled"
+        placement="bottom"
+        type="text"
+        value="{{ selectedDateRange[0] | luxonFormat: 'ff' }} - {{ selectedDateRange[1] | luxonFormat: 'ff' }}"
+    />
+    <div class="input-group-append">
+        <button class="btn btn-sm btn-primary" type="button">
+            <i aria-hidden="true" class="fa fa-calendar-day p-0" style="color: white"></i>
+        </button>
+    </div>
+</div>

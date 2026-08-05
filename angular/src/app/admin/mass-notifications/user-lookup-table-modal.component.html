@@ -1,0 +1,102 @@
+<div
+    #userLookupTableModal="bs-modal"
+    [config]="{ backdrop: 'true' }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="userLookupTableModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <span>{{ l('SearchUser') }}</span>
+                </h4>
+                <button
+                    (click)="close()"
+                    [disabled]="saving"
+                    aria-label="Close"
+                    class="btn-close"
+                    type="button"
+                ></button>
+            </div>
+            <div class="card card-custom gutter-b">
+                <div class="card-body">
+                    <form autocomplete="off" class="form">
+                        <div>
+                            <div class="row align-items-center mb-4">
+                                <div class="col-xl-12">
+                                    <div class="my-3">
+                                        <div class="input-group">
+                                            <input
+                                                [(ngModel)]="filterText"
+                                                [placeholder]="l('SearchWithThreeDot')"
+                                                autoFocus
+                                                class="form-control m-input"
+                                                name="filterText"
+                                                type="text"
+                                            />
+                                            <button (click)="getAll()" class="btn btn-sm btn-primary" type="submit">
+                                                <i class="fa-solid fa-magnifying-glass"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="row align-items-center">
+                        <div
+                            [busyIf]="$safeNavigationMigration(dataTableHelper?.isLoading)"
+                            class="ag-grid-container"
+                        >
+                            <ag-grid-angular
+                                #agGrid
+                                (gridReady)="onGridReady($event)"
+                                (selectionChanged)="onSelectionChanged($event)"
+                                [columnDefs]="columnDefs"
+                                [defaultColDef]="{
+                                    resizable: true,
+                                    sortable: true,
+                                    filter: true,
+                                }"
+                                [paginationPageSize]="dataTableHelper?.defaultRecordsCountPerPage || 10"
+                                [pagination]="false"
+                                [rowData]="rowData"
+                                [rowSelection]="{ mode: 'multiRow' }"
+                                class="ag-theme-balham"
+                                domLayout="autoHeight"
+                            ></ag-grid-angular>
+                            @if (rowData.length == 0) {
+                                <div class="ag-grid-no-data">
+                                    {{ l('NoData') }}
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                    (click)="close()"
+                    [disabled]="saving"
+                    class="btn btn-sm btn-light-primary font-weight-bold"
+                    type="button"
+                >
+                    {{ 'Cancel' | localize }}
+                </button>
+                <button
+                    (click)="save()"
+                    [busyText]="l('SavingWithThreeDot')"
+                    [buttonBusy]="saving"
+                    class="btn btn-sm btn-primary font-weight-bold"
+                >
+                    <i class="fa fa-save"></i>
+                    <span>{{ 'Save' | localize }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

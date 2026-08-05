@@ -1,0 +1,178 @@
+<div [@routerTransition]>
+    <sub-header [breadcrumbs]="breadcrumbs" [title]="'WebhookSubscriptions' | localize">
+        <div role="actions">
+            @if (subscription && subscription.isActive) {
+                <span class="badge badge-success me-2">
+                    {{ 'Active' | localize }}
+                </span>
+            }
+            @if (subscription && !subscription.isActive) {
+                <span class="badge badge-dark me-2">
+                    {{ 'Disabled' | localize }}
+                </span>
+            }
+            @if (
+                (subscription && ('Pages.Administration.WebhookSubscription.Edit' | permission)) ||
+                ('Pages.Administration.WebhookSubscription.ChangeActivity' | permission)
+            ) {
+                <div class="btn-group" dropdown placement="bottom right">
+                    <button
+                        aria-controls="dropdownMenu01"
+                        class="btn btn-sm btn-primary btn-sm dropdown-toggle"
+                        dropdownToggle
+                        id="dropdownButton01"
+                        type="button"
+                    >
+                        <i class="fa fa-cog"></i>
+                        <span class="caret"></span>
+                    </button>
+                    <ul
+                        *dropdownMenu
+                        aria-labelledby="dropdownButton01"
+                        class="dropdown-menu dropdown-menu-right"
+                        id="dropdownMenu01"
+                        role="menu"
+                    >
+                        @if (('Pages.Administration.WebhookSubscription.Edit' | permission) && subscription) {
+                            <li role="menuitem">
+                                <a
+                                    (click)="createOrEditWebhookSubscriptionModal.show(subscription.id)"
+                                    class="dropdown-item"
+                                    href="javascript:;"
+                                >
+                                    {{ 'EditWebhookSubscription' | localize }}
+                                </a>
+                            </li>
+                        }
+                        @if ('Pages.Administration.WebhookSubscription.ChangeActivity' | permission) {
+                            <li role="menuitem">
+                                <a (click)="toggleActivity()" class="dropdown-item" href="javascript:;">
+                                    @if (subscription.isActive) {
+                                        <span>{{ 'Disable' | localize }}</span>
+                                    }
+                                    @if (!subscription.isActive) {
+                                        <span>{{ 'Enable' | localize }}</span>
+                                    }
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            @if (subscription) {
+                <div class="card-body">
+                    <div class="mb-5 row">
+                        <label class="col-2 col-form-label">{{ 'WebhookEndpoint' | localize }}</label>
+                        <div class="col-10 text-break mt-2">
+                            {{ subscription.webhookUri }}
+                        </div>
+                    </div>
+                    <div class="mb-5 row">
+                        <label class="col-2 col-form-label">{{ 'WebhookEvents' | localize }}</label>
+                        <div class="col-10 text-break mt-2">
+                            @if (subscription.webhooks) {
+                                <div>
+                                    @for (webhook of subscription.webhooks; track webhook) {
+                                        <div class="col-12">
+                                            {{ webhook }}
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="mb-5 row">
+                        <label class="col-2 col-form-label">{{ 'AdditionalWebhookHeaders' | localize }}</label>
+                        <div class="col-10 text-break mt-2">
+                            @if (subscription.headers) {
+                                <div>
+                                    @for (headerKey of objectKeys(subscription.headers); track headerKey) {
+                                        <div class="col-12">
+                                            "{{ headerKey }}" : "{{ subscription.headers[headerKey] }}"
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="row mb-0">
+                        <label class="col-2 col-form-label">{{ 'WebhookSecret' | localize }}</label>
+                        <div class="col-10 position-relative mt-2">
+                            <span [class.blur]="isSecretBlurActive">{{ subscription.secret }}</span>
+                            @if (isSecretBlurActive) {
+                                <button
+                                    (click)="viewSecret()"
+                                    class="btn btn-sm btn-dark btn-elevate btn-elevate-air secret-view-btn"
+                                >
+                                    {{ 'ViewWebhookSecret' | localize }}
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="card card-custom gutter-b">
+            <div class="card-header align-items-center border-0 mt-4">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="fw-bolder text-dark">{{ 'WebhookSendAttempts' | localize }}</span>
+                </h3>
+                <div class="card-toolbar">
+                    <button
+                        (click)="getSendAttempts()"
+                        class="btn btn-sm btn-outline-brand btn-sm btn-icon btn-icon-md"
+                    >
+                        <i class="fa-solid fa-rotate"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <!--<AG-Grid-Start>-->
+                    <div [busyIf]="gridLoading" class="col ag-grid-container">
+                        <ag-grid-angular
+                            (gridReady)="onGridReady($event)"
+                            [columnDefs]="columnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [domLayout]="'autoHeight'"
+                            [rowData]="rowData"
+                            class="ag-theme-balham"
+                        ></ag-grid-angular>
+                        @if (rowData.length == 0 && !gridLoading) {
+                            <div class="app-no-data">
+                                {{ 'NoData' | localize }}
+                            </div>
+                        }
+                    </div>
+                    <!--<AG-Grid-End>-->
+                </div>
+            </div>
+        </div>
+        <create-or-edit-webhook-subscription
+            #createOrEditWebhookSubscriptionModal
+            (modalSave)="getDetail()"
+        ></create-or-edit-webhook-subscription>
+        <div
+            #detailModal="bs-modal"
+            aria-hidden="true"
+            aria-labelledby="detailModal"
+            bsModal
+            class="modal fade"
+            id="detailModal"
+            role="dialog"
+            tabindex="-1"
+        >
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        {{ detailModalText }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

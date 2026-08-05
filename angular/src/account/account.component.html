@@ -1,0 +1,87 @@
+<div class="nextwave-login-register" id="main-wrapper">
+    <div class="container-fluid px-0">
+        <div class="row g-0 min-vh-100">
+            <!-- Welcome Text
+            ========================= -->
+            <div class="col-md-6 d-sm-none d-none d-md-block d-md-block">
+                <div class="hero-wrap d-flex align-items-center h-100">
+                    <div class="hero-mask opacity-8 bg-primary"></div>
+                    <div
+                        class="hero-bg hero-bg-scroll"
+                        style="background-image: url('/assets/common/images/{{ backgroundImageName }}.svg');"
+                    ></div>
+                    <div class="hero-content w-100 min-vh-100 d-flex flex-column">
+                        <div class="row g-0">
+                            <div class="col-11 col-sm-10 col-lg-9 mx-auto">
+                                <div class="logo mt-5 mb-5 mb-md-0">
+                                    <!--begin::Logo-->
+                                    <a
+                                        (click)="goToHome()"
+                                        [class.mb-12]="!isSelectEditionPage()"
+                                        class="d-flex justify-content-center"
+                                        href=""
+                                    >
+                                        <img alt="nextwave" class="h-100px" src="/assets/common/images/applogo.png" />
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-0 my-auto">
+                            <div class="col-11 col-sm-10 col-lg-9 mx-auto">
+                                <h1 class="text-11 text-white mb-4 welcome-title">Sign in</h1>
+                                <p class="text-4 text-white lh-base mb-5">to continue to NextWave Restro</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Welcome Text End -->
+            <!-- Login Form
+            ========================= -->
+            <div class="col-md-6 d-flex">
+                <div class="container my-auto py-5">
+                    <div
+                        [class.pb-0]="isSelectEditionPage()"
+                        [class.pb-lg-20]="!isSelectEditionPage()"
+                        class="d-flex flex-center flex-column flex-column-fluid p-10"
+                    >
+                        <!--begin::Wrapper-->
+                        @if (isSelectEditionPage()) {
+                            <div class="container-xxl mx-auto">
+                                @if (showTenantChange()) {
+                                    <div class="tenant-change-box mb-5 tenant-change-box">
+                                        <tenant-change></tenant-change>
+                                    </div>
+                                }
+                                <!--begin::Form-->
+                                <router-outlet></router-outlet>
+                                <!--end::Form-->
+                            </div>
+                        }
+                        @if (!isSelectEditionPage()) {
+                            <div class="w-lg-500px p-10 p-lg-15 mx-auto login-form-container">
+                                <!-- <div *ngIf="showTenantChange()" class="tenant-change-box mb-5 tenant-change-box">
+                            <tenant-change></tenant-change>
+                          </div> -->
+                                <!--begin::Form-->
+                                <router-outlet></router-outlet>
+                                <!--end::Form-->
+                            </div>
+                        }
+                        <!--end::Wrapper-->
+                    </div>
+                    <!--end::Content-->
+                    <!--begin::Footer-->
+                    <div [class.pt-0]="isSelectEditionPage()" class="d-flex flex-center flex-column-auto p-10">
+                        <!--begin::Links-->
+                        <div class="d-flex align-items-center fw-bold fs-6">
+                            <language-switch class="mx-auto"></language-switch>
+                        </div>
+                        <!--end::Links-->
+                    </div>
+                </div>
+            </div>
+            <!-- Login Form End -->
+        </div>
+    </div>
+</div>

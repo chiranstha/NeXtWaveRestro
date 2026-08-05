@@ -1,0 +1,25 @@
+/*
+ * OPTIMIZED COMPONENT CSS - key-value-list-manager.component.css
+ * Generated: 2025-06-04T16:34:54.322Z
+ * Original: 17 lines, 288 bytes
+ * Optimizations: 1 CSS properties replaced with utility classes
+ *
+ * UTILITY CLASSES TO ADD TO TEMPLATES:
+ *  * - Overflow auto: 1 replacements
+ *
+ * BACKUP: key-value-list-manager.component.css.backup-1749054894321
+ */
+
+.key-value-items-list {
+    height: auto;
+    overflow-y: auto;
+    background-color: #e5e5e5;
+    padding: 5px;
+    resize: vertical;
+    height: 250px;
+}
+
+.key-value-items-list /* Use .overflow-auto utility class */
+.key-value-items-list .alert {
+    line-height: 30px;
+}

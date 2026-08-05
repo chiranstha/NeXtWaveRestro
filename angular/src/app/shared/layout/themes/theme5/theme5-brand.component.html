@@ -1,0 +1,34 @@
+<a href="/">
+    @if (!appSession.tenant || !appSession.tenant.HasLogo()) {
+        <img [src]="defaultLogo" alt="logo" class="d-none d-lg-inline h-30px" />
+    }
+    @if (!appSession.tenant || !appSession.tenant.HasLogo()) {
+        <img [src]="defaultLogo" alt="logo" class="d-lg-none h-25px" />
+    }
+    @if (appSession.tenant && appSession.tenant.HasLogo()) {
+        <img
+            [src]="
+                remoteServiceBaseUrl +
+                '/TenantCustomization/GetTenantLogo?skin=' +
+                skin +
+                '&tenantId=' +
+                appSession.tenant.id
+            "
+            alt="logo"
+            class="d-none d-lg-inline h-30px"
+        />
+    }
+    @if (appSession.tenant && appSession.tenant.HasLogo()) {
+        <img
+            [src]="
+                remoteServiceBaseUrl +
+                '/TenantCustomization/GetTenantLogo?skin=' +
+                skin +
+                '&tenantId=' +
+                appSession.tenant.id
+            "
+            alt="logo"
+            class="d-lg-none h-25px"
+        />
+    }
+</a>

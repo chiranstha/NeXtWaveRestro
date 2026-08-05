@@ -1,0 +1,44 @@
+.page-intro {
+    background: linear-gradient(135deg, var(--bs-body-bg) 0%, var(--bs-gray-100) 100%);
+}
+.page-intro__eyebrow {
+    letter-spacing: 0.1em;
+}
+
+.page-intro__title {
+    letter-spacing: -0.01em;
+}
+
+.filter-shell {
+    z-index: 1060;
+}
+
+.report-toolbar {
+    z-index: 1050;
+}
+
+.report-grid {
+    z-index: 1;
+}
+
+:host ::ng-deep .total-row {
+    background: var(--bs-light) !important;
+    font-weight: var(--bs-font-weight-bolder) !important;
+}
+
+:host ::ng-deep .account-group-row {
+    background: var(--bs-body-bg) !important;
+    font-weight: var(--bs-font-weight-semibold) !important;
+}
+
+
+.loader-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(var(--bs-body-color-rgb), 0.1);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}

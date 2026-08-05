@@ -1,0 +1,9 @@
+<app-autocomplete
+    (completeMethod)="filter($event)"
+    [(ngModel)]="selectedValues"
+    [minLength]="1"
+    [multiple]="true"
+    [suggestions]="filteredValues"
+    inputStyleClass="form-control"
+    styleClass="width-percent-100"
+></app-autocomplete>

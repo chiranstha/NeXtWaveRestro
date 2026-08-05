@@ -1,0 +1,60 @@
+<div
+    #addWidgetModal="bs-modal"
+    [config]="{ backdrop: 'true' }"
+    appBsModal
+    aria-hidden="true"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form #addWidgetModalForm="ngForm" (ngSubmit)="save()">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <span>{{ 'AddWidget' | localize }}</span>
+                    </h5>
+                    <button (click)="close()" [attr.aria-label]="l('Close')" class="btn-close" type="button"></button>
+                </div>
+                <div class="modal-body">
+                    @if (widgets && widgets.length > 0) {
+                        <div class="mb-5">
+                            <select
+                                [(ngModel)]="selectedWidgetId"
+                                autoFocus
+                                class="form-control"
+                                name="selectedWidget"
+                                size="1"
+                            >
+                                @for (widget of widgets; track widget) {
+                                    <option [value]="widget.id">
+                                        {{ widget.name | localize }}
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                    }
+                    @if (!widgets || widgets.length == 0) {
+                        <div class="mb-5">
+                            {{ 'NoWidgetAvailableMessage' | localize }}
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button
+                        (click)="close()"
+                        [disabled]="saving"
+                        class="btn btn-sm btn-light-primary fw-bold"
+                        type="button"
+                    >
+                        {{ 'Cancel' | localize }}
+                    </button>
+                    <button [disabled]="saving" class="btn btn-sm btn-primary fw-bold" type="submit">
+                        <i class="fa fa-save"></i>
+                        <span>{{ 'Save' | localize }}</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

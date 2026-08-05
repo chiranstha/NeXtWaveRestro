@@ -1,0 +1,9 @@
+import { AccountSharedModule } from '@account/shared/account-shared.module';
+import { NgModule } from '@angular/core';
+import { AppSharedModule } from '@app/shared/app-shared.module';
+import { ConfirmEmailRoutingModule } from './confirm-email-routing.module';
+import { ConfirmEmailComponent } from './confirm-email.component';
+@NgModule({
+    imports: [AppSharedModule, AccountSharedModule, ConfirmEmailRoutingModule, ConfirmEmailComponent],
+})
+export class EmailConfirmModule {}

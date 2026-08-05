@@ -1,0 +1,221 @@
+.daybook-page {
+    --daybook-border: #e1e7ef;
+    --daybook-muted: #667085;
+    --daybook-ink: #162033;
+    --daybook-green: #0f766e;
+    --daybook-red: #b42318;
+    --daybook-blue: #1d4ed8;
+    --daybook-soft: #f8fafc;
+}
+
+.daybook-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.daybook-hero,
+.daybook-filter-panel,
+.daybook-grid-card,
+.daybook-side-panel,
+.daybook-summary-tile {
+    background: #ffffff;
+    border: 1px solid var(--daybook-border);
+    border-radius: 8px;
+}
+
+.daybook-hero {
+    align-items: center;
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    padding: 16px;
+}
+
+.daybook-kicker {
+    color: var(--daybook-green);
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 7px;
+    text-transform: uppercase;
+}
+
+.daybook-hero h3,
+.daybook-card-header h4 {
+    color: var(--daybook-ink);
+    font-weight: 750;
+    line-height: 1.2;
+    margin: 0;
+}
+
+.daybook-hero h3 {
+    font-size: 22px;
+}
+
+.daybook-hero p,
+.daybook-card-header span {
+    color: var(--daybook-muted);
+    display: block;
+    font-size: 12px;
+    margin: 4px 0 0;
+}
+
+.daybook-hero-stats {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: repeat(3, minmax(90px, 1fr));
+}
+
+.daybook-hero-stats div {
+    background: var(--daybook-soft);
+    border: 1px solid var(--daybook-border);
+    border-radius: 8px;
+    min-height: 50px;
+    padding: 9px 11px;
+}
+
+.daybook-hero-stats span,
+.daybook-summary-tile span {
+    color: var(--daybook-muted);
+    display: block;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.1;
+    text-transform: uppercase;
+}
+
+.daybook-hero-stats strong,
+.daybook-summary-tile strong {
+    color: var(--daybook-ink);
+    display: block;
+    font-size: 16px;
+    line-height: 1.2;
+    margin-top: 7px;
+    overflow-wrap: anywhere;
+}
+
+.daybook-filter-panel {
+    padding: 14px;
+}
+
+.daybook-summary-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.daybook-summary-tile {
+    min-height: 74px;
+    padding: 13px;
+}
+
+.daybook-summary-tile:nth-child(1) strong,
+.daybook-summary-tile:nth-child(3) strong {
+    color: var(--daybook-green);
+}
+
+.daybook-summary-tile:nth-child(2) strong,
+.daybook-summary-tile:nth-child(4) strong {
+    color: var(--daybook-red);
+}
+
+.daybook-layout {
+    align-items: start;
+    display: grid;
+    gap: 14px;
+    grid-template-columns: minmax(0, 1fr) 320px;
+}
+
+.daybook-grid-card,
+.daybook-side-panel {
+    overflow: hidden;
+}
+
+.daybook-card-header {
+    align-items: center;
+    border-bottom: 1px solid var(--daybook-border);
+    display: flex;
+    justify-content: space-between;
+    min-height: 58px;
+    padding: 12px 14px;
+}
+
+.daybook-card-header h4 {
+    font-size: 16px;
+}
+
+.daybook-grid {
+    min-height: 390px;
+    width: 100%;
+}
+
+.day-summary-list {
+    max-height: 620px;
+    overflow: auto;
+}
+
+.day-summary-row {
+    align-items: flex-start;
+    border-bottom: 1px solid var(--daybook-border);
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    padding: 11px 14px;
+}
+
+.day-summary-row strong {
+    color: var(--daybook-ink);
+    display: block;
+    font-size: 13px;
+}
+
+.day-summary-row span {
+    color: var(--daybook-muted);
+    display: block;
+    font-size: 12px;
+    margin-top: 3px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.day-summary-row div:first-child span {
+    text-align: left;
+}
+
+.day-summary-empty {
+    color: var(--daybook-muted);
+    padding: 18px 14px;
+}
+
+:host ::ng-deep .daybook-debit-row .ag-cell[col-id='debit'] {
+    color: var(--daybook-green);
+    font-weight: 700;
+}
+
+:host ::ng-deep .daybook-credit-row .ag-cell[col-id='credit'] {
+    color: var(--daybook-red);
+    font-weight: 700;
+}
+
+@media (max-width: 1199px) {
+    .daybook-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767px) {
+    .daybook-hero {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .daybook-hero-stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .daybook-filter-panel {
+        padding: 10px;
+    }
+}

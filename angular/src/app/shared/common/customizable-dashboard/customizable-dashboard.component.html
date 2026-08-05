@@ -1,0 +1,256 @@
+<div [@routerTransition]>
+    <sub-header [title]="'Dashboard' | localize">
+        <div class="d-flex align-items-center" role="actions">
+            @if (!loading && userDashboard && userDashboard.filters && userDashboard.filters.length > 0) {
+                <button (click)="filterModal.show()" class="btn btn-sm btn-light-primary btn-filter" type="button">
+                    <i class="fa fa-filter"></i>
+                    {{ 'Filter' | localize }}
+                </button>
+            }
+            <label class="form-check form-check-custom form-check-solid form-switch">
+                <input
+                    (change)="changeEditMode()"
+                    [checked]="editModeEnabled"
+                    class="form-check-input"
+                    type="checkbox"
+                />
+                <span class="form-check-label">
+                    {{ 'EditMode' | localize }}
+                </span>
+            </label>
+        </div>
+    </sub-header>
+    @if (!loading) {
+        <div [class]="containerClass">
+            @if (!userDashboard?.pages?.length) {
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-warning" role="alert">
+                            {{ 'Dashboard_NoPageDefined_Warning' | localize }}
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="row">
+                <div class="col-md-12" style="z-index: 0">
+                    <tabset #dashboardTabs [justified]="false" [ngClass]="{ 'nav-hidden': !moreThanOnePage() }">
+                        @for (page of userDashboard?.pages || []; track page; let i = $index) {
+                            <tab (selectTab)="selectPageTab(page.id)" heading="{{ page.name }}">
+                                <gridster
+                                    [ngClass]="{ 'no-tab': !moreThanOnePage() }"
+                                    [options]="options[i]"
+                                    [perfectScrollOptions]="{ wheelPropagation: false }"
+                                    perfectScrollbar
+                                >
+                                    @for (widget of page.widgets; track widget) {
+                                        <gridster-item
+                                            (itemResize)="onGridSterItemResize(widget)"
+                                            [item]="widget.gridInformation"
+                                        >
+                                            <ng-container
+                                                *ngComponentOutlet="
+                                                    widget.component;
+                                                    injector: this.widgetSubjects[widget.guid].injector
+                                                "
+                                            ></ng-container>
+                                            @if (editModeEnabled) {
+                                                <button
+                                                    (click)="removeItem(widget.gridInformation)"
+                                                    class="btn btn-sm bg-danger deleteWidgetButton"
+                                                >
+                                                    <i class="fa-duotone fa-regular fa-xmark text-white"></i>
+                                                </button>
+                                            }
+                                        </gridster-item>
+                                    }
+                                </gridster>
+                            </tab>
+                        }
+                    </tabset>
+                </div>
+                @if (editModeEnabled) {
+                    <div class="div-dashboard-customization d-flex w-auto shadow-lg">
+                        <div class="me-1 border-right">
+                            <button
+                                (click)="openAddWidgetModal()"
+                                [disabled]="selectedPage.id === ''"
+                                class="btn btn-sm btn-warning btn-elevate-hover btn-pill"
+                                id="AddWidgetButton"
+                                type="button"
+                            >
+                                <i class="fa fa-plus"></i>
+                                {{ 'AddWidget' | localize }}
+                            </button>
+                            &nbsp;
+                        </div>
+                        <div class="ms-1 me-1 border-right">
+                            <div
+                                #dropdownAddPage="bs-dropdown"
+                                (onShown)="addPageDropdownShown()"
+                                [dropup]="true"
+                                [insideClick]="true"
+                                class="btn-group"
+                                dropdown
+                            >
+                                <button
+                                    aria-controls="dropdownMenuAddPage"
+                                    class="btn btn-sm btn-primary dropdown-toggle btn-elevate-hover btn-pill"
+                                    dropdownToggle
+                                    id="dropdownButtonAddPage"
+                                    type="button"
+                                >
+                                    <i class="fa fa-plus"></i>
+                                    {{ 'AddPage' | localize }}
+                                    <span class="caret"></span>
+                                </button>
+                                <ul
+                                    *dropdownMenu
+                                    aria-labelledby="dropdownButtonAddPage"
+                                    class="dropdown-menu p-10"
+                                    id="dropdownMenuAddPage"
+                                    role="menu"
+                                >
+                                    <li role="menuitem">
+                                        <div class="mb-5">
+                                            <label class="form-label">{{ 'NewPageName' | localize }}</label>
+                                            <input
+                                                [(ngModel)]="addPageInput"
+                                                class="form-control"
+                                                placeholder=""
+                                                type="text"
+                                            />
+                                        </div>
+                                        <button (click)="addNewPage(addPageInput)" class="btn btn-sm w-100 btn-info">
+                                            {{ 'Save' | localize }}
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div
+                                #dropdownRenamePage="bs-dropdown"
+                                (onShown)="renamePageDropdownShown()"
+                                [dropup]="true"
+                                [insideClick]="true"
+                                [isDisabled]="selectedPage.id === ''"
+                                class="btn-group"
+                                dropdown
+                            >
+                                <button
+                                    aria-controls="dropdownMenuRenamePage"
+                                    class="btn btn-sm btn-info btn-elevate-hover btn-pill dropdown-toggle"
+                                    dropdownToggle
+                                    id="dropdownButtonRenamePage"
+                                    type="button"
+                                >
+                                    <i class="fa fa-edit"></i>
+                                    {{ 'RenamePage' | localize }}
+                                    <span class="caret"></span>
+                                </button>
+                                <ul
+                                    *dropdownMenu
+                                    aria-labelledby="dropdownButtonRenamePage"
+                                    class="dropdown-menu p-10"
+                                    id="dropdownMenuRenamePage"
+                                    role="menu"
+                                >
+                                    <li role="menuitem">
+                                        <div class="mb-5">
+                                            <label class="form-label">{{ 'PageNewName' | localize }}</label>
+                                            <input
+                                                [(ngModel)]="renamePageInput"
+                                                class="form-control"
+                                                placeholder="{{ selectedPage.name }}"
+                                                type="text"
+                                            />
+                                        </div>
+                                        <button (click)="renamePage(renamePageInput)" class="btn btn-sm w-100 btn-info">
+                                            {{ 'Save' | localize }}
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <button
+                                (click)="deletePage()"
+                                [disabled]="selectedPage.id === ''"
+                                class="btn btn-sm btn-danger btn-elevate-hover btn-pill"
+                                id="DeletePageButton"
+                            >
+                                <i class="fa fa-trash"></i>
+                                @if (userDashboard && userDashboard.pages.length > 1) {
+                                    <span>
+                                        {{ 'DeletePage' | localize }}
+                                    </span>
+                                }
+                                @if (userDashboard && userDashboard.pages.length == 1) {
+                                    <span>
+                                        {{ 'BackToDefaultPage' | localize }}
+                                    </span>
+                                }
+                                @if (!userDashboard || userDashboard.pages.length == 0) {
+                                    <span>
+                                        {{ 'BackToDefaultPage' | localize }}
+                                    </span>
+                                }
+                            </button>
+                            &nbsp;
+                        </div>
+                        <div class="ms-1">
+                            <button
+                                (click)="savePage()"
+                                class="btn btn-sm btn-success btn-elevate-hover btn-pill"
+                                type="button"
+                            >
+                                <i class="fa fa-save"></i>
+                                {{ 'Save' | localize }}
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    @if (dashboardName) {
+        <add-widget-modal #addWidgetModal (onClose)="addWidget($event)"></add-widget-modal>
+    }
+    <div
+        #filterModal="bs-modal"
+        appBsModal
+        aria-hidden="true"
+        class="modal fade filterModal"
+        role="dialog"
+        tabindex="-1"
+    >
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <span>{{ 'DashboardFilters' | localize }}</span>
+                    </h5>
+                    <button (click)="close()" [attr.aria-label]="l('Close')" class="btn-close" type="button"></button>
+                </div>
+                @if (userDashboard) {
+                    <div class="modal-body">
+                        @for (filter of userDashboard.filters; track filter; let i = $index) {
+                            <div>
+                                <div class="row">
+                                    <h6 style="margin-left: 10px">{{ filter.name | localize }}</h6>
+                                    <div class="col-md-12">
+                                        <ng-container *ngComponentOutlet="filter.component"></ng-container>
+                                    </div>
+                                </div>
+                                @if (i != userDashboard.filters.length - 1) {
+                                    <hr />
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+                <div class="modal-footer">
+                    <button (click)="close()" class="btn btn-sm btn-light-primary fw-bold" type="button">
+                        {{ 'Close' | localize }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

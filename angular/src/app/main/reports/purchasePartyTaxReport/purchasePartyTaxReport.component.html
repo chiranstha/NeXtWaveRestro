@@ -1,0 +1,83 @@
+<div [@routerTransition]>
+    <sub-header [title]="'Purchase Party Tax Report'">
+        <div role="search">
+            <div class="position-relative w-md-400px me-md-2">
+                <i
+                    class="fa-duotone fa-magnifying-glass fs-3 text-gray-500 position-absolute top-50 translate-middle ms-6"><span
+                        class="path1"></span><span class="path2"></span></i>
+                <input (keyup.enter)="searchFilter($event.target.value)" [ngModelOptions]="{ standalone: true }"
+                    class="form-control form-control-solid ps-10 headerSearch" name="search" placeholder="Search"
+                    type="text" value="">
+            </div>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="card card-bordered p-4">
+            <div [hidden]="!advancedFiltersAreShown" class="col-12 p-3">
+                <div class="hidden-filter">
+                    <div>
+                        <form [formGroup]="myForm">
+                            <div class="row">                                
+                                <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
+                                    <label class="form-label" for="fromMiti">From Date</label>
+                                    <div>
+                                        <ne-datepicker [dateFormat]="'yyyy/MM/dd'"
+                                            [formControl]="myForm.controls['fromMiti']" [placeholder]="'yyyy/MM/dd'"
+                                            [todayBtn]="true" language="en"></ne-datepicker>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
+                                    <label class="form-label" for="toMiti">To Date</label>
+                                    <div>
+                                        <ne-datepicker [dateFormat]="'yyyy/MM/dd'"
+                                            [formControl]="myForm.controls['toMiti']" [placeholder]="'yyyy/MM/dd'"
+                                            [todayBtn]="true" language="en"></ne-datepicker>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12 pt-8">
+                                    <a (click)="refresh()" class="btn btn-sm btn-flex btn-primary fw-bold">
+                                        <i class="fa-duotone fa-rotate-right fs-6 text-light me-1">
+                                        </i>
+                                        Reset
+                                    </a>
+                                    <a (click)="onAdvanceSearch(this.myForm.value)"
+                                        class="btn btn-sm btn-flex btn-primary fw-bold">
+                                        <i class="fa fa-search"></i>
+                                        Search
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-sm-12">
+                    <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown" *ngIf="!advancedFiltersAreShown"
+                        class="clickable-item text-muted">
+                        <i class="fa fa-angle-down"></i>
+                        {{ 'ShowAdvancedFilters' | localize }}
+                    </span>
+                    <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown" *ngIf="advancedFiltersAreShown"
+                        class="clickable-item text-muted">
+                        <i class="fa fa-angle-up"></i>
+                        {{ 'HideAdvancedFilters' | localize }}
+                    </span>
+                </div>
+            </div>
+
+
+            <ag-grid-angular
+                class="ag-theme-balham"
+                style="width: 100%; height: 600px;"
+                [columnDefs]="columnDefs"
+                [defaultColDef]="defaultColDef"
+                [rowData]="displayedRows"
+            ></ag-grid-angular>
+
+        </div>
+    </div>
+</div>

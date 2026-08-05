@@ -1,0 +1,76 @@
+<div
+    #createOrEditModal="bs-modal"
+    (onShown)="onShown()"
+    [config]="{ backdrop: 'static', keyboard: !saving }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="createOrEditModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            @if (active) {
+                <form #editForm="ngForm" (ngSubmit)="save()" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            @if (organizationUnit.id) {
+                                <span>{{ 'Edit' | localize }}: {{ organizationUnit.displayName }}</span>
+                            }
+                            @if (!organizationUnit.id) {
+                                <span>{{ 'NewOrganizationUnit' | localize }}</span>
+                            }
+                        </h5>
+                        <button
+                            (click)="close()"
+                            [attr.aria-label]="l('Close')"
+                            [disabled]="saving"
+                            class="btn-close"
+                            type="button"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-5 form-md-line-input form-md-floating-label no-hint">
+                            <label class="form-label required" for="OrganizationUnitDisplayName">
+                                {{ 'Name' | localize }}
+                            </label>
+                            <input
+                                #organizationUnitDisplayName="ngModel"
+                                [(ngModel)]="organizationUnit.displayName"
+                                [ngClass]="{ edited: organizationUnit.displayName }"
+                                class="form-control"
+                                id="OrganizationUnitDisplayName"
+                                maxlength="128"
+                                name="displayName"
+                                required
+                                type="text"
+                            />
+                            <validation-messages [formCtrl]="organizationUnitDisplayName"></validation-messages>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            (click)="close()"
+                            [disabled]="saving"
+                            class="btn btn-sm btn-light-primary fw-bold"
+                            type="button"
+                        >
+                            {{ 'Cancel' | localize }}
+                        </button>
+                        <button
+                            [busyText]="l('SavingWithThreeDot')"
+                            [buttonBusy]="saving"
+                            [disabled]="!isFormValid"
+                            class="btn btn-sm btn-primary fw-bold"
+                            type="submit"
+                        >
+                            <i class="fa fa-save"></i>
+                            <span>{{ 'Save' | localize }}</span>
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,184 @@
+<div [@routerTransition]>
+    <sub-header [title]="'Opening Stock' | localize">
+        <div role="actions">
+            <button
+                (click)="keyEventsReceipt()"
+                [disabled]="duplicate"
+                class="btn btn-sm btn-light-success me-2"
+                id="add"
+                type="button"
+            >
+                <i class="fa-duotone fa-grid-2-plus btn-md-icon"></i>
+                <span class="d-none d-md-inline-block">{{ l('Add') }}</span>
+            </button>
+            <button
+                (click)="save()"
+                [disabled]="form.invalid || duplicate || products.length === 0 || saving"
+                class="btn btn-sm btn-primary"
+                id="save"
+                type="button"
+            >
+                @if (saving) {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                }
+                <i class="fa fa-save btn-md-icon"></i>
+                <span class="d-none d-md-inline-block">{{ l('Save') }}</span>
+            </button>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <form [formGroup]="form" autocomplete="off">
+            <div class="card card-custom shadow-sm">
+                <div class="card-header align-items-center py-4">
+                    <div>
+                        <h3 class="card-title fw-bold mb-1">{{ l('Opening Stock Details') }}</h3>
+                    </div>
+                    <div class="card-toolbar">
+                        <span class="badge badge-light-primary me-3">
+                            {{ products.length }} {{ l('Rows') }}
+                        </span>
+                        @if (duplicate) {
+                            <span class="badge badge-light-danger">
+                                {{ l('Duplicate product and unit') }}
+                            </span>
+                        }
+                    </div>
+                </div>
+
+                <div class="card-body pt-4">
+                    <div class="table-responsive">
+                        <table class="table table-row-bordered table-row-gray-200 align-middle gs-0 gy-3" formArrayName="products">
+                            <thead>
+                                <tr class="fw-bold text-gray-700 text-uppercase bg-light">
+                                    <th class="min-w-60px text-center ps-4">{{ l('SN') }}</th>
+                                    <th class="min-w-300px">{{ l('Product') }}</th>
+                                    <th class="min-w-160px text-end">{{ l('Opening Qty') }}</th>
+                                    <th class="min-w-180px">{{ l('Unit') }}</th>
+                                    <th class="min-w-160px text-end">{{ l('Rate') }}</th>
+                                    <th class="min-w-80px text-center">{{ l('Edit') }}</th>
+                                    <th class="min-w-80px text-center pe-4">{{ l('Remove') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    *ngFor="let abcd of getproducts(form); let i = index"
+                                    [formGroupName]="i"
+                                    class="text-gray-800"
+                                >
+                                    <td class="text-center fw-semibold ps-4" appPadding>
+                                        {{ i + 1 }}
+                                    </td>
+                                    <td appPadding>
+                                        <ng-select
+                                            #productKey
+                                            (change)="onGetProduct($event.id, abcd, i)"
+                                            (keyup)="fromProduct($event, i, abcd)"
+                                            [items]="allProduct"
+                                            appendTo="body"
+                                            bindLabel="displayName"
+                                            bindValue="id"
+                                            class="w-100"
+                                            formControlName="productId"
+                                            id="productId"
+                                            name="productId"
+                                            placeholder="{{ l('Select product') }}"
+                                        ></ng-select>
+                                        @if (
+                                            abcd.get('productId').invalid &&
+                                            (abcd.get('productId').dirty || abcd.get('productId').touched)
+                                        ) {
+                                            <div class="text-danger small mt-1">{{ l('Required') }}</div>
+                                        }
+                                    </td>
+                                    <td appPadding>
+                                        <input
+                                            #qty
+                                            (keyup)="formQty($event, i)"
+                                            [ngClass]="{
+                                                'is-invalid':
+                                                    abcd.get('openingQty').touched && abcd.get('openingQty').invalid
+                                            }"
+                                            class="form-control form-control-sm text-end"
+                                            formControlName="openingQty"
+                                            id="openingQty"
+                                            min="0"
+                                            type="number"
+                                        />
+                                    </td>
+                                    <td appPadding>
+                                        <ng-select
+                                            #units
+                                            (change)="checkIfDuplicate(); unitConversion($event.rate, abcd)"
+                                            (keyup)="gotoRate($event, i)"
+                                            [items]="allUnits"
+                                            appendTo="body"
+                                            bindLabel="displayName"
+                                            bindValue="id"
+                                            class="w-100"
+                                            formControlName="unitId"
+                                            id="unitId"
+                                            name="unitId"
+                                            placeholder="{{ l('Select unit') }}"
+                                        ></ng-select>
+                                        @if (
+                                            abcd.get('unitId').invalid &&
+                                            (abcd.get('unitId').dirty || abcd.get('unitId').touched)
+                                        ) {
+                                            <div class="text-danger small mt-1">{{ l('Required') }}</div>
+                                        }
+                                    </td>
+                                    <td appPadding>
+                                        <input
+                                            #rates
+                                            (keyup)="gotGodOwn($event, i)"
+                                            [ngClass]="{
+                                                'is-invalid': abcd.get('rate').touched && abcd.get('rate').invalid
+                                            }"
+                                            class="form-control form-control-sm text-end"
+                                            formControlName="rate"
+                                            id="amountc"
+                                            min="0"
+                                            type="number"
+                                        />
+                                    </td>
+                                    <td class="text-center" appPadding>
+                                        <button
+                                            (click)="enableproductsFormGroup(i, form)"
+                                            class="btn btn-sm btn-icon btn-light-primary"
+                                            title="{{ l('Edit') }}"
+                                            type="button"
+                                        >
+                                            <i class="fa-duotone fa-pen-to-square"></i>
+                                        </button>
+                                    </td>
+                                    <td class="text-center pe-4" appPadding>
+                                        <button
+                                            (click)="removeproductsForm(i, form)"
+                                            class="btn btn-sm btn-icon btn-light-danger"
+                                            title="{{ l('Remove') }}"
+                                            type="button"
+                                        >
+                                            <i class="fa-duotone fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                @if (products.length === 0) {
+                                    <tr>
+                                        <td class="text-center text-muted py-10" colspan="7">
+                                            {{ l('No opening stock rows added yet') }}
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- <erp-key-event (closeEvent)="keyClose($event)" (saveEvent)="keySave($event)"
+    [id]="this.id ? this.id : null"></erp-key-event> -->

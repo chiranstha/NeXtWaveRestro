@@ -1,0 +1,197 @@
+<div class="book-report-page" *ngIf="myForm">
+    <sub-header [title]="reportTitle || 'Daybook Report'">
+        <div role="search" class="print-hidden">
+            <div class="position-relative w-md-400px me-md-2">
+                <i class="fa-duotone fa-magnifying-glass fs-3 text-gray-500 position-absolute top-50 translate-middle ms-6"></i>
+                <input
+                    (keyup)="searchValueOnApiCall($event.target.value)"
+                    [(ngModel)]="filterText"
+                    [ngModelOptions]="{ standalone: true }"
+                    class="form-control form-control-solid ps-10 headerSearch"
+                    name="search"
+                    placeholder="Search"
+                    type="text"
+                />
+            </div>
+        </div>
+
+        <div role="actions" class="d-flex gap-2 print-hidden">
+            <button class="btn btn-sm btn-outline-secondary" type="button" (click)="advancedFiltersAreShown = !advancedFiltersAreShown">
+                <i class="fa" [ngClass]="advancedFiltersAreShown ? 'fa-angle-up' : 'fa-angle-down'"></i>
+                {{ advancedFiltersAreShown ? ('HideAdvancedFilters' | localize) : ('ShowAdvancedFilters' | localize) }}
+            </button>
+            <button class="btn btn-sm btn-primary" type="button" (click)="exportToExcel()" [disabled]="loading">
+                <i class="fa-duotone fa-file-excel"></i>
+                Excel
+            </button>
+            <button class="btn btn-sm btn-danger" type="button" (click)="exportToPdf()" [disabled]="loading">
+                <i class="fa-duotone fa-file-pdf"></i>
+                PDF
+            </button>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="book-report-toolbar print-hidden">
+            <div class="book-report-toolbar-head">
+                <div class="active-report-mark">
+                    <span class="active-report-icon"><i [class]="selectedReport.icon"></i></span>
+                    <div>
+                        <h4>{{ reportTitle }}</h4>
+                        <span>{{ myForm.get('fromMiti')?.value }} - {{ myForm.get('toMiti')?.value }}</span>
+                    </div>
+                </div>
+                <div class="active-report-facts">
+                    <div>
+                        <span>Net</span>
+                        <strong>{{ formatAmount(summary.difference) }}</strong>
+                    </div>
+                    <div>
+                        <span>Side</span>
+                        <strong>{{ netMovementLabel }}</strong>
+                    </div>
+                    <div>
+                        <span>Filters</span>
+                        <strong>{{ activeFilterCount }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="report-chip-grid">
+                <button
+                    *ngFor="let report of bookReports"
+                    type="button"
+                    class="report-chip"
+                    [class.active]="selectedReport.id === report.id"
+                    (click)="selectReport(report.id)"
+                >
+                    <i [class]="report.icon"></i>
+                    <span>{{ report.name }}</span>
+                </button>
+            </div>
+
+            <form [formGroup]="myForm" [hidden]="!advancedFiltersAreShown" class="filter-panel">
+                <div class="row g-3 align-items-end">
+                    <div class="col-12 col-md-3 col-xl-2">
+                        <label class="form-label" for="fromMiti">From Date(NP)</label>
+                        <ne-datepicker
+                            id="fromMiti"
+                            [dateFormat]="'yyyy/MM/dd'"
+                            [formControl]="myForm.controls['fromMiti']"
+                            [placeholder]="'yyyy/MM/dd'"
+                            [todayBtn]="true"
+                            language="en"
+                        ></ne-datepicker>
+                    </div>
+
+                    <div class="col-12 col-md-3 col-xl-2">
+                        <label class="form-label" for="toMiti">To Date(NP)</label>
+                        <ne-datepicker
+                            id="toMiti"
+                            [dateFormat]="'yyyy/MM/dd'"
+                            [formControl]="myForm.controls['toMiti']"
+                            [placeholder]="'yyyy/MM/dd'"
+                            [todayBtn]="true"
+                            language="en"
+                        ></ne-datepicker>
+                    </div>
+
+                    <div class="col-12 col-md-3 col-xl-3" *ngIf="showLedgerFilter">
+                        <label class="form-label" for="ledgerId">Ledger</label>
+                        <ng-select
+                            id="ledgerId"
+                            [items]="ledgers"
+                            bindLabel="displayName"
+                            bindValue="id"
+                            formControlName="ledgerId"
+                            [clearable]="true"
+                            placeholder="All Ledgers"
+                            (change)="loadReport()"
+                        ></ng-select>
+                    </div>
+
+                    <div class="col-12 col-md-3 col-xl-3" *ngIf="showVoucherFilter">
+                        <label class="form-label" for="voucherTypeId">Voucher Type</label>
+                        <ng-select
+                            id="voucherTypeId"
+                            [items]="voucherTypes"
+                            bindLabel="displayName"
+                            bindValue="id"
+                            formControlName="voucherTypeId"
+                            [clearable]="true"
+                            placeholder="All Voucher Types"
+                        ></ng-select>
+                    </div>
+
+                    <div class="col-12 col-md-auto">
+                        <button class="btn btn-primary w-100" type="button" (click)="loadReport()" [disabled]="loading">
+                            <i class="fa-duotone fa-magnifying-glass"></i>
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="alert alert-warning py-3" *ngIf="inlineMessage">
+            {{ inlineMessage }}
+        </div>
+
+        <div class="summary-grid">
+            <div class="summary-tile">
+                <span>Rows</span>
+                <strong>{{ summary.totalRows | number: '1.0-0' }}</strong>
+            </div>
+            <div class="summary-tile">
+                <span>In</span>
+                <strong>{{ formatAmount(summary.totalIn) }}</strong>
+            </div>
+            <div class="summary-tile">
+                <span>Out</span>
+                <strong>{{ formatAmount(summary.totalOut) }}</strong>
+            </div>
+            <div class="summary-tile">
+                <span>Opening</span>
+                <strong>{{ formatAmount(summary.openingBalance) }}</strong>
+            </div>
+            <div class="summary-tile">
+                <span>Debit</span>
+                <strong>{{ formatAmount(summary.totalDebit) }}</strong>
+            </div>
+            <div class="summary-tile">
+                <span>Credit</span>
+                <strong>{{ formatAmount(summary.totalCredit) }}</strong>
+            </div>
+            <div class="summary-tile">
+                <span>Difference</span>
+                <strong>{{ formatAmount(summary.difference) }}</strong>
+            </div>
+            <div class="summary-tile">
+                <span>Closing</span>
+                <strong>{{ formatAmount(summary.closingBalance) }}</strong>
+            </div>
+        </div>
+
+        <div class="card report-grid-card">
+            <div class="card-header align-items-center">
+                <div>
+                    <h3 class="card-title mb-0">{{ reportTitle }}</h3>
+                    <span class="text-muted">{{ myForm.get('fromMiti')?.value }} - {{ myForm.get('toMiti')?.value }}</span>
+                </div>
+                <span class="badge badge-light-primary">{{ rowData.length | number: '1.0-0' }}</span>
+            </div>
+            <div class="card-body">
+                <ag-grid-angular
+                    class="ag-theme-balham book-report-grid"
+                    [gridOptions]="gridOptions"
+                    [columnDefs]="columnDefs"
+                    [defaultColDef]="defaultColDef"
+                    [rowData]="rowData"
+                    [pinnedBottomRowData]="gridOptions.pinnedBottomRowData"
+                    (gridReady)="onGridReady($event)"
+                    [style.height.px]="screenHeight"
+                ></ag-grid-angular>
+            </div>
+        </div>
+    </div>
+</div>

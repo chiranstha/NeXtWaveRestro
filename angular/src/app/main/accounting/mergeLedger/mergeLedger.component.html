@@ -1,0 +1,68 @@
+<div [@routerTransition]>
+
+    <sub-header [description]="" title="Merge Ledger"> </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <form [formGroup]="form" autocomplete="off">
+                    <div class="row">
+                        <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3">
+                            <div>
+                                <label class="required form-label" for="requestLedgerId">
+                                    {{ l('Request Ledger') }}
+                                </label>
+                                <ng-select #requestledger (change)="onChange()" (keyup)="gotoAccountLedger($event)"
+                                    [items]="requestData" appendTo="body" bindLabel="displayName" bindValue="id"
+                                    formControlName="requestLedgerId" id="requestLedgerId" name="requestLedgerId"
+                                    placeholder="Select an item" required></ng-select>
+                                <div *ngIf="
+                  this.form.get('requestLedgerId').invalid &&
+                  (this.form.get('requestLedgerId').dirty || this.form.get('requestLedgerId').touched)
+                ">
+                                    <div class="alert alert-danger alert-height mt-1" role="alert">
+                                        <div class="alert-div">Request Ledger is required!</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class=" col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 text-center">
+                            <div class="mb-1 mt-8 fw-bold ">
+                                <div>{{ l('To') }}</div>
+                            </div>
+                        </div>
+                        <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3">
+                            <div>
+                                <label class=" required form-label" for="ledgerId">{{ l('Account Ledger') }}</label>
+                                <ng-select #accountledger (change)="toggleEnable()" (keyup)="saveOnEnter($event)"
+                                    [items]="ledgerData" appendTo="body" bindLabel="displayName" bindValue="id"
+                                    formControlName="ledgerId" id="ledgerId" name="ledgerId"
+                                    placeholder="Select an item" required></ng-select>
+                                <div *ngIf="
+                  this.form.get('ledgerId').invalid &&
+                  (this.form.get('ledgerId').dirty || this.form.get('ledgerId').touched)
+                ">
+                                    <div class="alert alert-danger alert-height mt-1" role="alert">
+                                        <div class="alert-div">Account Ledger is required!</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 mt-8 ">
+                            <div>
+                                <button (click)="postData()" [disabled]="form.invalid || enabled"
+                                    class="me-2 btn btn-sm btn-primary" id="save" label="Post" type="submit"><i
+                                        class="fa-duotone fa-circle-plus">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                    Merge
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

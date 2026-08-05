@@ -1,0 +1,82 @@
+<div [@routerTransition]>
+    <sub-header [description]="" [title]="'FinancialYears' | localize">
+        <div role="search">
+            <div class="position-relative w-md-400px me-md-2">
+                <i
+                    class="fa-duotone fa-magnifying-glass fs-3 text-gray-500 position-absolute top-50 translate-middle ms-6"
+                >
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                </i>
+                <input
+                    (keyup.enter)="searchValueOnApiCall($event.target.value)"
+                    [(ngModel)]="filterText"
+                    [ngModelOptions]="{ standalone: true }"
+                    class="form-control form-control-solid ps-12 rounded-pill border-0 bg-light shadow-none"
+                    name="search"
+                    placeholder="Search"
+                    type="text"
+                    value=""
+                />
+            </div>
+        </div>
+        <div role="actions">
+            @if (selectedRows.length > 0) {
+                <button (click)="exportSelectedRows()" class="btn btn-sm btn-secondary">
+                    <i class="fa-duotone fa-file-excel"></i>
+                    <span class="d-none d-md-inline-block">
+                        {{ 'Export' | localize }}
+                    </span>
+                </button>
+            }
+            @if (selectedRows.length > 0 && ('Pages.FinancialYears.Delete' | permission)) {
+                <button (click)="deleteSelectedRows()" class="btn btn-sm btn-danger">
+                    <i class="fa-duotone fa-trash"></i>
+                    <span class="d-none d-md-inline-block">
+                        {{ 'Delete' | localize }}
+                    </span>
+                </button>
+            }
+            @if ('Pages.FinancialYears.Create' | permission) {
+                <button (click)="addRoute()" class="btn btn-sm btn-primary">
+                    <i class="fa fa-plus btn-md-icon"></i>
+                    <span class="d-none d-md-inline-block">
+                        {{ 'Create' | localize }}
+                    </span>
+                </button>
+            }
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <div class="ag-theme-balham">
+                    <ag-grid-angular
+                        (cellValueChanged)="onCellValueChanged($event)"
+                        (gridReady)="onGridReady($event)"
+                        (selectionChanged)="onSelectionChanged()"
+                        [columnDefs]="columnDefs"
+                        [defaultColDef]="defaultColDef"
+                        [getContextMenuItems]="getCustomContextMenuItems"
+                        [groupDefaultExpanded]="groupDefaultExpanded"
+                        [rowData]="rowData"
+                        style="width: 100%; height: 600px"
+                     [loading]="$any(this)['loading'] || $any(this)['isLoading'] || false"></ag-grid-angular>
+                </div>
+                <app-pagination
+                    (pageChange)="onPageChange($event)"
+                    (pageSizeChange)="onPageSizeChange($event)"
+                    [currentPage]="currentPage"
+                    [pageSizeOptions]="pageSizeOptions"
+                    [pageSize]="pageSize"
+                    [totalRecords]="totalRecords"
+                ></app-pagination>
+            </div>
+        </div>
+    </div>
+    <app-add-financialyear
+        #createOrEditFinancialYearModal
+        (modalSave)="loadPage(currentPage)"
+        [dialog]="true"
+    ></app-add-financialyear>
+</div>

@@ -1,0 +1,106 @@
+<div [@routerTransition]>
+    <sub-header [title]="'WebhookEventDetail' | localize"></sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            @if (webhookEvent) {
+                <div class="card-body">
+                    <div class="mb-5 row">
+                        <label class="col-2 col-form-label">{{ 'WebhookEvent' | localize }}</label>
+                        <div class="col-10">
+                            {{ webhookEvent.webhookName }}
+                        </div>
+                    </div>
+                    <div class="mb-5 row">
+                        <label class="col-2 col-form-label">{{ 'CreationTime' | localize }}</label>
+                        <div class="col-10">
+                            {{ webhookEvent.creationTime | luxonFormat: 'F' }}
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <label class="col-2 col-form-label">{{ 'Data' | localize }}</label>
+                        @if (webhookEvent.data.length <= maxDataLength) {
+                            <div class="col-10 text-break">
+                                {{ webhookEvent.data }}
+                            </div>
+                        }
+                        @if (webhookEvent.data.length > maxDataLength) {
+                            <div class="col-10 text-break">
+                                <p>
+                                    <span id="dataDots">{{ webhookEvent.data.slice(0, maxDataLength) }}. . .</span>
+                                    <span class="d-none" id="dataMore">
+                                        {{ webhookEvent.data }}
+                                    </span>
+                                </p>
+                                <button
+                                    (click)="showMoreData()"
+                                    class="btn btn-sm btn-outline-primary btn-sm"
+                                    id="dataShowMoreBtn"
+                                >
+                                    {{ 'ShowData' | localize }}
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="card card-custom gutter-b">
+            <div class="card-header align-items-center border-0 mt-4">
+                <h3 class="card-title align-items-start flex-column">
+                    <span class="fw-bolder text-dark">{{ 'WebhookSendAttempts' | localize }}</span>
+                </h3>
+                <div class="card-toolbar">
+                    <button
+                        (click)="getSendAttempts()"
+                        class="btn btn-sm btn-outline-brand btn-sm btn-icon btn-icon-md"
+                    >
+                        <i class="fa-solid fa-rotate"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <!--<AG-Grid-Start>-->
+                    <div [busyIf]="gridLoading" class="col ag-grid-container">
+                        <ag-grid-angular
+                            (gridReady)="onGridReady($event)"
+                            [columnDefs]="columnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [domLayout]="'autoHeight'"
+                            [rowData]="rowData"
+                            class="ag-theme-balham"
+                        ></ag-grid-angular>
+                        @if (rowData.length == 0 && !gridLoading) {
+                            <div class="app-no-data">
+                                {{ 'NoData' | localize }}
+                            </div>
+                        }
+                    </div>
+                    <!--<AG-Grid-End>-->
+                </div>
+            </div>
+        </div>
+        <create-or-edit-webhook-subscription
+            #createOrEditWebhookSubscriptionModal
+            (modalSave)="getDetail()"
+        ></create-or-edit-webhook-subscription>
+        <div
+            #detailModal="bs-modal"
+            aria-hidden="true"
+            aria-labelledby="detailModal"
+            bsModal
+            class="modal fade"
+            id="detailModal"
+            role="dialog"
+            tabindex="-1"
+        >
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        {{ detailModalText }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

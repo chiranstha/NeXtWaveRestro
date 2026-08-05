@@ -1,0 +1,268 @@
+<div [@routerTransition]>
+    <sub-header [title]="'Restaurant Dashboard' | localize">
+        <div class="restaurant-dashboard-header-actions" role="actions">
+            <span class="restaurant-refresh-note">
+                {{ 'Last refreshed' | localize }}:
+                {{ lastRefreshedAt ? lastRefreshedAt.toFormat('HH:mm:ss') : '-' }}
+            </span>
+            <button class="btn btn-sm btn-light-primary" type="button" [disabled]="loading" (click)="refresh()">
+                <i class="fa fa-rotate" [class.fa-spin]="loading"></i>
+            </button>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="restaurant-page restaurant-dashboard-page">
+            <div class="card card-custom gutter-b restaurant-card">
+                <div class="card-body">
+                    <div class="restaurant-filterbar restaurant-dashboard-filterbar">
+                        <div>
+                            <label class="form-label">{{ 'From Date' | localize }} (BS)</label>
+                            <ne-datepicker
+                                class="restaurant-date-filter restaurant-dashboard-date-filter"
+                                [date]="filter.fromDate"
+                                [dateFormat]="'yyyy/mm/dd'"
+                                dateIn="AD"
+                                [placeholder]="'yyyy/mm/dd'"
+                                language="en"
+                                (dateInAD)="setFilterDate('fromDate', $event)"
+                            ></ne-datepicker>
+                        </div>
+                        <div>
+                            <label class="form-label">{{ 'To Date' | localize }} (BS)</label>
+                            <ne-datepicker
+                                class="restaurant-date-filter restaurant-dashboard-date-filter"
+                                [date]="filter.toDate"
+                                [dateFormat]="'yyyy/mm/dd'"
+                                dateIn="AD"
+                                [placeholder]="'yyyy/mm/dd'"
+                                language="en"
+                                (dateInAD)="setFilterDate('toDate', $event)"
+                            ></ne-datepicker>
+                        </div>
+                        <div>
+                            <label class="form-label">{{ 'Table' | localize }}</label>
+                            <ng-select
+                                class="w-200px"
+                                [items]="tables"
+                                bindLabel="name"
+                                bindValue="id"
+                                [(ngModel)]="filter.tableId"
+                                [clearable]="true"
+                                appendTo="body"
+                            ></ng-select>
+                        </div>
+                        <div>
+                            <label class="form-label">{{ 'Waiter' | localize }}</label>
+                            <ng-select
+                                class="w-200px"
+                                [items]="waiters"
+                                bindLabel="name"
+                                bindValue="id"
+                                [(ngModel)]="filter.waiterUserId"
+                                [clearable]="true"
+                                appendTo="body"
+                            ></ng-select>
+                        </div>
+                        <div>
+                            <label class="form-label">{{ 'Category' | localize }}</label>
+                            <ng-select
+                                class="w-200px"
+                                [items]="categories"
+                                bindLabel="name"
+                                bindValue="id"
+                                [(ngModel)]="filter.categoryId"
+                                [clearable]="true"
+                                appendTo="body"
+                            ></ng-select>
+                        </div>
+                        <button class="btn btn-primary" type="button" [disabled]="loading" (click)="refresh()">
+                            <i class="fa fa-filter"></i>
+                            {{ 'Filter' | localize }}
+                        </button>
+                        <button class="btn btn-light" type="button" (click)="clearFilters()">
+                            {{ 'Clear' | localize }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="restaurant-dashboard-metrics">
+                @for (metric of kpiMetrics; track metric.label) {
+                    <div class="restaurant-dashboard-metric" [ngClass]="'restaurant-dashboard-accent-' + metric.accent">
+                        <div class="restaurant-dashboard-metric-icon">
+                            <i class="fa" [ngClass]="metric.icon"></i>
+                        </div>
+                        <div>
+                            <span class="restaurant-metric-label">{{ metric.label }}</span>
+                            <strong class="restaurant-dashboard-metric-value">{{ metric.value }}</strong>
+                            <span class="restaurant-muted">{{ metric.subText }}</span>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="restaurant-dashboard-metrics restaurant-dashboard-ops">
+                @for (metric of operationMetrics; track metric.label) {
+                    <div class="restaurant-dashboard-metric" [ngClass]="'restaurant-dashboard-accent-' + metric.accent">
+                        <div class="restaurant-dashboard-metric-icon">
+                            <i class="fa" [ngClass]="metric.icon"></i>
+                        </div>
+                        <div>
+                            <span class="restaurant-metric-label">{{ metric.label }}</span>
+                            <strong class="restaurant-dashboard-metric-value">{{ metric.value }}</strong>
+                            <span class="restaurant-muted">{{ metric.subText }}</span>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="restaurant-dashboard-grid">
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Top Selling Items' | localize }}</div>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (topItems.length) {
+                            <table class="restaurant-table restaurant-compact-table">
+                                <tbody>
+                                    @for (item of topItems; track item.productId) {
+                                        <tr>
+                                            <td>
+                                                <div class="fw-bold">{{ item.productName || '-' }}</div>
+                                                <div class="restaurant-muted">{{ item.categoryName || '-' }}</div>
+                                            </td>
+                                            <td class="text-end">
+                                                <div class="fw-bold">{{ formatMoney(item.grandTotal) }}</div>
+                                                <div class="restaurant-muted">{{ formatNumber(item.qty, 2) }} {{ 'Qty' | localize }}</div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        } @else {
+                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                        }
+                    </div>
+                </div>
+
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Table Sales' | localize }}</div>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (topTables.length) {
+                            <table class="restaurant-table restaurant-compact-table">
+                                <tbody>
+                                    @for (table of topTables; track table.tableId || table.tableName) {
+                                        <tr>
+                                            <td>
+                                                <div class="fw-bold">{{ table.tableName || '-' }}</div>
+                                                <div class="restaurant-muted">{{ table.orderCount || 0 }} {{ 'Orders' | localize }}</div>
+                                            </td>
+                                            <td class="text-end fw-bold">{{ formatMoney(table.grandTotal) }}</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        } @else {
+                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                        }
+                    </div>
+                </div>
+
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Waiter Performance' | localize }}</div>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (topWaiters.length) {
+                            <table class="restaurant-table restaurant-compact-table">
+                                <tbody>
+                                    @for (waiter of topWaiters; track waiter.waiterUserId || waiter.waiterName) {
+                                        <tr>
+                                            <td>
+                                                <div class="fw-bold">{{ waiter.waiterName || '-' }}</div>
+                                                <div class="restaurant-muted">{{ waiter.orderCount || 0 }} {{ 'Orders' | localize }}</div>
+                                            </td>
+                                            <td class="text-end fw-bold">{{ formatMoney(waiter.grandTotal) }}</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        } @else {
+                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                        }
+                    </div>
+                </div>
+
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Payment Mix' | localize }}</div>
+                    </div>
+                    <div class="card-body">
+                        @if (topPayments.length) {
+                            <div class="restaurant-dashboard-payment-list">
+                                @for (payment of topPayments; track payment.paymentMethod) {
+                                    <div class="restaurant-dashboard-payment-row">
+                                        <div>
+                                            <div class="fw-bold">{{ payment.paymentMethodName || '-' }}</div>
+                                            <div class="restaurant-muted">{{ payment.orderCount || 0 }} {{ 'Orders' | localize }}</div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fw-bold">{{ formatMoney(payment.grandTotal) }}</div>
+                                            <div class="restaurant-dashboard-bar">
+                                                <span [style.width.%]="paymentShare(payment)"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        } @else {
+                            <div class="restaurant-empty">{{ 'NoData' | localize }}</div>
+                        }
+                    </div>
+                </div>
+
+                <div class="card card-custom gutter-b restaurant-card restaurant-dashboard-wide">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Low Stock Alerts' | localize }}</div>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (urgentLowStock.length) {
+                            <table class="restaurant-table restaurant-compact-table">
+                                <thead>
+                                    <tr>
+                                        <th>{{ 'Item' | localize }}</th>
+                                        <th>{{ 'Available' | localize }}</th>
+                                        <th>{{ 'Suggested' | localize }}</th>
+                                        <th>{{ 'Supplier' | localize }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (item of urgentLowStock; track item.productId) {
+                                        <tr>
+                                            <td>
+                                                <div class="fw-bold">{{ item.productName || '-' }}</div>
+                                                @if (item.missingSupplierMapping) {
+                                                    <span class="restaurant-status restaurant-status-danger">
+                                                        {{ 'Mapping Missing' | localize }}
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td>{{ formatNumber(item.availableQty, 2) }} {{ item.unitName || '' }}</td>
+                                            <td>{{ formatNumber(item.suggestedQty, 2) }} {{ item.unitName || '' }}</td>
+                                            <td>{{ item.supplierName || '-' }}</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        } @else {
+                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

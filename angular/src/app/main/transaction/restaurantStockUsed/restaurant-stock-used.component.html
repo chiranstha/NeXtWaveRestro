@@ -1,0 +1,129 @@
+<div [@routerTransition]>
+    <sub-header [description]="" [title]="'Restaurant Stock Used' | localize">
+        <div class="d-flex justify-content-between align-items-center w-100">
+            <div role="search">
+                <div class="position-relative w-md-400px me-md-2">
+                    <i class="fa-duotone fa-magnifying-glass fs-3 text-gray-500 position-absolute top-50 translate-middle ms-6"></i>
+                    <input
+                        class="form-control form-control-solid ps-10 headerSearch"
+                        type="text"
+                        placeholder="Search"
+                        [(ngModel)]="filterText"
+                        [ngModelOptions]="{ standalone: true }"
+                        (keyup.enter)="searchValueOnApiCall($event.target.value)"
+                    />
+                </div>
+            </div>
+            <div role="actions">
+                <button
+                    class="btn btn-sm btn-secondary me-2"
+                    *ngIf="selectedRows.length > 0"
+                    (click)="exportSelectedRows()"
+                >
+                    <i class="fa-duotone fa-file-excel"></i>
+                    <span class="d-none d-md-inline-block">{{ 'Export' | localize }}</span>
+                </button>
+                <span
+                    class="btn btn-sm btn-outline-secondary clickable-item me-2"
+                    *ngIf="!advancedFiltersAreShown"
+                    (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
+                >
+                    <i class="fa fa-angle-down"></i>
+                    {{ 'ShowAdvancedFilters' | localize }}
+                </span>
+                <span
+                    class="btn btn-sm btn-outline-secondary clickable-item me-2"
+                    *ngIf="advancedFiltersAreShown"
+                    (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
+                >
+                    <i class="fa fa-angle-up"></i>
+                    {{ 'HideAdvancedFilters' | localize }}
+                </span>
+                <button
+                    class="btn btn-sm btn-light-primary me-2"
+                    [buttonBusy]="loading"
+                    (click)="refresh()"
+                    tooltip="{{ 'Refresh' | localize }}"
+                >
+                    <i class="fa fa-rotate"></i>
+                </button>
+                <button
+                    class="btn btn-sm btn-primary"
+                    *ngIf="'Pages.Restaurant.Inventory.StockAdjustment' | permission"
+                    (click)="addRoute()"
+                >
+                    <i class="fa fa-plus btn-md-icon"></i>
+                    <span class="d-none d-md-inline-block">{{ 'Create' | localize }}</span>
+                </button>
+            </div>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <form [formGroup]="form" autocomplete="off">
+                    <div [hidden]="!advancedFiltersAreShown" class="col-12 px-0">
+                        <div class="hidden-filter">
+                            <div class="row">
+                                <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
+                                    <div class="mb-1 form-item">
+                                        <label class="form-label" for="fromDate">{{ l('From Date') }}</label>
+                                        <input
+                                            class="form-control"
+                                            id="fromDate"
+                                            type="date"
+                                            formControlName="fromDate"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
+                                    <div class="mb-1 form-item">
+                                        <label class="form-label" for="toDate">{{ l('To Date') }}</label>
+                                        <input
+                                            class="form-control"
+                                            id="toDate"
+                                            type="date"
+                                            formControlName="toDate"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
+                                    <button class="btn btn-sm btn-primary mt-6" type="button" (click)="refresh()">
+                                        <i class="fa fa-search btn-md-icon"></i>
+                                        <span class="d-none d-md-inline-block">{{ 'Search' | localize }}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="ag-theme-balham">
+                    <ag-grid-angular
+                        (gridReady)="onGridReady($event)"
+                        (selectionChanged)="onSelectionChanged()"
+                        [columnDefs]="columnDefs"
+                        [defaultColDef]="defaultColDef"
+                        [getContextMenuItems]="getCustomContextMenuItems"
+                        [rowData]="rowData"
+                        rowSelection="multiple"
+                        style="width: 100%;"
+                        [style.height.px]="screenHeight"
+                    ></ag-grid-angular>
+                </div>
+
+                <app-pagination
+                    (pageChange)="onPageChange($event)"
+                    (pageSizeChange)="onPageSizeChange($event)"
+                    [currentPage]="currentPage"
+                    [pageSizeOptions]="pageSizeOptions"
+                    [pageSize]="pageSize"
+                    [totalRecords]="totalRecords"
+                ></app-pagination>
+            </div>
+        </div>
+    </div>
+</div>

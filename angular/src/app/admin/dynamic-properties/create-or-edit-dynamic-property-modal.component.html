@@ -1,0 +1,117 @@
+@if (!loading) {
+    <div
+        #createOrEditModal="bs-modal"
+        [config]="{ backdrop: 'static', keyboard: !saving }"
+        appBsModal
+        aria-hidden="true"
+        aria-labelledby="createOrEditModal"
+        class="modal fade"
+        role="dialog"
+        tabindex="-1"
+    >
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                @if (active) {
+                    <div>
+                        <div class="modal-header">
+                            <h4 class="modal-title">
+                                @if (dynamicPropertyId) {
+                                    <span>{{ 'Edit' | localize }} {{ 'DynamicProperty' | localize }}</span>
+                                }
+                                @if (!dynamicPropertyId) {
+                                    <span>{{ 'AddNewDynamicProperty' | localize }}</span>
+                                }
+                            </h4>
+                            <button
+                                (click)="close()"
+                                [attr.aria-label]="l('Close')"
+                                [disabled]="saving"
+                                class="btn-close"
+                                type="button"
+                            ></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-5 col-12">
+                                <div class="mb-5">
+                                    <label class="form-label required">{{ 'PropertyName' | localize }}</label>
+                                    <input
+                                        [(ngModel)]="dynamicProperty.propertyName"
+                                        class="form-control"
+                                        name="Name"
+                                        required
+                                        type="text"
+                                    />
+                                </div>
+                                <div class="mb-5">
+                                    <label class="form-label">{{ 'DisplayName' | localize }}</label>
+                                    <input
+                                        [(ngModel)]="dynamicProperty.displayName"
+                                        class="form-control"
+                                        name="Name"
+                                        required
+                                        type="text"
+                                    />
+                                </div>
+                                <div class="mb-5">
+                                    <label class="form-label required">{{ 'InputType' | localize }}</label>
+                                    <select [(ngModel)]="dynamicProperty.inputType" class="form-select">
+                                        @for (inputType of allIputTypes; track inputType) {
+                                            <option [value]="inputType">
+                                                {{ inputType }}
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="mb-5">
+                                    <label class="form-label">{{ 'Permission' | localize }}</label>
+                                    <div class="input-group">
+                                        <input
+                                            class="form-control"
+                                            disabled="disabled"
+                                            type="text"
+                                            value="{{ dynamicProperty.permission }}"
+                                        />
+                                        <button
+                                            (click)="openPermissionTreeModal()"
+                                            class="btn btn-sm btn-primary"
+                                            type="button"
+                                        >
+                                            <i class="fa fa-hand-pointer" style="color: white"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button
+                                (click)="close()"
+                                [disabled]="saving"
+                                class="btn btn-sm btn-light-primary fw-bold"
+                                type="button"
+                            >
+                                {{ 'Cancel' | localize }}
+                            </button>
+                            <button
+                                (click)="save()"
+                                [busyText]="l('Saving...')"
+                                [buttonBusy]="saving"
+                                [disabled]="!dynamicProperty.propertyName || !dynamicProperty.inputType"
+                                class="btn btn-sm btn-primary fw-bold"
+                                type="button"
+                            >
+                                <i class="fa fa-save"></i>
+                                <span>{{ 'Save' | localize }}</span>
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+<permission-tree-modal
+    #permissionFilterTreeModal
+    (onModalclose)="onPermissionSelected($event)"
+    [dontAddOpenerButton]="true"
+    [singleSelect]="true"
+></permission-tree-modal>

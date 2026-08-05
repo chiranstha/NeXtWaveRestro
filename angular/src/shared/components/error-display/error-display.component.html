@@ -1,0 +1,10 @@
+@if (hasErrors) {
+    <div class="alert alert-danger alert-height mt-1" role="alert">
+        <div class="alert-div">
+            @if (showIcon) {
+                <i class="fa-duotone fa-circle-exclamation me-1" style="color: #ef4444"></i>
+            }
+            {{ errorMessage }}
+        </div>
+    </div>
+}

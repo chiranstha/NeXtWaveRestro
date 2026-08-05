@@ -1,0 +1,19 @@
+@if (isMenuSearchActive) {
+    <input
+        (input)="onSearchInput($event)"
+        (keydown.enter)="onEnter()"
+        [(ngModel)]="searchQuery"
+        class="form-control menuSearchBarInput"
+        placeholder="{{ 'QuickNav' | localize }}"
+        type="text"
+    />
+}
+@if (searchMenuResults && searchMenuResults.length > 0) {
+    <ul class="menuSearchBarContainer">
+        @for (item of searchMenuResults; track item) {
+            <li (click)="selectMenuItem(item)" style="cursor: pointer">
+                {{ item.name }}
+            </li>
+        }
+    </ul>
+}

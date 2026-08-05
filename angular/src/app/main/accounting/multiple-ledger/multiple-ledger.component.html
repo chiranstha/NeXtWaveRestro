@@ -1,0 +1,293 @@
+@if (serialNumber === 0) {
+    <div>
+        <div class="card">
+            <div class="form-title">
+                <div class="row">
+                    <div class="col-lg-6 col-xl-6 col-md-6 col-xs-12">
+                        <h3 class="style-this mt-2 mb-0">{{ l('Multiple AccountLedger ') }}</h3>
+                    </div>
+                    <div class="col-lg-6 col-xl-6 col-md-6 col-xs-12 text-right">
+                        <button
+                            (click)="save()"
+                            [buttonBusy]="saving"
+                            [disabled]="form.invalid || ledgerList.length == 0"
+                            class="mt-2"
+                            class="btn btn-sm fw-bold btn-primary"
+                            id="save"
+                            label="Save"
+                            type="submit"
+                        >
+                            <i class="fa-duotone fa-circle-plus fs-2">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                            </i>
+                            {{ l(id ? 'Update' : 'Save') }}
+                        </button>
+                        <button (click)="close()" class="mr-2" class="btn btn-sm fw-bold btn-light-success" id="cancel">
+                            <i class="fa-duotone fa-circle-xmark fs-2">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                            </i>
+                            {{ l('Cancel') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <form [formGroup]="form" autocomplete="off">
+                    <div appCustomEnter>
+                        <div class="container-fluid">
+                            <div class="card shadow-sm my-5 p-2">
+                                <div class="card-header">
+                                    <h3 class="card-title">{{ l('Multiple Ledger Details') }}</h3>
+                                    <div class="card-toolbar">
+                                        <button
+                                            (click)="keyEventsReceipt()"
+                                            [disabled]="form.get('ledgerList').invalid"
+                                            [label]="'Add Details'"
+                                            class="btn btn-sm btn-outline btn-outline-dashed btn-outline-success btn-active-light-success"
+                                            id="add"
+                                        >
+                                            <i class="fa-duotone fa-grid-2-plus fs-2">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                                <span class="path3"></span>
+                                            </i>
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="table-responsives">
+                                    <table
+                                        class="table table-row-dashed table-row-gray-300 table-striped"
+                                        formArrayName="ledgerList"
+                                    >
+                                        <thead class="bg-tableHead">
+                                            <tr class="text-center">
+                                                <th><b>S.N.</b></th>
+                                                <th><b>LEDGER NAME</b></th>
+                                                <th><b>DR/CR</b></th>
+                                                <th><b>OPENING</b></th>
+                                                <th><b>CREDIT PERIOD</b></th>
+                                                <th><b>CREDIT LIMIT</b></th>
+                                                <th><b>BANK A/C</b></th>
+                                                <th><b>PAN NO.</b></th>
+                                                <th><b>MOBILE NO.</b></th>
+                                                <th><b>EDIT</b></th>
+                                                <th><b>DELETE</b></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @for (abcd of getDetails(form); track abcd; let i = $index) {
+                                                <tr [focusable]="true" [formGroupName]="i" class="text-center">
+                                                    <td class="sn_css text-center text-left">
+                                                        {{ i + 1 }}
+                                                    </td>
+                                                    <td appPadding>
+                                                        <div>
+                                                            <input
+                                                                #ledger
+                                                                (keyup)="gotoDrCr($event, i)"
+                                                                [ngClass]="
+                                                                    abcd.get('ledgerName').invalid &&
+                                                                    (abcd.get('ledgerName').dirty ||
+                                                                        abcd.get('ledgerName').touched)
+                                                                        ? 'is-danger'
+                                                                        : 'is-success'
+                                                                "
+                                                                class="text-capitalize"
+                                                                class="form-control"
+                                                                formControlName="ledgerName"
+                                                                id="ledgerName"
+                                                                maxlength="50"
+                                                                minlength="0"
+                                                                name="ledgerName"
+                                                                placeholder=""
+                                                                required
+                                                                type="text"
+                                                            />
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding>
+                                                        <div>
+                                                            <ng-select
+                                                                #drCr
+                                                                (change)="selectDrCr($event.target.value, abcd)"
+                                                                (keyup)="gotoOpeningBlnc($event, i)"
+                                                                [items]="drOrcr"
+                                                                appendTo="body"
+                                                                bindLabel="name"
+                                                                bindValue="value"
+                                                                class="w-70px"
+                                                                formControlName="drOrCr"
+                                                            ></ng-select>
+                                                            @if (
+                                                                abcd.get('drOrCr').invalid &&
+                                                                (abcd.get('drOrCr').dirty || abcd.get('drOrCr').touched)
+                                                            ) {
+                                                                <div>
+                                                                    <div
+                                                                        class="alert alert-danger alert-height mt-1"
+                                                                        role="alert"
+                                                                    >
+                                                                        <div class="alert-div">Required!</div>
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding>
+                                                        <div>
+                                                            <input
+                                                                #openingBalance
+                                                                (focus)="$event.target.select()"
+                                                                (keyup)="gotoCreditPeriod($event, i)"
+                                                                [ngClass]="
+                                                                    abcd.get('openingBalance').invalid &&
+                                                                    (abcd.get('openingBalance').dirty ||
+                                                                        abcd.get('openingBalance').touched)
+                                                                        ? 'is-danger'
+                                                                        : 'is-success'
+                                                                "
+                                                                class="form-control"
+                                                                formControlName="openingBalance"
+                                                                min="0"
+                                                                type="number"
+                                                                name="openingBalance"
+                                                            />
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding class="text-center">
+                                                        <div>
+                                                            <input
+                                                                #creditPeriod
+                                                                (focus)="$event.target.select()"
+                                                                (keyup)="gotoCreditLimit($event, i)"
+                                                                [ngClass]="
+                                                                    abcd.get('creditPeriod').invalid &&
+                                                                    (abcd.get('creditPeriod').dirty ||
+                                                                        abcd.get('creditPeriod').touched)
+                                                                        ? 'is-danger'
+                                                                        : 'is-success'
+                                                                "
+                                                                class="form-control"
+                                                                formControlName="creditPeriod"
+                                                                id="ledgerName"
+                                                                maxlength="50"
+                                                                min="0"
+                                                                minlength="0"
+                                                                name="ledgerName"
+                                                                placeholder=""
+                                                                required
+                                                                type="number"
+                                                            />
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding class="text-center">
+                                                        <div>
+                                                            <input
+                                                                #creditLimit
+                                                                (focus)="$event.target.select()"
+                                                                (keyup)="gotoBankAc($event, i)"
+                                                                [ngClass]="
+                                                                    abcd.get('creditLimit').invalid &&
+                                                                    (abcd.get('creditLimit').dirty ||
+                                                                        abcd.get('creditLimit').touched)
+                                                                        ? 'is-danger'
+                                                                        : 'is-success'
+                                                                "
+                                                                class="form-control"
+                                                                formControlName="creditLimit"
+                                                                id="creditLimit"
+                                                                maxlength="50"
+                                                                min="0"
+                                                                minlength="0"
+                                                                name="creditLimit"
+                                                                placeholder=""
+                                                                required
+                                                                type="number"
+                                                            />
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding class="text-center">
+                                                        <div>
+                                                            <input
+                                                                #bankAc
+                                                                (keyup)="gotoPanNo($event, i)"
+                                                                class="text-uppercase"
+                                                                class="form-control"
+                                                                formControlName="bankACNo"
+                                                                id="bankACNo"
+                                                                maxlength="50"
+                                                                minlength="0"
+                                                                name="bankACNo"
+                                                                placeholder=""
+                                                                type="text"
+                                                            />
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding>
+                                                        <div>
+                                                            <input
+                                                                #panno
+                                                                (keyup)="gotoMobNo($event, i)"
+                                                                class="text-uppercase"
+                                                                class="form-control"
+                                                                formControlName="panNumber"
+                                                                type="text"
+                                                                name="panNumber"
+                                                            />
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding>
+                                                        <div>
+                                                            <input
+                                                                #mobno
+                                                                (keyup)="chekCondtion($event)"
+                                                                class="form-control"
+                                                                formControlName="mobileNo"
+                                                                type="number"
+                                                                name="mobileNo"
+                                                            />
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding class="text-center text-left">
+                                                        <div class="btn btn-sm">
+                                                            <i
+                                                                (click)="enableDetailsFormGroup(i, form)"
+                                                                class="mt-2 fa-duotone fa-pen-to-square text-edit fs-20 cursor-pointer"
+                                                            ></i>
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding class="text-center text-left">
+                                                        <div class="btn btn-sm">
+                                                            <i
+                                                                (click)="removeDetailsForm(i, form)"
+                                                                class="mt-2 fa-duotone fa-trash fs-20 cursor-pointer"
+                                                            ></i>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    {{ form.getRawValue() | json }}
+                </form>
+            </div>
+        </div>
+    </div>
+}
+<erp-key-event (closeEvent)="keyClose($event)" (saveEvent)="keySave($event)" [id]="id ? id : null"></erp-key-event>
+@if (serialNumber === 2) {
+    <app-add-or-edit-account-group
+        (accountGroupSave)="getAccountGroup($event)"
+        [serialNo]="serialNumber"
+    ></app-add-or-edit-account-group>
+}

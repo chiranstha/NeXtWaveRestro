@@ -1,0 +1,18 @@
+<a href="/">
+    @if (!appSession.tenant || !appSession.tenant.HasLogo()) {
+        <img [class]="imageClass" [src]="defaultLogo" alt="logo" />
+    }
+    @if (appSession.tenant && appSession.tenant.HasLogo()) {
+        <img
+            [class]="imageClass"
+            [src]="
+                remoteServiceBaseUrl +
+                '/TenantCustomization/GetTenantLogo?skin=' +
+                skin +
+                '&tenantId=' +
+                appSession.tenant.id
+            "
+            alt="logo"
+        />
+    }
+</a>

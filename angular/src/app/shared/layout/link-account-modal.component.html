@@ -1,0 +1,96 @@
+<div
+    #linkAccountModal="bs-modal"
+    (onShown)="onShown()"
+    [config]="{ backdrop: 'true' }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="createOrEditModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @if (active) {
+                <form #linkAccountForm="ngForm" (ngSubmit)="save()" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <span>{{ 'LinkNewAccount' | localize }}</span>
+                        </h5>
+                        <button
+                            (click)="close()"
+                            [attr.aria-label]="l('Close')"
+                            class="btn-close"
+                            type="button"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-5">
+                            <label class="form-label" for="TenancyName">{{ 'TenancyName' | localize }}</label>
+                            <input
+                                #tenancyNameInput="ngModel"
+                                [(ngModel)]="linkUser.tenancyName"
+                                [ngClass]="{ edited: linkUser.tenancyName }"
+                                class="form-control"
+                                id="TenancyName"
+                                maxlength="64"
+                                name="TenancyName"
+                                type="text"
+                            />
+                        </div>
+                        <div class="mb-5">
+                            <label class="form-label required" for="UserName">{{ 'UserName' | localize }}</label>
+                            <input
+                                #usernameOrEmailAddressInput="ngModel"
+                                [(ngModel)]="linkUser.usernameOrEmailAddress"
+                                [ngClass]="{ edited: linkUser.usernameOrEmailAddress }"
+                                class="form-control"
+                                id="UserName"
+                                maxlength="256"
+                                name="UserName"
+                                required
+                                type="text"
+                            />
+                            <validation-messages [formCtrl]="usernameOrEmailAddressInput"></validation-messages>
+                        </div>
+                        <div class="mb-5">
+                            <label class="form-label required" for="Password">{{ 'Password' | localize }}</label>
+                            <input
+                                #passwordInput="ngModel"
+                                [(ngModel)]="linkUser.password"
+                                [ngClass]="{ edited: linkUser.password }"
+                                class="form-control"
+                                id="Password"
+                                maxlength="128"
+                                name="Password"
+                                required
+                                type="password"
+                            />
+                            <validation-messages [formCtrl]="passwordInput"></validation-messages>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            (click)="close()"
+                            [disabled]="saving"
+                            class="btn btn-sm btn-light-primary fw-bold"
+                            type="button"
+                        >
+                            {{ 'Cancel' | localize }}
+                        </button>
+                        <button
+                            [busyText]="l('SavingWithThreeDot')"
+                            [buttonBusy]="saving"
+                            [disabled]="!linkAccountForm.form.valid"
+                            class="btn btn-sm btn-primary fw-bold"
+                            type="submit"
+                        >
+                            <i class="fa fa-save"></i>
+                            <span>{{ 'Save' | localize }}</span>
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>

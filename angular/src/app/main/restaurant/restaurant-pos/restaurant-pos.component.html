@@ -1,0 +1,925 @@
+<div [@routerTransition]>
+    <sub-header [title]="'Restaurant POS' | localize">
+        <div role="actions" class="restaurant-actionbar restaurant-actionbar-end">
+            <button
+                type="button"
+                class="btn btn-sm btn-light restaurant-icon-button"
+                [buttonBusy]="loading"
+                (click)="refresh()"
+                tooltip="{{ 'Refresh' | localize }}"
+                aria-label="Refresh POS"
+            >
+                <i class="fa fa-rotate"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-light-primary" [buttonBusy]="saving" (click)="saveOrder(false)">
+                <i class="fa fa-save me-1"></i>
+                {{ 'Save' | localize }}
+            </button>
+            <button
+                type="button"
+                class="btn btn-sm btn-warning"
+                [buttonBusy]="saving"
+                [disabled]="!hasKitchenSendableLines()"
+                (click)="saveOrder(true)"
+            >
+                <i class="fa fa-paper-plane me-1"></i>
+                {{ sendButtonLabel() }}
+            </button>
+            <button type="button" class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="finalizeBill()">
+                <i class="fa fa-cash-register me-1"></i>
+                Pay {{ payButtonAmount | number: '1.2-2' }}
+            </button>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="restaurant-page">
+            <section class="restaurant-pos-command p-2">
+                <div class="restaurant-actionbar">
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Order type">
+                        <button
+                            type="button"
+                            class="btn"
+                            [class.btn-primary]="orderType === orderTypeEnum.DineIn"
+                            [class.btn-light]="orderType !== orderTypeEnum.DineIn"
+                            (click)="startNewOrder(orderTypeEnum.DineIn)"
+                        >
+                            <i class="fa fa-chair me-1"></i>
+                            Dine In
+                        </button>
+                        <button
+                            type="button"
+                            class="btn"
+                            [class.btn-primary]="orderType === orderTypeEnum.TakeAway"
+                            [class.btn-light]="orderType !== orderTypeEnum.TakeAway"
+                            (click)="startTakeaway()"
+                        >
+                            <i class="fa fa-bag-shopping me-1"></i>
+                            Takeaway
+                        </button>
+                        <button
+                            type="button"
+                            class="btn"
+                            [class.btn-primary]="orderType === orderTypeEnum.Delivery"
+                            [class.btn-light]="orderType !== orderTypeEnum.Delivery"
+                            (click)="startDelivery()"
+                        >
+                            <i class="fa fa-truck me-1"></i>
+                            Delivery
+                        </button>
+                    </div>
+
+                    <div class="border-start ps-3">
+                        <div class="restaurant-label">{{ currentOrderSubtitleText || 'New order' }}</div>
+                        <div class="restaurant-pos-current-title">
+                            {{ currentOrderTitleText || orderTypeText(orderType) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="restaurant-pos-current">
+                    <span class="restaurant-status restaurant-status-neutral">
+                        <i class="fa fa-receipt"></i>
+                        {{ openOrders.length }} open
+                    </span>
+                    <span class="restaurant-status restaurant-status-warning">
+                        <i class="fa fa-fire-burner"></i>
+                        {{ activeTicketCountValue }} KOT/BOT
+                    </span>
+                    <span class="restaurant-status restaurant-status-primary">
+                        <i class="fa fa-clock"></i>
+                        {{ formatClock(currentClock) }}
+                    </span>
+                    <button type="button" class="btn btn-sm btn-light" (click)="startNewOrder(orderType)">
+                        <i class="fa fa-plus me-1"></i>
+                        New order
+                    </button>
+                </div>
+            </section>
+
+            <main class="restaurant-pos-simple-layout">
+                <div class="restaurant-pos-workspace">
+                    <section class="card restaurant-card">
+                        <div class="card-header">
+                            <div class="restaurant-actionbar">
+                                <button
+                                    type="button"
+                                    class="btn btn-sm"
+                                    [class.btn-primary]="activeContext === 'tables'"
+                                    [class.btn-light]="activeContext !== 'tables'"
+                                    (click)="activeContext = 'tables'"
+                                >
+                                    <i class="fa fa-table-cells-large me-1"></i>
+                                    Tables
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-sm"
+                                    [class.btn-primary]="activeContext === 'orders'"
+                                    [class.btn-light]="activeContext !== 'orders'"
+                                    (click)="activeContext = 'orders'"
+                                >
+                                    <i class="fa fa-list-ul me-1"></i>
+                                    Orders
+                                    <span class="badge badge-circle badge-light ms-1">{{ openOrders.length }}</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-sm"
+                                    [class.btn-primary]="activeContext === 'tickets'"
+                                    [class.btn-light]="activeContext !== 'tickets'"
+                                    (click)="activeContext = 'tickets'"
+                                >
+                                    <i class="fa fa-print me-1"></i>
+                                    KOT/BOT
+                                    <span class="badge badge-circle badge-light ms-1">{{ tickets.length }}</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <ng-container [ngSwitch]="activeContext">
+                                <div *ngSwitchCase="'tables'">
+                                    <div class="restaurant-category-strip mb-2">
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm"
+                                            [class.btn-primary]="!selectedAreaId"
+                                            [class.btn-light]="selectedAreaId"
+                                            (click)="selectArea('')"
+                                        >
+                                            All areas
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm"
+                                            *ngFor="let area of areas"
+                                            [class.btn-primary]="selectedAreaId === area.id"
+                                            [class.btn-light]="selectedAreaId !== area.id"
+                                            (click)="selectArea(area.id)"
+                                        >
+                                            {{ area.name }}
+                                        </button>
+                                    </div>
+
+                                    <div class="restaurant-touch-grid restaurant-table-grid" *ngIf="filteredTablesList.length; else emptyTables">
+                                        <button
+                                            type="button"
+                                            class="restaurant-touch-button restaurant-table-tile"
+                                            *ngFor="let table of filteredTablesList"
+                                            [class.active]="selectedTable?.id === table.id"
+                                            (click)="selectTable(table)"
+                                        >
+                                            <span class="d-flex align-items-start justify-content-between w-100 gap-2">
+                                                <span>
+                                                    <strong class="restaurant-table-name d-block">{{ table.name }}</strong>
+                                                    <small class="restaurant-muted">{{ table.areaName || 'Floor' }}</small>
+                                                </span>
+                                                <span class="restaurant-status" [ngClass]="tableStatusClass(table.status)">
+                                                    {{ tableStatusText(table.status) }}
+                                                </span>
+                                            </span>
+                                            <span class="d-flex align-items-center justify-content-between w-100 mt-auto">
+                                                <small class="restaurant-muted">{{ table.capacity || 0 }} seats</small>
+                                                <ng-container *ngIf="orderForTable(table) as tableOrder">
+                                                    <strong>{{ tableOrder.grandTotal | number: '1.2-2' }}</strong>
+                                                </ng-container>
+                                            </span>
+                                        </button>
+                                    </div>
+
+                                    <ng-template #emptyTables>
+                                        <div class="restaurant-empty">
+                                            <i class="fa fa-chair me-1"></i>
+                                            No tables found.
+                                        </div>
+                                    </ng-template>
+                                </div>
+
+                                <div *ngSwitchCase="'orders'">
+                                    <div class="restaurant-ticket-list" *ngIf="openOrders.length; else emptyOrders">
+                                        <button
+                                            type="button"
+                                            class="restaurant-ticket-row bg-white text-start"
+                                            *ngFor="let order of openOrders"
+                                            [class.border-primary]="selectedOrder?.id === order.id"
+                                            (click)="selectOrder(order)"
+                                        >
+                                            <span class="restaurant-status restaurant-status-primary">
+                                                #{{ indexOrderNo(order.orderNo) }}
+                                            </span>
+                                            <span class="flex-grow-1">
+                                                <strong class="d-block">{{ order.tableName || orderTypeText(order.orderType) }}</strong>
+                                                <small class="restaurant-muted">{{ order.orderNo }}</small>
+                                            </span>
+                                            <span class="restaurant-status" [ngClass]="lineStatusClass(order.status)">
+                                                {{ orderStatusText(order.status) }}
+                                            </span>
+                                            <strong class="restaurant-total-sm">{{ order.grandTotal | number: '1.2-2' }}</strong>
+                                        </button>
+                                    </div>
+
+                                    <ng-template #emptyOrders>
+                                        <div class="restaurant-empty">
+                                            <i class="fa fa-receipt me-1"></i>
+                                            No open orders.
+                                        </div>
+                                    </ng-template>
+                                </div>
+
+                                <div *ngSwitchCase="'tickets'">
+                                    <div class="restaurant-ticket-list" *ngIf="tickets.length; else emptyTickets">
+                                        <div class="restaurant-ticket-row" *ngFor="let ticket of tickets">
+                                            <span class="restaurant-status" [ngClass]="ticketStatusClass(ticket.status)">
+                                                {{ ticketStatusText(ticket.status) }}
+                                            </span>
+                                            <span class="flex-grow-1">
+                                                <strong class="d-block">{{ ticket.ticketNo }}</strong>
+                                                <small class="restaurant-muted">
+                                                    {{ ticket.stationName || 'Kitchen' }} · {{ ticketPurposeText(ticket.purpose) }}
+                                                </small>
+                                            </span>
+                                            <small class="restaurant-muted" *ngIf="ticket.sentAt">{{ ticketElapsedText(ticket) }}</small>
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-light restaurant-icon-button"
+                                                (click)="printTicket(ticket, false)"
+                                                tooltip="Print"
+                                            >
+                                                <i class="fa fa-print"></i>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-light-danger restaurant-icon-button"
+                                                [disabled]="!canCancelTicket(ticket)"
+                                                (click)="cancelTicket(ticket)"
+                                                tooltip="Cancel"
+                                            >
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <ng-template #emptyTickets>
+                                        <div class="restaurant-empty">
+                                            <i class="fa fa-print me-1"></i>
+                                            No KOT/BOT tickets for this order.
+                                        </div>
+                                    </ng-template>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </section>
+
+                    <section class="card restaurant-card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">Menu</h3>
+                                <div class="restaurant-muted mt-1">{{ filteredMenuItemsList.length }} items</div>
+                                <div class="restaurant-muted mt-1">
+                                    {{ kitchenItemCountValue }} Kitchen Item / {{ stockItemCountValue }} Stock Item
+                                </div>
+                            </div>
+                            <div class="input-group input-group-sm restaurant-menu-search">
+                                <span class="input-group-text bg-white">
+                                    <i class="fa fa-search"></i>
+                                </span>
+                                <input
+                                    type="search"
+                                    class="form-control"
+                                    [(ngModel)]="menuSearch"
+                                    (ngModelChange)="onMenuFilterChange()"
+                                    placeholder="Search or scan item"
+                                    aria-label="Search menu"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="restaurant-category-strip mb-2">
+                                <button
+                                    type="button"
+                                    class="btn btn-sm"
+                                    [class.btn-primary]="!selectedCategoryId"
+                                    [class.btn-light]="selectedCategoryId"
+                                    (click)="selectCategory('')"
+                                >
+                                    All
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-sm"
+                                    *ngFor="let category of categories"
+                                    [class.btn-primary]="selectedCategoryId === category.id"
+                                    [class.btn-light]="selectedCategoryId !== category.id"
+                                    (click)="selectCategory(category.id)"
+                                >
+                                    {{ category.name }}
+                                </button>
+                            </div>
+                            <div class="restaurant-category-strip restaurant-route-strip mb-2">
+                                <button
+                                    type="button"
+                                    class="btn btn-sm"
+                                    [class.btn-primary]="!selectedRouteFilter"
+                                    [class.btn-light]="selectedRouteFilter"
+                                    (click)="selectedRouteFilter = ''; onMenuFilterChange()"
+                                >
+                                    All types
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-sm"
+                                    [class.btn-warning]="selectedRouteFilter === 'kitchen'"
+                                    [class.btn-light]="selectedRouteFilter !== 'kitchen'"
+                                    (click)="selectedRouteFilter = 'kitchen'; onMenuFilterChange()"
+                                >
+                                    <i class="fa fa-fire-burner me-1"></i>
+                                    Kitchen Item
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-sm"
+                                    [class.btn-success]="selectedRouteFilter === 'stock'"
+                                    [class.btn-light]="selectedRouteFilter !== 'stock'"
+                                    (click)="selectedRouteFilter = 'stock'; onMenuFilterChange()"
+                                >
+                                    <i class="fa fa-box me-1"></i>
+                                    Stock Item
+                                </button>
+                            </div>
+
+                            <div class="restaurant-menu-grid" *ngIf="filteredMenuItemsList.length; else emptyMenu">
+                                <button
+                                    type="button"
+                                    class="restaurant-touch-button restaurant-menu-tile"
+                                    [class.restaurant-menu-tile-stock]="!isKitchenItem(item)"
+                                    *ngFor="let item of filteredMenuItemsList"
+                                    [class.unavailable]="isSoldOut(item)"
+                                    [disabled]="isSoldOut(item)"
+                                    (click)="addMenuItem(item)"
+                                >
+                                    <span class="restaurant-menu-tile-head">
+                                        <span class="restaurant-menu-avatar" [style.background]="item.colorHex || '#eef6ff'">
+                                            <img *ngIf="item.imageUrl" [src]="item.imageUrl" alt="" />
+                                            <span *ngIf="!item.imageUrl">{{ itemInitial(item) }}</span>
+                                        </span>
+                                        <span class="restaurant-menu-tile-body">
+                                            <strong class="restaurant-menu-title">{{ item.displayName }}</strong>
+                                            <small class="restaurant-muted">{{ item.categoryName || 'Menu item' }}</small>
+                                        </span>
+                                    </span>
+                                    <span class="restaurant-menu-price-row">
+                                        <span class="restaurant-menu-price">{{ item.price | number: '1.2-2' }}</span>
+                                        <span class="restaurant-menu-badges">
+                                            <span class="restaurant-status" [ngClass]="itemRouteClass(item)">
+                                                <i
+                                                    [class]="
+                                                        isKitchenItem(item) ? 'fa fa-fire-burner' : 'fa fa-box'
+                                                    "
+                                                ></i>
+                                                {{ itemRouteText(item) }}
+                                            </span>
+                                            <span class="restaurant-status restaurant-status-neutral" *ngIf="item.hasVariants">
+                                                Variant
+                                            </span>
+                                            <span class="restaurant-status restaurant-status-primary" *ngIf="item.hasModifiers">
+                                                Add-on
+                                            </span>
+                                            <span class="restaurant-status restaurant-status-danger" *ngIf="isSoldOut(item)">
+                                                Sold out
+                                            </span>
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+
+                            <ng-template #emptyMenu>
+                                <div class="restaurant-empty">
+                                    <i class="fa fa-utensils me-1"></i>
+                                    No menu items match the current filter.
+                                </div>
+                            </ng-template>
+                        </div>
+                    </section>
+                </div>
+
+                <aside class="restaurant-pos-sticky">
+                    <section class="card restaurant-card restaurant-cart-card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">{{ currentOrderTitleText || 'Current order' }}</h3>
+                                <div class="restaurant-muted mt-1">
+                                    {{ cartItemCountValue }} items / {{ cart.length }} lines /
+                                    {{ kitchenLineCountValue }} Kitchen Item / {{ stockLineCountValue }} Stock Item
+                                </div>
+                            </div>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-light-danger restaurant-icon-button"
+                                [disabled]="!draftLineCountValue"
+                                (click)="clearDraftLines()"
+                                tooltip="Clear unsaved items"
+                                aria-label="Clear unsaved items"
+                            >
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="restaurant-cart-list" *ngIf="cart.length; else emptyCart">
+                                <article class="restaurant-cart-line" *ngFor="let line of cart; let i = index">
+                                    <div class="restaurant-cart-line-head">
+                                        <div>
+                                            <strong class="fw-bold d-block">{{ lineName(line) }}</strong>
+                                            <span class="restaurant-muted d-block" *ngIf="lineVariantText(line)">
+                                                {{ lineVariantText(line) }}
+                                            </span>
+                                            <span class="restaurant-muted d-block" *ngIf="lineModifierText(line)">
+                                                {{ lineModifierText(line) }}
+                                            </span>
+                                        </div>
+                                        <span class="restaurant-line-total">{{ lineTotal(line) | number: '1.2-2' }}</span>
+                                    </div>
+
+                                    <div class="restaurant-cart-line-actions">
+                                        <div class="restaurant-quantity-control">
+                                            <button
+                                                type="button"
+                                                class="btn btn-xs btn-light"
+                                                [disabled]="!canEditLine(line)"
+                                                (click)="decreaseLine(line)"
+                                                aria-label="Decrease quantity"
+                                            >
+                                                <i class="fa fa-minus"></i>
+                                            </button>
+                                            <span class="px-2 fw-bold">{{ line.qty }}</span>
+                                            <button
+                                                type="button"
+                                                class="btn btn-xs btn-light"
+                                                [disabled]="!canEditLine(line)"
+                                                (click)="increaseLine(line)"
+                                                aria-label="Increase quantity"
+                                            >
+                                                <i class="fa fa-plus"></i>
+                                            </button>
+                                        </div>
+                                        <small class="restaurant-cart-rate restaurant-muted">@ {{ line.rate | number: '1.2-2' }}</small>
+                                        <span class="restaurant-status" [ngClass]="lineRouteClass(line)">
+                                            <i [class]="isKitchenLine(line) ? 'fa fa-fire-burner' : 'fa fa-box'"></i>
+                                            {{ lineRouteText(line) }}
+                                        </span>
+                                        <span class="restaurant-status" [ngClass]="lineStatusClass(line.status || 0)">
+                                            {{ statusText(line.status || 0) }}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            class="btn btn-xs btn-light-danger restaurant-cart-remove"
+                                            [disabled]="!canEditLine(line)"
+                                            (click)="removeLine(i)"
+                                            aria-label="Remove item"
+                                        >
+                                            <i class="fa fa-xmark"></i>
+                                        </button>
+                                    </div>
+                                </article>
+                            </div>
+
+                            <ng-template #emptyCart>
+                                <div class="restaurant-empty">
+                                    <i class="fa fa-bell-concierge d-block mb-2"></i>
+                                    Select a menu item to start the order.
+                                </div>
+                            </ng-template>
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="d-flex align-items-end justify-content-between">
+                                <span>
+                                    <span class="restaurant-label d-block">Order total</span>
+                                    <small class="restaurant-muted">Before tip</small>
+                                </span>
+                                <strong class="restaurant-main-total">{{ cartTotalAmount | number: '1.2-2' }}</strong>
+                            </div>
+                            <div class="restaurant-cart-actions">
+                                <button type="button" class="btn btn-sm btn-light-primary" [buttonBusy]="saving" (click)="saveOrder(false)">
+                                    Save
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-warning"
+                                    [buttonBusy]="saving"
+                                    [disabled]="!hasKitchenSendableLines()"
+                                    (click)="saveOrder(true)"
+                                >
+                                    {{ sendButtonLabel() }}
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-light"
+                                    [disabled]="!selectedOrder"
+                                    (click)="setBillMode(billMode === 'full' ? 'split' : 'full')"
+                                >
+                                    {{ billMode === 'full' ? 'Split' : 'Full' }}
+                                </button>
+                                <button type="button" class="btn btn-sm btn-light" (click)="validateStock()">Stock</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="card restaurant-card restaurant-bill-card">
+                        <div class="card-header">
+                            <div>
+                                <h3 class="card-title">Payment</h3>
+                                <div class="restaurant-muted mt-1">
+                                    {{ billMode === 'split' ? selectedBillLineCountValue + ' split lines' : 'Full bill' }}
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <span class="restaurant-label d-block">Payable</span>
+                                <strong class="restaurant-total">{{ billPayableAmount | number: '1.2-2' }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col-7">
+                                    <label class="form-label">Customer</label>
+                                    <input
+                                        type="text"
+                                        class="form-control form-control-sm"
+                                        [(ngModel)]="billForm.customerName"
+                                        (ngModelChange)="onCustomerChanged()"
+                                        placeholder="Walk-in customer"
+                                    />
+                                </div>
+                                <div class="col-5">
+                                    <label class="form-label">Phone</label>
+                                    <input
+                                        type="text"
+                                        class="form-control form-control-sm"
+                                        [(ngModel)]="billForm.customerPhoneNo"
+                                        placeholder="Optional"
+                                    />
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Customer ledger</label>
+                                    <ng-select
+                                        [items]="ledgers"
+                                        bindLabel="displayName"
+                                        bindValue="id"
+                                        [(ngModel)]="billForm.ledgerId"
+                                        placeholder="Select ledger"
+                                        appendTo="body"
+                                    ></ng-select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Sales account</label>
+                                    <ng-select
+                                        [items]="salesLedgerList"
+                                        bindLabel="displayName"
+                                        bindValue="id"
+                                        [(ngModel)]="billForm.salesAccountId"
+                                        placeholder="Select account"
+                                        appendTo="body"
+                                    ></ng-select>
+                                </div>
+                            </div>
+
+                            <div *ngIf="billMode === 'split'" class="border rounded p-2 mb-2">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <strong>Split quantities</strong>
+                                    <span class="restaurant-muted">{{ selectedBillTotalAmount | number: '1.2-2' }}</span>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <div class="d-flex align-items-center justify-content-between gap-2" *ngFor="let line of unbilledLinesList">
+                                        <span class="text-truncate flex-grow-1">{{ lineName(line) }}</span>
+                                        <div class="restaurant-quantity-control">
+                                            <button
+                                                type="button"
+                                                class="btn btn-xs btn-light"
+                                                (click)="setSplitBillQty(line, (splitBillQuantities[line.id] || 0) - 1)"
+                                            >
+                                                -
+                                            </button>
+                                            <input
+                                                type="number"
+                                                class="form-control form-control-sm text-center"
+                                                min="0"
+                                                [max]="getLineUnbilledQty(line)"
+                                                [ngModel]="splitBillQuantities[line.id] || 0"
+                                                (ngModelChange)="setSplitBillQty(line, $event)"
+                                            />
+                                            <button
+                                                type="button"
+                                                class="btn btn-xs btn-light"
+                                                (click)="setSplitBillQty(line, (splitBillQuantities[line.id] || 0) + 1)"
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="restaurant-payment-grid">
+                                <button
+                                    type="button"
+                                    class="btn btn-sm"
+                                    *ngFor="let method of paymentMethods"
+                                    [class.btn-primary]="billForm.paymentMethod === method.value"
+                                    [class.btn-light]="billForm.paymentMethod !== method.value"
+                                    (click)="setPaymentMethod(method.value)"
+                                >
+                                    <i [class]="'fa ' + method.icon"></i>
+                                    {{ method.label }}
+                                </button>
+                            </div>
+
+                            <div class="row g-2 mt-1">
+                                <div class="col-4">
+                                    <label class="form-label">Tip</label>
+                                    <input
+                                        type="number"
+                                        class="form-control form-control-sm text-end"
+                                        min="0"
+                                        [(ngModel)]="billForm.tipAmount"
+                                        (ngModelChange)="onTipChanged()"
+                                    />
+                                </div>
+                                <div class="col-4">
+                                    <label class="form-label">Paid</label>
+                                    <input
+                                        type="number"
+                                        class="form-control form-control-sm text-end"
+                                        min="0"
+                                        [(ngModel)]="billForm.customerPaidAmount"
+                                        (ngModelChange)="onCustomerPaidChanged()"
+                                    />
+                                </div>
+                                <div class="col-4">
+                                    <label class="form-label">Return</label>
+                                    <input
+                                        type="text"
+                                        class="form-control form-control-sm text-end fw-bold"
+                                        [value]="billReturnAmount | number: '1.2-2'"
+                                        readonly
+                                    />
+                                </div>
+                            </div>
+
+                            <label class="form-check form-check-sm form-check-custom form-check-solid mt-2">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="billForm.isPrint" />
+                                <span class="form-check-label">Print receipt after payment</span>
+                            </label>
+                        </div>
+
+                        <div class="card-footer">
+                            <button type="button" class="btn btn-primary w-100" [buttonBusy]="saving" (click)="finalizeBill()">
+                                <i class="fa fa-cash-register me-2"></i>
+                                Pay {{ payButtonAmount | number: '1.2-2' }}
+                            </button>
+                        </div>
+                    </section>
+
+                    <section class="card restaurant-card restaurant-ops-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Order tools</h3>
+                            <small class="restaurant-muted">Optional</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="restaurant-actionbar">
+                                <button
+                                    type="button"
+                                    class="btn btn-sm"
+                                    [class.btn-light-primary]="activeOperation === 'discount'"
+                                    [class.btn-light]="activeOperation !== 'discount'"
+                                    [disabled]="!selectedOrder"
+                                    (click)="showOperation('discount')"
+                                >
+                                    <i class="fa fa-percent me-1"></i>
+                                    Discount
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-sm"
+                                    [class.btn-light-primary]="activeOperation === 'transfer'"
+                                    [class.btn-light]="activeOperation !== 'transfer'"
+                                    [disabled]="!selectedOrder"
+                                    (click)="showOperation('transfer')"
+                                >
+                                    <i class="fa fa-right-left me-1"></i>
+                                    Transfer
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-sm"
+                                    [class.btn-light-primary]="activeOperation === 'split'"
+                                    [class.btn-light]="activeOperation !== 'split'"
+                                    [disabled]="!selectedOrder"
+                                    (click)="showOperation('split')"
+                                >
+                                    Split
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-sm"
+                                    [class.btn-light-primary]="activeOperation === 'merge'"
+                                    [class.btn-light]="activeOperation !== 'merge'"
+                                    [disabled]="!selectedOrder"
+                                    (click)="showOperation('merge')"
+                                >
+                                    Merge
+                                </button>
+                            </div>
+
+                            <div class="border-top mt-2 pt-2" *ngIf="activeOperation">
+                                <ng-container [ngSwitch]="activeOperation">
+                                    <div *ngSwitchCase="'discount'" class="d-flex align-items-end gap-2">
+                                        <label class="flex-grow-1">
+                                            <span class="form-label">Discount amount</span>
+                                            <input
+                                                type="number"
+                                                class="form-control form-control-sm"
+                                                min="0"
+                                                [(ngModel)]="operationForm.discountAmount"
+                                            />
+                                        </label>
+                                        <button type="button" class="btn btn-sm btn-primary" (click)="applyDiscount()">Apply</button>
+                                    </div>
+
+                                    <div *ngSwitchCase="'transfer'" class="d-flex align-items-end gap-2">
+                                        <label class="flex-grow-1">
+                                            <span class="form-label">Target table</span>
+                                            <ng-select
+                                                [items]="operationTablesList"
+                                                bindLabel="name"
+                                                bindValue="id"
+                                                [(ngModel)]="operationForm.transferTableId"
+                                                appendTo="body"
+                                            ></ng-select>
+                                        </label>
+                                        <button type="button" class="btn btn-sm btn-primary" (click)="transferTable()">Transfer</button>
+                                    </div>
+
+                                    <div *ngSwitchCase="'split'">
+                                        <label class="d-block mb-2">
+                                            <span class="form-label">Move to table</span>
+                                            <ng-select
+                                                [items]="operationTablesList"
+                                                bindLabel="name"
+                                                bindValue="id"
+                                                [(ngModel)]="operationForm.splitTableId"
+                                                appendTo="body"
+                                            ></ng-select>
+                                        </label>
+                                        <div class="d-grid gap-2 mb-2">
+                                            <label
+                                                class="form-check form-check-sm form-check-custom form-check-solid"
+                                                *ngFor="let line of splittableLinesList"
+                                            >
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    [ngModel]="isSplitItemSelected(line.id)"
+                                                    (ngModelChange)="toggleSplitItem(line.id, $event)"
+                                                />
+                                                <span class="form-check-label">{{ lineName(line) }}</span>
+                                            </label>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-primary w-100" (click)="splitOrder()">Split order</button>
+                                    </div>
+
+                                    <div *ngSwitchCase="'merge'">
+                                        <div class="d-grid gap-2 mb-2">
+                                            <label
+                                                class="form-check form-check-sm form-check-custom form-check-solid"
+                                                *ngFor="let order of mergeCandidatesList"
+                                            >
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    [checked]="(operationForm.mergeSourceOrderIds || []).includes(order.id)"
+                                                    (change)="onMergeOrderChanged(order.id, $event)"
+                                                />
+                                                <span class="form-check-label">
+                                                    {{ order.orderNo }} · {{ order.tableName || orderTypeText(order.orderType) }}
+                                                </span>
+                                            </label>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-primary w-100" (click)="mergeOrders()">Merge orders</button>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="card restaurant-card" *ngIf="stockValidation">
+                        <div class="card-header">
+                            <h3 class="card-title">Stock check</h3>
+                            <span
+                                class="restaurant-status"
+                                [class.restaurant-status-success]="stockValidation.isValid"
+                                [class.restaurant-status-danger]="!stockValidation.isValid"
+                            >
+                                {{ stockValidation.isValid ? 'Available' : 'Shortage' }}
+                            </span>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="restaurant-table-wrap">
+                                <table class="restaurant-table restaurant-compact-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Need</th>
+                                            <th>Available</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let row of stockValidation.requirements">
+                                            <td>{{ row.productName }}</td>
+                                            <td>{{ row.requiredQty }} {{ row.unitName }}</td>
+                                            <td>{{ row.availableQty }} {{ row.unitName }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                </aside>
+            </main>
+        </div>
+    </div>
+
+    <div class="restaurant-modal-backdrop" *ngIf="pendingMenuItem">
+        <div class="restaurant-modal" role="dialog" aria-modal="true" aria-labelledby="item-config-title">
+            <div class="restaurant-modal-header">
+                <div>
+                    <div class="restaurant-label">Customize item</div>
+                    <h3 id="item-config-title" class="restaurant-modal-title mb-0">{{ pendingMenuItem.displayName }}</h3>
+                </div>
+                <button
+                    type="button"
+                    class="btn btn-sm btn-light restaurant-icon-button"
+                    (click)="cancelConfigurator()"
+                    aria-label="Close"
+                >
+                    <i class="fa fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="restaurant-modal-body restaurant-scroll-sm">
+                <section *ngIf="pendingVariants.length" class="mb-3">
+                    <div class="restaurant-label mb-2">Choose a variant</div>
+                    <div class="restaurant-config-choice-grid">
+                        <label
+                            class="restaurant-config-choice"
+                            *ngFor="let variant of pendingVariants"
+                            [class.active]="pendingVariantId === variant.id"
+                        >
+                            <input
+                                type="radio"
+                                name="variant"
+                                [value]="variant.id"
+                                [(ngModel)]="pendingVariantId"
+                                (ngModelChange)="onVariantChanged()"
+                            />
+                            <span>
+                                <strong class="d-block">{{ variant.name }}</strong>
+                                <small class="restaurant-muted">{{ variantPrice(pendingMenuItem, variant) | number: '1.2-2' }}</small>
+                            </span>
+                        </label>
+                    </div>
+                </section>
+
+                <section *ngFor="let group of pendingModifierGroups" class="mb-3">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="restaurant-label">{{ group.name }}</span>
+                        <small class="restaurant-muted">{{ group.isRequired ? 'Required' : 'Optional' }}</small>
+                    </div>
+                    <label class="restaurant-modifier-option" *ngFor="let modifier of group.modifiers">
+                        <input
+                            type="checkbox"
+                            [checked]="isModifierSelected(group.id, modifier.id)"
+                            (change)="onModifierChanged(group, modifier, $event)"
+                        />
+                        <span class="flex-grow-1">{{ modifier.name }}</span>
+                        <strong>+ {{ modifier.priceDelta | number: '1.2-2' }}</strong>
+                    </label>
+                </section>
+            </div>
+
+            <div class="restaurant-modal-footer">
+                <div class="me-auto">
+                    <span class="restaurant-label d-block">Item total</span>
+                    <strong class="restaurant-total">{{ configuratorTotalAmount | number: '1.2-2' }}</strong>
+                </div>
+                <button type="button" class="btn btn-sm btn-light" (click)="cancelConfigurator()">Cancel</button>
+                <button type="button" class="btn btn-sm btn-primary" (click)="confirmConfiguredItem()">
+                    <i class="fa fa-plus me-1"></i>
+                    Add item
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

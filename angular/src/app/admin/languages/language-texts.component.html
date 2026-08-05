@@ -1,0 +1,131 @@
+<div [@routerTransition]>
+    <sub-header [description]="'LanguageTextsHeaderInfo' | localize" [title]="'LanguageTexts' | localize"></sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <form autocomplete="new-password" class="form" id="TextsFilterForm">
+                    <div>
+                        <div class="row align-items-center m--margin-bottom-10">
+                            <div class="col-sm-6 col-md-3">
+                                <div class="mb-5">
+                                    <label class="form-label" for="TextBaseLanguageSelectionCombobox">
+                                        {{ 'BaseLanguage' | localize }}
+                                    </label>
+                                    <select
+                                        #baseLanguageNameCombobox
+                                        [(ngModel)]="baseLanguageName"
+                                        class="form-control bs-select"
+                                        name="baseLanguageName"
+                                    >
+                                        @for (language of languages; track language) {
+                                            <option [attr.data-icon]="language.icon" [value]="language.name">
+                                                {{ language.displayName }}
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="mb-5">
+                                    <label class="form-label" for="TextTargetLanguageSelectionCombobox">
+                                        {{ 'TargetLanguage' | localize }}
+                                    </label>
+                                    <select
+                                        #targetLanguageNameCombobox
+                                        [(ngModel)]="targetLanguageName"
+                                        class="form-control bs-select"
+                                        name="targetLanguageName"
+                                    >
+                                        @for (language of languages; track language) {
+                                            <option [attr.data-icon]="language.icon" [value]="language.name">
+                                                {{ language.displayName }}
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="mb-5">
+                                    <label class="form-label" for="TextSourceSelectionCombobox">
+                                        {{ 'Source' | localize }}
+                                    </label>
+                                    <select
+                                        #sourceNameCombobox
+                                        [(ngModel)]="sourceName"
+                                        class="form-control bs-select"
+                                        name="sourceName"
+                                    >
+                                        @for (sourceName of sourceNames; track sourceName) {
+                                            <option [value]="sourceName">
+                                                {{ sourceName }}
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <div class="mb-5">
+                                    <label class="form-label" for="TargetValueFilterSelectionCombobox">
+                                        {{ 'TargetValue' | localize }}
+                                    </label>
+                                    <select
+                                        #targetValueFilterCombobox
+                                        [(ngModel)]="targetValueFilter"
+                                        class="form-control bs-select"
+                                        name="targetValueFilter"
+                                    >
+                                        <option value="ALL">{{ 'All' | localize }}</option>
+                                        <option value="EMPTY">{{ 'EmptyOnes' | localize }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row align-items-center mb-4">
+                            <div class="col-sm-12">
+                                <div class="input-group">
+                                    <input
+                                        [(ngModel)]="filterText"
+                                        autoFocus
+                                        class="form-control"
+                                        name="filterText"
+                                        placeholder="{{ 'SearchWithThreeDot' | localize }}"
+                                        type="text"
+                                    />
+                                    <button (click)="applyFilters()" class="btn btn-sm btn-primary" type="submit">
+                                        <i class="la la-refresh"></i>
+                                        {{ 'Refresh' | localize }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="row align-items-center">
+                    <div class="ag-theme-balham">
+                        <ag-grid-angular
+                            (gridReady)="onGridReady($event)"
+                            [autoGroupColumnDef]="autoGroupColumnDef"
+                            [columnDefs]="columnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [getContextMenuItems]="getCustomContextMenuItems"
+                            [groupDefaultExpanded]="groupDefaultExpanded"
+                            [rowData]="rowData"
+                            [rowGroupPanelShow]="rowGroupPanelShow"
+                            [style.height.px]="screenHeight"
+                            style="width: 100%"
+                        ></ag-grid-angular>
+                        <app-pagination
+                            (pageChange)="onPageChange($event)"
+                            (pageSizeChange)="onPageSizeChange($event)"
+                            [currentPage]="currentPage"
+                            [pageSizeOptions]="pageSizeOptions"
+                            [pageSize]="pageSize"
+                            [totalRecords]="totalRecords"
+                        ></app-pagination>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <editTextModal #editTextModal (modalSave)="refreshTextValueFromModal()"></editTextModal>
+</div>

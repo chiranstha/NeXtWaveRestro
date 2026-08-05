@@ -1,0 +1,28 @@
+@if ((isHost || ('App.ChatFeature' | checkFeature)) && !chatConnected) {
+    <div class="d-flex align-items-center ms-1 ms-lg-3" id="chat_is_connecting_icon">
+        <button [class]="customStyle">
+            @if (!chatConnected) {
+                <img
+                    placement="left"
+                    src="./assets/common/images/loading.gif"
+                    style="width: 23px"
+                    tooltip="{{ 'ChatIsConnecting' | localize }}"
+                />
+            }
+        </button>
+    </div>
+}
+@if ((isHost || ('App.ChatFeature' | checkFeature)) && chatConnected) {
+    <div class="d-flex align-items-center ms-1 ms-lg-3" id="kt_drawer_chat_toggle">
+        <button [class]="customStyle" class="unread-notification" id="chatIconUnRead">
+            <i [class]="iconStyle"></i>
+            @if (unreadChatMessageCount) {
+                <span
+                    class="position-absolute top-0 start-100 translate-middle badge badge-circle badge-warning unread-chat-message-count"
+                >
+                    {{ unreadChatMessageCount }}
+                </span>
+            }
+        </button>
+    </div>
+}

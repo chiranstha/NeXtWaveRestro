@@ -1,0 +1,222 @@
+<div [@routerTransition]>
+    <sub-header [description]="'UsersHeaderInfo' | localize" [title]="'Users' | localize">
+        <div role="actions">
+            <div class="btn-group" dropdown placement="button right">
+                <button
+                    aria-controls="dropdownMenuExcelOperations"
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                    class="btn btn-sm btn-outline btn-outline-success btn-active-light-success dropdown-toggle me-1"
+                    data-toggle="dropdown"
+                    dropdownToggle
+                    id="dropdownButtonExcelOperations"
+                    type="button"
+                >
+                    <i class="far fa-file-excel btn-md-icon"></i>
+                    <span class="d-none d-md-inline-block">
+                        {{ 'ExcelOperations' | localize }}
+                    </span>
+                </button>
+                <ul
+                    *dropdownMenu
+                    aria-labelledby="dropdownButtonExcelOperations"
+                    class="dropdown-menu dropdown-menu-right dropdown-excel-operations"
+                    id="dropdownMenuExcelOperations"
+                    role="menu"
+                >
+                    <li role="menuitem">
+                        <button
+                            (click)="this.showExcelColumnsSelectionModal()"
+                            class="dropdown-item text-dark"
+                            id="ExportUsersToExcelButton"
+                            type="button"
+                        >
+                            <i class="fa fa-download me-2 mt-1 text-dark" style="font-size: 1rem"></i>
+                            {{ 'ExportToExcel' | localize }}
+                        </button>
+                    </li>
+                    @if ('Pages.Administration.Users.Create' | permission) {
+                        <li role="menuitem">
+                            <button class="w-100 text-dark p-0 m-0 border-0" type="button">
+                                <span class="fileinput-button">
+                                    <app-file-upload
+                                        #ExcelFileUpload
+                                        (onError)="onUploadExcelError()"
+                                        (uploadHandler)="uploadExcel($event)"
+                                        accept=".csv,.xls,.xlsx"
+                                        auto="auto"
+                                        chooseLabel="{{ 'ImportFromExcel' | localize }}"
+                                        customUpload="true"
+                                        maxFileSize="10000000"
+                                        name="ExcelFileUpload"
+                                    ></app-file-upload>
+                                </span>
+                            </button>
+                        </li>
+                    }
+                    @if ('Pages.Administration.Users.Create' | permission) {
+                        <li class="divider dropdown-divider"></li>
+                    }
+                    @if ('Pages.Administration.Users.Create' | permission) {
+                        <li role="menuitem">
+                            <span class="dropdown-item-text text-muted pl-3" href="#">
+                                <small
+                                    [innerHTML]="
+                                        l(
+                                            'ImportToExcelSampleFileDownloadInfo',
+                                            '<a href=/assets/sampleFiles/ImportUsersSampleFile.xlsx>' +
+                                                l('ClickHere') +
+                                                '</a>'
+                                        )
+                                    "
+                                ></small>
+                            </span>
+                        </li>
+                    }
+                </ul>
+            </div>
+            @if ('Pages.Administration.Users.Create' | permission) {
+                <button (click)="createUser()" class="btn btn-sm btn-primary">
+                    <i class="fa fa-plus btn-md-icon"></i>
+                    <span class="d-none d-md-inline-block">
+                        {{ 'CreateNewUser' | localize }}
+                    </span>
+                </button>
+            }
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <form autocomplete="new-password" class="form">
+                    <div>
+                        <div class="row align-items-center mb-4">
+                            <div class="col-xl-12">
+                                <div class="mb-5 m-form__group align-items-center">
+                                    <div class="input-group">
+                                        <input
+                                            [(ngModel)]="filterText"
+                                            [placeholder]="l('SearchWithThreeDot')"
+                                            autoFocus
+                                            class="form-control m-input"
+                                            name="filterText"
+                                            type="text"
+                                        />
+                                        <button
+                                            (click)="loadPage(currentPage)"
+                                            class="btn btn-sm btn-primary"
+                                            type="submit"
+                                        >
+                                            <i [attr.aria-label]="l('Search')" class="fa-solid fa-magnifying-glass"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div [hidden]="!advancedFiltersAreShown" class="row mb-4">
+                            <div
+                                [ngClass]="{
+                                    'col-md-6': ('Pages.Administration.Roles' | permission),
+                                    'col-md-12': !('Pages.Administration.Roles' | permission),
+                                }"
+                            >
+                                <div class="mb-5">
+                                    <permission-tree-modal
+                                        #permissionFilterTreeModal
+                                        (onModalclose)="loadPage(currentPage)"
+                                        [disableCascade]="true"
+                                    ></permission-tree-modal>
+                                </div>
+                            </div>
+                            @if ('Pages.Administration.Roles' | permission) {
+                                <div class="col-md-6">
+                                    <div class="mb-5">
+                                        <role-combo [(ngModel)]="role" name="roleFilter"></role-combo>
+                                    </div>
+                                </div>
+                            }
+                            <div class="col-md-6">
+                                <label class="form-check form-check-custom form-check-solid form-switch py-1">
+                                    <input
+                                        [(ngModel)]="onlyLockedUsers"
+                                        class="form-check-input"
+                                        id="UsersTable_OnlyLockedUsers"
+                                        name="OnlyLockedUsers"
+                                        type="checkbox"
+                                    />
+                                    <span class="form-check-label">
+                                        {{ 'OnlyLockedUsers' | localize }}
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                        @if (advancedFiltersAreShown) {
+                            <div class="row mb-4">
+                                <div class="col-sm-12 text-end">
+                                    <button (click)="loadPage(currentPage)" class="btn btn-sm btn-primary float-end">
+                                        <i class="fa fa-sync btn-md-icon"></i>
+                                        <span class="d-none d-md-inline-block">
+                                            {{ 'Refresh' | localize }}
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                        <div class="row mb-4">
+                            <div class="col-sm-12">
+                                @if (!advancedFiltersAreShown) {
+                                    <span
+                                        (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
+                                        class="clickable-item text-muted"
+                                    >
+                                        <i class="fa fa-angle-down"></i>
+                                        {{ 'ShowAdvancedFilters' | localize }}
+                                    </span>
+                                }
+                                @if (advancedFiltersAreShown) {
+                                    <span
+                                        (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
+                                        class="clickable-item text-muted"
+                                    >
+                                        <i class="fa fa-angle-up"></i>
+                                        {{ 'HideAdvancedFilters' | localize }}
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="row align-items-center">
+                    <div class="ag-theme-balham">
+                        <ag-grid-angular
+                            [autoGroupColumnDef]="autoGroupColumnDef"
+                            [columnDefs]="columnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [getContextMenuItems]="getCustomContextMenuItems"
+                            [groupDefaultExpanded]="groupDefaultExpanded"
+                            [rowData]="rowData"
+                            [rowGroupPanelShow]="rowGroupPanelShow"
+                            [style.height.px]="screenHeight"
+                            style="width: 100%"
+                        ></ag-grid-angular>
+                    </div>
+                    <app-pagination
+                        (pageChange)="onPageChange($event)"
+                        (pageSizeChange)="onPageSizeChange($event)"
+                        [currentPage]="currentPage"
+                        [pageSizeOptions]="pageSizeOptions"
+                        [pageSize]="pageSize"
+                        [totalRecords]="totalRecords"
+                    ></app-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+    <createOrEditUserModal #createOrEditUserModal (modalSave)="loadPage(currentPage)"></createOrEditUserModal>
+    <editUserPermissionsModal #editUserPermissionsModal></editUserPermissionsModal>
+    <dynamic-entity-property-manager #dynamicEntityPropertyManager></dynamic-entity-property-manager>
+    <excel-column-selection-modal
+        #excelColumnSelectionModal
+        (modalSave)="exportToExcel($event)"
+    ></excel-column-selection-modal>
+</div>

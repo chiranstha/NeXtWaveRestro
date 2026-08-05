@@ -1,0 +1,425 @@
+@media only screen
+and (max-width: 760px), (min-device-width: 768px)
+and (max-device-width: 1024px) {
+
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    tr {
+        margin: 0 0 1rem 0;
+    }
+
+    tr:nth-child(odd) {
+        background: #e8f3ff;
+    }
+
+    td div {
+        width: 351px !important;
+    }
+
+    .text-left {
+        text-align: left !important;
+    }
+
+    td {
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%;
+        display: grid;
+        justify-content: end;
+    }
+
+    td:before {
+        position: absolute;
+        top: 0;
+        left: 2px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+    }
+
+    .fd-input:last-child {
+        margin-right: -22px;
+    }
+
+    .os-td:nth-of-type(1):before {
+        content: "S.N.";
+    }
+
+    .os-td:nth-of-type(2):before {
+        content: "BRANCH";
+    }
+
+    .os-td:nth-of-type(3):before {
+        content: "QUANTITY";
+    }
+
+    .os-td:nth-of-type(4):before {
+        content: "SE.NUMBER";
+    }
+
+    .os-td:nth-of-type(5):before {
+        content: "UNIT";
+    }
+
+    .os-td:nth-of-type(6):before {
+        content: "RATE";
+    }
+
+    .os-td:nth-of-type(7):before {
+        content: "GodOwn";
+    }
+
+    .os-td:nth-of-type(8):before {
+        content: "RACK";
+    }
+
+    .os-td:nth-of-type(9):before {
+        content: "EDIT";
+    }
+
+    .os-td:nth-of-type(10):before {
+        content: "DELETE";
+    }
+
+    /* multiple unit table td */
+    .mu-td:nth-of-type(1):before {
+        content: "QUANTITY (INITIAL)";
+    }
+
+    .mu-td:nth-of-type(2):before {
+        content: "Unit (INITIAL)";
+    }
+
+    .mu-td:nth-of-type(3):before {
+        content: "QUANTITY (FINAL)";
+    }
+
+    .mu-td:nth-of-type(4):before {
+        content: "UNIT (FINAL)";
+    }
+
+    .mu-td:nth-of-type(5):before {
+        content: "EDIT";
+    }
+
+    .mu-td:nth-of-type(6):before {
+        content: "DELETE";
+    }
+
+
+    /* boom table td */
+    .bm-td:nth-of-type(1):before {
+        content: "S.N.";
+    }
+
+    .bm-td:nth-of-type(2):before {
+        content: "RAW MATERIAL";
+    }
+
+    .bm-td:nth-of-type(3):before {
+        content: "QUANTITY";
+    }
+
+    .bm-td:nth-of-type(4):before {
+        content: "UNIT";
+    }
+
+    .bm-td:nth-of-type(5):before {
+        content: "EDIT";
+    }
+
+    .bm-td:nth-of-type(6):before {
+        content: "DELETE";
+    }
+
+}
+
+@media (min-width: 435px) and (max-width: 575px) {
+    td div {
+        width: 205px !important;
+
+    }
+}
+
+@media (max-width: 435px) {
+    td div {
+        width: 170px !important;
+
+    }
+}
+
+@media (max-width: 315px) {
+
+    td div {
+        width: 232px !important;
+        margin-top: 17px !important;
+    }
+}
+
+input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.table-heading {
+    background-color: #afd8fb;
+}
+
+.table-responsive table thead th {
+    font-size: 12px;
+}
+
+.padding-box {
+    padding-left: 18%;
+    padding-top: 2%;
+}
+
+.modal-body {
+    max-width: 800px;
+}
+
+/* Main styling for Add Product page */
+.product-form-container {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.product-form-container:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.product-section-title {
+  font-weight: 600;
+  color: #344767;
+  border-left: 4px solid #2684FF;
+  padding-left: 12px;
+}
+
+.form-card {
+  background: #FFFFFF;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s;
+  margin-bottom: 1.5rem;
+  border: none;
+}
+
+.form-card:hover {
+  transform: translateY(-3px);
+}
+
+.card-header-custom {
+  background: linear-gradient(to right, #3b6091, #3498db);
+  color: white;
+  border-radius: 10px 10px 0 0;
+  padding: 1rem 1.5rem;
+  font-weight: 500;
+}
+
+
+.form-label {
+  font-weight: 500;
+  color: #4B5563;
+  margin-bottom: 0.5rem;
+}
+
+.required:after {
+  content: " *";
+  color: #EF4444;
+}
+
+.btn-primary {
+  background: #2684FF;
+  border-color: #2684FF;
+  border-radius: 6px;
+  transition: all 0.3s;
+}
+
+.btn-primary:hover {
+  background: #1a73e8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(38, 132, 255, 0.3);
+}
+
+.btn-light-success {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+  border-color: transparent;
+  font-weight: 500;
+}
+
+.btn-light-success:hover {
+  background-color: rgba(16, 185, 129, 0.2);
+}
+
+.btn-light-danger {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+  border-color: transparent;
+}
+
+.btn-light-danger:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+.btn-light-primary {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: #2684FF;
+  border-color: transparent;
+}
+
+.btn-light-primary:hover {
+  background-color: rgba(37, 99, 235, 0.2);
+}
+
+/* Table Styling */
+.table-container {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table thead th {
+  background-color: #f1f5f9;
+  color: #475569;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  border-bottom: none;
+  padding: 12px 16px;
+}
+
+.table tbody td {
+  padding: 12px 16px;
+  vertical-align: middle;
+}
+
+.bg-tableHead {
+  background-color: #f1f5f9 !important;
+}
+
+.tablebordered {
+  transition: background-color 0.2s;
+}
+
+.tablebordered:hover {
+  background-color: #f8fafc;
+}
+
+.h-450px {
+  max-height: 450px;
+  overflow-y: auto;
+}
+
+/* Card styling for product options */
+.product-options-card {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  transition: all 0.2s;
+}
+
+.option-item:hover {
+  background-color: #f1f5f9;
+  border-radius: 6px;
+  padding-left: 8px;
+}
+
+.form-check-input {
+  width: 18px;
+  height: 18px;
+}
+
+.form-check-input:checked {
+  background-color: #2684FF;
+  border-color: #2684FF;
+}
+
+/* Alert styling */
+.alert-danger {
+  background-color: #FEF2F2;
+  color: #B91C1C;
+  border-left: 4px solid #EF4444;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+}
+
+.alert-height {
+  padding: 5px 10px;
+  margin-top: 5px;
+}
+
+/* Animation */
+.blink {
+  animation: blink-animation 1s steps(5, start) infinite;
+}
+
+@keyframes blink-animation {
+  to {
+    visibility: hidden;
+  }
+}
+
+/* Custom tabs */
+.custom-tabs {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 1rem;
+}
+
+.custom-tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  font-weight: 500;
+  color: #6B7280;
+  transition: all 0.3s;
+}
+
+.custom-tab:hover {
+  color: #2684FF;
+}
+
+.custom-tab.active {
+  border-bottom: 2px solid #2684FF;
+  color: #2684FF;
+}
+
+/* Loading spinner */
+.loading-spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #2684FF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

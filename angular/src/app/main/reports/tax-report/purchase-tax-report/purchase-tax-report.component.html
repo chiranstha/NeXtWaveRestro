@@ -1,0 +1,103 @@
+<div>
+    <div [@routerTransition]>
+        <sub-header [title]="'Purchase Tax Report'">
+            <div role="search">
+                <div class="position-relative w-md-400px me-md-2">
+                    <i
+                        class="fa-duotone fa-magnifying-glass fs-3 text-gray-500 position-absolute top-50 translate-middle ms-6"><span
+                            class="path1"></span><span class="path2"></span></i>
+                    <input (keyup.enter)="searchFilter($event.target.value)" [ngModelOptions]="{ standalone: true }"
+                        class="form-control form-control-solid ps-10 headerSearch" name="search" placeholder="Search"
+                        type="text" value="">
+                </div>
+            </div>
+        </sub-header>
+        <div [class]="containerClass">
+            <div class="card card-bordered p-4">
+                <div [hidden]="!advancedFiltersAreShown" class="col-12 p-4">
+                    <div class="hidden-filter">
+                        <div>
+                            <form [formGroup]="myForm">
+                                <div class="row">
+                                    <div class="col-md-3 col-xl-3 col-xs-12 col-sm-12">
+                                        <label class="form-label" for="fromMiti">From Miti</label>
+                                        <ne-datepicker [formControl]="myForm.controls['fromMiti']"
+                                            language="en"></ne-datepicker>
+                                    </div>
+                                    <div class="col-md-3 col-xl-3 col-xs-12 col-sm-12">
+                                        <label class="form-label" for="toMiti">To Miti</label>
+                                        <ne-datepicker [formControl]="myForm.controls['toMiti']"
+                                            language="en"></ne-datepicker>
+                                    </div>
+                                    <div class="col-md-3 col-xl-3 col-xs-12 col-sm-12">
+                                        <div>
+                                            <label class="form-label" for="type">Report View Type</label>
+                                            <ng-select [items]="allTypes" bindLabel="displayName" bindValue="id"
+                                                formControlName="type" id="branchId" name="branchId"
+                                                placeholder="Select items"></ng-select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
+                                        <label class="form-label" for="showValue">{{
+                                            l('Show Import and Capitalize Tax')
+                                            }}</label>
+                                        <div>
+                                            <input Class="form-check-input" class="form-check-input"
+                                                formControlName="showValue" id="showValue" name="Filter"
+                                                type="checkbox" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
+                                        <label class="form-label" for="showProducts">{{ l('Show Product') }}</label>
+                                        <div>
+                                            <input Class="form-check-input" class="form-check-input"
+                                                formControlName="showProducts" id="showProducts" name="Filter"
+                                                type="checkbox" />
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="col-lg-6 col-xl-6 col-md-6 col-xs-6 mt-2 mb-2 display-flex justify-content-end">
+                                        <div class="search-button">
+                                            <button (click)="getReport()" class="mr-2"
+                                                class="btn btn-sm  fs-5 btn-primary" glyph="search" label="Search">
+                                                <i class="fa fa-search"></i>
+                                                Search
+                                            </button>
+                                            <button (click)="getExcel()" class="btn btn-sm fs-5 btn-primary"
+                                                label="Excel">Excel
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-sm-12">
+                        <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
+                            *ngIf="!advancedFiltersAreShown" class="clickable-item text-muted">
+                            <i class="fa fa-angle-down"></i>
+                            {{ 'ShowAdvancedFilters' | localize }}
+                        </span>
+                        <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
+                            *ngIf="advancedFiltersAreShown" class="clickable-item text-muted">
+                            <i class="fa fa-angle-up"></i>
+                            {{ 'HideAdvancedFilters' | localize }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="ag-theme-balham">
+                    <ag-grid-angular #agGrid style="width: 100%; height: 600px;" [columnDefs]="columnDefs"
+                        [rowData]="rowData" [gridOptions]="gridOptions" [pinnedBottomRowData]="pinnedBottomRowData"
+                        (gridReady)="onGridReady($event)" [loading]="loading">
+                    </ag-grid-angular>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

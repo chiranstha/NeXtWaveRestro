@@ -1,0 +1,51 @@
+<div
+    #createOrEditModal="bs-modal"
+    [config]="{ backdrop: 'true' }"
+    aria-hidden="true"
+    aria-labelledby="createOrEditModal"
+    bsModal
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <h4 class="modal-title">
+                    <span class="info-header">{{ l('ACCOUNTLEDGERDETAILS') }}</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="row">
+                        <div class="mb-3 col-lg-6 col-xl-6 col-md-6 col-xs-12">
+                            <div class="display-flex">
+                                <span class="fs-16px mr-5px">{{ l('Name') }} :</span>
+                                &nbsp;
+                                <span class="fw-bold mt-2px">{{ item.name }}</span>
+                            </div>
+                        </div>
+                        <div class="mb-3 col-lg-6 col-xl-6 col-md-6 col-xs-12">
+                            <div class="display-flex">
+                                <span class="fs-16px mr-5px">{{ l('AccountGroup') }} :</span>
+                                &nbsp;
+                                <span class="fw-bold mt-2px">{{ item.accountGroupName }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer padding-1rem">
+                <button
+                    (click)="close()"
+                    [disabled]="saving"
+                    class="btn btn-sm btn-primary"
+                    fdType="emphasized"
+                    type="button"
+                >
+                    {{ l('Close') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

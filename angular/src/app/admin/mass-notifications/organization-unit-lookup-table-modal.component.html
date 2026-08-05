@@ -1,0 +1,57 @@
+<div
+    #organizationUnitLookupTableModal="bs-modal"
+    [config]="{ backdrop: 'true' }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="organizationUnitLookupTableModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <span>{{ l('SearchOrganizationUnit') }}</span>
+                </h4>
+                <button
+                    (click)="close()"
+                    [disabled]="saving"
+                    aria-label="Close"
+                    class="btn-close"
+                    type="button"
+                ></button>
+            </div>
+            <div class="card card-custom gutter-b">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <organization-unit-tree
+                            #organizationUnitTree
+                            [data]="organizationUnitTreeData"
+                            [cascadeSelectEnabled]="false"
+                        ></organization-unit-tree>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                    (click)="close()"
+                    [disabled]="saving"
+                    class="btn btn-sm btn-light-primary font-weight-bold"
+                    type="button"
+                >
+                    {{ 'Cancel' | localize }}
+                </button>
+                <button
+                    (click)="save()"
+                    [busyText]="l('SavingWithThreeDot')"
+                    [buttonBusy]="saving"
+                    class="btn btn-sm btn-primary font-weight-bold"
+                >
+                    <i class="fa fa-save"></i>
+                    <span>{{ 'Save' | localize }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

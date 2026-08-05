@@ -1,0 +1,64 @@
+<div
+    #modal="bs-modal"
+    (onShown)="shown()"
+    [config]="{ backdrop: 'true' }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="modal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+    style="z-index:30000; pointer-events:auto;"
+>
+    <div class="modal-dialog modal-lg" style="z-index:30001; pointer-events:auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    {{ options?.title }}
+                </h4>
+                <button (click)="close()" [attr.aria-label]="l('Close')" class="btn-close" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <form (ngSubmit)="refreshTable()" autocomplete="new-password" novalidate>
+                    @if (options?.isFilterEnabled) {
+                        <div class="input-group mb-4">
+                            <input
+                                [(ngModel)]="filterText"
+                                autoFocus
+                                class="form-control"
+                                name="filterText"
+                                placeholder="{{ 'SearchWithThreeDot' | localize }}"
+                                type="text"
+                            />
+                            <div class="input-group-append">
+                                <button class="btn btn btn-sm btn-primary" type="submit">
+                                    <i [attr.aria-label]="l('Search')" class="fa-solid fa-magnifying-glass"></i>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                    <!--<AG-Grid-Start>-->
+                    <div class="ag-grid-container">
+                        <ag-grid-angular
+                            #agGrid
+                            [gridOptions]="gridOptions"
+                            class="ag-theme-balham"
+                            style="width: 100%; height: 400px"
+                        ></ag-grid-angular>
+                        @if (agGridTableHelper.totalRecordsCount == 0) {
+                            <div class="ag-grid-no-data">
+                                {{ 'NoData' | localize }}
+                            </div>
+                        }
+                    </div>
+                    <!--<AG-Grid-End>-->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button (click)="close()" class="btn btn-sm btn-light-primary fw-bold" type="button">
+                    {{ 'Cancel' | localize }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

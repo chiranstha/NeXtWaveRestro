@@ -1,0 +1,40 @@
+@if (initialized) {
+    <div [busyIf]="dataTableHelper.isLoading" class="col app-datatable-container">
+        <app-data-table #dataTable [paginator]="false" [value]="items">
+            <ng-template appTemplate="header">
+                <tr>
+                    <th>{{ 'PropertyName' | localize }}</th>
+                    <th>{{ 'Values' | localize }}</th>
+                    <th style="width: 100px">{{ 'Actions' | localize }}</th>
+                </tr>
+            </ng-template>
+            <ng-template let-record appTemplate="body">
+                <tr>
+                    <td>
+                        {{ record.data.propertyName }}
+                    </td>
+                    <td>
+                        <ng-container
+                            *ngComponentOutlet="record.definition.component; injector: record.injector"
+                        ></ng-container>
+                    </td>
+                    <td>
+                        @if ('Pages.Administration.DynamicEntityPropertyValue.Delete' | permission) {
+                            <button
+                                (click)="deleteAllValuesOfDynamicEntityPropertyId(record)"
+                                class="btn btn-danger bt-sm"
+                            >
+                                {{ 'Delete' | localize }}
+                            </button>
+                        }
+                    </td>
+                </tr>
+            </ng-template>
+        </app-data-table>
+        @if (items.length == 0) {
+            <div class="app-no-data">
+                {{ 'NoData' | localize }}
+            </div>
+        }
+    </div>
+}

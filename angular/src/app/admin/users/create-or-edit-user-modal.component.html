@@ -1,0 +1,469 @@
+<div
+    #createOrEditModal="bs-modal"
+    (onShown)="onShown()"
+    [config]="{ backdrop: 'static', keyboard: !saving }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="createOrEditModal"
+    class="modal fade create-or-edit-user-modal"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg modal-fullscreen-sm-down">
+        <div class="modal-content">
+            @if (active) {
+                <form #userForm="ngForm" (ngSubmit)="save()" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            @if (user.id) {
+                                <span>{{ 'EditUser' | localize }}: {{ user.userName }}</span>
+                            }
+                            @if (!user.id) {
+                                <span>{{ 'CreateNewUser' | localize }}</span>
+                            }
+                        </h4>
+                        <button
+                            (click)="close()"
+                            [attr.aria-label]="l('Close')"
+                            [disabled]="saving"
+                            class="btn-close"
+                            type="button"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <tabset>
+                            <tab class="pt-5" heading="{{ 'UserInformations' | localize }}">
+                                <div class="row">
+                                    <div class="col-12 col-sm-3 text-center mb-5 mt-sm-5">
+                                        <img
+                                            class="img-thumbnail img-rounded"
+                                            height="128"
+                                            src="{{ profilePicture }}"
+                                            width="128"
+                                        />
+                                        @if (canChangeProfilePicture) {
+                                            <button
+                                                (click)="changeProfilePictureModal.show(user.id)"
+                                                class="btn btn-light btn-sm mb-5 mt-5"
+                                                type="button"
+                                            >
+                                                {{ 'ChangeProfilePicture' | localize }}
+                                            </button>
+                                        }
+                                    </div>
+                                    <div class="col-12 col-sm-9">
+                                        <div class="mb-5">
+                                            <label class="form-label required" for="Name">
+                                                {{ 'FirstName' | localize }}
+                                            </label>
+                                            <input
+                                                #nameInput="ngModel"
+                                                [(ngModel)]="user.name"
+                                                class="form-control"
+                                                id="Name"
+                                                maxlength="64"
+                                                name="Name"
+                                                required
+                                                type="text"
+                                            />
+                                            <validation-messages [formCtrl]="nameInput"></validation-messages>
+                                        </div>
+                                        <div class="mb-5">
+                                            <label class="form-label required" for="Surname">
+                                                {{ 'Surname' | localize }}
+                                            </label>
+                                            <input
+                                                #surnameInput="ngModel"
+                                                [(ngModel)]="user.surname"
+                                                class="form-control"
+                                                id="Surname"
+                                                maxlength="64"
+                                                name="Surname"
+                                                required
+                                                type="text"
+                                            />
+                                            <validation-messages [formCtrl]="surnameInput"></validation-messages>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-5">
+                                    <label class="form-label required" for="EmailAddress">
+                                        {{ 'EmailAddress' | localize }}
+                                    </label>
+                                    <input
+                                        #emailAddressInput="ngModel"
+                                        [(ngModel)]="user.emailAddress"
+                                        class="form-control"
+                                        email
+                                        id="EmailAddress"
+                                        maxlength="256"
+                                        name="EmailAddress"
+                                        required
+                                        type="email"
+                                    />
+                                    <validation-messages [formCtrl]="emailAddressInput"></validation-messages>
+                                </div>
+                                <div class="mb-5">
+                                    <label class="form-label" for="PhoneNumber">{{ 'PhoneNumber' | localize }}</label>
+                                    <input
+                                        [(ngModel)]="user.phoneNumber"
+                                        class="form-control"
+                                        id="PhoneNumber"
+                                        maxlength="32"
+                                        name="PhoneNumber"
+                                        type="text"
+                                    />
+                                </div>
+                                <div class="mb-5">
+                                    <label class="form-label required" for="UserName">
+                                        {{ 'UserName' | localize }}
+                                    </label>
+                                    <div class="input-group">
+                                        <input
+                                            #userNameInput="ngModel"
+                                            [(ngModel)]="user.userName"
+                                            [disabled]="!canChangeUserName"
+                                            class="form-control"
+                                            id="UserName"
+                                            maxlength="256"
+                                            name="UserName"
+                                            required
+                                            type="text"
+                                        />
+                                        <span
+                                            class="input-group-text"
+                                            tooltip="{{
+                                                'AllowedUserNameCharactersInfoText'
+                                                    | localize: allowedUserNameCharacters
+                                            }}"
+                                        >
+                                            <i class="fas fa-info-circle"></i>
+                                        </span>
+                                    </div>
+                                    @if (!canChangeUserName) {
+                                        <span class="form-text text-muted">
+                                            {{ 'CanNotChangeAdminUserName' | localize }}
+                                        </span>
+                                    }
+                                    <validation-messages [formCtrl]="userNameInput"></validation-messages>
+                                </div>
+                                <label class="form-check form-check-custom form-check-solid py-1">
+                                    <input
+                                        (ngModelChange)="setRandomPasswordChange($event)"
+                                        [(ngModel)]="setRandomPassword"
+                                        class="form-check-input"
+                                        id="EditUser_SetRandomPassword"
+                                        name="SetRandomPassword"
+                                        type="checkbox"
+                                    />
+                                    <span class="form-check-label">
+                                        {{ 'SetRandomPassword' | localize }}
+                                    </span>
+                                </label>
+                                @if (!setRandomPassword) {
+                                    <div class="mb-5" data-kt-password-meter="true">
+                                        <div class="right">
+                                            <label class="form-label" for="Password">{{ 'Password' | localize }}</label>
+                                            <div class="position-relative mb-3">
+                                                <input
+                                                    #Password="ngModel"
+                                                    [(ngModel)]="user.password"
+                                                    [requireDigit]="passwordComplexitySetting.requireDigit"
+                                                    [requireLowercase]="passwordComplexitySetting.requireLowercase"
+                                                    [requireNonAlphanumeric]="
+                                                        passwordComplexitySetting.requireNonAlphanumeric
+                                                    "
+                                                    [requireUppercase]="passwordComplexitySetting.requireUppercase"
+                                                    [requiredLength]="passwordComplexitySetting.requiredLength"
+                                                    [required]="!user.id && !setRandomPassword"
+                                                    autocomplete="new-password"
+                                                    class="form-control password-meter"
+                                                    id="Password"
+                                                    id="Password"
+                                                    maxlength="32"
+                                                    name="Password"
+                                                    reverse="true"
+                                                    type="password"
+                                                    validateEqual="PasswordRepeat"
+                                                />
+                                                <!--begin::Visibility toggle-->
+                                                <span
+                                                    class="btn btn-sm btn-icon position-absolute translate-middle top-50 end-0 me-n2"
+                                                    data-kt-password-meter-control="visibility"
+                                                >
+                                                    <i class="fas fa-eye-slash fs-4">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                        <span class="path3"></span>
+                                                        <span class="path4"></span>
+                                                    </i>
+                                                    <i class="fas fa-eye d-none fs-4">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                        <span class="path3"></span>
+                                                    </i>
+                                                </span>
+                                                <!--end::Visibility toggle-->
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                <div [hidden]="setRandomPassword || userForm.form.valid || userForm.form.pristine">
+                                    @if (userForm.controls['Password'] && userForm.controls['Password'].errors) {
+                                        <ul class="help-block text-danger">
+                                            <li [hidden]="!userForm.controls['Password'].errors.requireDigit">
+                                                {{ 'PasswordComplexity_RequireDigit_Hint' | localize }}
+                                            </li>
+                                            <li [hidden]="!userForm.controls['Password'].errors.requireLowercase">
+                                                {{ 'PasswordComplexity_RequireLowercase_Hint' | localize }}
+                                            </li>
+                                            <li [hidden]="!userForm.controls['Password'].errors.requireUppercase">
+                                                {{ 'PasswordComplexity_RequireUppercase_Hint' | localize }}
+                                            </li>
+                                            <li [hidden]="!userForm.controls['Password'].errors.requireNonAlphanumeric">
+                                                {{ 'PasswordComplexity_RequireNonAlphanumeric_Hint' | localize }}
+                                            </li>
+                                            <li [hidden]="!userForm.controls['Password'].errors.requiredLength">
+                                                {{
+                                                    'PasswordComplexity_RequiredLength_Hint'
+                                                        | localize: passwordComplexitySetting.requiredLength
+                                                }}
+                                            </li>
+                                        </ul>
+                                    }
+                                </div>
+                                @if (!setRandomPassword) {
+                                    <div class="mb-5" data-kt-password-meter="true">
+                                        <div class="right">
+                                            <label class="form-label" for="PasswordRepeat">
+                                                {{ 'PasswordRepeat' | localize }}
+                                            </label>
+                                            <div class="position-relative mb-3">
+                                                <input
+                                                    #PasswordRepeat="ngModel"
+                                                    [(ngModel)]="userPasswordRepeat"
+                                                    [requireDigit]="passwordComplexitySetting.requireDigit"
+                                                    [requireLowercase]="passwordComplexitySetting.requireLowercase"
+                                                    [requireNonAlphanumeric]="
+                                                        passwordComplexitySetting.requireNonAlphanumeric
+                                                    "
+                                                    [requireUppercase]="passwordComplexitySetting.requireUppercase"
+                                                    [requiredLength]="passwordComplexitySetting.requiredLength"
+                                                    [required]="!user.id && !setRandomPassword"
+                                                    autocomplete="new-password"
+                                                    class="form-control"
+                                                    id="PasswordRepeat"
+                                                    maxlength="32"
+                                                    name="PasswordRepeat"
+                                                    reverse="false"
+                                                    type="password"
+                                                    validateEqual="Password"
+                                                />
+                                                <span
+                                                    class="btn btn-sm btn-icon position-absolute translate-middle top-50 end-0 me-n2"
+                                                    data-kt-password-meter-control="visibility"
+                                                >
+                                                    <i class="fas fa-eye-slash fs-4">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                        <span class="path3"></span>
+                                                        <span class="path4"></span>
+                                                    </i>
+                                                    <i class="fas fa-eye d-none fs-4">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                        <span class="path3"></span>
+                                                    </i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                <div [hidden]="setRandomPassword || userForm.form.valid || userForm.form.pristine">
+                                    @if (
+                                        userForm.controls['PasswordRepeat'] &&
+                                        userForm.controls['PasswordRepeat'].errors
+                                    ) {
+                                        <ul class="help-block text-danger">
+                                            <li [hidden]="!userForm.controls['PasswordRepeat'].errors.requireDigit">
+                                                {{ 'PasswordComplexity_RequireDigit_Hint' | localize }}
+                                            </li>
+                                            <li [hidden]="!userForm.controls['PasswordRepeat'].errors.requireLowercase">
+                                                {{ 'PasswordComplexity_RequireLowercase_Hint' | localize }}
+                                            </li>
+                                            <li [hidden]="!userForm.controls['PasswordRepeat'].errors.requireUppercase">
+                                                {{ 'PasswordComplexity_RequireUppercase_Hint' | localize }}
+                                            </li>
+                                            <li
+                                                [hidden]="
+                                                    !userForm.controls['PasswordRepeat'].errors.requireNonAlphanumeric
+                                                "
+                                            >
+                                                {{ 'PasswordComplexity_RequireNonAlphanumeric_Hint' | localize }}
+                                            </li>
+                                            <li [hidden]="!userForm.controls['PasswordRepeat'].errors.requiredLength">
+                                                {{
+                                                    'PasswordComplexity_RequiredLength_Hint'
+                                                        | localize: passwordComplexitySetting.requiredLength
+                                                }}
+                                            </li>
+                                            <li [hidden]="userForm.controls['PasswordRepeat'].valid">
+                                                {{ 'PasswordsDontMatch' | localize }}
+                                            </li>
+                                        </ul>
+                                    }
+                                </div>
+                                <label class="form-check form-check-custom form-check-solid py-1">
+                                    <input
+                                        [(ngModel)]="user.shouldChangePasswordOnNextLogin"
+                                        class="form-check-input"
+                                        id="EditUser_ShouldChangePasswordOnNextLogin"
+                                        name="ShouldChangePasswordOnNextLogin"
+                                        type="checkbox"
+                                    />
+                                    <span class="form-check-label">
+                                        {{ 'ShouldChangePasswordOnNextLogin' | localize }}
+                                    </span>
+                                </label>
+                                @if (!isSMTPSettingsProvided) {
+                                    <span class="form-text text-muted">
+                                        {{ 'SMTPSettingsNotProvidedWarningText' | localize }}
+                                    </span>
+                                }
+                                <label
+                                    [class.checkbox-disabled]="!isSMTPSettingsProvided"
+                                    class="form-check form-check-custom form-check-solid py-1"
+                                >
+                                    <input
+                                        [(ngModel)]="sendActivationEmail"
+                                        [disabled]="!isSMTPSettingsProvided"
+                                        class="form-check-input"
+                                        id="EditUser_SendActivationEmail"
+                                        name="SendActivationEmail"
+                                        type="checkbox"
+                                    />
+                                    <span class="form-check-label">
+                                        {{ 'SendActivationEmail' | localize }}
+                                    </span>
+                                </label>
+                                <label class="form-check form-check-custom form-check-solid py-1">
+                                    <input
+                                        [(ngModel)]="user.isActive"
+                                        class="form-check-input"
+                                        id="EditUser_IsActive"
+                                        name="IsActive"
+                                        type="checkbox"
+                                    />
+                                    <span class="form-check-label">
+                                        {{ 'Active' | localize }}
+                                    </span>
+                                </label>
+                                @if (isTwoFactorEnabled) {
+                                    <label class="form-check form-check-custom form-check-solid py-1">
+                                        <input
+                                            [(ngModel)]="user.isTwoFactorEnabled"
+                                            class="form-check-input"
+                                            id="EditUser_IsTwoFactorEnabled"
+                                            name="IsTwoFactorEnabled"
+                                            type="checkbox"
+                                        />
+                                        <span class="form-check-label">
+                                            {{ 'IsTwoFactorEnabled' | localize }}
+                                        </span>
+                                    </label>
+                                }
+                                @if (isLockoutEnabled) {
+                                    <label class="form-check form-check-custom form-check-solid py-1">
+                                        <input
+                                            [(ngModel)]="user.isLockoutEnabled"
+                                            class="form-check-input"
+                                            id="EditUser_IsLockoutEnabled"
+                                            name="IsLockoutEnabled"
+                                            type="checkbox"
+                                        />
+                                        <span class="form-check-label">
+                                            {{ 'IsLockoutEnabled' | localize }}
+                                        </span>
+                                        <i
+                                            class="fas fa-info-circle ms-2"
+                                            tooltip="{{ 'IsLockoutEnabled_Hint' | localize }}"
+                                        ></i>
+                                    </label>
+                                }
+                            </tab>
+                            <tab class="pt-5" heading="{{ 'Roles' | localize }}">
+                                <ng-template tabHeading>
+                                    <span class="badge badge-success assigned-role-count ms-2">
+                                        {{ assignedRoleCount }}
+                                    </span>
+                                </ng-template>
+                                <div class="row">
+                                    @for (role of roles; track role) {
+                                        <div class="col-12 col-sm-6 col-lg-4">
+                                            <label class="form-check form-check-custom form-check-solid py-1">
+                                                <input
+                                                    [(ngModel)]="role.isAssigned"
+                                                    (ngModelChange)="onRoleAssignmentChanged(role, $event)"
+                                                    [disabled]="role.inheritedFromOrganizationUnit"
+                                                    class="form-check-input"
+                                                    id="EditUser_{{ role.roleName }}"
+                                                    name="{{ role.roleName }}"
+                                                    type="checkbox"
+                                                />
+                                                <span class="form-check-label">
+                                                    {{ role.roleDisplayName }}
+                                                    @if (role.inheritedFromOrganizationUnit) {
+                                                        <small>
+                                                            ({{ 'RoleIsInheritedFromOrganizationUnit' | localize }})
+                                                        </small>
+                                                    }
+                                                </span>
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                            </tab>
+                            <tab class="pt-5" heading="{{ 'OrganizationUnits' | localize }}">
+                                <ng-template tabHeading>
+                                    <span class="badge badge-success assigned-role-count ms-2">
+                                        {{ assignedMemberedOrganizationUnitCount }}
+                                    </span>
+                                </ng-template>
+                                <organization-unit-tree
+                                    #organizationUnitTree
+                                    [data]="organizationUnitTreeData"
+                                    (onChange)="onOrganizationUnitTreeSelectionChanged()"
+                                    [cascadeSelectEnabled]="false"
+                                ></organization-unit-tree>
+                            </tab>
+                        </tabset>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            (click)="close()"
+                            [disabled]="saving"
+                            class="btn btn-sm btn-light-primary fw-bold"
+                            type="button"
+                        >
+                            {{ 'Cancel' | localize }}
+                        </button>
+                        <button
+                            [busyText]="l('SavingWithThreeDot')"
+                            [buttonBusy]="saving"
+                            [disabled]="saving || userForm.invalid"
+                            class="btn btn-sm btn-primary fw-bold"
+                            type="submit"
+                        >
+                            <i class="fa fa-save"></i>
+                            <span>{{ 'Save' | localize }}</span>
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>
+<changeProfilePictureModal
+    #changeProfilePictureModal
+    (modalSave)="getProfilePicture($event)"
+></changeProfilePictureModal>

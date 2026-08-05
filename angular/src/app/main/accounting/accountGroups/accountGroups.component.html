@@ -1,0 +1,67 @@
+<div [@routerTransition]>
+    <sub-header [description]="" [title]="'AccountGroup' | localize">
+        <div role="search">
+            <div class="position-relative w-md-400px me-md-2">
+                <i
+                    class="fa-duotone fa-magnifying-glass fs-3 text-gray-500 position-absolute top-50 translate-middle ms-6"
+                >
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                </i>
+                <input
+                    (keyup.enter)="searchValueOnApiCall($event.target.value)"
+                    [(ngModel)]="filterText"
+                    [ngModelOptions]="{ standalone: true }"
+                    class="form-control form-control-solid ps-12 rounded-pill border-0 bg-light shadow-none"
+                    name="search"
+                    placeholder="Search"
+                    type="text"
+                    value=""
+                />
+            </div>
+        </div>
+        <div role="actions">
+            @if ('Pages.AccountGroups.Create' | permission) {
+                <button (click)="addRoute()" class="btn btn-sm btn-primary">
+                    <i class="fa fa-plus btn-md-icon"></i>
+                    <span class="d-none d-md-inline-block">
+                        {{ 'Create' | localize }}
+                    </span>
+                </button>
+            }
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <div class="ag-theme-balham">
+                    <ag-grid-angular
+                        (gridReady)="onGridReady($event)"
+                        [columnDefs]="columnDefs"
+                        [getContextMenuItems]="getCustomContextMenuItems"
+                        [groupDefaultExpanded]="groupDefaultExpanded"
+                        [rowData]="rowData"
+                        [rowGroupPanelShow]="rowGroupPanelShow"
+                        [style.height.px]="screenHeight"
+                        style="width: 100%"
+                     [loading]="$any(this)['loading'] || $any(this)['isLoading'] || false"></ag-grid-angular>
+                </div>
+                <app-pagination
+                    (pageChange)="onPageChange($event)"
+                    (pageSizeChange)="onPageSizeChange($event)"
+                    [currentPage]="currentPage"
+                    [pageSizeOptions]="pageSizeOptions"
+                    [pageSize]="pageSize"
+                    [totalRecords]="totalRecords"
+                ></app-pagination>
+            </div>
+        </div>
+    </div>
+    <app-add-or-edit-account-group
+        #createOrEditAccountGroupModal
+        (modalSave)="loadPage(currentPage)"
+        [dialog]="true"
+    ></app-add-or-edit-account-group>
+    <viewAccountGroupModal #viewAccountGroupModal></viewAccountGroupModal>
+</div>
+<ng-keyboard-shortcuts-help [closeKey]="'escape'" [key]="'f1'" [title]="'Help'"></ng-keyboard-shortcuts-help>

@@ -1,0 +1,153 @@
+<!--begin::Signin-->
+<div [@routerTransition] class="login-form">
+    <div class="pb-13 pt-lg-0 pt-5">
+        <h3 class="fw-bolder text-dark fs-h4 fs-h1-lg">{{ 'LogIn' | localize }}</h3>
+    </div>
+    <!--begin::Form-->
+    <form #loginForm="ngForm" (ngSubmit)="login()" class="login-form form" method="post">
+        <div class="mb-5">
+            <input
+                #userNameOrEmailAddressInput="ngModel"
+                [(ngModel)]="loginService.authenticateModel.userNameOrEmailAddress"
+                autoFocus
+                autocomplete="new-password"
+                class="form-control form-control-solid h-auto py-4 px-6 rounded-lg fs-h6"
+                name="userNameOrEmailAddress"
+                placeholder="{{ 'UserNameOrEmail' | localize }} *"
+                required
+                type="text"
+            />
+            @if (!userNameOrEmailAddressInput.touched) {
+                <validation-messages [formCtrl]="userNameOrEmailAddressInput"></validation-messages>
+            }
+        </div>
+        <div class="mb-5" data-kt-password-meter="true">
+            <div class="position-relative mb-3">
+                <input
+                    #passwordInput="ngModel"
+                    [(ngModel)]="loginService.authenticateModel.password"
+                    [type]="showPassword || passwordAnimation ? 'text' : 'password'"
+                    autocomplete="new-password"
+                    class="form-control form-control-solid h-auto px-6 py-4 rounded-lg fs-h6"
+                    maxlength="32"
+                    name="password"
+                    placeholder="{{ 'Password' | localize }} *"
+                    required
+                />
+                <!--begin::Visibility toggle-->
+                <span
+                    (click)="togglePasswordVisibility()"
+                    [ngClass]="{
+                        'password-animating': passwordAnimation,
+                        'eye-open': showPassword,
+                        'eye-closed': !showPassword,
+                        'hidden-toggle':
+                            !loginService.authenticateModel.password ||
+                            loginService.authenticateModel.password.length === 0,
+                    }"
+                    class="position-absolute translate-middle top-50 end-0 me-n2 password-toggle"
+                >
+                    <div class="simple-eye">
+                        <!-- Open Eye (visible when password is shown) -->
+                        <svg class="open-eye-icon" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                            <path class="eye-outline" d="M50,10C25,10,5,30,5,30s20,20,45,20s45-20,45-20S75,10,50,10z" />
+                            <circle [attr.cx]="eyePositionX" [attr.cy]="eyePositionY" class="eye-pupil" r="15" />
+                        </svg>
+                        <!-- Closed Eye (visible when password is hidden) -->
+                        <svg class="closed-eye-icon" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+                            <path class="eyelash" d="M10,15 Q20,5 30,15" />
+                            <path class="eyelash" d="M30,10 Q40,0 50,10" />
+                            <path class="eyelash" d="M50,5 Q60,-5 70,5" />
+                            <path class="eyelash" d="M70,10 Q80,0 90,10" />
+                            <path class="eye-outline" d="M10,15 Q50,-5 90,15" />
+                        </svg>
+                    </div>
+                </span>
+                <!--end::Visibility toggle-->
+            </div>
+            @if (!passwordInput.touched) {
+                <validation-messages [formCtrl]="passwordInput"></validation-messages>
+            }
+        </div>
+        <div class="mb-5 d-flex justify-content-between mt-4">
+            <label class="form-check form-check-custom form-check-solid">
+                <input
+                    [(ngModel)]="loginService.rememberMe"
+                    class="form-check-input"
+                    name="rememberMe"
+                    type="checkbox"
+                    value="true"
+                />
+                <span class="form-check-label">
+                    {{ 'RememberMe' | localize }}
+                </span>
+            </label>
+            <a
+                class="text-primary fs-h6 fw-bolder text-hover-primary"
+                id="forget-password"
+                routerLink="/account/forgot-password"
+            >
+                {{ 'ForgotPassword' | localize }}
+            </a>
+        </div>
+        <!--begin::Action-->
+        <div class="pb-lg-0 pb-5">
+            <button
+                [disabled]="isLoginButtonDisabled"
+                class="btn w-100 btn-primary fw-bolder fs-h6 px-8 py-3 my-3 me-3"
+                type="submit"
+            >
+                {{ 'LogIn' | localize }}
+            </button>
+        </div>
+        <!--end::Action-->
+    </form>
+    <!--end::Form-->
+    <!--begin::Options-->
+    @if ((multiTenancySideIsTeanant || !isMultiTenancyEnabled) && loginService.externalLoginProviders.length > 0) {
+        <div class="mt-10 mb-2">
+            <div class="divider">
+                <span>{{ 'LoginWith' | localize }}</span>
+            </div>
+        </div>
+    }
+    @if ((multiTenancySideIsTeanant || !isMultiTenancyEnabled) && loginService.externalLoginProviders.length > 0) {
+        <div class="pb-lg-0 pb-5 login__options">
+            @for (provider of loginService.externalLoginProviders; track provider) {
+                <a
+                    (click)="externalLogin(provider)"
+                    class="btn btn-sm btn-light-primary fw-bolder py-2 mb-2 ml-0 me-2"
+                    title="{{ provider.name }}"
+                >
+                    <i class="fab fa-{{ provider.icon }}"></i>
+                    {{ provider.name }}
+                </a>
+            }
+        </div>
+    }
+    <!--end::Options-->
+</div>
+<div class="mt-5">
+    @if (isPasswordlessLoginEnabled) {
+        <span>
+            <span>{{ 'PasswordlessLogin_Description' | localize }}</span>
+            <a href="/account/passwordless-login" id="passwordless-btn">{{ 'ClickHere' | localize }}</a>
+        </span>
+    }
+    <div class="mt-2">
+        <span>{{ 'NotAMemberYet' | localize }}</span>
+    </div>
+    @if (isSelfRegistrationAllowed) {
+        <span>
+            <a routerLink="/account/register">{{ 'CreateAnAccount' | localize }}</a>
+            <span class="pipe-divider">|</span>
+        </span>
+    }
+    @if (!multiTenancySideIsTeanant && isTenantSelfRegistrationAllowed) {
+        <span>
+            <a routerLink="/account/select-edition">{{ 'NewTenant' | localize }}</a>
+            <span class="pipe-divider">|</span>
+        </span>
+    }
+    <a id="email-activation-btn" routerLink="/account/email-activation">{{ 'EmailActivation' | localize }}</a>
+</div>

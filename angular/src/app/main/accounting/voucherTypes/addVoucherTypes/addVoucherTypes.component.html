@@ -1,0 +1,127 @@
+<div [@routerTransition]>
+
+    <sub-header [description]="" [title]="title | localize">
+
+        <div role="actions">
+
+            <button *ngIf="this.id" class="btn btn-sm btn-light-danger fw-bold me-2">
+                <i class="fa-duotone fa-trash fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                    <span class="path4"></span>
+                </i>
+            </button>
+            <button (click)="save()" [buttonBusy]="saving" [disabled]="form.invalid" class="mr-2"
+                class="btn btn-sm fw-bold btn-primary" id="save" label="{{ l(this.id ? 'Update' : 'Save') }}"
+                type="submit">
+                <i class="fa-duotone fa-circle-plus fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l(this.id ? 'Update' : 'Save') }}
+            </button>
+            <button (click)="close()" class="mr-2" class="btn btn-sm fw-bold btn-light-success" id="cancel">
+                <i class="fa-duotone fa-circle-xmark fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l('Cancel') }}
+            </button>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <form [formGroup]="form" autocomplete="off">
+                    <div class="row">
+                        
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <label class="w-20 required form-label" for="voucherTypeId">
+                                {{ l('Voucher Type') }}
+                            </label>
+                            <div class="w-30">
+                                <ng-select #voucher (keyup)="gotoGenerateType($event)"
+                                    [items]="allVoucherTypes$ | async" [readonly]="this.id" appendTo="body"
+                                    bindLabel="displayName" bindValue="id" formControlName="voucherTypeId"
+                                    id="voucherTypeId" name="voucherTypeId" required></ng-select>
+                                <div *ngIf="
+                      this.form.get('voucherTypeId').invalid &&
+                      (this.form.get('voucherTypeId').dirty || this.form.get('voucherTypeId').touched)
+                    ">
+                                    <div class="alert alert-danger alert-height mt-1" role="alert">
+                                        <div class="alert-div">Voucher Type is required!</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <label class="w-20 required form-label" for="GenerateVoucherType">
+                                {{ l('Generate Voucher Type') }}
+                            </label>
+                            <div class="w-30">
+                                <ng-select #generateTypes (keyup)="gotoStartIndex($event)" [items]="generateType"
+                                    appendTo="body" bindLabel="displayName" bindValue="id"
+                                    formControlName="voucherGenerateType" id="voucherGenerateType"
+                                    name="voucherGenerateType" required></ng-select>
+                                <div *ngIf="
+                      this.form.get('voucherGenerateType').invalid &&
+                      (this.form.get('voucherGenerateType').dirty || this.form.get('voucherGenerateType').touched)
+                    ">
+                                    <div class="alert alert-danger alert-height mt-1" role="alert">
+                                        <div class="alert-div">Generate Voucher Type is required!</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <label class="w-20 required form-label" for="startIndex">
+                                {{ l('Start Index') }}
+                            </label>
+                            <div class=" w-30 ">
+                                <input #startindex (keyup)="gotoPrefix($event)" [ngClass]="
+                      this.form.get('startIndex').invalid &&
+                      (this.form.get('startIndex').dirty || this.form.get('startIndex').touched)
+                        ? 'is-danger'
+                        : 'is-success'
+                    " class="change_postion form-control" formControlName="startIndex" id="startIndex" min="1"
+                                    name="startIndex" onkeydown="return event.keyCode !== 69 && event.keyCode !== 189"
+                                    type="number" />
+                                <div *ngIf="
+                  this.form.get('startIndex').invalid &&
+                  (this.form.get('startIndex').dirty || this.form.get('startIndex').touched)
+                " class="alert alert-danger alert-height mt-1" role="alert">
+                                    <div class="alert-div">Start Index required!</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <label class="w-20 form-label" for="prefix">{{ l('Prefix') }}</label>
+                            <div class="w-30">
+                                <input #prefix (keyup)="gotoPostfix($event)" class="form-control"
+                                    formControlName="prefix" id="prefix" name="prefix" type="text" />
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <label class="w-20 form-label" for="postfix">{{ l('Postfix') }}</label>
+                            <div class="w-30">
+                                <input #postfix (keyup)="onSaveOnInput($event)" class="form-control"
+                                    formControlName="postfix" id="postfix" name="postfix" placeholder="" type="text" />
+                            </div>
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+                    <!-- {{ this.form.value | json }} -->
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<ng-keyboard-shortcuts [shortcuts]="shortcuts"></ng-keyboard-shortcuts>
+<erp-key-event (closeEvent)="keyClose($event)" (saveEvent)="keySave($event)"
+    [id]="this.id ? this.id : null"></erp-key-event>

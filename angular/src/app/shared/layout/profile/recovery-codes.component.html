@@ -1,0 +1,10 @@
+<h3 class="card-label">
+    {{ 'SaveRecoveryCodesTitle' | localize }}
+</h3>
+<div class="bg-light p-5" id="recoveryCodes">
+    <div class="row">
+        @for (code of this.model.recoveryCodes; track code) {
+            <div class="text-dark fs-6 fw-bold col-6">{{ code }}</div>
+        }
+    </div>
+</div>

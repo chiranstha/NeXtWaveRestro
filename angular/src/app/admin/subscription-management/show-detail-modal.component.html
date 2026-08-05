@@ -1,0 +1,30 @@
+<div
+    #showDetailModal="bs-modal"
+    [config]="{ backdrop: 'static' }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="showDetailModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <span>{{ 'Detail' | localize }}</span>
+                </h4>
+                <button (click)="close()" [attr.aria-label]="l('Close')" class="btn-close" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <ag-grid-angular
+                    class="ag-theme-balham"
+                    style="width: 100%; height: 360px;"
+                    [columnDefs]="productColumnDefs"
+                    [defaultColDef]="defaultColDef"
+                    [rowData]="products"
+                ></ag-grid-angular>
+            </div>
+        </div>
+    </div>
+</div>

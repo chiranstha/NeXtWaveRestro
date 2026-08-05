@@ -1,0 +1,54 @@
+<div
+    #userDelegationsModal="bs-modal"
+    (onShown)="onShown()"
+    [config]="{ keyboard: false }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="myLargeModalLabel"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <span>{{ 'UserDelegations' | localize }}</span>
+                </h4>
+                <button (click)="manageUserDelegations()" class="btn btn-sm btn-primary pull-right">
+                    <i class="fa fa-plus btn-md-icon"></i>
+                    <span class="d-none d-md-inline-block">
+                        {{ 'DelegateNewUser' | localize }}
+                    </span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!--<AG-Grid-Start>-->
+                <div [busyIf]="isLoading" class="ag-grid-container">
+                    <ag-grid-angular
+                        #agGrid
+                        (gridReady)="onGridReady($event)"
+                        (sortChanged)="onSortChanged($event)"
+                        [columnDefs]="columnDefs"
+                        [defaultColDef]="defaultColDef"
+                        [domLayout]="'autoHeight'"
+                        [rowData]="rowData"
+                        class="ag-theme-balham"
+                    ></ag-grid-angular>
+                    @if (totalRecordsCount == 0) {
+                        <div class="no-data">
+                            {{ 'NoData' | localize }}
+                        </div>
+                    }
+                </div>
+                <!--<AG-Grid-End>-->
+            </div>
+            <div class="modal-footer">
+                <button (click)="close()" class="btn btn-sm btn-light-primary fw-bold pull-right" type="button">
+                    {{ 'Close' | localize }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<createNewUserDelegation #createNewUserDelegation (modalSave)="getUserDelegations()"></createNewUserDelegation>

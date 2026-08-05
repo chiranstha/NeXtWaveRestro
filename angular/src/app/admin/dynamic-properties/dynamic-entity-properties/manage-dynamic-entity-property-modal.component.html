@@ -1,0 +1,60 @@
+<div
+    #createModal="bs-modal"
+    [config]="{ backdrop: 'true' }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="createModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <span>{{ 'AddNewDynamicEntityProperty' | localize }}</span>
+                </h4>
+                <button (click)="close()" [attr.aria-label]="l('Close')" class="btn-close" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12" style="height: 40px">
+                    @if ('Pages.Administration.DynamicEntityProperties.Create' | permission) {
+                        <button (click)="addNewDynamicEntityProperty()" class="btn btn-sm btn-primary float-end">
+                            <i class="fa fa-plus"></i>
+                            {{ 'AddNewDynamicEntityProperty' | localize }}
+                        </button>
+                    }
+                </div>
+                <div class="clear-fix"></div>
+                <div class="d-flex w-100">
+                    <div class="col">
+                        <ag-grid-angular
+                            #agGrid
+                            (cellClicked)="onCellClicked($event)"
+                            (gridReady)="onGridReady($event)"
+                            [columnDefs]="columnDefs"
+                            [domLayout]="'autoHeight'"
+                            [pagination]="false"
+                            [rowData]="rowData"
+                            class="ag-theme-balham"
+                        ></ag-grid-angular>
+                        @if (rowData.length == 0) {
+                            <div class="ag-grid-no-data">
+                                {{ 'NoData' | localize }}
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button (click)="close()" class="btn btn-sm btn-light-primary fw-bold" type="button">
+                    {{ 'Close' | localize }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<create-dynamic-entity-property-modal
+    #createDynamicEntityPropertyModal
+    (modalSave)="handlePropertyChanges()"
+></create-dynamic-entity-property-modal>

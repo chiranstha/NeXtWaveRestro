@@ -1,0 +1,41 @@
+<div [@routerTransition]>
+    <sub-header [description]="'LanguagesHeaderInfo' | localize" [title]="'Languages' | localize">
+        <div role="actions">
+            @if (('Pages.Administration.Languages.Create' | permission) && multiTenancySideIsHost) {
+                <button (click)="createOrEditLanguageModal.show()" class="btn btn-sm btn-primary">
+                    <i class="fa fa-plus btn-md-icon"></i>
+                    <span class="d-none d-md-inline-block">
+                        {{ 'CreateNewLanguage' | localize }}
+                    </span>
+                </button>
+            }
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <!--<DataTable-Start>-->
+                    <div class="ag-theme-balham">
+                        <ag-grid-angular
+                            [autoGroupColumnDef]="autoGroupColumnDef"
+                            [columnDefs]="columnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [getContextMenuItems]="getCustomContextMenuItems"
+                            [groupDefaultExpanded]="groupDefaultExpanded"
+                            [rowData]="rowData"
+                            [rowGroupPanelShow]="rowGroupPanelShow"
+                            [style.height.px]="screenHeight"
+                            style="width: 100%"
+                        ></ag-grid-angular>
+                    </div>
+                    <!--<DataTable-End>-->
+                    @if (appSession.tenantId) {
+                        <p class="col-12 mt-2">* {{ 'CanNotEditOrDeleteDefaultLanguages' | localize }}</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <createOrEditLanguageModal #createOrEditLanguageModal (modalSave)="loadPage()"></createOrEditLanguageModal>
+</div>

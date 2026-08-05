@@ -1,0 +1,148 @@
+@media only screen and (max-width: 760px),
+(min-device-width: 768px) and (max-device-width: 1024px) {
+
+    table,
+    thead,
+    tbody,
+    th,
+    td,
+    tr {
+        display: block;
+    }
+
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    tr {
+        margin: 0 0 1rem 0;
+    }
+
+    .tr-one {
+        display: none;
+    }
+
+    tr:nth-child(odd) {
+        background: #e8f3ff;
+    }
+
+    td div {
+        width: 351px !important;
+    }
+
+    .text-left {
+        text-align: left !important;
+    }
+
+    td {
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%;
+        display: grid;
+        justify-content: end;
+    }
+
+    td:before {
+        position: absolute;
+        top: 0;
+        left: 2px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+    }
+
+
+    td:nth-of-type(1):before {
+        content: "S.N.";
+    }
+
+    td:nth-of-type(2):before {
+        content: "PRODUCT CODE";
+    }
+
+
+    td:nth-of-type(3):before {
+        content: "PRODUCT NAME";
+    }
+
+    td:nth-of-type(4):before {
+        content: "QTY";
+    }
+
+    td:nth-of-type(5):before {
+        content: "UNIT";
+    }
+
+    /* td:nth-of-type(7):before { content: "GodOwn"; }
+    td:nth-of-type(8):before { content: "Rack"; } */
+    td:nth-of-type(6):before {
+        content: "RATE";
+    }
+
+    td:nth-of-type(7):before {
+        content: "AMOUNT";
+    }
+
+    td:nth-of-type(8):before {
+        content: "EDIT";
+    }
+
+    td:nth-of-type(9):before {
+        content: "REMOVE";
+    }
+
+    /* upload file table */
+    .upload-td:nth-of-type(1):before {
+        content: "S.N.";
+    }
+
+    .upload-td:nth-of-type(2):before {
+        content: "FILE NAME";
+    }
+
+
+    .upload-td:nth-of-type(3):before {
+        content: "FILE TYPE";
+    }
+
+    .upload-td:nth-of-type(4):before {
+        content: "FILE";
+    }
+
+    .upload-td:nth-of-type(5):before {
+        content: "DELETE";
+    }
+
+
+}
+
+@media (max-width: 600px) {
+    td {
+        height: auto;
+    }
+
+
+    td div {
+        width: 200px !important;
+        margin-top: 17px !important;
+    }
+}
+
+
+@media (max-width: 350px) {
+    td {
+        height: auto;
+    }
+
+    .fold-overflow {
+        overflow: auto;
+    }
+
+    td div {
+        width: 170px !important;
+        margin-top: 17px !important;
+    }
+}

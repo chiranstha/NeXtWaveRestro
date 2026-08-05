@@ -1,0 +1,65 @@
+{
+  "compilerOptions": {
+    "declaration": false,
+    "experimentalDecorators": true,
+    "lib": [
+      "es2022",
+      "dom"
+    ],
+    "mapRoot": "./",
+    "module": "esnext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "outDir": "../dist/out-tsc",
+    "sourceMap": true,
+    "target": "es2022",
+    "ignoreDeprecations": "6.0",
+    "types": [
+      "node"
+    ],
+    "typeRoots": [
+      "../node_modules/@types"
+    ],
+    "baseUrl": ".",
+    "strict": true,
+    "noImplicitOverride": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "noImplicitReturns": false,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false,
+    "strictPropertyInitialization": false,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "strictFunctionTypes": false,
+    "noImplicitThis": false,
+    "paths": {
+      "@app/*": [
+        "./app/*"
+      ],
+      "@account/*": [
+        "./account/*"
+      ],
+      "@shared/*": [
+        "./shared/*"
+      ],
+      "@metronic/*": [
+        "./assets/metronic/*"
+      ]
+    }
+  },
+  "angularCompilerOptions": {
+    "enableControlFlowSyntax": true,
+    "fullTemplateTypeCheck": true,
+    "strictTemplates": true,
+    "strictInputTypes": false,
+    "strictAttributeTypes": false,
+    "strictOutputEventTypes": false,
+    "strictDomEventTypes": false,
+    "strictLiteralTypes": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictSafeNavigationTypes": false
+  }
+}

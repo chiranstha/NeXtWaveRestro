@@ -1,0 +1,52 @@
+<div [@routerTransition]>
+    <sub-header [description]="'EditionsHeaderInfo' | localize" [title]="'Editions' | localize">
+        <div role="actions">
+            @if ('Pages.Editions.Create' | permission) {
+                <button (click)="createEdition()" class="btn btn-sm btn-primary">
+                    <i class="fa fa-plus btn-md-icon"></i>
+                    <span class="d-none d-md-inline-block">
+                        {{ 'CreateNewEdition' | localize }}
+                    </span>
+                </button>
+            }
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <!--<AG-Grid-Start>-->
+                    <div
+                        [busyIf]="$safeNavigationMigration(dataTableHelper?.isLoading)"
+                        class="col ag-grid-container"
+                    >
+                        <ag-grid-angular
+                            #agGrid
+                            (gridReady)="onGridReady($event)"
+                            [columnDefs]="columnDefs"
+                            [defaultColDef]="{
+                                resizable: true,
+                                sortable: true,
+                                filter: true,
+                            }"
+                            [paginationPageSize]="dataTableHelper?.defaultRecordsCountPerPage || 10"
+                            [pagination]="false"
+                            [rowData]="rowData"
+                            class="ag-theme-balham"
+                            domLayout="autoHeight"
+                        ></ag-grid-angular>
+                        @if (rowData.length == 0) {
+                            <div class="ag-grid-no-data">
+                                {{ 'NoData' | localize }}
+                            </div>
+                        }
+                    </div>
+                    <!--<AG-Grid-End>-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <createEditionModal #createEditionModal (modalSave)="getEditions()"></createEditionModal>
+    <editEditionModal #editEditionModal (modalSave)="getEditions()"></editEditionModal>
+    <moveTenantsToAnotherEditionModal #moveTenantsToAnotherEditionModal></moveTenantsToAnotherEditionModal>
+</div>

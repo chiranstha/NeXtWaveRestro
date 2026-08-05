@@ -1,0 +1,144 @@
+<div
+    aria-expanded="true"
+    class="d-flex align-items-center ms-1 ms-lg-3"
+    container="body"
+    data-toggle="dropdown"
+    dropdown
+>
+    <div [class]="customStyle" dropdownToggle id="notificationIcon">
+        @if (unreadNotificationCount) {
+            <i [class]="iconStyle"></i>
+        }
+        @if (unreadNotificationCount) {
+            <span
+                class="position-absolute top-0 start-100 translate-middle badge badge-circle badge-warning badge-custom"
+            >
+                {{ unreadNotificationCount }}
+            </span>
+        }
+        @if (!unreadNotificationCount) {
+            <i class="fa-duotone fa-regular fa-bell"></i>
+        }
+    </div>
+    @if (isRight) {
+        <div
+            *dropdownMenu
+            class="dropdown-menu p-0 m-0 dropdown-menu-right dropdown-menu-anim-up menu-column w-200px w-sm-250px w-md-400px"
+        >
+            <ng-container *ngTemplateOutlet="dropdownMenuContent"></ng-container>
+        </div>
+    }
+    @if (!isRight) {
+        <div
+            *dropdownMenu
+            class="dropdown-menu p-0 m-0 dropdown-menu-left dropdown-menu-anim-up menu-column w-200px w-sm-250px w-md-400px"
+        >
+            <ng-container *ngTemplateOutlet="dropdownMenuContent"></ng-container>
+        </div>
+    }
+</div>
+<ng-template #dropdownMenuContent>
+    <div
+        class="d-flex flex-column pt-5 bgi-size-cover bgi-no-repeat rounded-top bg-primary"
+        perfectScrollbar
+        style="min-height: 70px"
+    >
+        <h4 class="d-flex flex-center" style="align-items: center; justify-content: space-between">
+            <span class="ms-5">
+                <span class="text-white">{{ 'Notifications' | localize }}</span>
+                <span class="btn btn-text btn-secondary btn-sm fw-bold btn-font-md ms-2">
+                    {{ unreadNotificationCount }} {{ 'New' | localize }}
+                </span>
+            </span>
+            <a
+                (click)="openNotificationSettingsModal()"
+                class="btn btn-md btn-icon btn-secondary me-5"
+                href="javascript:;"
+                id="openNotificationSettingsModalLink"
+            >
+                <i class="fa-duotone fa-regular fa-gear"></i>
+            </a>
+        </h4>
+    </div>
+    <div class="px-4">
+        <div
+            class="scroll pt-5"
+            data-height="300"
+            data-mobile-height="200"
+            data-scroll="true"
+            style="height: 300px; overflow: hidden"
+        >
+            @for (notification of notifications; track notification) {
+                <div
+                    (click)="gotoUrl(notification.url)"
+                    [ngClass]="{
+                        'user-notification-item-clickable': notification.url,
+                        'user-notification-item-unread': notification.isUnread,
+                    }"
+                    class="d-flex align-items-sm-center mb-7 user-notification-item-clickable user-notification-item-unread"
+                >
+                    <div class="symbol symbol-50px me-5">
+                        <span class="symbol-label">
+                            <i class="{{ notification.icon }} {{ notification.iconFontClass }} icon-lg"></i>
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-center flex-row-fluid flex-wrap">
+                        <div class="flex-grow-1 me-2">
+                            <a
+                                [ngClass]="{ 'text-muted': !notification.isUnread }"
+                                class="text-hover-primary fs-6 fw-bolder"
+                            >
+                                {{ notification.text }}
+                            </a>
+                        </div>
+                        <span class="text-muted fw-bold d-block fs-7">
+                            {{ notification.creationTime | luxonFromNow }}
+                        </span>
+                        @if (notification.isUnread) {
+                            <span
+                                (click)="
+                                    setNotificationAsRead(notification);
+                                    $event.preventDefault();
+                                    $event.stopPropagation()
+                                "
+                                class="btn btn-link-success text-success set-notification-as-read fs-7 py-0 my-0 set-notification-as-read"
+                            >
+                                {{ 'SetAsRead' | localize }}
+                            </span>
+                        }
+                    </div>
+                </div>
+            }
+            @if (!notifications.length) {
+                <span class="notification-empty-text text-center p-5">
+                    {{ 'ThereAreNoNotifications' | localize }}
+                </span>
+            }
+        </div>
+        @if (notifications.length) {
+            <hr />
+        }
+        @if (notifications.length) {
+            <div class="m-1 mb-4 d-flex" style="align-items: center; justify-content: space-between">
+                @if (unreadNotificationCount) {
+                    <a
+                        (click)="setAllNotificationsAsRead(); $event.preventDefault(); $event.stopPropagation()"
+                        class="btn btn-secondary col-md-6 col-xs-12"
+                        href="javascript:;"
+                        id="setAllNotificationsAsReadLink"
+                    >
+                        {{ 'SetAllAsRead' | localize }}
+                    </a>
+                }
+                <a
+                    [class.col-md-12]="!unreadNotificationCount"
+                    [class.col-md-6]="unreadNotificationCount"
+                    class="btn btn-sm btn-primary col-xs-12"
+                    routerLink="notifications"
+                >
+                    {{ 'SeeAllNotifications' | localize }}
+                </a>
+            </div>
+        }
+    </div>
+</ng-template>

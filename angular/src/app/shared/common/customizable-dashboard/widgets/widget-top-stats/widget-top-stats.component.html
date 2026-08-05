@@ -1,0 +1,71 @@
+@if (statCards.length) {
+    <div class="stat-grid">
+        @for (card of statCards; track trackByLabel($index, card)) {
+            <article
+                [ngClass]="'stat-card--' + card.variant"
+                aria-label="{{ card.label }}"
+                class="stat-card"
+                role="group"
+            >
+                <!-- Decoration / Glow -->
+                <div class="stat-card__glow"></div>
+                <div class="stat-card__top">
+                    <div aria-hidden="true" class="stat-card__icon">
+                        <i [ngClass]="card.icon" class="fa-duotone">
+                            @for (path of card.paths; track path) {
+                                <span [ngClass]="path"></span>
+                            }
+                        </i>
+                    </div>
+                    <span class="stat-card__chip">{{ card.chip }}</span>
+                </div>
+                <div class="stat-card__main">
+                    <div class="stat-card__value">{{ card.value || '—' }}</div>
+                    @if (card.trend) {
+                        <div
+                            [ngClass]="card.trend > 0 ? 'positive' : card.trend < 0 ? 'negative' : 'neutral'"
+                            class="stat-card__trend"
+                        >
+                            @if (card.trend > 0) {
+                                <i class="fa-solid fa-arrow-trend-up"></i>
+                            }
+                            @if (card.trend < 0) {
+                                <i class="fa-solid fa-arrow-trend-down"></i>
+                            }
+                            @if (card.trend === 0) {
+                                <i class="fa-solid fa-minus"></i>
+                            }
+                            <span class="stat-card__trend-value">{{ card.trendDisplay || card.trend + '%' }}</span>
+                        </div>
+                    }
+                </div>
+                <div class="stat-card__label">{{ card.label }}</div>
+                @if (card.progress != null) {
+                    <div aria-hidden="true" class="stat-card__progress">
+                        <div [style.width]="card.progress + '%'" class="stat-card__progress-bar"></div>
+                    </div>
+                }
+            </article>
+        }
+    </div>
+} @else {
+    <div class="stat-grid stat-grid--skeleton">
+        @for (_ of skeletonSlots; track _; let i = $index) {
+            <article aria-hidden="true" class="stat-card stat-card--skeleton">
+                <div class="stat-card__top">
+                    <div class="stat-card__icon shimmer"></div>
+                    <span class="stat-card__chip shimmer"></span>
+                </div>
+                <div class="stat-card__main">
+                    <div class="stat-card__value shimmer"></div>
+                    <div class="stat-card__trend shimmer"></div>
+                </div>
+                <div class="stat-card__label shimmer"></div>
+                <div class="stat-card__progress">
+                    <div class="stat-card__progress-bar shimmer" style="width: 60%"></div>
+                </div>
+                <div class="stat-card__description shimmer"></div>
+            </article>
+        }
+    </div>
+}

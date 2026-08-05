@@ -1,0 +1,51 @@
+<div class="card card-custom h-100">
+    <div class="card-header align-items-center border-0">
+        <div class="card-title">
+            <span class="card-icon">
+                <i class="far fa-clock text-danger"></i>
+            </span>
+            <h3 class="card-label text-danger">
+                {{ 'SubscriptionExpiringTenants' | localize }}
+                @if (expiringTenantsData) {
+                    <small class="text-muted">
+                        {{
+                            'ExpiringTenantsHelpText'
+                                | localize
+                                    : expiringTenantsData.subscriptionEndAlertDayCount
+                                    : expiringTenantsData.maxExpiringTenantsShownCount
+                        }}
+                    </small>
+                }
+            </h3>
+        </div>
+    </div>
+    <div class="card-body" perfectScrollbar>
+        <div class="scroller chart">
+            @if (!dataLoading) {
+                <div [busyIf]="dataLoading" class="ag-grid-container expiring-tenants-table">
+                    <ag-grid-angular
+                        (gridReady)="onGridReady($event)"
+                        [columnDefs]="columnDefs"
+                        [defaultColDef]="defaultColDef"
+                        [domLayout]="'autoHeight'"
+                        [rowData]="expiringTenantsData?.expiringTenants || []"
+                        class="ag-theme-balham"
+                    ></ag-grid-angular>
+                    @if (expiringTenantsData?.expiringTenants?.length == 0) {
+                        <div class="app-no-data">
+                            {{ 'NoData' | localize }}
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+        <div class="scroller-footer">
+            <div class="btn-arrow-link pull-right">
+                <a (click)="gotoAllExpiringTenants()" class="see-all-expiring-tenants" href="javascript:;">
+                    {{ 'SeeAllRecords' | localize }}
+                </a>
+                <i class="icon-arrow-right"></i>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,509 @@
+<div *ngIf="serialNumber === 0">
+
+    <sub-header [description]="" [title]="title | localize">
+
+        <div role="actions">
+            <button *ngIf="this.id" (click)="clearForm(id)" class="btn btn-sm btn-light-danger fw-bold me-2">
+                <i class="fa-duotone fa-trash fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                    <span class="path4"></span>
+                </i>
+            </button>
+
+
+            <button (click)="checkSave()" [buttonBusy]="saving" [disabled]="form.invalid" class="mr-2"
+                class="btn btn-sm fw-bold btn-primary" id="save" label="{{ l(this.id ? 'Update' : 'Save') }}"
+                type="submit">
+                <i class="fa-duotone fa-circle-plus fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l(this.id ? 'Update' : 'Save') }}
+            </button>
+
+            <span *ngIf="this.id">
+                <button class="btn btn-light-success fw-bold me-2"
+                    routerLink="/app/main/transaction/pdf/3/{{ this.id }}">
+                    <i class="fa-duotone fa-file-spreadsheet ps-1 fs-2">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                        <span class="path4"></span>
+                    </i>
+                </button>
+            </span>
+
+            <button (click)="close()" class="mr-2" class="btn btn-sm fw-bold btn-light-success" id="cancel">
+                <i class="fa-duotone fa-circle-xmark fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l('Cancel') }}
+            </button>
+        </div>
+    </sub-header>
+
+    <div>
+
+        <div [class]="containerClass">
+            <div class="card card-custom gutter-b">
+                <div class="card-body">
+                    <form [formGroup]="form" autocomplete="off">
+                        <div appCustomEnter>
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
+                                        <div class="mb-1">
+                                            <label class="required form-label" for="datemiti">{{ l('Date-Miti')
+                                                }}</label>
+                                            <ne-datepicker (keyup)="goFromDate($event)" [dateFormat]="'yyyy/MM/dd'"
+                                                [formControl]="form.controls['dateMiti']" [placeholder]="'yyyy/MM/dd'"
+                                                language="en"></ne-datepicker>
+                                            <div *ngIf="
+                      this.form.get('dateMiti').invalid &&
+                      (this.form.get('dateMiti').dirty || this.form.get('dateMiti').touched)
+                    ">
+                                                <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                    <div class="alert-div">Date Miti is required!</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
+                                        <div class="mb-1">
+                                            <label class="required form-label" for="voucherNo">{{ l('Voucher No')
+                                                }}</label>
+                                            <input #voucherNo (keyup)="gotoReference($event)"
+                                                [readonly]="this.automaticInput || this.id" class="form-control"
+                                                formControlName="voucherNo" id="voucherNo" type="text"
+                                                voucherNo="voucherNo" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
+                                        <div class="mb-1">
+                                            <label class="form-label" for="ReferenceNo">{{ l('Reference No') }}</label>
+                                            <input #ref (keyup)="gotoAccount($event)" class="mt-2" class="form-control"
+                                                formControlName="referenceNo" id="ReferenceNo" type="text" />
+                                        </div>
+                                    </div>
+
+                                    <div class="card  shadow-sm my-5 p-2">
+                                        <div class="card-header">
+                                            <h3 class="card-title fw-bold">{{ l('Journal Master Details') }}</h3>
+
+                                            <div *ngIf="ledgerBalanceStatus">
+                                                <div class="card-toolbar">
+                                                    <h5 class="detail-title mt-2 mb-2 fs-15px fs-15px">
+                                                        Current Balance:
+                                                        <span class="border-radius">{{ ledgerBalanceStatus }}</span>
+                                                    </h5>
+                                                </div>
+                                            </div>
+
+                                            <div class="card-toolbar">
+                                                <button (click)="keyEventsAdd()"
+                                                    [disabled]="this.form.get('journalDetail').invalid"
+                                                    [label]="'Add Details'"
+                                                    class="btn btn-sm btn-outline btn-outline-success btn-active-light-success"
+                                                    id="add">
+                                                    <i class="fa-duotone fa-grid-2-plus fs-2">
+                                                        <span class="path1"></span>
+                                                        <span class="path2"></span>
+                                                        <span class="path3"></span>
+                                                    </i>
+                                                    Add
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="table-responsives overflow-x-auto h-450px">
+                                            <table class="table table-row-dashed table-row-gray-300 table-striped"
+                                                formArrayName="journalDetail">
+                                                <thead class="bg-tableHead">
+                                                    <tr class="tr-one bg-tableHead">
+                                                        <th></th>
+                                                        <th class="text-center" colspan="3" scope="colgroup">ACCOUNT
+                                                            LEDGER</th>
+                                                        <th colspan="1" scope="colgroup"></th>
+                                                        <th class="text-center" colspan="2" scope="colgroup">CHEQUE</th>
+                                                        <th class="text-center" colspan="2" scope="colgroup">OPTIONS
+                                                        </th>
+                                                    </tr>
+                                                    <tr class="text-center">
+                                                        <th class="min-w-10px ps-2">S.N.</th>
+                                                        <th class="min-w-250px">ACCOUNT</th>
+                                                        <th class="min-w-100px">DR/CR</th>
+                                                        <th class="min-w-150px">AMOUNT</th>
+                                                        <th class="min-w-150px">DATE</th>
+                                                        <th class="min-w-150px">NUMBER</th>
+                                                        <th class="min-w-100px">ADJUSTMENT</th>
+                                                        <th class="min-w-50px">EDIT</th>
+                                                        <th class="min-w-50px">DEL</th>
+                                                    </tr>
+                                                </thead>
+                                                <tr *ngFor="let abcd of journalDetailArray.controls; let i = index"
+                                                    [formGroupName]="i" class="text-center" class="tablebordered">
+                                                    <td class="sn_css">
+                                                        {{ i + 1 }}
+                                                    </td>
+                                                    <td>
+                                                        <div>
+                                                            <ng-select #account
+                                                                (change)="insertParty(abcd,$event.isBillByBill)"
+                                                                (keyup)="gotoDrCr($event, i)"
+                                                                [items]="allLedgers$ | async" appendTo="body"
+                                                                bindLabel="displayName" bindValue="id"
+                                                                formControlName="ledgerId" id="ledgerId" name="ledgerId"
+                                                                placeholder="Select items" required></ng-select>
+                                                            <div *ngIf="
+                              abcd.get('ledgerId').invalid &&
+                              (abcd.get('ledgerId').dirty || abcd.get('ledgerId').touched)
+                            ">
+                                                                <div class="alert alert-danger alert-height mt-1"
+                                                                    role="alert">
+                                                                    <div class="alert-div">Required!</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div>
+                                                            <ng-select #drcr
+                                                                (change)="insertParty(abcd,$event.isBillByBill)"
+                                                                (keyup)="insertParty(abcd,$event.isBillByBill)"
+                                                                [items]="drOrcr" appendTo="body" bindLabel="displayName"
+                                                                bindValue="id" formControlName="drOrCr" id="drOrcr"
+                                                                name="drOrcr" placeholder="Select an item"
+                                                                required></ng-select>
+
+                                                            <div *ngIf="
+                              abcd.get('drOrCr').invalid && (abcd.get('drOrCr').dirty || abcd.get('drOrCr').touched)
+                            ">
+                                                                <div class="alert alert-danger alert-height mt-1"
+                                                                    role="alert">
+                                                                    <div class="alert-div">Required!</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+
+                                                    <td>
+                                                        <div>
+                                                            <input #amounts (input)="totalAmountCalculation()"
+                                                                (keyup)="adjustDetailFormArray(abcd)" [ngClass]="
+                              abcd.get('amount').invalid && (abcd.get('amount').dirty || abcd.get('amount').touched)
+                                ? 'is-danger'
+                                : 'is-success'
+                            " class="form-control" formControlName="amount" min="0" required type="number" />
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="array">
+                                                            <input (keyup)="gotoNumber($event, i)" class="form-control"
+                                                                formControlName="chequeMiti" placeholder="yyyy/MM/dd"
+                                                                type="text" />
+                                                        </div>
+                                                    </td>
+
+                                                    <td>
+                                                        <div>
+                                                            <input #number
+                                                                (input)="uppercase(abcd, $event.target.value, 'chequeNo')"
+                                                                (keyup)="checkCondition($event, i)" class="form-control"
+                                                                formControlName="chequeNo" type="text" />
+                                                        </div>
+                                                    </td>
+
+                                                    <td>
+                                                        <div *ngIf="abcd.get('isBillByBill').value" class="text-center">
+                                                            <button (click)="openDialog(confirmationDialog)"
+                                                                class="btn btn-sm btn-icon btn-light-linkedin">
+                                                                <i class="fa-duotone fa-list fs-3">
+                                                                    <span class="path1"></span>
+                                                                    <span class="path2"></span>
+                                                                    <span class="path3"></span>
+                                                                </i>
+                                                            </button>
+
+                                                            <ng-template #confirmationDialog class="modal-xl">
+                                                                <div class="modal-header">
+                                                                    <h3 class="modal-title fw-semibold">Adjustment</h3>
+                                                                    <!--begin::Close-->
+                                                                    <button (click)="closeDialog()" aria-label="Close"
+                                                                        class="btn btn-sm" data-bs-dismiss="modal">
+                                                                        <i class="fa fa-close"
+                                                                            style="writing-mode: vertical-lr">
+                                                                            <span class="path1"></span>
+                                                                            <span class="path2"></span>
+                                                                        </i>
+                                                                    </button>
+                                                                    <!--end::Close-->
+                                                                </div>
+                                                                <div class="table-responsive modal-table">
+                                                                    <table
+                                                                        class="table table-row-dashed table-row-gray-300 table-striped"
+                                                                        formGroupName="partyBalanceDetail">
+                                                                        <thead class="bg-tableHead">
+                                                                            <tr>
+                                                                                <th class="min-w-50px ps-2">S.No</th>
+                                                                                <th class="min-w-50px">Bill Date</th>
+                                                                                <th class="min-w-50px">Due Date</th>
+                                                                                <th class="min-w-50px">VhType</th>
+                                                                                <th class="min-w-50px">Bill NO</th>
+                                                                                <th class="min-w-50px">Bill Amt</th>
+                                                                                <th class="min-w-50px">Paid</th>
+                                                                                <th class="min-w-50px">Balance</th>
+                                                                                <th class="min-w-100px">Adjust</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody formArrayName="details">
+                                                                            <tr *ngFor="let detail of getpartyBalanceDetail(abcd); let j = index"
+                                                                                [formGroupName]="j"
+                                                                                [ngClass]="{ disabled: detail.get('isDisable').value }">
+                                                                                <td class="text-center">
+                                                                                    {{ j + 1 }}
+                                                                                </td>
+                                                                                <td appPadding>
+                                                                                    {{ detail.get('billDate').value ||
+                                                                                    detail.get('payDate').value }}
+                                                                                </td>
+                                                                                <td appPadding>
+                                                                                    {{ detail.get('dueDate').value }}
+                                                                                </td>
+                                                                                <td appPadding>
+                                                                                    {{ detail.get('voucherType').value
+                                                                                    ||
+                                                                                    detail.get('voucherTypeName').value
+                                                                                    }}
+                                                                                </td>
+                                                                                <td appPadding
+                                                                                    class="text-end text-nowrap">
+                                                                                    {{ detail.get('voucherNo').value }}
+                                                                                </td>
+                                                                                <td appPadding class="text-end">
+                                                                                    {{ detail.get('billAmount').value ||
+                                                                                    detail.get('billAmt').value }}
+                                                                                </td>
+                                                                                <td appPadding class="text-end">
+                                                                                    {{ detail.get('paidAmount').value ||
+                                                                                    detail.get('paid').value }}
+                                                                                </td>
+                                                                                <td appPadding
+                                                                                    class="text-end text-nowrap">
+                                                                                    {{ detail.get('balanceString').value
+                                                                                    || detail.get('balanceAmount').value
+                                                                                    || detail.get('balance').value}}
+                                                                                </td>
+
+                                                                                <td appPadding>
+                                                                                    <div>
+                                                                                        <input #adjust
+                                                                                            (keyup)="adjustAmountValidataion(abcd, detail, j)"
+                                                                                            [ngClass]="
+                                            (detail.get('balanceAmount').value || detail.get('balance').value) < detail.get('adjust').value
+                                              ? 'is-danger'
+                                              : 'is-success'
+                                          " class="form-control text-end" formControlName="adjust" id="adjust" min="0"
+                                                                                            type="number" />
+                                                                                    </div>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+
+                                                                <div class="card-body d-flex align-items-end">
+                                                                    <!--begin::Wrapper-->
+                                                                    <div class="w-100 pd-10">
+                                                                        <div class="separator separator-dashed my-3">
+                                                                        </div>
+                                                                        <!--begin::Item-->
+                                                                        <div class="d-flex align-items-center">
+                                                                            <!--begin::Symbol-->
+                                                                            <div class="symbol symbol-30px me-5">
+                                                                                <span class="symbol-label">
+                                                                                    <i
+                                                                                        class="fa-duotone fa-indian-rupee-sign fs-3 text-gray-600"></i>
+                                                                                </span>
+                                                                            </div>
+                                                                            <!--end::Symbol-->
+
+                                                                            <!--begin::Container-->
+                                                                            <div
+                                                                                class="d-flex align-items-center flex-stack flex-wrap d-grid gap-1 flex-row-fluid">
+                                                                                <!--begin::Content-->
+                                                                                <div
+                                                                                    class="d-flex align-items-center me-2">
+                                                                                    <!--begin::Title-->
+                                                                                    <span
+                                                                                        class="text-gray-800 fw-semibold fs-6 me-3">Amount
+                                                                                        :</span>
+
+                                                                                    <!--end::Title-->
+
+                                                                                    <!--begin::Desc-->
+                                                                                    <span
+                                                                                        class="text-gray-700 fw-semibold fs-6 d-block text-start ps-0">
+                                                                                        {{ abcd.get('amount').value }}
+                                                                                    </span>
+                                                                                    <!--end::Desc-->
+                                                                                </div>
+                                                                                <!--end::Content-->
+
+                                                                                <!--begin::Wrapper-->
+                                                                                <div class="d-flex align-items-center">
+                                                                                    <!--begin::Number-->
+                                                                                    <span
+                                                                                        class="text-gray-800 fw-semibold text-hover fs-6 mx-2">
+                                                                                        Adjust Amount :
+                                                                                    </span>
+
+                                                                                    <!--end::Number-->
+
+                                                                                    <!--begin::Info-->
+                                                                                    <!--begin::label-->
+                                                                                    <span
+                                                                                        class="text-gray-700 fw-semibold fs-6">
+                                                                                        {{ calculateSum(i) }}
+                                                                                    </span>
+                                                                                    <!--end::label-->
+
+                                                                                    <!--end::Info-->
+                                                                                </div>
+                                                                                <!--end::Wrapper-->
+                                                                                <!--begin::Wrapper-->
+                                                                                <div class="d-flex align-items-center">
+                                                                                    <!--begin::Number-->
+                                                                                    <span
+                                                                                        class="text-gray-800 fw-semibold text-hover fs-6 mx-2">
+                                                                                        New Reference:
+                                                                                    </span>
+
+                                                                                    <!--end::Number-->
+
+                                                                                    <!--begin::Info-->
+                                                                                    <!--begin::label-->
+                                                                                    <span
+                                                                                        class="text-gray-700 fw-semibold fs-6">
+                                                                                        {{
+                                                                                        abcd.get('partyBalanceDetail').get('newReferenceAmount').value
+                                                                                        | number : '1.1-1' }}
+                                                                                    </span>
+                                                                                    <!--end::label-->
+
+                                                                                    <!--end::Info-->
+                                                                                </div>
+                                                                                <!--end::Wrapper-->
+
+                                                                                <!--begin::Wrapper-->
+                                                                                <div class="d-flex align-items-center">
+                                                                                    <!--begin::Number-->
+                                                                                    <span
+                                                                                        class="text-gray-800 fw-semibold text-hover fs-6 mx-2">
+                                                                                        Balance Remaining:
+                                                                                    </span>
+
+                                                                                    <!--end::Number-->
+
+                                                                                    <!--begin::Info-->
+                                                                                    <!--begin::label-->
+                                                                                    <span
+                                                                                        class="text-gray-700 fw-semibold fs-6">
+                                                                                        {{
+                                                                                        newAgeningSum(i) | number :
+                                                                                        '1.1-1'
+                                                                                        }}
+                                                                                    </span>
+                                                                                    <!--end::label-->
+
+                                                                                    <!--end::Info-->
+                                                                                </div>
+                                                                                <!--end::Wrapper-->
+                                                                            </div>
+                                                                            <!--end::Container-->
+                                                                        </div>
+                                                                        <!--end::Item-->
+
+                                                                        <!--begin::Separator-->
+                                                                        <div class="separator separator-dashed my-3">
+                                                                        </div>
+                                                                        <!--end::Separator-->
+                                                                    </div>
+                                                                    <!--end::Container-->
+                                                                </div>
+
+                                                                <!--end::Item-->
+                                                            </ng-template>
+                                                        </div>
+                                                    </td>
+
+                                                    <td>
+                                                        <div (click)="enableDetailsFormGroup(i, form)"
+                                                            class="btn btn-sm">
+                                                            <i
+                                                                class="mt-2 fa-duotone fa-pen-to-square text-edit fs-20 cursor-pointer"></i>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div (click)="removeDetailsForm(i, form)" class="btn btn-sm">
+                                                            <i
+                                                                class="mt-2 fa-duotone fa-trash fs-20 cursor-pointer"></i>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-3">
+                                    <div class="col-lg-6 col-md-6 col-xl-6 col-sm-12">
+                                        <div class="mb-1">
+                                            <label class="form-label" for="narration">{{ l('Narration') }}</label>
+                                            <textarea #narration (keyup)="checksSave($event)" class="form-control"
+                                                formControlName="description" id="narration" maxlength="100"
+                                                minlength="0" placeholder="" type="text"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
+                                        <div class="mb-1">
+                                            <label class="required form-label" for="debitTotal">{{ l('Debit Amount')
+                                                }}</label>
+                                            <input class="form-control" formControlName="debitTotal" id="debitTotal"
+                                                maxlength="100" minlength="0" placeholder="" readonly type="number" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
+                                        <div class="mb-1">
+                                            <label class="required form-label" for="creditTotal">{{
+                                                l('Credit Amount')
+                                                }}</label>
+                                            <input class="form-control" formControlName="creditTotal" id="creditTotal"
+                                                maxlength="100" minlength="0" placeholder="" readonly type="number" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 mt-3">
+                                        <label class="form-label me-2" for="Print">{{ l('Print') }}</label>
+                                        <input Class="form-check-input" [(ngModel)]="isPrint"
+                                            [ngModelOptions]="{ standalone: true }" label="Print" required="true"
+                                            type="checkbox" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- {{ this.form.getRawValue() | json }} -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<erp-key-event (closeEvent)="keyClose($event)" (deletEvent)="clearForm($event)" (saveEvent)="keySave($event)"
+    [id]="this.id ? this.id : null"></erp-key-event>
+<app-add-account-ledgers (accountLedgerSave)="getAllAcountLedger($event)" *ngIf="serialNumber === 2"
+    [serialNo]="serialNumber"></app-add-account-ledgers>

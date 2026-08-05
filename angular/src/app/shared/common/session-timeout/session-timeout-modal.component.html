@@ -1,0 +1,34 @@
+<div
+    #modal="bs-modal"
+    [config]="{ backdrop: 'true' }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="modal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <span>{{ 'YourSessionIsAboutToExpire' | localize }}</span>
+                </h5>
+                <button aria-hidden="true" class="btn-close" data-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <p>{{ l('SessionExpireRedirectingInXSecond', currentSecond) }}</p>
+                <div class="bg-light-primary rounded">
+                    <div
+                        [style.width]="progresbarWidth"
+                        class="bg-primary rounded text-center"
+                        role="progressbar"
+                        style="min-width: 15px"
+                    >
+                        <span>{{ currentSecond }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

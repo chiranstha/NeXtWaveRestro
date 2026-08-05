@@ -1,0 +1,64 @@
+<div>
+    <div [@routerTransition]>
+        <sub-header [title]="'Product Wise Monthly'">
+            <div role="search">
+                <div class="position-relative w-md-400px me-md-2">
+                    <i
+                        class="fa-duotone fa-magnifying-glass fs-3 text-gray-500 position-absolute top-50 translate-middle ms-6"
+                    >
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                    </i>
+                    <input
+                        (input)="searchFilter($event)"
+                        [ngModelOptions]="{ standalone: true }"
+                        class="form-control form-control-solid ps-10 headerSearch"
+                        name="search"
+                        placeholder="Search"
+                        type="text"
+                    />
+                </div>
+            </div>
+        </sub-header>
+        <div [class]="containerClass">
+            <div class="card card-bordered p-4">
+                <div [hidden]="!advancedFiltersAreShown" class="col-12 p-4">
+                    <div class="hidden-filter">
+                        <div class="row">
+                            <div class="col-md-6 col-xl-6 col-xs-12 col-sm-12">
+                                <label class="form-label" for="branchId">Search By Product Group</label>
+                                <ng-select (change)="loadreport($event?.id || emptyGuId)" [formControl]="productGroupId"
+                                    [items]="allProductGroup$ | async" bindLabel="displayName" bindValue="id"
+                                    id="searchTypes">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-sm-12">
+                        <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
+                            *ngIf="!advancedFiltersAreShown" class="clickable-item text-muted">
+                            <i class="fa fa-angle-down"></i>
+                            {{ 'ShowAdvancedFilters' | localize }}
+                        </span>
+                        <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
+                            *ngIf="advancedFiltersAreShown" class="clickable-item text-muted">
+                            <i class="fa fa-angle-up"></i>
+                            {{ 'HideAdvancedFilters' | localize }}
+                        </span>
+                    </div>
+                </div>
+
+                <ag-grid-angular
+                    class="ag-theme-balham"
+                    style="width: 100%; height: 600px;"
+                    [columnDefs]="monthlyColumnDefs"
+                    [defaultColDef]="defaultColDef"
+                    [rowData]="displayedTableRows"
+                ></ag-grid-angular>
+
+            </div>
+        </div>
+    </div>
+</div>

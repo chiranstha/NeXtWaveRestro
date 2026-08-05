@@ -1,0 +1,55 @@
+th {
+    padding: 0em;
+    outline: initial;
+    text-align: center;
+    height: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+}
+
+td {
+    padding: 0.15em;
+    word-wrap: break-word;
+    font-size: 13px;
+    font-weight: 500;
+    outline: initial;
+}
+
+/* AG Grid Styling */
+.ag-theme-balham {
+    --ag-font-size: 13px;
+    --ag-header-height: 40px;
+    --ag-row-height: 35px;
+    --ag-font-weight: 500;
+}
+
+.ag-theme-balham .ag-header-cell-text {
+    font-weight: bold;
+    text-align: center;
+}
+
+.ag-theme-balham .ag-cell {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+}
+
+.ag-theme-balham .ag-pinned-bottom-row {
+    font-weight: bold;
+    background-color: #f8f9fa;
+}
+
+.text-center {
+    justify-content: center;
+}
+
+.text-right {
+    justify-content: flex-end;
+}
+
+.text-left {
+    justify-content: flex-start;
+}
+
+.font-weight-bold {
+    font-weight: bold !important;
+}

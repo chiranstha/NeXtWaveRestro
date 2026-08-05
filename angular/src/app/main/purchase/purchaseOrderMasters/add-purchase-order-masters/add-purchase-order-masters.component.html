@@ -1,0 +1,322 @@
+<div [@routerTransition] *ngIf="serialNumber === 0">
+    <sub-header [description]="" [title]="title | localize">
+        <div role="actions">
+            <span *ngIf="this.id">
+                <button class="btn btn-light-success fw-bold me-2" routerLink="/app/main/purchase/pdf/0/{{ this.id }}">
+                    <i class="fa-duotone fa-file-spreadsheet ps-1 fs-2">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                        <span class="path4"></span>
+                    </i>
+                </button>
+            </span>
+
+            <button *ngIf="this.id" (click)="clearForm(id)" class="btn btn-sm btn-light-danger fw-bold me-2">
+                <i class="fa-duotone fa-trash fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                    <span class="path4"></span>
+                </i>
+            </button>
+            <button (click)="checkSave()" [buttonBusy]="saving" [disabled]="form.invalid" class="mr-2"
+                class="btn btn-sm fw-bold btn-primary" id="save" label="{{ l(this.id ? 'Update' : 'Save') }}"
+                type="submit">
+                <i class="fa-duotone fa-circle-plus fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l(this.id ? 'Update' : 'Save') }}
+            </button>
+
+
+
+            <button (click)="close()" class="mr-2" class="btn btn-sm fw-bold btn-light-success" id="cancel">
+                <i class="fa-duotone fa-circle-xmark fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l('Cancel') }}
+            </button>
+        </div>
+    </sub-header>
+
+    <div>
+        <div [class]="containerClass">
+            <div class="card card-custom gutter-b">
+                <div class="card-body">
+                    <form [formGroup]="form" autocomplete="off">
+                        <div appCustomEnter>
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <!-- receipt no.  -->
+                                    <div class="col-lg-2 col-md-4 col-sm-4 col-xs-6 mb-4">
+                                        <div class="mb-1   ">
+                                            <label class="required form-label" for="voucherNo">{{ l('Voucher No')
+                                                }}</label>
+                                            <input #vrNo (keyup.enter)="fromVoucherNo()" [ngClass]="
+                      this.form.get('voucherNo').invalid &&
+                      (this.form.get('voucherNo').dirty || this.form.get('voucherNo').touched)
+                        ? 'is-danger'
+                        : 'is-success'
+                    " [readonly]="this.automaticInput" class="form-control" formControlName="voucherNo"
+                                                id="AccountGroup_voucherNo" placeholder="" type="text"
+                                                voucherNo="voucherNo" />
+                                        </div>
+                                    </div>
+                                    <!-- receipt Date  -->
+
+                                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-6 ">
+                                        <div class="mb-1   ">
+                                            <label class="required form-label" for="ledgerId">{{ l('Ledger Name')
+                                                }}</label>
+                                            <ng-select #cashParty (keyup)="gotoDueDate($event)"
+                                                [items]="allAccountLedgers$ | async" appendTo="body"
+                                                bindLabel="displayName" bindValue="id" formControlName="ledgerId"
+                                                id="ledgerId" name="ledgerId" placeholder="Select an item"></ng-select>
+
+                                            <div *ngIf="
+                      this.form.get('ledgerId').invalid &&
+                      (this.form.get('ledgerId').dirty || this.form.get('ledgerId').touched)
+                    ">
+                                                <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                    <div class="alert-div">Ledger is required!</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-lg-3 col-xs-12 col-sm-12">
+                                        <div class="mb-1   ">
+                                            <label class="required form-label" for="dueDate">{{ l('Date-Miti')
+                                                }}</label>
+                                            <ne-datepicker (keyup)="gotoDueDates($event)"
+                                                (ngModelChange)="diffDateMiti($event)" [dateFormat]="'yyyy/MM/dd'"
+                                                [formControl]="form.controls['dateMiti']" [placeholder]="'yyyy/MM/dd'"
+                                                [todayBtn]="true" id="dateMiti" language="en"></ne-datepicker>
+                                        </div>
+                                        <div *ngIf="
+                    this.form.get('dateMiti').invalid &&
+                    (this.form.get('dateMiti').dirty || this.form.get('dateMiti').touched)
+                  ">
+                                            <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                <div class="alert-div">Date Miti is required!</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-lg-3 col-xs-12 col-sm-12">
+                                        <div class="mb-1   ">
+                                            <label class="required form-label" for="date">{{ l('Due-Miti') }}</label>
+                                            <ne-datepicker (keyup)="gotoProduct($event)"
+                                                (ngModelChange)="diffdueDate($event)" [dateFormat]="'yyyy/MM/dd'"
+                                                [formControl]="form.controls['dueDateMiti']"
+                                                [placeholder]="'yyyy/MM/dd'" [todayBtn]="true"
+                                                language="en"></ne-datepicker>
+                                            <div *ngIf="
+                      this.form.get('dueDateMiti').invalid &&
+                      (this.form.get('dueDateMiti').dirty || this.form.get('dueDateMiti').touched)
+                    ">
+                                                <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                    <div class="alert-div">Due DateMiti is required!</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-lg-1 col-xs-12 col-sm-12">
+                                        <div class="mb-1   ">
+                                            <label class=" form-label" for="diffrenceDay">{{ l('Due Days') }}</label>
+                                            <input [(ngModel)]="diffrenceDay"
+                                                [ngClass]="diffrenceDay < 0 ? 'is-danger' : 'is-success'"
+                                                [ngClass]="diffrenceDay < 0 ? 'is-danger' : 'is-success'"
+                                                [ngModelOptions]="{ standalone: true }" class="form-control"
+                                                id="diffrenceDay" min="0" placeholder="" readonly type="number" />
+                                        </div>
+                                        <div *ngIf="diffrenceDay < 0">
+                                            <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                <div class="alert-div">Due Miti must be higher than Order Date</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card shadow-sm my-5 p-2">
+                                    <div class="card-header">
+                                        <h3 class="card-title fw-bold">{{ l('Purchase Order Details') }}</h3>
+                                        <div class="card-toolbar">
+                                            <button (click)="keyEventsReceipt()"
+                                                [disabled]="this.purchaseOrderDetails.invalid" [label]="'Add Details'"
+                                                class="btn btn-sm btn-outline  btn-outline-success btn-active-light-success"
+                                                id="add">
+                                                <i class="fa-duotone fa-grid-2-plus fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                </i>
+                                                Add
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="table-responsives overflow-x-auto h-300px">
+                                        <table class="table table-row-dashed table-row-gray-300 table-striped"
+                                            formArrayName="purchaseOrderDetails">
+                                            <thead class="bg-tableHead">
+                                                <tr>
+                                                    <th class="min-w-50px ps-2">S.N.</th>
+                                                    <th class="min-w-250px">PRODUCT NAME</th>
+                                                    <th class="min-w-80px">QTY</th>
+                                                    <th class="min-w-150px">UNIT</th>
+                                                    <th class="min-w-100px">RATE</th>
+                                                    <th class="min-w-100px">AMOUNT</th>
+                                                    <th class="width-6">EDIT</th>
+                                                    <th class="width-6 pe-2">REMOVE</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let abcd of this.purchaseOrderDetails.controls; let i = index"
+                                                    [formGroupName]="i">
+                                                    <td class="text-center">
+                                                        {{ i + 1 }}
+                                                    </td>
+                                                    <td >
+                                                        <div>
+                                                            <ng-select #productName
+                                                                (change)="getProductCode($event.id, abcd, i)"
+                                                                (keyup)="keyEventProduct($event, i)"
+                                                                [items]="allProducts$ | async" appendTo="body"
+                                                                bindLabel="displayName" bindValue="id"
+                                                                formControlName="productId" id="productId"
+                                                                name="productId"
+                                                                placeholder="Select an item"></ng-select>
+                                                            <div *ngIf="
+                              abcd.get('productId').invalid &&
+                              (abcd.get('productId').dirty || abcd.get('productId').touched)
+                            ">
+                                                                <div class="alert alert-danger alert-height mt-1"
+                                                                    role="alert">
+                                                                    <div class="alert-div">Product is Required</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td >
+                                                        <div>
+                                                            <input #qtys
+                                                                (keyup)="totalAmountCalculation(); goToUnit($event, i)"
+                                                                [ngClass]="{ blink: abcd.get('qty').invalid, grid__input: abcd.get('qty').valid }"
+                                                                [ngClass]="
+                              abcd.get('qty').invalid && (abcd.get('qty').dirty || abcd.get('qty').touched)
+                                ? 'is-danger'
+                                : 'is-success'
+                            " class="form-control" formControlName="qty" min="0" type="number" />
+                                                        </div>
+                                                    </td>
+                                                    <td >
+                                                        <div>
+                                                            <ng-select #unit (change)="onUnitConversion($event, abcd)"
+                                                                (keyup)="keyEventProductUnit($event, i)"
+                                                                [items]="allUnits$ | async" appendTo="body"
+                                                                bindLabel="unitName" bindValue="unitId"
+                                                                formControlName="unitId" id="unitId" name="unitId"
+                                                                placeholder="Select an item"></ng-select>
+                                                            <div *ngIf="
+                              abcd.get('unitId').invalid && (abcd.get('unitId').dirty || abcd.get('unitId').touched)
+                            ">
+                                                                <div class="alert alert-danger alert-height mt-1"
+                                                                    role="alert">
+                                                                    <div class="alert-div">unit is Required</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding>
+                                                        <div>
+                                                            <input #rates
+                                                                (keyup)="priceCalculation(); keyEventRate($event, i)"
+                                                                [ngClass]="
+                              abcd.get('rate').invalid && (abcd.get('rate').dirty || abcd.get('rate').touched)
+                                ? 'is-danger'
+                                : 'is-success'
+                            " class="form-control" formControlName="rate" id="rate" min="0" type="number" />
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding>
+                                                        <div>
+                                                            <input #amounts
+                                                                (keyup)="rateCalculation(); addReceiptDetails($event, i)"
+                                                                [ngClass]="
+                              abcd.get('amount').invalid && (abcd.get('amount').dirty || abcd.get('amount').touched)
+                                ? 'is-danger'
+                                : 'is-success'
+                            " class="form-control" formControlName="amount" id="amount" min="0" type="number" />
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding class="text-center">
+                                                        <div (click)="enablepurchaseOrderDetailsFormGroup(i, form)"
+                                                            class="btn btn-sm">
+                                                            <i class="fa-duotone fa-pen-to-square cursor-pointer"></i>
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding class="text-center">
+                                                        <div (click)="removepurchaseOrderDetailsForm(i, form)"
+                                                            class="btn btn-sm">
+                                                            <i class="fa-duotone fa-trash cursor-pointer"></i>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 col-lg-6 col-xs-6 col-sm-6 mb-3">
+                                    <div class="mb-1   ">
+                                        <label class=" form-label" for="description">{{ l('Description') }}</label>
+                                        <textarea #descriptions (keypress)="onSaveOnInput($event)" class="form-control"
+                                            formControlName="description" id="description" maxlength="400" minlength="0"
+                                            placeholder="" type="text"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-2 col-xl-4 col-xs-12 col-sm-12 mb-3">
+                                    <div class="mb-1   ">
+                                        <label class=" form-label" for="totalAmount">{{ l('Total Amount') }}</label>
+                                        <input class="form-control" formControlName="totalAmount" id="totalAmount"
+                                            maxlength="100" minlength="0" placeholder="" readonly type="number" />
+                                    </div>
+                                </div>
+
+                                <!-- cancelled status  -->
+                                <div *ngIf="this.id" class="mt-20px col-lg-2 col-xl-2 col-md-2 col-xs-12 ">
+                                    <label class="form-label" for="cancelled">{{ l('cancelled') }}</label>
+                                    <div class="mb-1   ">
+                                        <input class="form-check-input" formControlName="cancelled" id="cancelled"
+                                            name="Filter" type="checkbox" />
+                                    </div>
+                                </div>
+
+                                <div class="mt-20px col-lg-2 col-xl-2 col-md-2 col-xs-12">
+                                    <label class="form-label" for="isPrint">{{ l('Print') }}</label>
+                                    <div class="mb-1   ">
+                                        <input class="form-check-input" id="isPrint" name="Filter" type="checkbox" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- {{ this.form.getRawValue() | json }} -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<app-add-account-ledgers (accountLedgerSave)="getAllAcountLedgers($event)" *ngIf="serialNumber === 5"
+    [serialNo]="serialNumber"></app-add-account-ledgers>
+<app-add-product (productSave)="getAllProducts($event)" *ngIf="serialNumber === 4"
+    [serialNo]="serialNumber"></app-add-product>
+<ng-keyboard-shortcuts [shortcuts]="shortcuts"></ng-keyboard-shortcuts>
+
+<erp-key-event (closeEvent)="keyClose($event)" (deletEvent)="clearForm($event)" (saveEvent)="keySave($event)"
+    [id]="this.id ? this.id : null"></erp-key-event>

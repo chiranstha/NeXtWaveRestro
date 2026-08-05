@@ -1,0 +1,86 @@
+<div class="card card-custom gutter-b">
+    <div class="card-header align-items-center border-0">
+        <h3 class="card-title align-items-start flex-column">
+            <span class="fw-bolder text-dark">
+                {{ 'Input Mask' | localize }}
+            </span>
+        </h3>
+    </div>
+    <div class="card-body">
+        <form class="form" role="form">
+            <div class="mb-5 row">
+                <label class="col-lg-12 form-label" for="DateInputMask">Date</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <app-input-mask
+                        [(ngModel)]="dateValue"
+                        id="DateInputMask"
+                        mask="99/99/9999"
+                        name="dateValue"
+                        placeholder="mm/dd/yyyy"
+                        slotChar="mm/dd/yyyy"
+                        styleClass="form-control"
+                    ></app-input-mask>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-4">
+                    <button (click)="submitDateValue()" class="btn btn-sm btn-primary" type="button">
+                        {{ 'Submit' | localize }}
+                    </button>
+                </div>
+            </div>
+            <div class="mb-5 row">
+                <label class="col-lg-12 form-label" for="PhoneInputMask">Phone</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <app-input-mask
+                        [(ngModel)]="phoneValue"
+                        id="PhoneInputMask"
+                        mask="(999) 999-9999"
+                        name="phoneValue"
+                        placeholder="(999) 999-9999"
+                        styleClass="form-control"
+                    ></app-input-mask>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-4">
+                    <button (click)="submiPhoneValue()" class="btn btn-sm btn-primary" type="button">
+                        {{ 'Submit' | localize }}
+                    </button>
+                </div>
+            </div>
+            <div class="mb-5 row">
+                <label class="col-lg-12 form-label" for="PhoneExtInputMask">Phone Ext</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <app-input-mask
+                        [(ngModel)]="phoneExtValue"
+                        id="PhoneExtInputMask"
+                        mask="(999) 999-9999? x99999"
+                        name="phoneExtValue"
+                        placeholder="(999) 999-9999? x99999"
+                        styleClass="form-control"
+                    ></app-input-mask>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-4">
+                    <button (click)="submitPhoneExtValue()" class="btn btn-sm btn-primary" type="button">
+                        {{ 'Submit' | localize }}
+                    </button>
+                </div>
+            </div>
+            <div class="mb-5 row">
+                <label class="col-lg-12 form-label" for="SerialInputMask">Serial</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <app-input-mask
+                        [(ngModel)]="serialValue"
+                        id="SerialInputMask"
+                        mask="a*-999-a999"
+                        name="serialValue"
+                        placeholder="a*-999-a999"
+                        styleClass="form-control"
+                    ></app-input-mask>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-4">
+                    <button (click)="submitSerialValue()" class="btn btn-sm btn-primary" type="button">
+                        {{ 'Submit' | localize }}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

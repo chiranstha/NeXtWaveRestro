@@ -1,0 +1,50 @@
+<div class="mb-2">
+    <label class="form-label">{{ header }}</label>
+    <div class="input-group mb-2">
+        <input
+            (change)="onKeyChange()"
+            [(ngModel)]="addOrEditKey"
+            class="form-control"
+            placeholder="{{ keyPlaceHolder }}"
+            type="text"
+        />
+        <input [(ngModel)]="addOrEditValue" class="form-control" placeholder="{{ valuePlaceHolder }}" type="text" />
+        <button (click)="addOrEdit()" class="btn btn-sm btn-primary" type="button">
+            @if (!isEdit) {
+                <span>{{ 'Add' | localize }}</span>
+            }
+            @if (isEdit) {
+                <span>{{ 'Edit' | localize }}</span>
+            }
+        </button>
+    </div>
+    @if (items) {
+        <div class="key-value-items-list">
+            @for (keyValueItem of items; track keyValueItem) {
+                <div
+                    [class.alert-warning]="addOrEditKey === keyValueItem.key"
+                    [class.alert-white]="addOrEditKey !== keyValueItem.key"
+                    class="alert alert-custom alert-white alert-bold m-1 min-h-60px"
+                    role="alert"
+                >
+                    "{{ keyValueItem.key }}" : "{{ keyValueItem.value }}"
+                    <button
+                        aria-label="Close"
+                        class="btn btn-danger float-end btn-sm m-0 p-3"
+                        data-dismiss="alert"
+                        type="button"
+                    >
+                        <span (click)="removeItem(keyValueItem)" aria-hidden="true">
+                            <i class="la la-close fa-1x m-0 p-0"></i>
+                        </span>
+                    </button>
+                    <button class="btn btn-sm btn-primary float-end btn-sm m-0 me-1 p-3" type="button">
+                        <span (click)="openItemEdit(keyValueItem)" aria-hidden="true">
+                            <i class="la la-edit fa-1x m-0 p-0"></i>
+                        </span>
+                    </button>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,70 @@
+<div [@routerTransition]>
+    <sub-header [description]="" [title]="title | localize">
+        <div role="actions">
+            <button class="btn btn-sm btn-light-danger fw-bold me-2">
+                <i class="fa-duotone fa-trash fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                    <span class="path4"></span>
+                </i>
+            </button>
+            <button (click)="save()" [disabled]="form.invalid" class="mr-2" class="btn btn-sm fw-bold btn-primary"
+                id="save" label="{{ l('Save') }}" type="submit">
+                <i class="fa-duotone fa-circle-plus fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l('Save') }}
+            </button>
+            <button (click)="close()" class="mr-2" class="btn btn-sm fw-bold btn-light-success" id="cancel">
+                <i class="fa-duotone fa-circle-xmark fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l('Cancel') }}
+            </button>
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <form [formGroup]="form" autocomplete="off">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-12 ">
+                            <div class="mb-1">
+                                <label class="required form-label" for="productId">{{ l('Old Product Name') }}</label>
+                                <ng-select #oldProduct (change)="onChange()" (keyup)="gotoNewProduct($event)" [items]="allProducts"
+                                    appendTo="body" bindLabel="displayName" bindValue="id"
+                                    formControlName="oldProductId" id="oldProductId" name="oldProductId"
+                                    placeholder="Select an item" required></ng-select>
+                                <div *ngIf="this.form.get('oldProductId').invalid &&
+                  (this.form.get('oldProductId').dirty || this.form.get('oldProductId').touched)">
+                                    <div class="alert alert-danger alert-height mt-1" role="alert">
+                                        <div class="alert-div">ProductName is required!</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-12 ">
+                            <div class="mb-1">
+                                <label class="required form-label" for="newProductId">{{ l('New Product') }}</label>
+                                <ng-select #newProduct [items]="allProducts" appendTo="body" bindLabel="displayName"
+                                    bindValue="id" formControlName="newProductId" id="newProductId" name="newProductId"
+                                    placeholder="Select an item" required></ng-select>
+                                <div *ngIf="this.form.get('newProductId').invalid &&
+                  (this.form.get('newProductId').dirty || this.form.get('newProductId').touched)">
+                                    <div class="alert alert-danger alert-height mt-1" role="alert">
+                                        <div class="alert-div">Unit is required!</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

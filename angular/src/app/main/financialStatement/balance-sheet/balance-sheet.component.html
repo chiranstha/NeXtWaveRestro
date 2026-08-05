@@ -1,0 +1,305 @@
+<div [@routerTransition]>
+  
+
+    <div [class]="containerClass + ' balance-sheet-page'">
+        <section class="statement-header">
+            <div class="statement-header__main">
+                <span class="statement-header__eyebrow">Financial Statement</span>
+                <h1 class="statement-header__title">Balance Sheet</h1>
+                <div class="statement-header__meta">
+                    <span>
+                        <i class="fas fa-calendar-day"></i>
+                        {{ myForm?.get('fromMiti')?.value || '-' }}
+                    </span>
+                    <i class="fas fa-arrow-right statement-header__separator"></i>
+                    <span>
+                        <i class="fas fa-calendar-check"></i>
+                        {{ myForm?.get('toMiti')?.value || '-' }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="statement-header__position">
+                <span class="statement-header__position-label">Net Worth</span>
+                <strong class="statement-header__position-value">
+                    @if (!loading) {
+                        {{ formatCurrency(netWorth) }}
+                    } @else {
+                        <span class="inline-loader">
+                            <span class="spinner-grow spinner-grow-sm text-primary" role="status"></span>
+                            Loading
+                        </span>
+                    }
+                </strong>
+            </div>
+        </section>
+
+        <section class="metrics-grid">
+            <article class="metric-card metric-card--assets">
+                <span class="metric-card__accent"></span>
+                <div class="metric-card__icon">
+                    <i class="fas fa-landmark"></i>
+                </div>
+                <div class="metric-card__body">
+                    <span class="metric-card__label">{{ l('TotalAssets') }}</span>
+                    <strong class="metric-card__value">
+                        @if (!loading) {
+                            {{ formatCurrency(totalAssets) }}
+                        } @else {
+                            <span class="metric-card__skeleton"></span>
+                        }
+                    </strong>
+                    <small class="metric-card__hint">Debit position</small>
+                </div>
+            </article>
+
+            <article class="metric-card metric-card--liabilities">
+                <span class="metric-card__accent"></span>
+                <div class="metric-card__icon">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+                <div class="metric-card__body">
+                    <span class="metric-card__label">{{ l('TotalLiabilities') }}</span>
+                    <strong class="metric-card__value">
+                        @if (!loading) {
+                            {{ formatCurrency(totalLiabilities) }}
+                        } @else {
+                            <span class="metric-card__skeleton"></span>
+                        }
+                    </strong>
+                    <small class="metric-card__hint">Credit position</small>
+                </div>
+            </article>
+
+            <article class="metric-card metric-card--equity">
+                <span class="metric-card__accent"></span>
+                <div class="metric-card__icon">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+                <div class="metric-card__body">
+                    <span class="metric-card__label">{{ l('NetWorth') }}</span>
+                    <strong class="metric-card__value">
+                        @if (!loading) {
+                            {{ formatCurrency(netWorth) }}
+                        } @else {
+                            <span class="metric-card__skeleton"></span>
+                        }
+                    </strong>
+                    <small class="metric-card__hint">Owner's equity</small>
+                </div>
+            </article>
+
+            <article class="metric-card metric-card--working-capital">
+                <span class="metric-card__accent"></span>
+                <div class="metric-card__icon">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div class="metric-card__body">
+                    <span class="metric-card__label">{{ l('WorkingCapital') }}</span>
+                    <strong class="metric-card__value">
+                        @if (!loading) {
+                            {{ formatCurrency(workingCapital) }}
+                        } @else {
+                            <span class="metric-card__skeleton"></span>
+                        }
+                    </strong>
+                    <small class="metric-card__hint">Current liquidity</small>
+                </div>
+            </article>
+        </section>
+
+        <section class="filter-panel">
+            <div class="filter-panel__header">
+                <div class="filter-panel__title">
+                    <span class="filter-panel__icon">
+                        <i class="fas fa-sliders-h"></i>
+                    </span>
+                    <div>
+                        <h2>Report Controls</h2>
+                        <p>Period, refresh, and statement output</p>
+                    </div>
+                </div>
+
+                <div class="filter-panel__actions">
+                    <button
+                        type="button"
+                        (click)="toggleAdvancedFilters()"
+                        [class.is-active]="advancedFiltersAreShown"
+                        class="control-button control-button--primary"
+                    >
+                        <i class="fas fa-filter"></i>
+                        <span>{{ advancedFiltersAreShown ? 'Hide Filters' : 'Show Filters' }}</span>
+                    </button>
+                    <button
+                        type="button"
+                        (click)="refresh()"
+                        [disabled]="loading"
+                        [title]="l('Refresh')"
+                        class="icon-button"
+                    >
+                        <i [class.fa-spin]="loading" class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+
+            @if (advancedFiltersAreShown) {
+                <div class="filter-panel__body">
+                    <form [formGroup]="myForm" class="filter-form">
+                        <div class="filter-field">
+                            <label class="form-label">From Miti</label>
+                            <ne-datepicker formControlName="fromMiti"></ne-datepicker>
+                        </div>
+                        <div class="filter-field">
+                            <label class="form-label">To Miti</label>
+                            <ne-datepicker formControlName="toMiti"></ne-datepicker>
+                        </div>
+                        <div class="filter-field filter-field--action">
+                            <button
+                                type="button"
+                                (click)="onAdvanceSearch()"
+                                [disabled]="loading"
+                                class="btn btn-primary apply-button"
+                            >
+                                <i class="fas fa-search me-2"></i>
+                                Apply Filters
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            }
+        </section>
+
+        @if (!showPdfOk) {
+            <main class="report-workspace">
+                <div class="report-toolbar">
+                    <div class="report-toolbar__heading">
+                        <span class="report-toolbar__icon">
+                            <i class="fas fa-book-open"></i>
+                        </span>
+                        <div>
+                            <h2>Statement Ledger</h2>
+                            <p>Assets compared against liabilities and equity</p>
+                        </div>
+                    </div>
+
+                    <div class="report-toolbar__tools">
+                        <label class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input (input)="searchDataTable($event)" [placeholder]="l('Search') + '...'" type="text" />
+                        </label>
+
+                        <div class="btn-group toolbar-group" role="group">
+                            <button
+                                type="button"
+                                (click)="expandAll()"
+                                [title]="l('ExpandAll')"
+                                class="icon-button icon-button--success"
+                            >
+                                <i class="fas fa-expand-arrows-alt"></i>
+                            </button>
+                            <button
+                                type="button"
+                                (click)="collapseAll()"
+                                [title]="l('CollapseAll')"
+                                class="icon-button icon-button--danger"
+                            >
+                                <i class="fas fa-compress-arrows-alt"></i>
+                            </button>
+                        </div>
+
+                        <div class="dropdown">
+                            <button
+                                type="button"
+                                class="control-button control-button--export dropdown-toggle"
+                                data-bs-toggle="dropdown"
+                            >
+                                <i class="fas fa-download"></i>
+                                <span>Export</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                <li>
+                                    <a (click)="exportToExcel()" class="dropdown-item">
+                                        <i class="fas fa-file-excel me-2 text-success"></i>
+                                        Export to Excel
+                                    </a>
+                                </li>
+                                <li>
+                                    <a (click)="showPdf()" class="dropdown-item">
+                                        <i class="fas fa-file-pdf me-2 text-danger"></i>
+                                        View PDF
+                                    </a>
+                                </li>
+                                <li>
+                                    <a (click)="exportToExcelfromAPI(true)" class="dropdown-item">
+                                        <i class="fas fa-cloud-download-alt me-2 text-primary"></i>
+                                        Download Full Excel
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-grid-shell">
+                    <ag-grid-angular
+                        #agGrid
+                        (gridReady)="onGridReady($event)"
+                        [animateRows]="true"
+                        [autoGroupColumnDef]="autoGroupColumnDef"
+                        [columnDefs]="columnDefs"
+                        [defaultColDef]="defaultColDef"
+                        [enableCellTextSelection]="true"
+                        [getDataPath]="getDataPath"
+                        [groupDefaultExpanded]="groupDefaultExpanded"
+                        [headerHeight]="52"
+                        [rowData]="rowData"
+                        [rowClassRules]="rowClassRules"
+                        [rowHeight]="54"
+                        [suppressCellFocus]="true"
+                        [treeData]="true"
+                        class="ag-theme-balham balance-sheet-grid"
+                        style="width: 100%; height: 640px"
+                        [loading]="gridLoading"
+                    ></ag-grid-angular>
+
+                    @if (loading) {
+                        <div class="loader-wrapper">
+                            <div class="loader-card">
+                                <div class="spinner"></div>
+                                <span>Preparing balance sheet</span>
+                            </div>
+                        </div>
+                    }
+
+                    @if (rowData.length === 0 && !loading) {
+                        <div class="empty-state">
+                            <span class="empty-state__icon">
+                                <i class="fas fa-folder-open"></i>
+                            </span>
+                            <h3>No Data Available</h3>
+                            <p>No financial records were found for the selected balance sheet period.</p>
+                        </div>
+                    }
+                </div>
+            </main>
+        }
+
+        @if (showPdfOk) {
+            <section class="pdf-workspace">
+                <div class="pdf-workspace__header">
+                    <div>
+                        <span class="pdf-workspace__eyebrow">Report Preview</span>
+                        <h2>{{ title }}</h2>
+                    </div>
+                    <button type="button" (click)="back()" class="control-button">
+                        <i class="fas fa-chevron-left"></i>
+                        <span>Back to Grid</span>
+                    </button>
+                </div>
+                <div class="pdf-workspace__body">
+                    <app-report-pdf [pdfdata]="pdfUrl" [title]="title"></app-report-pdf>
+                </div>
+            </section>
+        }
+    </div>
+</div>

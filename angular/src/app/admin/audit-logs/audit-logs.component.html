@@ -1,0 +1,454 @@
+<div [@routerTransition]>
+    <sub-header [title]="'AuditLogs' | localize">
+        <div role="actions">
+            <button (click)="loadPage(currentPage)" class="btn btn-sm btn-primary float-end" type="button">
+                <i class="fa fa-sync btn-md-icon"></i>
+                <span class="d-none d-md-inline-block">
+                    {{ 'Refresh' | localize }}
+                </span>
+            </button>
+            <button (click)="exportToExcelAuditLogs()" class="btn btn-sm btn-success float-end me-1" type="button">
+                <i class="far fa-file-excel btn-md-icon"></i>
+                <span class="d-none d-md-inline-block">
+                    {{ 'ExportToExcel' | localize }}
+                </span>
+            </button>
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <tabset>
+                    <tab heading="{{ 'OperationLogs' | localize }}">
+                        <div class="row m-2 mt-5">
+                            <div class="col-sm-12 text-end">
+                                <button
+                                    (click)="loadPage(currentPage)"
+                                    class="btn btn-sm btn-primary float-end"
+                                    type="button"
+                                >
+                                    <i class="fa fa-sync btn-md-icon"></i>
+                                    <span class="d-none d-md-inline-block">
+                                        {{ 'Refresh' | localize }}
+                                    </span>
+                                </button>
+                                <button
+                                    (click)="exportToExcelAuditLogs()"
+                                    class="btn btn-sm btn-success float-end me-1"
+                                    type="button"
+                                >
+                                    <i class="far fa-file-excel btn-md-icon"></i>
+                                    <span class="d-none d-md-inline-block">
+                                        {{ 'ExportToExcel' | localize }}
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form">
+                            <form #auditFilterForm="ngForm" (ngSubmit)="loadPage(currentPage)">
+                                <div class="row align-items-center mb-1">
+                                    <div class="col-md-6">
+                                        <div class="mb-5">
+                                            <label class="form-label" for="StartEndRange">
+                                                {{ 'DateRange' | localize }}
+                                            </label>
+                                            <input
+                                                #drp="bsDaterangepicker"
+                                                [(date)]="dateRange"
+                                                bsDaterangepicker
+                                                class="form-control"
+                                                dateRangePickerLuxonModifier
+                                                id="StartEndRange"
+                                                name="StartEndRange"
+                                                readonly="readonly"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-5">
+                                            <label class="form-label" for="UsernameAuditLog">
+                                                {{ 'UserName' | localize }}
+                                            </label>
+                                            <input
+                                                [(ngModel)]="usernameAuditLog"
+                                                class="form-control"
+                                                id="UsernameAuditLog"
+                                                name="UsernameAuditLog"
+                                                type="text"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                @if (advancedFiltersAreShown) {
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-5">
+                                                <label class="form-label" for="ServiceName">
+                                                    {{ 'Service' | localize }}
+                                                </label>
+                                                <input
+                                                    [(ngModel)]="serviceName"
+                                                    class="form-control"
+                                                    id="ServiceName"
+                                                    name="ServiceName"
+                                                    type="text"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label d-block">{{ 'Duration' | localize }}</label>
+                                            <div class="input-group" style="width: 250px !important">
+                                                <input
+                                                    [(ngModel)]="minExecutionDuration"
+                                                    class="form-control"
+                                                    max="86400000"
+                                                    min="0"
+                                                    name="MinExecutionDuration"
+                                                    ng-maxlength="8"
+                                                    ng-minlength="0"
+                                                    only-number=""
+                                                    type="text"
+                                                />
+                                                <span class="input-group-text">---</span>
+                                                <input
+                                                    [(ngModel)]="maxExecutionDuration"
+                                                    class="form-control"
+                                                    max="86400000"
+                                                    min="0"
+                                                    name="MaxExecutionDuration"
+                                                    ng-maxlength="8"
+                                                    ng-minlength="0"
+                                                    only-number=""
+                                                    type="text"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-5">
+                                                <label class="form-label" for="MethodName">
+                                                    {{ 'Action' | localize }}
+                                                </label>
+                                                <input
+                                                    [(ngModel)]="methodName"
+                                                    class="form-control"
+                                                    id="MethodName"
+                                                    name="MethodName"
+                                                    type="text"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-5">
+                                                <label class="form-label" for="HasException">
+                                                    {{ 'ErrorState' | localize }}
+                                                </label>
+                                                <select
+                                                    [(ngModel)]="hasException"
+                                                    class="form-control"
+                                                    id="HasException"
+                                                    name="HasException"
+                                                >
+                                                    <option value="">{{ 'All' | localize }}</option>
+                                                    <option value="false">{{ 'Success' | localize }}</option>
+                                                    <option value="true">{{ 'HasError' | localize }}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-5">
+                                                <label class="form-label" for="BrowserInfo">
+                                                    {{ 'Browser' | localize }}
+                                                </label>
+                                                <input
+                                                    [(ngModel)]="browserInfo"
+                                                    class="form-control"
+                                                    id="BrowserInfo"
+                                                    name="BrowserInfo"
+                                                    type="text"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-5"></div>
+                                        </div>
+                                    </div>
+                                }
+                                <div class="row mb-1">
+                                    <div class="col-sm-6">
+                                        @if (!advancedFiltersAreShown) {
+                                            <span
+                                                (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
+                                                class="clickable-item text-muted"
+                                            >
+                                                <i class="fa fa-angle-down"></i>
+                                                {{ 'ShowAdvancedFilters' | localize }}
+                                            </span>
+                                        }
+                                        @if (advancedFiltersAreShown) {
+                                            <span
+                                                (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
+                                                class="clickable-item text-muted"
+                                            >
+                                                <i class="fa fa-angle-up"></i>
+                                                {{ 'HideAdvancedFilters' | localize }}
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="row align-items-center">
+                            <div class="card-body">
+                                <div class="ag-theme-balham">
+                                    <ag-grid-angular
+                                        (cellDoubleClicked)="onCellDoubleClicked($event)"
+                                        (gridReady)="onGridReady($event)"
+                                        [autoGroupColumnDef]="autoGroupColumnDef"
+                                        [columnDefs]="columnDefs"
+                                        [defaultColDef]="defaultColDef"
+                                        [getContextMenuItems]="getCustomContextMenuItems"
+                                        [groupDefaultExpanded]="groupDefaultExpanded"
+                                        [rowData]="rowData"
+                                        [rowGroupPanelShow]="rowGroupPanelShow"
+                                        [style.height.px]="screenHeight"
+                                        style="width: 100%"
+                                    ></ag-grid-angular>
+                                </div>
+                                <app-pagination
+                                    (pageChange)="onPageChange($event)"
+                                    (pageSizeChange)="onPageSizeChange($event)"
+                                    [currentPage]="currentPage"
+                                    [pageSizeOptions]="pageSizeOptions"
+                                    [pageSize]="pageSize"
+                                    [totalRecords]="totalRecords"
+                                ></app-pagination>
+                            </div>
+                        </div>
+                    </tab>
+                    <tab heading="{{ 'ChangeLogs' | localize }}">
+                        <div class="row m-2 mt-5">
+                            <div class="col-sm-12 text-end">
+                                <button
+                                    (click)="getEntityChanges()"
+                                    class="btn btn-sm btn-primary float-end"
+                                    type="button"
+                                >
+                                    <i class="fa fa-sync btn-md-icon"></i>
+                                    <span class="d-none d-md-inline-block">
+                                        {{ 'Refresh' | localize }}
+                                    </span>
+                                </button>
+                                <button
+                                    (click)="exportToExcelEntityChanges()"
+                                    class="btn btn-sm btn-success float-end me-1"
+                                    type="button"
+                                >
+                                    <i class="far fa-file-excel btn-md-icon"></i>
+                                    <span class="d-none d-md-inline-block">
+                                        {{ 'ExportToExcel' | localize }}
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form">
+                            <form #entityChangeFilterForm="ngForm" (ngSubmit)="getEntityChanges()">
+                                <div class="row align-items-center mb-1">
+                                    <div class="col-md-6">
+                                        <div class="mb-5">
+                                            <label class="form-label" for="StartEndRangeEntityChange">
+                                                {{ 'DateRange' | localize }}
+                                            </label>
+                                            <input
+                                                #drp="bsDaterangepicker"
+                                                [(date)]="dateRange"
+                                                bsDaterangepicker
+                                                class="form-control"
+                                                dateRangePickerLuxonModifier
+                                                id="StartEndRangeEntityChange"
+                                                name="StartEndRangeEntityChange"
+                                                readonly="readonly"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-5">
+                                            <label class="form-label" for="UserNameEntityChange">
+                                                {{ 'UserName' | localize }}
+                                            </label>
+                                            <input
+                                                [(ngModel)]="usernameEntityChange"
+                                                class="form-control"
+                                                id="UserNameEntityChange"
+                                                name="UserNameEntityChange"
+                                                type="text"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-5">
+                                            <label class="form-label" for="EntityTypeFullName">
+                                                {{ 'Object' | localize }}
+                                            </label>
+                                            <select
+                                                [(ngModel)]="entityTypeFullName"
+                                                class="form-control"
+                                                id="EntityTypeFullName"
+                                                name="EntityTypeFullName"
+                                            >
+                                                <option selected="selected" value="undefined">
+                                                    {{ 'All' | localize }}
+                                                </option>
+                                                @for (objectType of objectTypes; track objectType) {
+                                                    <option [value]="objectType.value">
+                                                        {{ objectType.name }}
+                                                    </option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="row align-items-center">
+                            <div [busyIf]="entityChangesLoading" class="col">
+                                <app-data-table
+                                    #dataTableEntityChanges
+                                    (onLazyLoad)="getEntityChanges($event)"
+                                    ScrollWidth="100%"
+                                    [lazy]="true"
+                                    [paginator]="false"
+                                    [tableStyle]="{ 'min-width': '50rem' }"
+                                    [value]="dataTableHelperEntityChanges.records"
+                                    resizableColumns="dataTableHelperEntityChanges.resizableColumns"
+                                    rows="{{ dataTableHelperEntityChanges.defaultRecordsCountPerPage }}"
+                                    scrollable="true"
+                                    sortMode="multiple"
+                                >
+                                    <ng-template appTemplate="header">
+                                        <tr>
+                                            <th style="width: 40px"></th>
+                                            <th style="width: 150px">
+                                                {{ 'Action' | localize }}
+                                            </th>
+                                            <th style="width: 250px">
+                                                {{ 'Object' | localize }}
+                                            </th>
+                                            <th appSortableColumn="userName" style="width: 150px">
+                                                {{ 'UserName' | localize }}
+                                                <app-sort-icon field="userName"></app-sort-icon>
+                                            </th>
+                                            <th appSortableColumn="changeTime" style="width: 150px">
+                                                {{ 'Time' | localize }}
+                                                <app-sort-icon field="changeTime"></app-sort-icon>
+                                            </th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template let-record="$implicit" appTemplate="body">
+                                        <tr>
+                                            <td>
+                                                <div
+                                                    class="btn-group"
+                                                    container="body"
+                                                    dropdown
+                                                    placement="bottom left"
+                                                >
+                                                    <button
+                                                        aria-controls="dropdownMenu"
+                                                        class="btn btn-sm btn-primary btn-sm dropdown-toggle"
+                                                        dropdownToggle
+                                                        id="dropdownButton"
+                                                        type="button"
+                                                    >
+                                                        <i class="fa fa-cog"></i>
+                                                        <span class="caret"></span>
+                                                        {{ 'Actions' | localize }}
+                                                    </button>
+                                                    <ul
+                                                        *dropdownMenu
+                                                        aria-labelledby="dropdownButton"
+                                                        class="dropdown-menu"
+                                                        id="dropdownMenu"
+                                                        role="menu"
+                                                    >
+                                                        @if (
+                                                            'Pages.Administration.EntityChanges.FullHistory'
+                                                                | permission
+                                                        ) {
+                                                            <li role="menuitem">
+                                                                <a
+                                                                    (click)="showEntityChangeAllDetails(record)"
+                                                                    class="dropdown-item"
+                                                                    href="javascript:;"
+                                                                    title="{{
+                                                                        'EntityChangeAllDetailTooltipTitle' | localize
+                                                                    }}"
+                                                                >
+                                                                    {{ 'AllChanges' | localize }}
+                                                                </a>
+                                                            </li>
+                                                        }
+                                                        <li role="menuitem">
+                                                            <a
+                                                                (click)="showEntityChangeDetails(record)"
+                                                                class="dropdown-item"
+                                                                href="javascript:;"
+                                                                title="{{ 'EntityChangeDetailTooltip' | localize }}"
+                                                            >
+                                                                {{ 'ViewChange' | localize }}
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td style="width: 150px">
+                                                <span class="app-column-title">{{ 'Action' | localize }}</span>
+                                                <span title="{{ record.changeTypeName }}">
+                                                    {{ l(record.changeTypeName) }}
+                                                </span>
+                                            </td>
+                                            <td style="width: 250px">
+                                                <span class="app-column-title">{{ 'Object' | localize }}</span>
+                                                {{ record.entityTypeFullName }}
+                                            </td>
+                                            <td style="width: 150px">
+                                                <span class="app-column-title">{{ 'UserName' | localize }}</span>
+                                                {{ record.userName }}
+                                            </td>
+                                            <td style="width: 150px">
+                                                <span class="app-column-title">{{ 'Time' | localize }}</span>
+                                                {{ record.changeTime | luxonFormat: 'yyyy-LL-dd HH:mm:ss' }}
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </app-data-table>
+                                @if (dataTableHelperEntityChanges.totalRecordsCount == 0) {
+                                    <div class="app-no-data">
+                                        {{ 'NoData' | localize }}
+                                    </div>
+                                }
+                                <div class="app-paging-container">
+                                    <app-paginator
+                                        #paginatorEntityChanges
+                                        (onPageChange)="getEntityChanges($event)"
+                                        [currentPageReportTemplate]="
+                                            'TotalRecordsCount'
+                                                | localize: dataTableHelperEntityChanges.totalRecordsCount
+                                        "
+                                        [rowsPerPageOptions]="
+                                            dataTableHelperEntityChanges.predefinedRecordsCountPerPage
+                                        "
+                                        [rows]="dataTableHelperEntityChanges.defaultRecordsCountPerPage"
+                                        [showCurrentPageReport]="true"
+                                        [totalRecords]="dataTableHelperEntityChanges.totalRecordsCount"
+                                    ></app-paginator>
+                                </div>
+                            </div>
+                        </div>
+                    </tab>
+                </tabset>
+            </div>
+        </div>
+    </div>
+    <auditLogDetailModal #auditLogDetailModal></auditLogDetailModal>
+    <entityChangeDetailModal #entityChangeDetailModal></entityChangeDetailModal>
+</div>

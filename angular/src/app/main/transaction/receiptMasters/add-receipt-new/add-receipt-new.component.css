@@ -1,0 +1,4 @@
+.bgImei-head {
+    background-color: var(--blue-100);
+    border: 1px solid var(--primary-200);
+}

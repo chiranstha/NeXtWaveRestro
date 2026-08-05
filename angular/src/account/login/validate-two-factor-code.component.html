@@ -1,0 +1,54 @@
+<div [@routerTransition] class="login-form">
+    <div class="pb-13 pt-lg-0 pt-5">
+        <h3>
+            {{ 'VerifySecurityCode' | localize }}
+        </h3>
+    </div>
+    <form #twoFactorForm="ngForm" (ngSubmit)="submit()" class="login-form form" method="post">
+        <div class="mb-5">
+            <input
+                #passwordInput="ngModel"
+                [(ngModel)]="code"
+                autoFocus
+                autocomplete="new-password"
+                class="form-control form-control-solid h-auto px-6 rounded-lg fs-h6"
+                maxlength="16"
+                name="code"
+                placeholder="{{ 'Code' | localize }} *"
+                required
+                type="password"
+            />
+            <validation-messages [formCtrl]="passwordInput"></validation-messages>
+        </div>
+        @if (s('Abp.Zero.UserManagement.TwoFactorLogin.IsRememberBrowserEnabled') === 'true') {
+            <div class="mb-5 mt-4">
+                <label class="form-check form-check-custom form-check-solid py-1">
+                    <input
+                        [(ngModel)]="loginService.authenticateModel.rememberClient"
+                        class="form-check-input"
+                        name="rememberClient"
+                        type="checkbox"
+                        value="true"
+                    />
+                    <span class="form-check-label">
+                        {{ 'RememberThisBrowser' | localize }}
+                    </span>
+                </label>
+            </div>
+        }
+        <div class="pb-lg-0 pb-5">
+            <button
+                [disabled]="isSubmitButtonDisabled"
+                class="btn btn-sm btn-primary fw-bolder fs-h6 px-8 py-3 my-3 me-3"
+                type="submit"
+            >
+                {{ 'Submit' | localize }}
+            </button>
+            @if (remainingSeconds >= 0) {
+                <span class="remaining-time-counter ml-5">
+                    {{ 'RemainingTime' | localize }}: {{ 'SecondShort{0}' | localize: remainingSeconds }}.
+                </span>
+            }
+        </div>
+    </form>
+</div>

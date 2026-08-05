@@ -1,0 +1,32 @@
+<div class="card card-custom gutter-b">
+    <div class="card-header align-items-center border-0">
+        <h3 class="card-title align-items-start flex-column">
+            <span class="fw-bolder text-dark">
+                {{ 'FileUpload' | localize }}
+            </span>
+        </h3>
+    </div>
+    <div class="card-body">
+        <label class="form-label" for="DefaultFileUploadFileInput">Default file uploader</label>
+        <app-file-upload
+            (onBeforeSend)="onBeforeSend($event)"
+            (onUpload)="onUpload($event)"
+            [url]="uploadUrl"
+            accept="image/*"
+            id="DefaultFileUploadFileInput"
+            maxFileSize="1000000"
+            multiple="multiple"
+            name="DefaultFileUploadFileInput[]"
+        >
+            <ng-template appTemplate="content">
+                @if (uploadedFiles.length) {
+                    <ul>
+                        @for (file of uploadedFiles; track file) {
+                            <li>{{ file.name }} - {{ file.size }} bytes</li>
+                        }
+                    </ul>
+                }
+            </ng-template>
+        </app-file-upload>
+    </div>
+</div>

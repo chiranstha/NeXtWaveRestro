@@ -1,0 +1,175 @@
+<div [@routerTransition] class="login-form">
+    <div class="pb-13 pt-lg-0 pt-5">
+        <h3 class="fw-bolder text-dark fs-h4 fs-h1-lg">
+            {{ 'SignUp' | localize }}
+        </h3>
+    </div>
+    <form #registerForm="ngForm" (ngSubmit)="save()" class="login-form form" method="post" novalidate>
+        <div class="mb-5">
+            <input
+                #nameInput="ngModel"
+                [(ngModel)]="model.name"
+                autoFocus
+                class="form-control form-control-solid h-auto px-6 rounded-lg fs-h6"
+                maxlength="64"
+                name="Name"
+                placeholder="{{ 'Name' | localize }} *"
+                required
+                type="text"
+            />
+            <validation-messages [formCtrl]="nameInput"></validation-messages>
+        </div>
+        <div class="mb-5">
+            <input
+                #surnameInput="ngModel"
+                [(ngModel)]="model.surname"
+                class="form-control form-control-solid h-auto px-6 rounded-lg fs-h6"
+                maxlength="64"
+                name="Surname"
+                placeholder="{{ 'Surname' | localize }} *"
+                required
+                type="text"
+            />
+            <validation-messages [formCtrl]="surnameInput"></validation-messages>
+        </div>
+        <div class="mb-5">
+            <input
+                #emailAddressInput="ngModel"
+                [(ngModel)]="model.emailAddress"
+                class="form-control form-control-solid h-auto px-6 rounded-lg fs-h6"
+                maxlength="256"
+                name="EmailAddress"
+                pattern="^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"
+                placeholder="{{ 'EmailAddress' | localize }} *"
+                required
+                type="email"
+            />
+            <validation-messages [formCtrl]="emailAddressInput"></validation-messages>
+        </div>
+        <div class="mb-5">
+            <input
+                #userNameInput="ngModel"
+                [(ngModel)]="model.userName"
+                autocomplete="new-password"
+                class="form-control form-control-solid h-auto px-6 rounded-lg fs-h6"
+                maxlength="256"
+                name="UserName"
+                placeholder="{{ 'UserName' | localize }} *"
+                required
+                type="text"
+            />
+            <validation-messages [formCtrl]="userNameInput"></validation-messages>
+        </div>
+        <div class="mb-5">
+            <input
+                #Password="ngModel"
+                [(ngModel)]="model.password"
+                [mediumLabel]="l('medium')"
+                [promptLabel]="l('PleaseEnterYourNewPassword')"
+                [requireDigit]="passwordComplexitySetting.requireDigit"
+                [requireLowercase]="passwordComplexitySetting.requireLowercase"
+                [requireNonAlphanumeric]="passwordComplexitySetting.requireNonAlphanumeric"
+                [requireUppercase]="passwordComplexitySetting.requireUppercase"
+                [requiredLength]="passwordComplexitySetting.requiredLength"
+                [strongLabel]="l('strong')"
+                [weakLabel]="l('weak')"
+                class="form-control form-control-solid h-auto px-6 rounded-lg fs-h6"
+                name="Password"
+                appPassword
+                placeholder="{{ 'Password' | localize }}"
+                required
+                reverse="true"
+                type="password"
+                validateEqual="PasswordRepeat"
+            />
+        </div>
+        <div [hidden]="registerForm.form.valid || registerForm.form.pristine" class="mb-5">
+            @if (Password.errors) {
+                <ul class="form-text text-danger">
+                    <li [hidden]="!Password.errors.requireDigit">
+                        {{ 'PasswordComplexity_RequireDigit_Hint' | localize }}
+                    </li>
+                    <li [hidden]="!Password.errors.requireLowercase">
+                        {{ 'PasswordComplexity_RequireLowercase_Hint' | localize }}
+                    </li>
+                    <li [hidden]="!Password.errors.requireUppercase">
+                        {{ 'PasswordComplexity_RequireUppercase_Hint' | localize }}
+                    </li>
+                    <li [hidden]="!Password.errors.requireNonAlphanumeric">
+                        {{ 'PasswordComplexity_RequireNonAlphanumeric_Hint' | localize }}
+                    </li>
+                    <li [hidden]="!Password.errors.requiredLength">
+                        {{
+                            'PasswordComplexity_RequiredLength_Hint'
+                                | localize: passwordComplexitySetting.requiredLength
+                        }}
+                    </li>
+                </ul>
+            }
+        </div>
+        <div class="mb-5">
+            <input
+                #PasswordRepeat="ngModel"
+                [ngModel]="model.passwordRepeat"
+                [requireDigit]="passwordComplexitySetting.requireDigit"
+                [requireLowercase]="passwordComplexitySetting.requireLowercase"
+                [requireNonAlphanumeric]="passwordComplexitySetting.requireNonAlphanumeric"
+                [requireUppercase]="passwordComplexitySetting.requireUppercase"
+                [requiredLength]="passwordComplexitySetting.requiredLength"
+                class="form-control form-control-solid h-auto px-6 rounded-lg fs-h6"
+                name="PasswordRepeat"
+                placeholder="{{ 'PasswordRepeat' | localize }}"
+                required
+                reverse="false"
+                type="password"
+                validateEqual="Password"
+            />
+        </div>
+        <div [hidden]="registerForm.form.valid || registerForm.form.pristine" class="mb-5">
+            @if (PasswordRepeat.errors) {
+                <ul class="form-text text-danger">
+                    <li [hidden]="!PasswordRepeat.errors.requireDigit">
+                        {{ 'PasswordComplexity_RequireDigit_Hint' | localize }}
+                    </li>
+                    <li [hidden]="!PasswordRepeat.errors.requireLowercase">
+                        {{ 'PasswordComplexity_RequireLowercase_Hint' | localize }}
+                    </li>
+                    <li [hidden]="!PasswordRepeat.errors.requireUppercase">
+                        {{ 'PasswordComplexity_RequireUppercase_Hint' | localize }}
+                    </li>
+                    <li [hidden]="!PasswordRepeat.errors.requireNonAlphanumeric">
+                        {{ 'PasswordComplexity_RequireNonAlphanumeric_Hint' | localize }}
+                    </li>
+                    <li [hidden]="!PasswordRepeat.errors.requiredLength">
+                        {{
+                            'PasswordComplexity_RequiredLength_Hint'
+                                | localize: passwordComplexitySetting.requiredLength
+                        }}
+                    </li>
+                    <li [hidden]="PasswordRepeat.valid">{{ 'PasswordsDontMatch' | localize }}</li>
+                </ul>
+            }
+        </div>
+        <div class="pb-lg-0 pb-5">
+            <button
+                [disabled]="saving"
+                class="btn btn-sm btn-light-primary fw-bolder fs-h6 px-8 py-3 my-3"
+                routerLink="/account/login"
+                type="button"
+            >
+                <i class="fa fa-arrow-left"></i>
+                {{ 'Back' | localize }}
+            </button>
+            <button
+                [busyText]="l('SavingWithThreeDot')"
+                [buttonBusy]="saving"
+                [disabled]="!isFormValid"
+                class="btn btn-sm btn-primary fw-bolder fs-h6 px-8 py-3 my-3 me-3"
+                type="submit"
+            >
+                <i class="fa fa-check"></i>
+                {{ 'Submit' | localize }}
+            </button>
+        </div>
+    </form>
+</div>

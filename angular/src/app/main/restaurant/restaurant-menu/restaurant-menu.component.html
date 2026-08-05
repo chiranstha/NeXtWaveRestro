@@ -1,0 +1,943 @@
+<div [@routerTransition]>
+    <sub-header [title]="'Restaurant Menu' | localize">
+        <div role="actions">
+            <button class="btn btn-sm btn-primary me-2" (click)="resetMenuItem()" tooltip="{{ 'New' | localize }}">
+                <i class="fa fa-plus"></i>
+                {{ 'New Item' | localize }}
+            </button>
+            <button
+                class="btn btn-sm btn-light-primary"
+                [buttonBusy]="loading"
+                (click)="refresh()"
+                tooltip="{{ 'Refresh' | localize }}"
+            >
+                <i class="fa fa-rotate"></i>
+            </button>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="restaurant-page">
+            <div class="restaurant-nav">
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/pos" routerLinkActive="active">
+                    <i class="fa fa-cash-register"></i>
+                    {{ 'POS' | localize }}
+                </a>
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/setup" routerLinkActive="active">
+                    <i class="fa fa-sliders"></i>
+                    {{ 'Setup' | localize }}
+                </a>
+                <a class="restaurant-nav-link active" routerLink="/app/main/restaurant/menu">
+                    <i class="fa fa-utensils"></i>
+                    {{ 'Menu' | localize }}
+                </a>
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/inventory" routerLinkActive="active">
+                    <i class="fa fa-boxes-stacked"></i>
+                    {{ 'Inventory' | localize }}
+                </a>
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/channels" routerLinkActive="active">
+                    <i class="fa fa-store"></i>
+                    {{ 'Channels' | localize }}
+                </a>
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/kds" routerLinkActive="active">
+                    <i class="fa fa-tv"></i>
+                    {{ 'KDS' | localize }}
+                </a>
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/reports" routerLinkActive="active">
+                    <i class="fa fa-chart-line"></i>
+                    {{ 'Reports' | localize }}
+                </a>
+            </div>
+
+            <div class="restaurant-metric-row">
+                <div class="restaurant-metric">
+                    <span class="restaurant-metric-label">{{ 'Categories' | localize }}</span>
+                    <span class="restaurant-metric-value">{{ categories.length }}</span>
+                </div>
+                <div class="restaurant-metric">
+                    <span class="restaurant-metric-label">{{ 'Menu Items' | localize }}</span>
+                    <span class="restaurant-metric-value">{{ menuItems.length }}</span>
+                </div>
+                <div class="restaurant-metric">
+                    <span class="restaurant-metric-label">{{ 'Kitchen Items' | localize }}</span>
+                    <span class="restaurant-metric-value">{{ kitchenItemCount }}</span>
+                </div>
+                <div class="restaurant-metric">
+                    <span class="restaurant-metric-label">{{ 'Stock Items' | localize }}</span>
+                    <span class="restaurant-metric-value">{{ stockItemCount }}</span>
+                </div>
+                <div class="restaurant-metric">
+                    <span class="restaurant-metric-label">{{ 'Visible' | localize }}</span>
+                    <span class="restaurant-metric-value">{{ visibleItemCount }}</span>
+                </div>
+                <div class="restaurant-metric">
+                    <span class="restaurant-metric-label">{{ 'Needs Attention' | localize }}</span>
+                    <span class="restaurant-metric-value">{{ soldOutCount + inactiveItemCount }}</span>
+                    <span class="restaurant-muted small">
+                        {{ soldOutCount }} {{ 'Sold Out' | localize }} / {{ inactiveItemCount }} {{ 'Inactive' | localize }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="restaurant-command-panel">
+                <div class="restaurant-command-main">
+                    <div>
+                        <div class="restaurant-section-title">
+                            {{ selectedMenuItem?.displayName || ('Select or create a menu item' | localize) }}
+                        </div>
+                        <div class="restaurant-muted">
+                            {{ activeItemCount }} {{ 'active items' | localize }} / {{ featuredCount }} {{ 'featured' | localize }}
+                            <span *ngIf="selectedMenuItem">
+                                / {{ selectedMenuItem.categoryName }} / {{ itemRouteText(selectedMenuItem) | localize }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="restaurant-actionbar">
+                        <span
+                            class="restaurant-status"
+                            [ngClass]="selectedMenuItem?.isAvailable === false ? 'restaurant-status-danger' : 'restaurant-status-success'"
+                            *ngIf="selectedMenuItem"
+                        >
+                            {{ selectedMenuItem.isAvailable === false ? ('Sold Out' | localize) : ('Available' | localize) }}
+                        </span>
+                        <span
+                            class="restaurant-status"
+                            [ngClass]="selectedMenuItem?.isActive === false ? 'restaurant-status-neutral' : 'restaurant-status-primary'"
+                            *ngIf="selectedMenuItem"
+                        >
+                            {{ selectedMenuItem.isActive === false ? ('Inactive' | localize) : ('Active' | localize) }}
+                        </span>
+                    </div>
+                </div>
+                <div class="restaurant-actionbar restaurant-actionbar-end">
+                    <button class="btn btn-sm btn-light" (click)="clearFilters()">
+                        <i class="fa fa-filter-circle-xmark"></i>
+                        {{ 'Clear Filters' | localize }}
+                    </button>
+                    <button class="btn btn-sm btn-light-primary" (click)="resetMenuItem()">
+                        <i class="fa fa-plus"></i>
+                        {{ 'New Item' | localize }}
+                    </button>
+                </div>
+            </div>
+
+            <div class="restaurant-grid-3">
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Categories' | localize }}</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label class="required form-label">{{ 'Category Name' | localize }}</label>
+                            <input class="form-control mb-2" [(ngModel)]="categoryForm.name" />
+                            <input
+                                class="form-control mb-2"
+                                [(ngModel)]="categoryForm.description"
+                                placeholder="{{ 'Description' | localize }}"
+                            />
+                            <div class="restaurant-actionbar">
+                                <input
+                                    class="form-control w-100px"
+                                    type="number"
+                                    [(ngModel)]="categoryForm.sortOrder"
+                                    placeholder="{{ 'Sort' | localize }}"
+                                />
+                                <label class="form-check form-check-sm">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        [(ngModel)]="categoryForm.isActive"
+                                    />
+                                    <span class="form-check-label">{{ 'Active' | localize }}</span>
+                                </label>
+                                <button class="btn btn-sm btn-light" (click)="resetCategory()">
+                                    {{ 'Clear' | localize }}
+                                </button>
+                                <button
+                                    class="btn btn-sm btn-primary ms-auto"
+                                    [buttonBusy]="saving"
+                                    (click)="saveCategory()"
+                                >
+                                    <i class="fa fa-save"></i>
+                                    {{ categoryForm.id ? ('Update' | localize) : ('Save' | localize) }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="restaurant-empty" *ngIf="!categories.length">{{ 'NoData' | localize }}</div>
+                        <div class="d-grid gap-2" *ngIf="categories.length">
+                            <div
+                                class="restaurant-touch-button restaurant-click-row"
+                                *ngFor="let category of categories"
+                                [class.active]="categoryFilterId === category.id"
+                                role="button"
+                                tabindex="0"
+                                (click)="selectCategory(category.id)"
+                                (keydown.enter)="selectCategory(category.id)"
+                                (keydown.space)="selectCategory(category.id); $event.preventDefault()"
+                            >
+                                <span class="fw-bold">{{ category.name }}</span>
+                                <span class="restaurant-muted">
+                                    {{ category.description || ('NoDescription' | localize) }}
+                                </span>
+                                <span
+                                    class="restaurant-status"
+                                    [class.restaurant-status-success]="category.isActive"
+                                    [class.restaurant-status-neutral]="!category.isActive"
+                                >
+                                    {{ category.isActive ? ('Active' | localize) : ('Inactive' | localize) }}
+                                </span>
+                                <span class="text-end w-100">
+                                    <button
+                                        type="button"
+                                        class="btn btn-xs me-1"
+                                        [class.btn-light-success]="!category.isActive"
+                                        [class.btn-light-warning]="category.isActive"
+                                        (click)="toggleCategoryActive(category, $event)"
+                                        tooltip="{{ category.isActive ? ('Deactivate' | localize) : ('Activate' | localize) }}"
+                                    >
+                                        <i class="fa" [ngClass]="category.isActive ? 'fa-pause' : 'fa-check'"></i>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="btn btn-xs btn-light-primary"
+                                        (click)="$event.stopPropagation(); editCategory(category)"
+                                        tooltip="{{ 'Edit' | localize }}"
+                                    >
+                                        <i class="fa fa-pencil"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Menu Items' | localize }}</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="restaurant-filterbar mb-4">
+                            <input
+                                class="form-control"
+                                [(ngModel)]="menuSearch"
+                                placeholder="{{ 'Search' | localize }}"
+                            />
+                            <ng-select
+                                class="w-175px"
+                                [items]="categories"
+                                bindLabel="name"
+                                bindValue="id"
+                                [(ngModel)]="categoryFilterId"
+                                [clearable]="true"
+                                placeholder="{{ 'Category' | localize }}"
+                                appendTo="body"
+                            ></ng-select>
+                            <ng-select
+                                class="w-175px"
+                                [items]="stations"
+                                bindLabel="name"
+                                bindValue="id"
+                                [(ngModel)]="stationFilterId"
+                                [clearable]="true"
+                                placeholder="{{ 'Station' | localize }}"
+                                appendTo="body"
+                            ></ng-select>
+                            <select class="form-select w-150px" [(ngModel)]="routeFilter">
+                                <option value="">{{ 'All Types' | localize }}</option>
+                                <option value="kitchen">{{ 'Kitchen Item' | localize }}</option>
+                                <option value="stock">{{ 'Stock Item' | localize }}</option>
+                            </select>
+                        </div>
+
+                        <div class="restaurant-scroll restaurant-table-wrap">
+                            <table class="restaurant-table" *ngIf="filteredMenuItems.length; else noMenuItems">
+                                <thead>
+                                    <tr>
+                                        <th>{{ 'Item' | localize }}</th>
+                                        <th>{{ 'Station' | localize }}</th>
+                                        <th>{{ 'Route' | localize }}</th>
+                                        <th class="text-end">{{ 'Price' | localize }}</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        class="restaurant-click-row"
+                                        *ngFor="let item of filteredMenuItems"
+                                        (click)="editMenuItem(item)"
+                                    >
+                                        <td>
+                                            <div class="fw-bold">{{ item.displayName }}</div>
+                                            <div class="restaurant-muted">
+                                                {{ item.shortCode || '-' }} / {{ item.categoryName }} /
+                                                {{ productTypeText(item.productType) }}
+                                            </div>
+                                            <div class="restaurant-actionbar mt-2">
+                                                <span
+                                                    class="restaurant-status restaurant-status-danger"
+                                                    *ngIf="!item.isAvailable"
+                                                >
+                                                    {{ 'Sold Out' | localize }}
+                                                </span>
+                                                <span
+                                                    class="restaurant-status restaurant-status-warning"
+                                                    *ngIf="item.hasVariants"
+                                                >
+                                                    {{ 'Variants' | localize }}
+                                                </span>
+                                                <span
+                                                    class="restaurant-status restaurant-status-primary"
+                                                    *ngIf="item.hasModifiers"
+                                                >
+                                                    {{ 'Modifiers' | localize }}
+                                                </span>
+                                                <span
+                                                    class="restaurant-status"
+                                                    *ngFor="let tag of item.tags"
+                                                    [style.background]="tag.colorHex || '#f5f8fa'"
+                                                >
+                                                    {{ tag.name }}
+                                                </span>
+                                            </div>
+                                            <div class="restaurant-muted small mt-1" *ngIf="!item.stationId">
+                                                {{ 'Direct stock sale' | localize }}
+                                            </div>
+                                        </td>
+                                        <td>{{ item.stationName || ('No KOT/BOT' | localize) }}</td>
+                                        <td>
+                                            <span class="restaurant-status" [ngClass]="itemRouteClass(item)">
+                                                {{ itemRouteText(item) | localize }}
+                                            </span>
+                                            <span class="restaurant-status d-inline-flex mt-1" [ngClass]="menuBehaviorClass(item)">
+                                                {{ menuBehaviorText(item) }}
+                                            </span>
+                                        </td>
+                                        <td class="text-end fw-bold">{{ item.price | number: '1.2-2' }}</td>
+                                        <td class="text-end">
+                                            <button
+                                                class="btn btn-xs me-1"
+                                                [class.btn-light-success]="!item.isAvailable"
+                                                [class.btn-light-danger]="item.isAvailable"
+                                                (click)="$event.stopPropagation(); setAvailability(item, !item.isAvailable)"
+                                                tooltip="{{ item.isAvailable ? ('Sold Out' | localize) : ('Available' | localize) }}"
+                                            >
+                                                <i class="fa" [ngClass]="item.isAvailable ? 'fa-ban' : 'fa-check'"></i>
+                                            </button>
+                                            <button
+                                                class="btn btn-xs me-1"
+                                                [class.btn-light-warning]="item.isFeatured"
+                                                [class.btn-light]="!item.isFeatured"
+                                                (click)="toggleFeatured(item, $event)"
+                                                tooltip="{{ 'Featured' | localize }}"
+                                            >
+                                                <i class="fa fa-star"></i>
+                                            </button>
+                                            <button
+                                                class="btn btn-xs me-1"
+                                                [class.btn-light-success]="item.isActive === false"
+                                                [class.btn-light-warning]="item.isActive !== false"
+                                                (click)="toggleMenuItemActive(item, $event)"
+                                                tooltip="{{ item.isActive === false ? ('Activate' | localize) : ('Deactivate' | localize) }}"
+                                            >
+                                                <i class="fa" [ngClass]="item.isActive === false ? 'fa-check' : 'fa-pause'"></i>
+                                            </button>
+                                            <button
+                                                class="btn btn-xs btn-light me-1"
+                                                (click)="duplicateMenuItem(item, $event)"
+                                                tooltip="{{ 'Duplicate' | localize }}"
+                                            >
+                                                <i class="fa fa-copy"></i>
+                                            </button>
+                                            <button
+                                                class="btn btn-xs btn-light-primary me-1"
+                                                (click)="$event.stopPropagation(); editMenuItem(item)"
+                                                tooltip="{{ 'Edit' | localize }}"
+                                            >
+                                                <i class="fa fa-pencil"></i>
+                                            </button>
+                                            <button
+                                                class="btn btn-xs btn-light-success"
+                                                (click)="$event.stopPropagation(); loadRecipe(item)"
+                                                tooltip="{{ 'Recipe' | localize }}"
+                                            >
+                                                <i class="fa fa-list"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <ng-template #noMenuItems>
+                                <div class="restaurant-empty">{{ 'NoData' | localize }}</div>
+                            </ng-template>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            {{ itemForm.id ? ('Edit Menu Item' | localize) : ('New Menu Item' | localize) }}
+                        </div>
+                        <div class="card-toolbar restaurant-actionbar" *ngIf="selectedMenuItem">
+                            <button
+                                class="btn btn-xs"
+                                [class.btn-light-success]="selectedMenuItem.isAvailable === false"
+                                [class.btn-light-danger]="selectedMenuItem.isAvailable !== false"
+                                (click)="setAvailability(selectedMenuItem, selectedMenuItem.isAvailable === false)"
+                            >
+                                <i class="fa" [ngClass]="selectedMenuItem.isAvailable === false ? 'fa-check' : 'fa-ban'"></i>
+                            </button>
+                            <button class="btn btn-xs btn-light" (click)="duplicateMenuItem(selectedMenuItem)">
+                                <i class="fa fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="required form-label">{{ 'Category' | localize }}</label>
+                            <ng-select
+                                [items]="categories"
+                                bindLabel="name"
+                                bindValue="id"
+                                [(ngModel)]="itemForm.categoryId"
+                                appendTo="body"
+                            ></ng-select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="required form-label">{{ 'Product' | localize }}</label>
+                            <ng-select
+                                [items]="products"
+                                bindLabel="displayName"
+                                bindValue="id"
+                                [(ngModel)]="itemForm.productId"
+                                (ngModelChange)="onProductChanged($event)"
+                                appendTo="body"
+                            ></ng-select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="required form-label">{{ 'Item Type' | localize }}</label>
+                            <div class="restaurant-route-toggle">
+                                <button
+                                    type="button"
+                                    class="restaurant-route-option"
+                                    [class.active]="itemForm.itemRoute === 'kitchen'"
+                                    (click)="onItemRouteChanged('kitchen')"
+                                >
+                                    <i class="fa fa-fire-burner"></i>
+                                    <span>
+                                        <strong>{{ 'Kitchen Item' | localize }}</strong>
+                                        <small>{{ 'KOT/BOT' | localize }}</small>
+                                    </span>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="restaurant-route-option"
+                                    [class.active]="itemForm.itemRoute === 'stock'"
+                                    (click)="onItemRouteChanged('stock')"
+                                >
+                                    <i class="fa fa-box"></i>
+                                    <span>
+                                        <strong>{{ 'Stock Item' | localize }}</strong>
+                                        <small>{{ 'Direct Sale' | localize }}</small>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-3" *ngIf="itemForm.itemRoute === 'kitchen'">
+                            <label class="form-label">{{ 'KOT/BOT Station' | localize }}</label>
+                            <ng-select
+                                [items]="stations"
+                                bindLabel="name"
+                                bindValue="id"
+                                [(ngModel)]="itemForm.stationId"
+                                [clearable]="true"
+                                appendTo="body"
+                            ></ng-select>
+                            <div class="alert alert-warning py-2 mt-2 mb-0" *ngIf="!itemForm.stationId">
+                                {{ 'Station required for KOT/BOT' | localize }}
+                            </div>
+                        </div>
+                        <div class="alert alert-success py-2 mb-3" *ngIf="itemForm.itemRoute === 'stock'">
+                            {{ 'Stock item - no KOT/BOT station' | localize }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="required form-label">{{ 'Display Name' | localize }}</label>
+                            <input class="form-control" [(ngModel)]="itemForm.displayName" />
+                        </div>
+                        <div class="row">
+                            <div class="col-md-5 mb-3">
+                                <label class="form-label">{{ 'Short Code' | localize }}</label>
+                                <input class="form-control" [(ngModel)]="itemForm.shortCode" />
+                            </div>
+                            <div class="col-md-7 mb-3">
+                                <label class="form-label">{{ 'Image URL' | localize }}</label>
+                                <input class="form-control" [(ngModel)]="itemForm.imageUrl" />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ 'Description' | localize }}</label>
+                            <textarea class="form-control" rows="2" [(ngModel)]="itemForm.description"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="required form-label">{{ 'Price' | localize }}</label>
+                                <input class="form-control" type="number" [(ngModel)]="itemForm.price" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">{{ 'Minutes' | localize }}</label>
+                                <input class="form-control" type="number" [(ngModel)]="itemForm.preparationMinutes" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">{{ 'Sort' | localize }}</label>
+                                <input class="form-control" type="number" [(ngModel)]="itemForm.sortOrder" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">{{ 'Tile Color' | localize }}</label>
+                                <input class="form-control" type="color" [(ngModel)]="itemForm.colorHex" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">{{ 'Spice Level' | localize }}</label>
+                                <input class="form-control" type="number" min="0" max="5" [(ngModel)]="itemForm.spiceLevel" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">{{ 'Unavailable Until' | localize }}</label>
+                                <input
+                                    class="form-control"
+                                    type="datetime-local"
+                                    [(ngModel)]="itemForm.unavailableUntil"
+                                    [disabled]="itemForm.isAvailable"
+                                />
+                            </div>
+                        </div>
+                        <div class="restaurant-actionbar mb-3">
+                            <label class="form-check form-check-sm">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="itemForm.isActive" />
+                                <span class="form-check-label">{{ 'Active' | localize }}</span>
+                            </label>
+                            <label class="form-check form-check-sm">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="itemForm.isAvailable" />
+                                <span class="form-check-label">{{ 'Available' | localize }}</span>
+                            </label>
+                            <label class="form-check form-check-sm">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="itemForm.isFeatured" />
+                                <span class="form-check-label">{{ 'Featured' | localize }}</span>
+                            </label>
+                            <label class="form-check form-check-sm">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="itemForm.isVeg" />
+                                <span class="form-check-label">{{ 'Veg' | localize }}</span>
+                            </label>
+                        </div>
+                        <div class="restaurant-actionbar restaurant-actionbar-end">
+                            <button class="btn btn-sm btn-light" (click)="resetMenuItem()">
+                                {{ 'Clear' | localize }}
+                            </button>
+                            <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="saveMenuItem()">
+                                <i class="fa fa-save"></i>
+                                {{ itemForm.id ? ('Update' | localize) : ('Save' | localize) }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="restaurant-grid-3" *ngIf="selectedMenuItem">
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Variants' | localize }}</div>
+                        <div class="card-toolbar">
+                            <span class="restaurant-status restaurant-status-neutral">
+                                {{ selectedMenuItem.variants?.length || 0 }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="restaurant-table-wrap mb-4" *ngIf="selectedMenuItem.variants?.length; else noVariants">
+                            <table class="restaurant-table restaurant-compact-table">
+                                <tbody>
+                                    <tr *ngFor="let variant of selectedMenuItem.variants">
+                                        <td>
+                                            <div class="fw-bold">{{ variant.name }}</div>
+                                            <div class="restaurant-muted">
+                                                {{
+                                                    variant.isAbsolutePrice
+                                                        ? ('Fixed Price' | localize)
+                                                        : ('Price Delta' | localize)
+                                                }}
+                                            </div>
+                                        </td>
+                                        <td class="text-end fw-bold">
+                                            {{ variantDisplayPrice(selectedMenuItem, variant) | number: '1.2-2' }}
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="restaurant-status restaurant-status-success" *ngIf="variant.isDefault">
+                                                {{ 'Default' | localize }}
+                                            </span>
+                                        </td>
+                                        <td class="text-end">
+                                            <button class="btn btn-xs btn-light-primary me-1" (click)="editVariant(variant)">
+                                                <i class="fa fa-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-xs btn-light-danger" (click)="deleteVariant(variant)">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ng-template #noVariants>
+                            <div class="restaurant-empty mb-4">{{ 'NoData' | localize }}</div>
+                        </ng-template>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="required form-label">{{ 'Variant Name' | localize }}</label>
+                                <input class="form-control" [(ngModel)]="variantForm.name" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ 'Price / Delta' | localize }}</label>
+                                <input class="form-control" type="number" [(ngModel)]="variantForm.priceDelta" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ 'Sort' | localize }}</label>
+                                <input class="form-control" type="number" [(ngModel)]="variantForm.sortOrder" />
+                            </div>
+                            <div class="col-md-6 mb-3 restaurant-actionbar align-items-end">
+                                <label class="form-check form-check-sm">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        [(ngModel)]="variantForm.isAbsolutePrice"
+                                    />
+                                    <span class="form-check-label">{{ 'Fixed' | localize }}</span>
+                                </label>
+                                <label class="form-check form-check-sm">
+                                    <input class="form-check-input" type="checkbox" [(ngModel)]="variantForm.isDefault" />
+                                    <span class="form-check-label">{{ 'Default' | localize }}</span>
+                                </label>
+                                <label class="form-check form-check-sm">
+                                    <input class="form-check-input" type="checkbox" [(ngModel)]="variantForm.isActive" />
+                                    <span class="form-check-label">{{ 'Active' | localize }}</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="restaurant-actionbar restaurant-actionbar-end">
+                            <button class="btn btn-sm btn-light" (click)="resetVariantForm()">
+                                {{ 'Clear' | localize }}
+                            </button>
+                            <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="saveVariant()">
+                                <i class="fa fa-save"></i>
+                                {{ 'Save' | localize }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Modifier Groups' | localize }}</div>
+                        <div class="card-toolbar">
+                            <span class="restaurant-status restaurant-status-neutral me-2">
+                                {{ assignedModifierGroupCount }} {{ 'Assigned' | localize }}
+                            </span>
+                            <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="saveMenuItemModifierGroups()">
+                                <i class="fa fa-link"></i>
+                                {{ 'Assign' | localize }}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="restaurant-scroll-sm mb-4" *ngIf="modifierGroups.length; else noModifierGroups">
+                            <div class="restaurant-modifier-manager" *ngFor="let group of modifierGroups">
+                                <div class="restaurant-modifier-manager-head">
+                                    <label class="restaurant-modifier-option mb-0">
+                                        <input
+                                            type="checkbox"
+                                            [checked]="selectedModifierGroupIds.includes(group.id)"
+                                            (change)="onModifierGroupChanged(group.id, $event)"
+                                        />
+                                        <span>
+                                            <strong>{{ group.name }}</strong>
+                                            <small class="restaurant-muted d-block">
+                                                {{ group.isRequired ? ('Required' | localize) : ('Optional' | localize) }}
+                                                / {{ group.minSelect }}-{{ group.maxSelect }}
+                                                / {{ group.modifiers?.length || 0 }} {{ 'modifiers' | localize }}
+                                            </small>
+                                        </span>
+                                    </label>
+                                    <button
+                                        class="btn btn-xs btn-light-primary"
+                                        (click)="editModifierGroup(group); modifierForm.modifierGroupId = group.id"
+                                        tooltip="{{ 'Edit' | localize }}"
+                                    >
+                                        <i class="fa fa-pencil"></i>
+                                    </button>
+                                </div>
+                                <div class="restaurant-modifier-pill-row" *ngIf="group.modifiers?.length">
+                                    <button
+                                        type="button"
+                                        class="restaurant-modifier-pill"
+                                        *ngFor="let modifier of group.modifiers"
+                                        [class.inactive]="modifier.isActive === false"
+                                        (click)="editModifier(group, modifier)"
+                                    >
+                                        <span>{{ modifier.name }}</span>
+                                        <strong>{{ modifier.priceDelta | number: '1.2-2' }}</strong>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <ng-template #noModifierGroups>
+                            <div class="restaurant-empty mb-4">{{ 'NoData' | localize }}</div>
+                        </ng-template>
+
+                        <div class="separator separator-dashed my-4"></div>
+                        <div class="row">
+                            <div class="col-md-7 mb-3">
+                                <label class="required form-label">{{ 'Group Name' | localize }}</label>
+                                <input class="form-control" [(ngModel)]="modifierGroupForm.name" />
+                            </div>
+                            <div class="col-md-5 mb-3">
+                                <label class="form-label">{{ 'Min / Max' | localize }}</label>
+                                <div class="d-flex gap-2">
+                                    <input class="form-control" type="number" [(ngModel)]="modifierGroupForm.minSelect" />
+                                    <input class="form-control" type="number" [(ngModel)]="modifierGroupForm.maxSelect" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="restaurant-actionbar mb-3">
+                            <label class="form-check form-check-sm">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="modifierGroupForm.isRequired" />
+                                <span class="form-check-label">{{ 'Required' | localize }}</span>
+                            </label>
+                            <label class="form-check form-check-sm">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="modifierGroupForm.isActive" />
+                                <span class="form-check-label">{{ 'Active' | localize }}</span>
+                            </label>
+                            <input
+                                class="form-control w-100px"
+                                type="number"
+                                [(ngModel)]="modifierGroupForm.sortOrder"
+                                placeholder="{{ 'Sort' | localize }}"
+                            />
+                            <button class="btn btn-sm btn-light ms-auto" (click)="resetModifierGroup()">
+                                {{ 'Clear' | localize }}
+                            </button>
+                            <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="saveModifierGroup()">
+                                <i class="fa fa-save"></i>
+                                {{ 'Group' | localize }}
+                            </button>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-5 mb-3">
+                                <label class="form-label">{{ 'Group' | localize }}</label>
+                                <ng-select
+                                    [items]="modifierGroups"
+                                    bindLabel="name"
+                                    bindValue="id"
+                                    [(ngModel)]="modifierForm.modifierGroupId"
+                                    appendTo="body"
+                                ></ng-select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="required form-label">{{ 'Modifier' | localize }}</label>
+                                <input class="form-control" [(ngModel)]="modifierForm.name" />
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">{{ 'Price' | localize }}</label>
+                                <input class="form-control" type="number" [(ngModel)]="modifierForm.priceDelta" />
+                            </div>
+                        </div>
+                        <div class="restaurant-actionbar restaurant-actionbar-end">
+                            <button class="btn btn-sm btn-light" (click)="resetModifierForm()">
+                                {{ 'Clear' | localize }}
+                            </button>
+                            <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="saveModifier()">
+                                <i class="fa fa-save"></i>
+                                {{ 'Modifier' | localize }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Tags & Availability' | localize }}</div>
+                        <div class="card-toolbar">
+                            <button class="btn btn-sm btn-light-primary" (click)="addTag()">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="restaurant-actionbar mb-4">
+                            <button
+                                class="btn btn-sm"
+                                [class.btn-success]="selectedMenuItem.isAvailable"
+                                [class.btn-light]="!selectedMenuItem.isAvailable"
+                                (click)="setAvailability(selectedMenuItem, true)"
+                            >
+                                <i class="fa fa-check"></i>
+                                {{ 'Available' | localize }}
+                            </button>
+                            <button
+                                class="btn btn-sm"
+                                [class.btn-danger]="!selectedMenuItem.isAvailable"
+                                [class.btn-light]="selectedMenuItem.isAvailable"
+                                (click)="setAvailability(selectedMenuItem, false)"
+                            >
+                                <i class="fa fa-ban"></i>
+                                {{ 'Sold Out' | localize }}
+                            </button>
+                        </div>
+
+                        <div class="restaurant-empty mb-3" *ngIf="!tagRows.length">{{ 'NoData' | localize }}</div>
+                        <div class="restaurant-tag-editor-row" *ngFor="let tag of tagRows; let i = index">
+                            <input class="form-control" [(ngModel)]="tag.name" placeholder="{{ 'Tag' | localize }}" />
+                            <input class="form-control restaurant-color-input" type="color" [(ngModel)]="tag.colorHex" />
+                            <input class="form-control w-80px" type="number" [(ngModel)]="tag.sortOrder" />
+                            <button class="btn btn-xs btn-light-danger" (click)="removeTag(i)">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+
+                        <div class="restaurant-actionbar restaurant-actionbar-end mt-4">
+                            <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="saveTags()">
+                                <i class="fa fa-save"></i>
+                                {{ 'Save Tags' | localize }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-custom gutter-b restaurant-card" *ngIf="selectedMenuItem">
+                <div class="card-header">
+                    <div class="card-title">
+                        {{ selectedMenuItem.displayName }} {{ 'Recipe' | localize }}
+                        <span
+                            class="restaurant-status restaurant-status-success ms-3"
+                            *ngIf="selectedMenuItem.hasRecipe"
+                        >
+                            Recipe/BOM
+                        </span>
+                        <span
+                            class="restaurant-status restaurant-status-primary ms-3"
+                            *ngIf="!selectedMenuItem.hasRecipe"
+                        >
+                            Direct
+                        </span>
+                    </div>
+                    <div class="card-toolbar">
+                        <span class="restaurant-status restaurant-status-neutral me-2" *ngIf="recipeCost">
+                            {{ 'Cost' | localize }} {{ recipeCost.totalCost | number: '1.2-2' }}
+                        </span>
+                        <span class="restaurant-status restaurant-status-success me-2" *ngIf="recipeMarginPercentage !== null">
+                            {{ 'Margin' | localize }} {{ recipeMarginPercentage | number: '1.0-0' }}%
+                        </span>
+                        <button
+                            class="btn btn-sm btn-light-primary"
+                            (click)="addRecipeLine()"
+                            tooltip="{{ 'Add' | localize }}"
+                        >
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="restaurant-cost-strip" *ngIf="recipeCost">
+                    <div>
+                        <span class="restaurant-label">{{ 'Selling Price' | localize }}</span>
+                        <strong>{{ selectedMenuItem.price | number: '1.2-2' }}</strong>
+                    </div>
+                    <div>
+                        <span class="restaurant-label">{{ 'Recipe Cost' | localize }}</span>
+                        <strong>{{ recipeCost.totalCost | number: '1.2-2' }}</strong>
+                    </div>
+                    <div>
+                        <span class="restaurant-label">{{ 'Gross Profit' | localize }}</span>
+                        <strong>{{ selectedMenuItem.price - recipeCost.totalCost | number: '1.2-2' }}</strong>
+                    </div>
+                    <div>
+                        <span class="restaurant-label">{{ 'Margin' | localize }}</span>
+                        <strong>{{ recipeMarginPercentage === null ? '-' : (recipeMarginPercentage | number: '1.0-0') + '%' }}</strong>
+                    </div>
+                </div>
+                <div class="card-body p-0 restaurant-table-wrap">
+                    <table class="restaurant-table" *ngIf="recipeLines.length; else noRecipeLines">
+                        <thead>
+                            <tr>
+                                <th>{{ 'Raw Material' | localize }}</th>
+                                <th>{{ 'Qty' | localize }}</th>
+                                <th>{{ 'Unit' | localize }}</th>
+                                <th>{{ 'Wastage %' | localize }}</th>
+                                <th>{{ 'Cost' | localize }}</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let line of recipeLines; let i = index">
+                                <td>
+                                    <ng-select
+                                        [items]="rawMaterials"
+                                        bindLabel="displayName"
+                                        bindValue="id"
+                                        [(ngModel)]="line.rawMaterialId"
+                                        appendTo="body"
+                                    ></ng-select>
+                                </td>
+                                <td>
+                                    <input class="form-control w-100px" type="number" [(ngModel)]="line.quantity" />
+                                </td>
+                                <td>
+                                    <ng-select
+                                        [items]="units"
+                                        bindLabel="displayName"
+                                        bindValue="id"
+                                        [(ngModel)]="line.unitId"
+                                        appendTo="body"
+                                    ></ng-select>
+                                </td>
+                                <td>
+                                    <input
+                                        class="form-control w-100px"
+                                        type="number"
+                                        [(ngModel)]="line.wastagePercentage"
+                                    />
+                                </td>
+                                <td>
+                                    <input class="form-control w-125px" type="number" [(ngModel)]="line.costRate" />
+                                </td>
+                                <td class="text-end">
+                                    <button
+                                        class="btn btn-xs btn-light-danger"
+                                        (click)="removeRecipeLine(i)"
+                                        tooltip="{{ 'Delete' | localize }}"
+                                    >
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <ng-template #noRecipeLines>
+                        <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                    </ng-template>
+                </div>
+                <div class="card-footer restaurant-actionbar restaurant-actionbar-end">
+                    <button class="btn btn-sm btn-light-primary" (click)="addRecipeLine()">
+                        <i class="fa fa-plus"></i>
+                        {{ 'Add' | localize }}
+                    </button>
+                    <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="saveRecipe()">
+                        <i class="fa fa-save"></i>
+                        {{ 'Save' | localize }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

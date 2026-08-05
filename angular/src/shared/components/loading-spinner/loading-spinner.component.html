@@ -1,0 +1,12 @@
+@if (isLoading) {
+    <div class="loading-container">
+        <div class="spinner-container">
+            <div [ngClass]="size" class="spinner">
+                <div class="spinner-circle"></div>
+            </div>
+            @if (showMessage) {
+                <div class="loading-message">{{ message }}</div>
+            }
+        </div>
+    </div>
+}

@@ -1,0 +1,85 @@
+<div
+    #modal="bs-modal"
+    [config]="{ backdrop: 'true' }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="modal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form #editForm="ngForm" (ngSubmit)="save()" novalidate>
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <span>{{ 'NotificationSettings' | localize }}</span>
+                    </h5>
+                    <button (click)="close()" [attr.aria-label]="l('Close')" class="btn-close" type="button"></button>
+                </div>
+                @if (settings) {
+                    <div class="modal-body">
+                        <h4>{{ 'ReceiveNotifications' | localize }}</h4>
+                        <label class="form-check form-check-custom form-check-solid form-switch py-1">
+                            <input
+                                [(ngModel)]="settings.receiveNotifications"
+                                class="form-check-input"
+                                name="ReceiveNotifications"
+                                type="checkbox"
+                                value="true"
+                            />
+                            <span class="form-check-label">({{ 'ReceiveNotifications_Definition' | localize }})</span>
+                        </label>
+                        @if (settings.notifications.length) {
+                            <h4 class="mt-4">{{ 'NotificationTypes' | localize }}</h4>
+                        }
+                        @if (settings.notifications.length && !settings.receiveNotifications) {
+                            <p class="text-danger">
+                                <small>{{ 'ReceiveNotifications_DisableInfo' | localize }}</small>
+                            </p>
+                        }
+                        @for (notification of settings.notifications; track notification) {
+                            <label class="form-check form-check-custom form-check-solid py-1">
+                                <input
+                                    [(ngModel)]="notification.isSubscribed"
+                                    [disabled]="!settings.receiveNotifications"
+                                    class="form-check-input"
+                                    id="Notification_{{ notification.name }}"
+                                    name="Notification_{{ notification.name }}"
+                                    type="checkbox"
+                                />
+                                <span class="form-check-label">
+                                    {{ notification.displayName }}
+                                    @if (notification.description) {
+                                        <span class="help-block">
+                                            {{ notification.description }}
+                                        </span>
+                                    }
+                                </span>
+                            </label>
+                        }
+                    </div>
+                }
+                <div class="modal-footer">
+                    <button
+                        (click)="close()"
+                        [disabled]="saving"
+                        class="btn btn-sm btn-light-primary fw-bold"
+                        type="button"
+                    >
+                        {{ 'Cancel' | localize }}
+                    </button>
+                    <button
+                        [busyText]="l('SavingWithThreeDot')"
+                        [buttonBusy]="saving"
+                        class="btn btn-sm btn-primary fw-bold"
+                        type="submit"
+                    >
+                        <i class="fa fa-save"></i>
+                        <span>{{ 'Save' | localize }}</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

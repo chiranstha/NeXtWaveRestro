@@ -1,0 +1,642 @@
+<div [@routerTransition]>
+    <sub-header [title]="'Restaurant Channels' | localize">
+        <div role="actions">
+            <button
+                class="btn btn-sm btn-light-primary"
+                [buttonBusy]="loading"
+                (click)="refresh()"
+                tooltip="{{ 'Refresh' | localize }}"
+            >
+                <i class="fa fa-rotate"></i>
+            </button>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="restaurant-page">
+            <div class="restaurant-nav">
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/pos" routerLinkActive="active">
+                    <i class="fa fa-cash-register"></i>
+                    {{ 'POS' | localize }}
+                </a>
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/setup" routerLinkActive="active">
+                    <i class="fa fa-sliders"></i>
+                    {{ 'Setup' | localize }}
+                </a>
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/menu" routerLinkActive="active">
+                    <i class="fa fa-utensils"></i>
+                    {{ 'Menu' | localize }}
+                </a>
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/inventory" routerLinkActive="active">
+                    <i class="fa fa-boxes-stacked"></i>
+                    {{ 'Inventory' | localize }}
+                </a>
+                <a class="restaurant-nav-link active" routerLink="/app/main/restaurant/channels">
+                    <i class="fa fa-store"></i>
+                    {{ 'Channels' | localize }}
+                </a>
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/kds" routerLinkActive="active">
+                    <i class="fa fa-tv"></i>
+                    {{ 'KDS' | localize }}
+                </a>
+                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/reports" routerLinkActive="active">
+                    <i class="fa fa-chart-line"></i>
+                    {{ 'Reports' | localize }}
+                </a>
+            </div>
+
+            <div class="restaurant-section-tabs">
+                <button class="nav-link" [class.active]="activeTab === 'channels'" (click)="setTab('channels')">
+                    <i class="fa fa-store me-1"></i>
+                    {{ 'Channels' | localize }}
+                </button>
+                <button class="nav-link" [class.active]="activeTab === 'mapping'" (click)="setTab('mapping')">
+                    <i class="fa fa-link me-1"></i>
+                    {{ 'Menu Mapping' | localize }}
+                </button>
+                <button class="nav-link" [class.active]="activeTab === 'orders'" (click)="setTab('orders')">
+                    <i class="fa fa-inbox me-1"></i>
+                    {{ 'Incoming Orders' | localize }}
+                </button>
+                <button class="nav-link" [class.active]="activeTab === 'payouts'" (click)="setTab('payouts')">
+                    <i class="fa fa-money-check-dollar me-1"></i>
+                    {{ 'Payouts' | localize }}
+                </button>
+            </div>
+
+            <div class="restaurant-metric-row">
+                <div class="restaurant-metric">
+                    <span class="restaurant-metric-label">{{ 'Active Channels' | localize }}</span>
+                    <span class="restaurant-metric-value">{{ activeChannelsCount }}</span>
+                </div>
+                <div class="restaurant-metric">
+                    <span class="restaurant-metric-label">{{ 'Mapped Items' | localize }}</span>
+                    <span class="restaurant-metric-value">{{ channelItems.length }}</span>
+                </div>
+                <div class="restaurant-metric">
+                    <span class="restaurant-metric-label">{{ 'Pending Orders' | localize }}</span>
+                    <span class="restaurant-metric-value">{{ pendingOrdersCount }}</span>
+                </div>
+                <div class="restaurant-metric">
+                    <span class="restaurant-metric-label">{{ 'Payout Issues' | localize }}</span>
+                    <span class="restaurant-metric-value">{{ payoutIssueCount }}</span>
+                </div>
+            </div>
+
+            <ng-container *ngIf="activeTab === 'channels'">
+                <div class="restaurant-grid-2">
+                    <div class="card card-custom gutter-b restaurant-card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                {{ channelForm.id ? ('Edit Channel' | localize) : ('New Channel' | localize) }}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="required form-label">{{ 'Name' | localize }}</label>
+                                    <input class="form-control" [(ngModel)]="channelForm.name" />
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">{{ 'Type' | localize }}</label>
+                                    <select class="form-select" [(ngModel)]="channelForm.channelType">
+                                        <option *ngFor="let option of channelTypeOptions" [ngValue]="option.value">
+                                            {{ option.label }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">{{ 'Provider' | localize }}</label>
+                                    <select class="form-select" [(ngModel)]="channelForm.provider">
+                                        <option *ngFor="let option of providerOptions" [ngValue]="option.value">
+                                            {{ option.label }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">{{ 'Commission %' | localize }}</label>
+                                    <input class="form-control" type="number" [(ngModel)]="channelForm.commissionPercent" />
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">{{ 'Markup %' | localize }}</label>
+                                    <input
+                                        class="form-control"
+                                        type="number"
+                                        [(ngModel)]="channelForm.defaultPriceMarkupPercent"
+                                    />
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">{{ 'Sort' | localize }}</label>
+                                    <input class="form-control" type="number" [(ngModel)]="channelForm.sortOrder" />
+                                </div>
+                            </div>
+                            <div class="restaurant-actionbar">
+                                <label class="form-check form-check-sm">
+                                    <input class="form-check-input" type="checkbox" [(ngModel)]="channelForm.isOnline" />
+                                    <span class="form-check-label">{{ 'Online' | localize }}</span>
+                                </label>
+                                <label class="form-check form-check-sm">
+                                    <input class="form-check-input" type="checkbox" [(ngModel)]="channelForm.isActive" />
+                                    <span class="form-check-label">{{ 'Active' | localize }}</span>
+                                </label>
+                                <button class="btn btn-sm btn-light ms-auto" (click)="resetChannelForm()">
+                                    {{ 'Clear' | localize }}
+                                </button>
+                                <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="saveChannel()">
+                                    <i class="fa fa-save"></i>
+                                    {{ 'Save' | localize }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-custom gutter-b restaurant-card">
+                        <div class="card-header">
+                            <div class="card-title">{{ 'Channel Accounts' | localize }}</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="required form-label">{{ 'Channel' | localize }}</label>
+                                    <ng-select
+                                        [items]="channels"
+                                        bindLabel="name"
+                                        bindValue="id"
+                                        [(ngModel)]="accountForm.channelId"
+                                        appendTo="body"
+                                    ></ng-select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="required form-label">{{ 'Account Name' | localize }}</label>
+                                    <input class="form-control" [(ngModel)]="accountForm.displayName" />
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">{{ 'Provider' | localize }}</label>
+                                    <select class="form-select" [(ngModel)]="accountForm.provider">
+                                        <option *ngFor="let option of providerOptions" [ngValue]="option.value">
+                                            {{ option.label }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">{{ 'Store Id' | localize }}</label>
+                                    <input class="form-control" [(ngModel)]="accountForm.externalStoreId" />
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">{{ 'API Base URL' | localize }}</label>
+                                    <input class="form-control" [(ngModel)]="accountForm.apiBaseUrl" />
+                                </div>
+                            </div>
+                            <div class="restaurant-actionbar">
+                                <label class="form-check form-check-sm">
+                                    <input class="form-check-input" type="checkbox" [(ngModel)]="accountForm.isOnline" />
+                                    <span class="form-check-label">{{ 'Online' | localize }}</span>
+                                </label>
+                                <label class="form-check form-check-sm">
+                                    <input class="form-check-input" type="checkbox" [(ngModel)]="accountForm.isActive" />
+                                    <span class="form-check-label">{{ 'Active' | localize }}</span>
+                                </label>
+                                <button class="btn btn-sm btn-primary ms-auto" [buttonBusy]="saving" (click)="saveAccount()">
+                                    <i class="fa fa-save"></i>
+                                    {{ 'Save Account' | localize }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Configured Channels' | localize }}</div>
+                    </div>
+                    <div class="card-body p-0 restaurant-table-wrap">
+                        <table class="restaurant-table" *ngIf="channels.length; else noChannels">
+                            <thead>
+                                <tr>
+                                    <th>{{ 'Channel' | localize }}</th>
+                                    <th>{{ 'Type' | localize }}</th>
+                                    <th>{{ 'Provider' | localize }}</th>
+                                    <th class="text-end">{{ 'Commission' | localize }}</th>
+                                    <th>{{ 'Status' | localize }}</th>
+                                    <th class="text-end"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let channel of channels">
+                                    <td class="fw-bold">{{ channel.name }}</td>
+                                    <td>{{ channelTypeText(channel.channelType) }}</td>
+                                    <td>{{ providerText(channel.provider) }}</td>
+                                    <td class="text-end">{{ channel.commissionPercent | number: '1.2-2' }}%</td>
+                                    <td>
+                                        <span
+                                            class="restaurant-status"
+                                            [class.restaurant-status-success]="channel.isOnline"
+                                            [class.restaurant-status-neutral]="!channel.isOnline"
+                                        >
+                                            {{ channel.isOnline ? ('Online' | localize) : ('Offline' | localize) }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn btn-xs btn-light-primary me-1" (click)="editChannel(channel)">
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-xs btn-light-success" [buttonBusy]="saving" (click)="queuePublish(channel)">
+                                            <i class="fa fa-cloud-arrow-up"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <ng-template #noChannels>
+                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                        </ng-template>
+                    </div>
+                </div>
+
+                <div class="card card-custom gutter-b restaurant-card" *ngIf="accounts.length">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Accounts' | localize }}</div>
+                    </div>
+                    <div class="card-body p-0 restaurant-table-wrap">
+                        <table class="restaurant-table">
+                            <thead>
+                                <tr>
+                                    <th>{{ 'Account' | localize }}</th>
+                                    <th>{{ 'Channel' | localize }}</th>
+                                    <th>{{ 'Store' | localize }}</th>
+                                    <th>{{ 'Last Sync' | localize }}</th>
+                                    <th class="text-end"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let account of accounts">
+                                    <td class="fw-bold">{{ account.displayName }}</td>
+                                    <td>{{ account.channelName }}</td>
+                                    <td>{{ account.externalStoreId || '-' }}</td>
+                                    <td>
+                                        {{ account.lastMenuSyncAt ? (account.lastMenuSyncAt | date: 'yyyy-MM-dd HH:mm') : '-' }}
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn btn-xs btn-light-primary" (click)="editAccount(account)">
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="activeTab === 'mapping'">
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Channel Menu Mapping' | localize }}</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label class="required form-label">{{ 'Channel' | localize }}</label>
+                                <ng-select
+                                    [items]="channels"
+                                    bindLabel="name"
+                                    bindValue="id"
+                                    [(ngModel)]="itemForm.channelId"
+                                    appendTo="body"
+                                ></ng-select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="required form-label">{{ 'Menu Item' | localize }}</label>
+                                <ng-select
+                                    [items]="menuItems"
+                                    bindLabel="displayName"
+                                    bindValue="id"
+                                    [(ngModel)]="itemForm.menuItemId"
+                                    appendTo="body"
+                                ></ng-select>
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">{{ 'External Id' | localize }}</label>
+                                <input class="form-control" [(ngModel)]="itemForm.externalItemId" />
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">{{ 'SKU' | localize }}</label>
+                                <input class="form-control" [(ngModel)]="itemForm.externalSku" />
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">{{ 'Price' | localize }}</label>
+                                <input class="form-control" type="number" [(ngModel)]="itemForm.channelPrice" />
+                            </div>
+                        </div>
+                        <div class="restaurant-actionbar restaurant-actionbar-end">
+                            <label class="form-check form-check-sm">
+                                <input class="form-check-input" type="checkbox" [(ngModel)]="itemForm.isOnline" />
+                                <span class="form-check-label">{{ 'Online' | localize }}</span>
+                            </label>
+                            <button class="btn btn-sm btn-light" (click)="resetItemForm()">{{ 'Clear' | localize }}</button>
+                            <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="saveItem()">
+                                <i class="fa fa-save"></i>
+                                {{ 'Save Mapping' | localize }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Mapped Items' | localize }}</div>
+                    </div>
+                    <div class="card-body p-0 restaurant-table-wrap">
+                        <table class="restaurant-table" *ngIf="channelItems.length; else noMappings">
+                            <thead>
+                                <tr>
+                                    <th>{{ 'Channel' | localize }}</th>
+                                    <th>{{ 'Menu Item' | localize }}</th>
+                                    <th>{{ 'External' | localize }}</th>
+                                    <th class="text-end">{{ 'Base' | localize }}</th>
+                                    <th class="text-end">{{ 'Channel Price' | localize }}</th>
+                                    <th>{{ 'Sync' | localize }}</th>
+                                    <th class="text-end"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of channelItems">
+                                    <td>{{ item.channelName }}</td>
+                                    <td class="fw-bold">{{ item.menuItemName }}</td>
+                                    <td>{{ item.externalItemId || item.externalSku || '-' }}</td>
+                                    <td class="text-end">{{ item.basePrice | number: '1.2-2' }}</td>
+                                    <td class="text-end">{{ item.channelPrice | number: '1.2-2' }}</td>
+                                    <td>
+                                        <span class="restaurant-status" [ngClass]="statusClass(item.syncStatus)">
+                                            {{ syncStatusText(item.syncStatus) }}
+                                        </span>
+                                        <div class="restaurant-muted">{{ item.lastSyncMessage || '-' }}</div>
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn btn-xs btn-light-primary" (click)="editItem(item)">
+                                            <i class="fa fa-pencil"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <ng-template #noMappings>
+                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                        </ng-template>
+                    </div>
+                </div>
+
+                <div class="card card-custom gutter-b restaurant-card" *ngIf="syncLogs.length">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Latest Sync Logs' | localize }}</div>
+                    </div>
+                    <div class="card-body p-0 restaurant-table-wrap">
+                        <table class="restaurant-table">
+                            <thead>
+                                <tr>
+                                    <th>{{ 'Time' | localize }}</th>
+                                    <th>{{ 'Provider' | localize }}</th>
+                                    <th>{{ 'Operation' | localize }}</th>
+                                    <th>{{ 'Status' | localize }}</th>
+                                    <th>{{ 'Message' | localize }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let log of syncLogs">
+                                    <td>{{ log.createdAt | date: 'yyyy-MM-dd HH:mm' }}</td>
+                                    <td>{{ providerText(log.provider) }}</td>
+                                    <td>{{ log.operation }}</td>
+                                    <td>{{ syncStatusText(log.status) }}</td>
+                                    <td>{{ log.message }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="activeTab === 'orders'">
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Incoming Aggregator Orders' | localize }}</div>
+                        <div class="card-toolbar restaurant-actionbar">
+                            <input class="form-control w-150px" type="date" [(ngModel)]="filter.fromDate" />
+                            <input class="form-control w-150px" type="date" [(ngModel)]="filter.toDate" />
+                            <button class="btn btn-sm btn-light-primary" [buttonBusy]="loading" (click)="refresh()">
+                                <i class="fa fa-filter"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0 restaurant-table-wrap">
+                        <table class="restaurant-table" *ngIf="orders.length; else noOrders">
+                            <thead>
+                                <tr>
+                                    <th>{{ 'Received' | localize }}</th>
+                                    <th>{{ 'Provider' | localize }}</th>
+                                    <th>{{ 'External Order' | localize }}</th>
+                                    <th>{{ 'Customer' | localize }}</th>
+                                    <th class="text-end">{{ 'Expected' | localize }}</th>
+                                    <th>{{ 'Status' | localize }}</th>
+                                    <th>{{ 'Accept As' | localize }}</th>
+                                    <th class="text-end"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let order of orders">
+                                    <td>{{ order.receivedAt | date: 'yyyy-MM-dd HH:mm' }}</td>
+                                    <td>{{ providerText(order.provider) }}</td>
+                                    <td class="fw-bold">{{ order.externalOrderId }}</td>
+                                    <td>
+                                        <div>{{ order.customerName || '-' }}</div>
+                                        <div class="restaurant-muted">{{ order.customerPhoneNo || '-' }}</div>
+                                    </td>
+                                    <td class="text-end">{{ order.expectedAmount | number: '1.2-2' }}</td>
+                                    <td>
+                                        <span class="restaurant-status" [ngClass]="statusClass(order.status)">
+                                            {{ orderStatusText(order.status) }}
+                                        </span>
+                                        <div class="restaurant-muted" *ngIf="order.orderNo">{{ order.orderNo }}</div>
+                                    </td>
+                                    <td>
+                                        <div class="restaurant-actionbar">
+                                            <ng-select
+                                                class="w-225px"
+                                                [items]="menuItems"
+                                                bindLabel="displayName"
+                                                bindValue="id"
+                                                [(ngModel)]="quickAcceptForms[order.id].menuItemId"
+                                                appendTo="body"
+                                            ></ng-select>
+                                            <input
+                                                class="form-control w-75px"
+                                                type="number"
+                                                [(ngModel)]="quickAcceptForms[order.id].qty"
+                                            />
+                                        </div>
+                                    </td>
+                                    <td class="text-end">
+                                        <button
+                                            class="btn btn-xs btn-light-success me-1"
+                                            [disabled]="order.status !== 0"
+                                            [buttonBusy]="saving"
+                                            (click)="acceptOrder(order)"
+                                        >
+                                            <i class="fa fa-check"></i>
+                                        </button>
+                                        <button
+                                            class="btn btn-xs btn-light-warning me-1"
+                                            [disabled]="order.status !== 0"
+                                            (click)="updateOrder(order, 2)"
+                                        >
+                                            <i class="fa fa-ban"></i>
+                                        </button>
+                                        <button
+                                            class="btn btn-xs btn-light-danger"
+                                            [disabled]="order.status === 3"
+                                            (click)="updateOrder(order, 3)"
+                                        >
+                                            <i class="fa fa-xmark"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <ng-template #noOrders>
+                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                        </ng-template>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="activeTab === 'payouts'">
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Import Payout' | localize }}</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">{{ 'Provider' | localize }}</label>
+                                <select class="form-select" [(ngModel)]="payoutForm.provider">
+                                    <option *ngFor="let option of providerOptions" [ngValue]="option.value">
+                                        {{ option.label }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="required form-label">{{ 'Payout Id' | localize }}</label>
+                                <input class="form-control" [(ngModel)]="payoutForm.externalPayoutId" />
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">{{ 'From' | localize }}</label>
+                                <input class="form-control" type="date" [(ngModel)]="payoutForm.periodFrom" />
+                            </div>
+                            <div class="col-md-2 mb-3">
+                                <label class="form-label">{{ 'To' | localize }}</label>
+                                <input class="form-control" type="date" [(ngModel)]="payoutForm.periodTo" />
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">{{ 'Notes' | localize }}</label>
+                                <input class="form-control" [(ngModel)]="payoutForm.notes" />
+                            </div>
+                        </div>
+
+                        <div class="restaurant-table-wrap">
+                            <table class="restaurant-table">
+                                <thead>
+                                    <tr>
+                                        <th>{{ 'External Order' | localize }}</th>
+                                        <th>{{ 'Expected' | localize }}</th>
+                                        <th>{{ 'Commission' | localize }}</th>
+                                        <th>{{ 'Discount' | localize }}</th>
+                                        <th>{{ 'Delivery Fee' | localize }}</th>
+                                        <th>{{ 'Paid' | localize }}</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let line of payoutForm.lines; let i = index">
+                                        <td><input class="form-control" [(ngModel)]="line.externalOrderId" /></td>
+                                        <td><input class="form-control" type="number" [(ngModel)]="line.expectedAmount" /></td>
+                                        <td><input class="form-control" type="number" [(ngModel)]="line.commissionAmount" /></td>
+                                        <td>
+                                            <input
+                                                class="form-control"
+                                                type="number"
+                                                [(ngModel)]="line.restaurantDiscountAmount"
+                                            />
+                                        </td>
+                                        <td><input class="form-control" type="number" [(ngModel)]="line.deliveryFeeAmount" /></td>
+                                        <td><input class="form-control" type="number" [(ngModel)]="line.paidAmount" /></td>
+                                        <td class="text-end">
+                                            <button class="btn btn-xs btn-light-danger" (click)="removePayoutLine(i)">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="restaurant-actionbar restaurant-actionbar-end mt-4">
+                            <button class="btn btn-sm btn-light-primary" (click)="addPayoutLine()">
+                                <i class="fa fa-plus"></i>
+                                {{ 'Add Line' | localize }}
+                            </button>
+                            <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="importPayout()">
+                                <i class="fa fa-file-import"></i>
+                                {{ 'Import' | localize }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card card-custom gutter-b restaurant-card">
+                    <div class="card-header">
+                        <div class="card-title">{{ 'Payout Reconciliation' | localize }}</div>
+                    </div>
+                    <div class="card-body p-0 restaurant-table-wrap">
+                        <table class="restaurant-table" *ngIf="payouts.length; else noPayouts">
+                            <thead>
+                                <tr>
+                                    <th>{{ 'Payout' | localize }}</th>
+                                    <th>{{ 'Period' | localize }}</th>
+                                    <th class="text-end">{{ 'Gross' | localize }}</th>
+                                    <th class="text-end">{{ 'Commission' | localize }}</th>
+                                    <th class="text-end">{{ 'Net Paid' | localize }}</th>
+                                    <th>{{ 'Lines' | localize }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let payout of payouts">
+                                    <td>
+                                        <div class="fw-bold">{{ payout.externalPayoutId }}</div>
+                                        <div class="restaurant-muted">{{ providerText(payout.provider) }}</div>
+                                    </td>
+                                    <td>
+                                        {{ payout.periodFrom | date: 'yyyy-MM-dd' }} -
+                                        {{ payout.periodTo | date: 'yyyy-MM-dd' }}
+                                    </td>
+                                    <td class="text-end">{{ payout.grossAmount | number: '1.2-2' }}</td>
+                                    <td class="text-end">{{ payout.commissionAmount | number: '1.2-2' }}</td>
+                                    <td class="text-end fw-bold">{{ payout.netPaidAmount | number: '1.2-2' }}</td>
+                                    <td>
+                                        <div class="mb-1" *ngFor="let line of payout.lines || []">
+                                            <span class="fw-bold">{{ line.externalOrderId }}</span>
+                                            <span class="restaurant-status ms-2" [ngClass]="statusClass(line.matchStatus)">
+                                                {{ payoutStatusText(line.matchStatus) }}
+                                            </span>
+                                            <span class="restaurant-muted ms-2">{{ line.matchMessage }}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <ng-template #noPayouts>
+                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                        </ng-template>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>

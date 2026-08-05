@@ -1,0 +1,198 @@
+<!-- Improved Attendance Dashboard UI -->
+<div [@routerTransition]>
+    <div [class]="containerClass">
+        <div class="kt-content">
+            <div class="dashboard-portlet">
+                <header class="dashboard-header d-flex align-items-center justify-content-between">
+                    <div class="dashboard-title">
+                        <h2 class="mb-0">{{ l('AttendanceDashboard') }}</h2>
+                        <p class="text-muted mb-0 small">{{ l('AttendanceDashboardSubtitle') }}</p>
+                    </div>
+                    <div class="dashboard-controls d-flex align-items-center gap-2">
+                        <div class="filter-inline d-flex align-items-center gap-2">
+                            <label class="sr-only" for="dateRangeSelect">{{ l('DateRange') }}</label>
+                            <select
+                                (change)="onDateRangeChange()"
+                                [(ngModel)]="dateRangeType"
+                                aria-label="{{ l('DateRange') }}"
+                                class="form-control form-control-sm"
+                                id="dateRangeSelect"
+                            >
+                                <option value="today">{{ l('Today') }}</option>
+                                <option value="yesterday">{{ l('Yesterday') }}</option>
+                                <option value="thisWeek">{{ l('ThisWeek') }}</option>
+                                <option value="thisMonth">{{ l('ThisMonth') }}</option>
+                                <option value="custom">{{ l('Custom') }}</option>
+                            </select>
+                            @if (dateRangeType === 'custom') {
+                                <div class="d-flex gap-1">
+                                    <ne-datepicker
+                                        (dateInAD)="setCustomDate('start', $event)"
+                                        [date]="$safeNavigationMigration(startDate?.toFormat('yyyy-MM-dd'))"
+                                        dateFormat="yyyy-mm-dd"
+                                        dateIn="AD"
+                                        language="en"
+                                    ></ne-datepicker>
+                                    <ne-datepicker
+                                        (dateInAD)="setCustomDate('end', $event)"
+                                        [date]="$safeNavigationMigration(endDate?.toFormat('yyyy-MM-dd'))"
+                                        dateFormat="yyyy-mm-dd"
+                                        dateIn="AD"
+                                        language="en"
+                                    ></ne-datepicker>
+                                </div>
+                            }
+                        </div>
+                        <button
+                            (click)="refreshData()"
+                            [disabled]="loading"
+                            class="btn btn-primary btn-sm"
+                            title="{{ l('Refresh') }}"
+                            type="button"
+                        >
+                            <i [class.fa-spin]="loading" aria-hidden="true" class="fa fa-refresh"></i>
+                            <span class="visually-hidden">{{ l('Refresh') }}</span>
+                        </button>
+                    </div>
+                </header>
+                <div class="dashboard-body">
+                    <!-- Stats cards -->
+                    <section aria-live="polite" class="stats-grid mb-3">
+                        @if (!loading) {
+                            @if (dashboardData) {
+                                <div class="stat-card">
+                                    <div class="stat-icon bg-soft-blue"><i class="fa fa-users"></i></div>
+                                    <div class="stat-body">
+                                        <div class="stat-number">
+                                            {{ dashboardData.statistics?.totalStudents || 0 }}
+                                        </div>
+                                        <div class="stat-label">{{ l('TotalStudents') }}</div>
+                                    </div>
+                                </div>
+                            }
+                            @if (dashboardData) {
+                                <div class="stat-card">
+                                    <div class="stat-icon bg-soft-green"><i class="fa fa-check"></i></div>
+                                    <div class="stat-body">
+                                        <div class="stat-number">{{ dashboardData.statistics?.presentToday || 0 }}</div>
+                                        <div class="stat-label">{{ l('PresentToday') }}</div>
+                                    </div>
+                                </div>
+                            }
+                            @if (dashboardData) {
+                                <div class="stat-card">
+                                    <div class="stat-icon bg-soft-red"><i class="fa fa-times"></i></div>
+                                    <div class="stat-body">
+                                        <div class="stat-number">{{ dashboardData.statistics?.absentToday || 0 }}</div>
+                                        <div class="stat-label">{{ l('AbsentToday') }}</div>
+                                    </div>
+                                </div>
+                            }
+                            @if (dashboardData) {
+                                <div class="stat-card">
+                                    <div class="stat-icon bg-soft-indigo"><i class="fa fa-chart-line"></i></div>
+                                    <div class="stat-body">
+                                        <div class="stat-number">
+                                            {{
+                                                $safeNavigationMigration(
+                                                    dashboardData.statistics?.attendancePercentageToday
+                                                ) | number: '1.1-1'
+                                            }}%
+                                        </div>
+                                        <div class="stat-label">{{ l('AttendancePercentageToday') }}</div>
+                                    </div>
+                                </div>
+                            }
+                        } @else {
+                            @for (i of [1, 2, 3, 4]; track i) {
+                                <div class="stat-skel"></div>
+                            }
+                        }
+                    </section>
+                    <!-- Charts -->
+                    <section class="charts-row mb-3">
+                        <div class="chart-main">
+                            <div class="chart-card">
+                                <div class="chart-header">
+                                    <strong>{{ l('MonthlyAttendanceTrend') }}</strong>
+                                </div>
+                                <div [attr.aria-hidden]="loading" class="chart-body">
+                                    @if (!loading) {
+                                        <canvas #attendanceTrendChart></canvas>
+                                    } @else {
+                                        <div class="chart-skel"></div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <aside class="chart-side">
+                            <div class="chart-card">
+                                <div class="chart-header">
+                                    <strong>{{ l('CourseWiseAttendance') }}</strong>
+                                </div>
+                                <div [attr.aria-hidden]="loading" class="chart-body">
+                                    @if (!loading) {
+                                        <canvas #classWiseChart></canvas>
+                                    } @else {
+                                        <div class="chart-skel"></div>
+                                    }
+                                </div>
+                            </div>
+                        </aside>
+                    </section>
+                    <section class="chart-full mb-3">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <strong>{{ l('DailyAttendanceCount') }}</strong>
+                            </div>
+                            <div [attr.aria-hidden]="loading" class="chart-body">
+                                @if (!loading) {
+                                    <canvas #dailyAttendanceChart></canvas>
+                                } @else {
+                                    <div class="chart-skel"></div>
+                                }
+                            </div>
+                        </div>
+                    </section>
+                    <!-- Tables -->
+                    @if (dashboardData?.classSummaries?.length) {
+                        <section class="mb-3">
+                            <div class="table-card">
+                                <div class="table-header">
+                                    <strong>{{ l('CourseWiseSummary') }}</strong>
+                                </div>
+                                <div class="table-body table-fixed-height">
+                                    <ag-grid-angular
+                                        class="ag-theme-balham"
+                                        style="width: 100%; height: 100%; min-height: 320px"
+                                        [columnDefs]="classSummaryColumnDefs"
+                                        [defaultColDef]="defaultColDef"
+                                        [rowData]="dashboardData.classSummaries"
+                                    ></ag-grid-angular>
+                                </div>
+                            </div>
+                        </section>
+                    }
+                    @if (dashboardData?.criticalAlerts?.length) {
+                        <section class="mb-3">
+                            <div class="table-card">
+                                <div class="table-header">
+                                    <strong>{{ l('CriticalAlerts') }}</strong>
+                                </div>
+                                <div class="table-body table-fixed-height">
+                                    <ag-grid-angular
+                                        class="ag-theme-balham"
+                                        style="width: 100%; height: 100%; min-height: 320px"
+                                        [columnDefs]="criticalAlertColumnDefs"
+                                        [defaultColDef]="defaultColDef"
+                                        [rowData]="dashboardData.criticalAlerts"
+                                    ></ag-grid-angular>
+                                </div>
+                            </div>
+                        </section>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

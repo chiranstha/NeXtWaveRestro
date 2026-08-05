@@ -1,0 +1,1155 @@
+<div [@routerTransition] *ngIf="serialNumber === 0" class="sales-invoice-page">
+    <sub-header [description]="" [title]="title | localize">
+        <div class="sales-page-actions" role="actions">
+            <span *ngIf="this.id">
+                <button
+                    class="btn btn-sm btn-light-success fw-bold"
+                    routerLink="/app/main/sales/pdf/3/{{ this.id }}"
+                    tooltip="{{ l('Preview invoice') }}"
+                    type="button"
+                >
+                    <i class="fa-duotone fa-file-spreadsheet ps-1 fs-2">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                        <span class="path4"></span>
+                    </i>
+                </button>
+            </span>
+
+            <button
+                *ngIf="this.id"
+                (click)="clearForm(id)"
+                class="btn btn-sm btn-light-danger fw-bold"
+                tooltip="{{ l('Delete') }}"
+                type="button"
+            >
+                <i class="fa-duotone fa-trash fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                    <span class="path4"></span>
+                </i>
+            </button>
+
+            <button
+                (click)="save()"
+                [buttonBusy]="saving"
+                [disabled]="form.invalid"
+                class="btn btn-sm fw-bold btn-primary"
+                id="save"
+                label="{{ l(this.id ? 'Update' : 'Save') }}"
+                type="submit"
+                tooltip="{{ l(this.id ? 'Update' : 'Save') }} (Alt+S)"
+            >
+                <i class="fa-duotone fa-circle-plus fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l(this.id ? 'Update' : 'Save') }}
+            </button>
+
+            <button
+                (click)="close()"
+                class="btn btn-sm fw-bold btn-light-success"
+                id="cancel"
+                tooltip="{{ l('Cancel') }} (Alt+C)"
+                type="button"
+            >
+                <i class="fa-duotone fa-circle-xmark fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l('Cancel') }}
+            </button>
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b sales-workspace-card">
+            <div class="card-body">
+                <form (keydown.enter)="$event.preventDefault()" [formGroup]="form" autocomplete="off">
+                    <div appCustomEnter class="sales-form-shell">
+                        <!-- Header Information Section -->
+                        <div class="container-fluid sales-header-panel">
+                            <div class="row">
+                                <!-- Left Column -->
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <div class="row">
+                                        <!-- Date-Miti Selection -->
+                                        <div class="col-lg-6 col-md-6 col-sm-6">
+                                            <label class="required form-label">{{ l('Date-Miti') }}</label>
+                                            <ne-datepicker
+                                                [dateFormat]="'yyyy/MM/dd'"
+                                                [formControl]="form.controls['dateMiti']"
+                                                id="dateMiti"
+                                                language="en"
+                                            ></ne-datepicker>
+                                            <div
+                                                *ngIf="
+                                                    form.get('dateMiti').invalid &&
+                                                    (form.get('dateMiti').dirty || form.get('dateMiti').touched)
+                                                "
+                                            >
+                                                <div class="alert alert-danger alert-height mt-1">
+                                                    <div class="alert-div">DateMiti is required!</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Invoice Number -->
+                                        <div class="col-lg-6 col-md-6 col-sm-6 mb-2">
+                                            <div class="mb-1">
+                                                <label class="required form-label" for="voucherNo">
+                                                    {{ l('Invoice#') }}
+                                                </label>
+                                                <input
+                                                    [readonly]="this.automaticInput"
+                                                    class="form-control"
+                                                    formControlName="voucherNo"
+                                                    id="voucherNo"
+                                                    placeholder=""
+                                                    type="text"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <!-- Cash/Party Selection with Add Button -->
+                                        <div class="col-lg-5 col-md-5 col-sm-5 mb-2">
+                                            <div class="mb-1">
+                                                <label #accLedger class="required form-label">
+                                                    {{ l('Cash / Party') }}
+                                                </label>
+                                                <ng-select
+                                                    #ledger
+                                                    (change)="byCash($event)"
+                                                    (keyup)="fromCashParty($event)"
+                                                    [items]="allAccountLedger"
+                                                    [searchFn]="customSearchFn"
+                                                    bindLabel="displayName"
+                                                    bindValue="id"
+                                                    formControlName="ledgerId"
+                                                    placeholder="Select an item (Alt+L)"
+                                                >
+                                                    <ng-template let-item="item" let-search="searchTerm" ng-option-tmp>
+                                                        <div class="main-item">
+                                                            <span>Name:</span>
+                                                            <span [ngOptionHighlight]="search" class="fw-bold">
+                                                                {{ item.displayName }}
+                                                            </span>
+                                                        </div>
+                                                        <div *ngIf="item.mobileNo || item.panNo">
+                                                            <small class="secondary-item">
+                                                                <b>Mobile :</b>
+                                                                {{ item.mobileNo }}
+                                                            </small>
+                                                            &nbsp;&nbsp;
+                                                            <small>
+                                                                <b>PAN :</b>
+                                                                {{ item.panNo }}
+                                                            </small>
+                                                        </div>
+                                                    </ng-template>
+                                                </ng-select>
+                                                <div
+                                                    *ngIf="
+                                                        form.get('ledgerId').invalid &&
+                                                        (form.get('ledgerId').dirty || form.get('ledgerId').touched)
+                                                    "
+                                                >
+                                                    <div class="alert alert-danger alert-height mt-1">
+                                                        <div class="alert-div">Cash/party is required!</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Add Customer Button -->
+                                        <div class="col-lg-1 col-md-1 col-sm-1 mt-8">
+                                            <button
+                                                (click)="openLedgerDialog(customerLedgerInfo)"
+                                                class="btn btn-sm btn-outline btn-outline-success btn-active-light-success customer-add-btn"
+                                                tooltip="{{ l('Create Customer') }}"
+                                                type="button"
+                                            >
+                                                <i class="fa-duotone fa-plus"></i>
+                                            </button>
+                                            <!-- Customer Add Modal Template -->
+                                            <ng-template #customerLedgerInfo>
+                                                <div class="modal-header">
+                                                    <h1>Create Customer</h1>
+                                                    <button
+                                                        (click)="modalRef?.hide()"
+                                                        aria-label="Close"
+                                                        class="btn-close close pull-right"
+                                                        type="button"
+                                                    >
+                                                        <span aria-hidden="true" class="visually-hidden">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body row">
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 mb-1">
+                                                        <label class="form-label">Name</label>
+                                                        <input
+                                                            class="form-control"
+                                                            formControlName="customerName"
+                                                            type="text"
+                                                        />
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 mb-1">
+                                                        <label class="form-label">PAN/VAT</label>
+                                                        <input
+                                                            class="form-control"
+                                                            formControlName="customerVatNo"
+                                                            type="text"
+                                                        />
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 mb-1">
+                                                        <label class="form-label">Phone No.</label>
+                                                        <input
+                                                            class="form-control"
+                                                            formControlName="customerPhoneNo"
+                                                            type="text"
+                                                        />
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-sm-6 mb-1">
+                                                        <label class="form-label">Address</label>
+                                                        <input
+                                                            class="form-control"
+                                                            formControlName="customerAddress"
+                                                            type="text"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button
+                                                        (click)="modalRef?.hide()"
+                                                        class="btn btn-sm btn-light-success"
+                                                    >
+                                                        Save
+                                                    </button>
+                                                </div>
+                                            </ng-template>
+                                        </div>
+
+                                        <!-- Party Address -->
+                                        <div class="col-lg-6 col-md-6 col-sm-6 mb-2">
+                                            <div class="mb-1">
+                                                <label class="form-label" for="customerAddress">
+                                                    {{ l('Party Address') }}
+                                                </label>
+                                                <input
+                                                    #party
+                                                    (keyup)="fromPartyAddress($event)"
+                                                    class="form-control"
+                                                    formControlName="customerAddress"
+                                                    id="customerAddress"
+                                                    placeholder=""
+                                                    type="text"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <!-- Sales Additional (conditionally displayed) -->
+                                        <div
+                                            #tothetop
+                                            *ngIf="this.showSalesAdditional"
+                                            class="col-lg-6 col-md-6 col-sm-6 mb-2"
+                                        >
+                                            <div class="mb-1">
+                                                <label class="form-label" for="salesAdditionalId">
+                                                    {{
+                                                        l(
+                                                            'Sales
+                                                    Additional'
+                                                        )
+                                                    }}
+                                                </label>
+                                                <ng-select
+                                                    #showSalesAdditional
+                                                    [items]="allSalesAdditional"
+                                                    appendTo="body"
+                                                    bindLabel="displayName"
+                                                    bindValue="id"
+                                                    formControlName="salesAdditionalId"
+                                                    id="salesAdditionalId"
+                                                    placeholder="Select an item"
+                                                ></ng-select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column -->
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <div class="row">
+                                        <!-- Against Mode -->
+                                        <div class="col-lg-6 col-md-6 col-sm-6 mb-2">
+                                            <div class="mb-1">
+                                                <label class="form-label" for="salesModeType">
+                                                    {{ l('Against Mode') }}
+                                                </label>
+                                                <ng-select
+                                                    #mode
+                                                    (change)="againstModeChange($event.id)"
+                                                    (keyup)="fromAgainstsMode($event)"
+                                                    [items]="salesModeType"
+                                                    [virtualScroll]="true"
+                                                    [clearable]="false"
+                                                    appendTo="body"
+                                                    bindLabel="displayName"
+                                                    bindValue="id"
+                                                    formControlName="salesModeType"
+                                                    id="salesModeType"
+                                                    placeholder="Select an item"
+                                                ></ng-select>
+                                                <div
+                                                    *ngIf="
+                                                        form.get('salesModeType').invalid &&
+                                                        (form.get('salesModeType').dirty ||
+                                                            form.get('salesModeType').touched)
+                                                    "
+                                                >
+                                                    <div class="alert alert-danger alert-height mt-1">
+                                                        <div class="alert-div">Against Mode is required!</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Voucher No (conditionally displayed) -->
+                                        <div
+                                            *ngIf="form.value.salesModeType != 0"
+                                            class="col-lg-6 col-md-6 col-sm-6 mb-2"
+                                        >
+                                            <div class="mb-1">
+                                                <label
+                                                    *ngIf="form.value.salesModeType == 1"
+                                                    class="form-label"
+                                                    for="Order"
+                                                >
+                                                    {{ l('Order Voucher No') }}
+                                                </label>
+                                                <label
+                                                    *ngIf="form.value.salesModeType == 3"
+                                                    class="form-label"
+                                                    for="Order"
+                                                >
+                                                    {{ l('Quotation Voucher No') }}
+                                                </label>
+                                                <label
+                                                    *ngIf="form.value.salesModeType == 2"
+                                                    class="form-label"
+                                                    for="Order"
+                                                >
+                                                    {{ l('DeliveryNote Voucher No') }}
+                                                </label>
+                                                <label
+                                                    *ngIf="form.value.salesModeType == 4"
+                                                    class="form-label"
+                                                    for="Order"
+                                                >
+                                                    {{ l('Service Delivery No') }}
+                                                </label>
+
+                                                <!-- When editing -->
+                                                <div *ngIf="this.id">
+                                                    <label class="form-label" for="Order">{{ l('Voucher No') }}</label>
+                                                    <input
+                                                        class="form-control"
+                                                        formControlName="againstVoucherNo"
+                                                        readonly
+                                                        type="text"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Credit Period -->
+                                        <div class="col-lg-6 col-md-6 col-sm-6 mb-2">
+                                            <div class="mb-1">
+                                                <label class="form-label" for="creditPeriod">
+                                                    {{ l('Credit Period') }}
+                                                </label>
+                                                <input
+                                                    #credit
+                                                    (keyup)="fromCreditPeriod($event)"
+                                                    [ngClass]="{
+                                                        'is-danger':
+                                                            form.get('creditPeriod').invalid &&
+                                                            (form.get('creditPeriod').touched ||
+                                                                form.get('creditPeriod').dirty),
+                                                        'is-success': !form.get('creditPeriod').invalid,
+                                                    }"
+                                                    class="form-control"
+                                                    formControlName="creditPeriod"
+                                                    min="0"
+                                                    placeholder=""
+                                                    type="number"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <!-- Payment Method -->
+                                        <div class="col-lg-6 col-md-6 col-sm-6 mb-2">
+                                            <div class="mb-1">
+                                                <label class="required form-label" for="paymentMethod">
+                                                    {{
+                                                        l(
+                                                            'Payment
+                                                    Method'
+                                                        )
+                                                    }}
+                                                </label>
+                                                <ng-select
+                                                    #pmethode
+                                                    (change)="paymentMethod($event.id)"
+                                                    (keyup)="fromPmethode($event)"
+                                                    [items]="paymentType"
+                                                    appendTo="body"
+                                                    bindLabel="displayName"
+                                                    bindValue="id"
+                                                    formControlName="paymentMethod"
+                                                    id="paymentMethod"
+                                                    placeholder="Select an item"
+                                                    required
+                                                ></ng-select>
+                                            </div>
+                                            <div
+                                                *ngIf="
+                                                    form.get('paymentMethod').invalid &&
+                                                    (form.get('paymentMethod').dirty ||
+                                                        form.get('paymentMethod').touched)
+                                                "
+                                            >
+                                                <div class="alert alert-danger alert-height mt-1">
+                                                    <div class="alert-div">Payment Method is required!</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Bank A/C (conditionally displayed) -->
+                                        <div *ngIf="showBankAcc" class="col-lg-6 col-md-6 col-sm-6 mb-2">
+                                            <div class="mb-1">
+                                                <label class="form-label" for="paymentMethodLedgerId">
+                                                    {{ l('Bank A/C') }}
+                                                </label>
+                                                <ng-select
+                                                    #bank
+                                                    (keyup)="fromBankAc($event)"
+                                                    [items]="allBanks"
+                                                    appendTo="body"
+                                                    bindLabel="displayName"
+                                                    bindValue="id"
+                                                    formControlName="paymentMethodLedgerId"
+                                                    id="paymentMethodLedgerId"
+                                                    placeholder="Select an item"
+                                                    required
+                                                ></ng-select>
+                                            </div>
+                                        </div>
+
+                                        <!-- Sales A/C -->
+                                        <div class="col-lg-6 col-md-6 col-sm-6 mb-2">
+                                            <div class="mb-1">
+                                                <label class="required form-label" for="salesAccountId">
+                                                    {{
+                                                        l(
+                                                            'Sales
+                                                    A/C'
+                                                        )
+                                                    }}
+                                                </label>
+                                                <ng-select
+                                                    #sales
+                                                    (keyup)="fromSalesAC($event)"
+                                                    [items]="this.salesAccount"
+                                                    appendTo="body"
+                                                    bindLabel="displayName"
+                                                    bindValue="id"
+                                                    formControlName="salesAccountId"
+                                                    id="salesAccountId"
+                                                    placeholder="Select an item"
+                                                    required
+                                                ></ng-select>
+                                                <div
+                                                    *ngIf="
+                                                        form.get('salesAccountId').invalid &&
+                                                        (form.get('salesAccountId').dirty ||
+                                                            form.get('salesAccountId').touched)
+                                                    "
+                                                >
+                                                    <div class="alert alert-danger alert-height mt-1">
+                                                        <div class="alert-div">Sales A/C is required!</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sales Invoice Details Section -->
+                        <div class="col-12 sales-details-section">
+                            <div class="card shadow-sm mb-8 mt-3 sales-details-card">
+                                <div class="card-header d-flex justify-content-between align-items-center sales-details-card__header">
+                                    <h3 class="card-title fw-bold mb-0">
+                                        <i class="fa-duotone fa-receipt me-2"></i>
+                                        {{ l('Sales Invoice Details') }}
+                                    </h3>
+
+                                    <!-- Product Stock Display -->
+                                    <div>
+                                        <div class="card-toolbar">
+                                            <h4 class="stock-qty mb-0">
+                                                {{ productNameSelected }} Qty:
+                                                <span
+                                                    [ngStyle]="{
+                                                        color: productStockQty < 1 ? '#ff0909b5' : '#0a6ed1b0',
+                                                    }"
+                                                >
+                                                    {{ productStockQty }}
+                                                </span>
+                                            </h4>
+                                        </div>
+                                    </div>
+
+                                    <!-- Add Details Button -->
+                                    <div class="card-toolbar">
+                                        <button
+                                            (click)="keyEventsDetail()"
+                                            [disabled]="salesDetails.invalid"
+                                            class="btn btn-sm btn-outline btn-outline-success btn-active-light-success sales-add-line-btn"
+                                            type="button"
+                                        >
+                                            <i class="fa-duotone fa-grid-2-plus fs-2">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                                <span class="path3"></span>
+                                            </i>
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Sales Details Table -->
+                                <div class="table-responsive overflow-x-auto h-350px sales-line-table-wrap">
+                                    <table
+                                        class="table table-bordered table-sm table-hover width-100 sales-line-table"
+                                        formArrayName="salesDetails"
+                                    >
+                                        <thead class="bg-tableHead">
+                                            <tr class="text-center">
+                                                <th class="ps-3">S.N.</th>
+                                                <th>PRODUCT NAME</th>
+                                                <th class="min-w-100px">QTY</th>
+                                                <th class="min-w-100px">UNIT</th>
+                                                <th class="min-w-100px">RATE</th>
+                                                <th>GROSS AMT</th>
+                                                <th *ngIf="this.discountPercent">DISCOUNT%</th>
+                                                <th *ngIf="this.discountAmount">DISCOUNT</th>
+                                                <th>NET AMOUNT</th>
+                                                <th>TAX</th>
+                                                <th>TAX AMOUNT</th>
+                                                <th>TOTAL AMT</th>
+                                                <th class="pe-2">REMOVE</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let abcd of getDetail(form); let i = index" [formGroupName]="i">
+                                                <!-- S.N. -->
+                                                <td class="sn_css text-center text-left">{{ i + 1 }}</td>
+
+                                                <!-- Product Selection -->
+                                                <td appPadding>
+                                                    <div class="min-w-250px">
+                                                        <ng-select
+                                                            #productKey
+                                                            (change)="onGetProduct($event.productId, abcd, i)"
+                                                            (keyup)="keyEventProduct($event, i, abcd)"
+                                                            [items]="allProducts"
+                                                            accesskey="p"
+                                                            appendTo="body"
+                                                            bindLabel="name"
+                                                            bindValue="productId"
+                                                            formControlName="productId"
+                                                            id="productId"
+                                                            name="productId"
+                                                            placeholder="Select an item (Alt+P)"
+                                                        ></ng-select>
+                                                        <div
+                                                            *ngIf="
+                                                                abcd.get('productId').invalid &&
+                                                                (abcd.get('productId').dirty ||
+                                                                    abcd.get('productId').touched)
+                                                            "
+                                                        >
+                                                            <div class="alert alert-danger alert-height mt-1">
+                                                                <div class="alert-div">Product is required!</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                                <!-- Quantity -->
+                                                <td appPadding>
+                                                    <div class="min-w-100px">
+                                                        <input
+                                                            #qty
+                                                            (keyup)="
+                                                                calculateTotalByInput(abcd, 'qty');
+                                                                changeInQty(abcd);
+                                                                fromQty($event, i)
+                                                            "
+                                                            [ngClass]="{
+                                                                blink: abcd.get('qty').invalid,
+                                                                grid__input: abcd.get('qty').valid,
+                                                                'is-danger':
+                                                                    abcd.get('qty').invalid &&
+                                                                    (abcd.get('qty').dirty || abcd.get('qty').touched),
+                                                                'is-success': !abcd.get('qty').invalid,
+                                                            }"
+                                                            class="form-control"
+                                                            formControlName="qty"
+                                                            min="0.0001"
+                                                            type="number"
+                                                        />
+                                                    </div>
+                                                </td>
+
+                                                <!-- Unit -->
+                                                <td appPadding>
+                                                    <div class="min-w-100px">
+                                                        <ng-select
+                                                            [items]="
+                                                                $safeNavigationMigration(abcd.get('unitsList')?.value)
+                                                            "
+                                                            bindLabel="unitName"
+                                                            bindValue="unitId"
+                                                            formControlName="unitId"
+                                                            id="unitId"
+                                                            name="unitName"
+                                                            placeholder="Select an item"
+                                                        ></ng-select>
+                                                        <div
+                                                            *ngIf="
+                                                                abcd.get('unitId').invalid &&
+                                                                (abcd.get('unitId').dirty || abcd.get('unitId').touched)
+                                                            "
+                                                        >
+                                                            <div class="alert alert-danger alert-height mt-1">
+                                                                <div class="alert-div">Required!</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <!-- Rate -->
+                                                <td appPadding>
+                                                    <div class="min-w-100px">
+                                                        <input
+                                                            #rate
+                                                            (keyup)="
+                                                                calculateTotalByInput(abcd, 'rate'); fromRate($event, i)
+                                                            "
+                                                            [ngClass]="{
+                                                                'is-danger':
+                                                                    abcd.get('rate').invalid &&
+                                                                    (abcd.get('rate').dirty ||
+                                                                        abcd.get('rate').touched),
+                                                                'is-success': !abcd.get('rate').invalid,
+                                                            }"
+                                                            class="form-control"
+                                                            formControlName="rate"
+                                                            min="0"
+                                                            type="number"
+                                                        />
+                                                    </div>
+                                                </td>
+
+                                                <!-- Gross Amount -->
+                                                <td appPadding>
+                                                    <div class="min-w-100px">
+                                                        <input
+                                                            [ngClass]="{
+                                                                'is-danger':
+                                                                    abcd.get('grossAmount').invalid &&
+                                                                    (abcd.get('grossAmount').dirty ||
+                                                                        abcd.get('grossAmount').touched),
+                                                                'is-success': !abcd.get('grossAmount').invalid,
+                                                            }"
+                                                            class="form-control"
+                                                            formControlName="grossAmount"
+                                                            readonly
+                                                            type="number"
+                                                        />
+                                                    </div>
+                                                </td>
+
+                                                <!-- Discount Percent (conditionally displayed) -->
+                                                <td *ngIf="this.discountPercent" appPadding>
+                                                    <div class="min-w-100px">
+                                                        <input
+                                                            #disper
+                                                            (keyup)="
+                                                                calculateTotalByInput(abcd, 'discountPer');
+                                                                fromDisPercent($event, i)
+                                                            "
+                                                            [ngClass]="{
+                                                                'is-danger':
+                                                                    abcd.get('discountPer').invalid &&
+                                                                    (abcd.get('discountPer').dirty ||
+                                                                        abcd.get('discountPer').touched),
+                                                                'is-success': !abcd.get('discountPer').invalid,
+                                                            }"
+                                                            class="form-control"
+                                                            formControlName="discountPer"
+                                                            max="100"
+                                                            min="0"
+                                                            type="number"
+                                                        />
+                                                    </div>
+                                                </td>
+
+                                                <!-- Discount Amount (conditionally displayed) -->
+                                                <td *ngIf="this.discountAmount" appPadding>
+                                                    <div class="min-w-100px">
+                                                        <input
+                                                            #disAmt
+                                                            (keyup)="
+                                                                calculateTotalByInput(abcd, 'discount');
+                                                                fromDisAmt($event, i)
+                                                            "
+                                                            [ngClass]="{
+                                                                'is-danger':
+                                                                    abcd.get('discount').invalid &&
+                                                                    (abcd.get('discount').dirty ||
+                                                                        abcd.get('discount').touched),
+                                                                'is-success': !abcd.get('discount').invalid,
+                                                            }"
+                                                            class="form-control"
+                                                            formControlName="discount"
+                                                            type="number"
+                                                        />
+                                                    </div>
+                                                </td>
+
+                                                <!-- Net Amount -->
+                                                <td appPadding>
+                                                    <div class="min-w-100px">
+                                                        <input
+                                                            [ngClass]="{
+                                                                'is-danger':
+                                                                    abcd.get('netAmount').invalid &&
+                                                                    (abcd.get('netAmount').dirty ||
+                                                                        abcd.get('netAmount').touched),
+                                                                'is-success': !abcd.get('netAmount').invalid,
+                                                            }"
+                                                            class="form-control"
+                                                            formControlName="netAmount"
+                                                            readonly
+                                                            type="number"
+                                                        />
+                                                    </div>
+                                                </td>
+
+                                                <!-- Tax -->
+                                                <td appPadding>
+                                                    <div class="min-w-100px">
+                                                        <ng-select
+                                                            #tax
+                                                            (change)="calculateTotalByInput(abcd, 'taxId')"
+                                                            (click)="calculateTotalByInput(abcd, 'taxId')"
+                                                            (keyup)="fromTax($event, i)"
+                                                            [items]="allTax"
+                                                            appendTo="body"
+                                                            bindLabel="name"
+                                                            bindValue="id"
+                                                            formControlName="taxId"
+                                                            id="taxId"
+                                                            name="taxId"
+                                                            placeholder="Select an item"
+                                                        ></ng-select>
+                                                        <div
+                                                            *ngIf="
+                                                                abcd.get('taxId').invalid &&
+                                                                (abcd.get('taxId').dirty || abcd.get('taxId').touched)
+                                                            "
+                                                        >
+                                                            <div class="alert alert-danger alert-height mt-1">
+                                                                <div class="alert-div">Required!</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                                <!-- Tax Amount -->
+                                                <td appPadding>
+                                                    <div class="min-w-100px">
+                                                        <input
+                                                            [ngClass]="{
+                                                                'is-danger':
+                                                                    abcd.get('taxAmount').invalid &&
+                                                                    (abcd.get('taxAmount').dirty ||
+                                                                        abcd.get('taxAmount').touched),
+                                                                'is-success': !abcd.get('taxAmount').invalid,
+                                                            }"
+                                                            class="form-control"
+                                                            formControlName="taxAmount"
+                                                            readonly
+                                                            type="number"
+                                                        />
+                                                    </div>
+                                                </td>
+
+                                                <!-- Total Amount -->
+                                                <td appPadding>
+                                                    <div class="min-w-100px">
+                                                        <input
+                                                            #total
+                                                            (keyup)="
+                                                                calculateTotalByInput(abcd, 'totalamt');
+                                                                addReceiptDetails($event)
+                                                            "
+                                                            [ngClass]="{
+                                                                'is-danger':
+                                                                    abcd.get('amount').invalid &&
+                                                                    (abcd.get('amount').dirty ||
+                                                                        abcd.get('amount').touched),
+                                                                'is-success': !abcd.get('amount').invalid,
+                                                            }"
+                                                            class="form-control"
+                                                            formControlName="amount"
+                                                            type="number"
+                                                        />
+                                                    </div>
+                                                </td>
+
+                                                <!-- Remove Button -->
+                                                <td appPadding class="text-center text-left">
+                                                    <div
+                                                        (click)="removePurchaseDetailForm(i, form)"
+                                                        class="btn btn-sm btn-icon btn-light-danger remove-line-btn"
+                                                        tooltip="{{ l('Remove') }}"
+                                                    >
+                                                        <i class="fa-duotone fa-trash cursor-pointer"></i>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- File Upload Section -->
+                            <div class="mt-3">
+                                <!-- Expand/Collapse Control -->
+                                <div class="expand-upload">
+                                    <app-uploader-expand (filterEvent)="openExpand($event)"></app-uploader-expand>
+                                </div>
+
+                                <!-- Upload Content (conditionally displayed) -->
+                                <div *ngIf="expand" class="card-upload">
+                                    <div class="row">
+                                        <!-- Upload Area -->
+                                        <div class="image-upload text-center col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                            <form class="image-upload">
+                                                <label for="file-input">
+                                                    <i class="pi pi-cloud-upload upload-icon"></i>
+                                                </label>
+                                                <input
+                                                    #fileInput
+                                                    (change)="onSingleImage($event)"
+                                                    id="file-input"
+                                                    multiple
+                                                    type="file"
+                                                />
+                                                <h2>Upload File</h2>
+                                            </form>
+                                        </div>
+
+                                        <!-- Upload List -->
+                                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr class="bg-tableHead h-30px text-center">
+                                                        <th>S.N.</th>
+                                                        <th>File Name</th>
+                                                        <th>File Type</th>
+                                                        <th>File</th>
+                                                        <th>Delete</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let file of documents; let i = index">
+                                                        <td class="text-center text-left upload-td" scope="row">
+                                                            {{ i + 1 }}
+                                                        </td>
+                                                        <td class="upload-td">
+                                                            <span class="filename">{{ file.fileName }}</span>
+                                                        </td>
+                                                        <td class="upload-td">
+                                                            <span>{{ file.fileType }}</span>
+                                                        </td>
+                                                        <td class="text-center text-left upload-td">
+                                                            <button (click)="getImages(file.id)" class="open_button">
+                                                                <span class="fs-xs">Open</span>
+                                                            </button>
+                                                        </td>
+                                                        <td class="text-center text-left upload-td">
+                                                            <button (click)="deleteFile(file.id)" class="open_button">
+                                                                <span class="fs-xs">Delete</span>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Image/PDF Preview Modal -->
+                            <div>
+                                <ng-template #template>
+                                    <div class="modal-header">
+                                        <button
+                                            (click)="modalRef?.hide()"
+                                            aria-label="Close"
+                                            class="btn-close close pull-right"
+                                            type="button"
+                                        >
+                                            <span aria-hidden="true" class="visually-hidden">&times;</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="modal-body width-50vw image-view">
+                                        <div *ngIf="imageView" class="card parent mb-5px">
+                                            <div class="card">
+                                                <img *ngIf="imageDocs" [src]="imageDocs" alt="first image" />
+                                            </div>
+                                        </div>
+                                        <div *ngIf="pdfView">
+                                            <pdf-viewer *ngIf="pdfDocs" [pdfdata]="pdfDocs"></pdf-viewer>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </div>
+
+                            <!-- Footer Information Section -->
+                            <div class="row sales-footer-grid">
+                                <!-- Left Column -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <div class="sales-notes-panel">
+                                    <div class="row">
+                                        <!-- LR No -->
+                                        <div class="col-md-6 col-xl-6 col-xs-12 col-sm-12 mb-4">
+                                            <div class="mb-1">
+                                                <label class="form-label" for="lrNo">{{ l('LR No.') }}</label>
+                                                <input
+                                                    #lrno
+                                                    (keyup)="fronLrNo($event)"
+                                                    class="form-control"
+                                                    formControlName="lrNo"
+                                                    id="lrNo"
+                                                    placeholder="Vechile No"
+                                                    type="text"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <!-- Performa Invoice -->
+                                        <div class="col-md-6 col-xl-6 col-xs-12 col-sm-12 mb-4">
+                                            <div class="mb-1">
+                                                <label class="form-label">{{ l('Performa Invoice') }}</label>
+                                                <input
+                                                    class="form-control"
+                                                    formControlName="piNumber"
+                                                    placeholder="Performa Invoice number"
+                                                    type="text"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <!-- Description -->
+                                        <div class="col-lg-12 col-xl-12 col-xs-12 col-sm-12 mb-4">
+                                            <div class="mb-1">
+                                                <label class="form-label" for="narration">{{ l('Description') }}</label>
+                                                <textarea
+                                                    #desc
+                                                    (keyup)="checkSave($event)"
+                                                    class="form-control"
+                                                    formControlName="description"
+                                                    id="narration"
+                                                    maxlength="400"
+                                                    minlength="0"
+                                                    placeholder=""
+                                                    type="text"
+                                                ></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column (Totals) -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <div class="row bg-deepgray totals-card">
+                                        <div class="col-12">
+                                            <div class="totals-card__header">
+                                                <div>
+                                                    <div class="totals-card__eyebrow">{{ l('Invoice Summary') }}</div>
+                                                    <div class="totals-card__hint">
+                                                        <i class="fa-duotone fa-circle-info me-1"></i>
+                                                        {{ l('Press Alt+F12 to recalculate totals') }}
+                                                    </div>
+                                                </div>
+                                                <div class="totals-card__grand">
+                                                    <span>{{ l('Grand Total') }}</span>
+                                                    <strong>{{ form.get('grandTotal')?.value || 0 }}</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <ng-container>
+                                            <!-- Gross Amount -->
+                                            <div class="col-lg-6 col-md-6 col-sm-6 mb-2">
+                                                <div class="mb-1">
+                                                    <label class="form-label" for="totalAmount">
+                                                        {{ l('Gross Amount') }}
+                                                    </label>
+                                                    <input
+                                                        class="form-control"
+                                                        formControlName="totalAmount"
+                                                        id="totalAmount"
+                                                        placeholder=""
+                                                        readonly
+                                                        required
+                                                        type="number"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <!-- Bill Discount -->
+                                            <div class="col-lg-6 col-md-6 col-sm-6 mb-2">
+                                                <div class="mb-1">
+                                                    <label class="form-label" for="billDiscount">
+                                                        {{ l('Bill Discount') }}
+                                                    </label>
+                                                    <input
+                                                        class="form-control"
+                                                        formControlName="billDiscount"
+                                                        id="billDiscount"
+                                                        placeholder=""
+                                                        readonly
+                                                        required
+                                                        type="number"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </ng-container>
+
+                                        <!-- Loyalty Points (conditionally displayed) -->
+
+                                        <!-- Net Amount -->
+                                        <div class="col-lg-6 col-md-6 col-sm-6 mb-2">
+                                            <div class="mb-1">
+                                                <label class="form-label" for="subTotalAmount">
+                                                    {{ l('Net Amount') }}
+                                                </label>
+                                                <input
+                                                    class="form-control"
+                                                    formControlName="subTotalAmount"
+                                                    id="subTotalAmount"
+                                                    placeholder=""
+                                                    readonly
+                                                    required
+                                                    type="number"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <!-- Taxable Amount -->
+                                        <div class="col-lg-6 col-md-6 col-sm-6 mb-2">
+                                            <div class="mb-1">
+                                                <label class="form-label" for="totalTax">
+                                                    {{ l('Taxable Amount') }}
+                                                </label>
+                                                <input
+                                                    class="form-control"
+                                                    formControlName="taxableAmount"
+                                                    id="totalTax"
+                                                    placeholder=""
+                                                    readonly
+                                                    required
+                                                    type="number"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <!-- Tax Amount -->
+                                        <div class="col-lg-6 col-md-6 col-sm-6 mb-2">
+                                            <div class="mb-1">
+                                                <label class="required form-label" for="taxAmount">
+                                                    {{ l('Tax Amount') }}
+                                                </label>
+                                                <input
+                                                    class="form-control"
+                                                    formControlName="taxAmount"
+                                                    id="taxAmount"
+                                                    placeholder=""
+                                                    readonly
+                                                    required
+                                                    type="number"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <!-- Grand Total -->
+                                        <div class="col-lg-6 col-md-6 col-sm-6 mb-2">
+                                            <div class="mb-1">
+                                                <label class="form-label">{{ l('Grand Total') }}</label>
+                                                <input
+                                                    class="form-control"
+                                                    formControlName="grandTotal"
+                                                    id="grandTotal"
+                                                    placeholder=""
+                                                    readonly
+                                                    required
+                                                    type="number"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Print Checkbox -->
+                            <div class="col-12 mt-3 sales-print-toggle">
+                                <label class="form-label me-2" for="salesPrint">{{ l('Print') }}</label>
+                                <input
+                                    [(ngModel)]="isPrint"
+                                    [ngModelOptions]="{ standalone: true }"
+                                    class="form-check-input"
+                                    id="salesPrint"
+                                    required="true"
+                                    type="checkbox"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- {{ this.form.getRawValue() | json }} -->
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <ng-keyboard-shortcuts [shortcuts]="shortcuts"></ng-keyboard-shortcuts>
+<app-add-product (productSave)="getAllProducts($event)" *ngIf="serialNumber === 3"
+    [serialNo]="serialNumber"></app-add-product>
+<app-add-account-ledgers (accountLedgerSave)="getAllAcountLedger($event)" *ngIf="serialNumber === 5"
+    [serialNo]="serialNumber"></app-add-account-ledgers>
+<erp-key-event (closeEvent)="keyClose()" (deletEvent)="clearForm($event)" (saveEvent)="keySave($event)"
+    [id]="this.id ? this.id : null"></erp-key-event> -->

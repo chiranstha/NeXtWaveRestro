@@ -1,0 +1,226 @@
+/* Dark theme for ngx-extended-pdf-viewer */
+
+/* Main container and toolbar background */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .pdfViewer,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #viewerContainer,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #toolbarContainer,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #outerContainer,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .page,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #mainContainer,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .dialogContainer {
+  background-color: #1e1e1e !important;
+}
+
+/* Toolbar */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #toolbarContainer,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .secondaryToolbar {
+  background-color: #2d2d2d !important;
+  border-color: #444 !important;
+}
+
+/* Text color for toolbar and UI elements */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #outerContainer,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #toolbarContainer,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .secondaryToolbar,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #toolbarSidebar,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .dropdownToolbarButton::after,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .toolbarButton,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .overlayButton,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .secondaryToolbarButton,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .selectScaleOption,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #customScaleOption,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #documentPropertiesOverlay,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .horizontalToolbarSeparator {
+  color: #fff !important;
+}
+
+/* Button hover and active states */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .toolbarButton:hover,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .secondaryToolbarButton:hover,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .overlayButton:hover {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .toolbarButton.toggled,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .secondaryToolbarButton.toggled {
+  background-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Sidebar */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #sidebarContainer,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #thumbnailView,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #outlineView,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #attachmentsView,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #layersView {
+  background-color: #2d2d2d !important;
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.25);
+}
+
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .treeItem > a,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .treeWithDeepNesting > .treeItem,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .treeItem > a:hover {
+  color: #ddd !important;
+}
+
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .treeItem.selected {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Thumbnail */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .thumbnailImage {
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.2) !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .thumbnail.selected > .thumbnailSelectionRing {
+  background-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Input fields */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .numPages,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #pageNumber,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .toolbarField,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #customScaleOption {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .toolbarField:focus,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #pageNumber:focus {
+  border-color: #0078d7 !important;
+}
+
+/* Dropdown menu */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .dropdownToolbarButton {
+  background-color: rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Modal dialog */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .dialogContainer {
+  background-color: #2d2d2d !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .dialog {
+  background-color: #2d2d2d !important;
+  color: #fff !important;
+}
+
+/* Progress bar */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #loadingBar {
+  background-color: #2d2d2d !important;
+}
+
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #loadingBar .progress {
+  background-color: #0078d7 !important;
+}
+
+/* Separator */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .horizontalToolbarSeparator,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .verticalToolbarSeparator {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Error wrapper */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #errorWrapper {
+  background-color: rgba(30, 30, 30, 0.8) !important;
+  color: #fff !important;
+}
+
+/* Text layers in PDF */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .textLayer {
+  opacity: 0.8 !important;
+}
+
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .textLayer span {
+  color: #ddd !important;
+  opacity: 1 !important;
+  background-color: transparent !important;
+}
+
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .textLayer ::selection {
+  background-color: #0078d7 !important;
+  color: #fff !important;
+}
+
+
+
+/* Annotations */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .annotationLayer .linkAnnotation > a,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .annotationLayer .buttonWidgetAnnotation.pushButton > a {
+  color: #8cb4ff !important;
+}
+
+/* Find bar */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #findbar {
+  background-color: #2d2d2d !important;
+  color: #fff !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Highlight */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .textLayer .highlight.selected {
+  background-color: #204a87 !important;
+}
+
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .textLayer .highlight {
+  background-color: #b58900 !important;
+}
+
+/* PDF presentation mode */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #viewerContextMenu,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #presentationMode,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .presentationControlsCenter,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .presentationModeHint {
+  background-color: #2d2d2d !important;
+  color: #fff !important;
+}
+
+/* Scroll bars */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer *::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+html[data-bs-theme=dark] ngx-extended-pdf-viewer *::-webkit-scrollbar-track {
+  background: #333 !important;
+}
+
+html[data-bs-theme=dark] ngx-extended-pdf-viewer *::-webkit-scrollbar-thumb {
+  background-color: #666 !important;
+  border-radius: 4px !important;
+}
+
+html[data-bs-theme=dark] ngx-extended-pdf-viewer *::-webkit-scrollbar-thumb:hover {
+  background-color: #888 !important;
+}
+
+/* Print service */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer #printServiceDialog {
+  background-color: #2d2d2d !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+
+/* Additional UI elements */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .doorHangerRight,
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .doorHangerLeft {
+  background-color: #2d2d2d !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Layer control */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .layerControl {
+  background-color: #2d2d2d !important;
+  color: #fff !important;
+}
+
+/* Override the canvas inversion for signature images if needed */
+html[data-bs-theme=dark] ngx-extended-pdf-viewer .canvasWrapper canvas.annotationLayer {
+  filter: none !important;
+}

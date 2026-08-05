@@ -1,0 +1,304 @@
+@if (dialog) {
+    <div
+        #createOrEditModal="bs-modal"
+        [config]="{ backdrop: 'static', keyboard: false }"
+        aria-hidden="true"
+        bsModal
+        class="modal fade"
+        role="dialog"
+        tabindex="-1"
+    >
+        <div class="modal-dialog modal-lg modal-dialog-scrollable mt-5">
+            <div class="modal-content">
+                @if (active) {
+                    <div class="modal-header px-5 py-3">
+                        <h5 class="modal-title fw-bold text-gray-900 mb-0">
+                            {{ l(this.id ? 'EditAccountGroup' : 'CreateAccountGroup') }}
+                        </h5>
+                        <button
+                            (click)="close()"
+                            [disabled]="saving"
+                            aria-label="Close"
+                            class="btn-close"
+                            type="button"
+                        ></button>
+                    </div>
+                    <div class="modal-body px-5 py-3">
+                        <ng-container *ngTemplateOutlet="formContent"></ng-container>
+                    </div>
+                    <ng-container *ngTemplateOutlet="dialogActions"></ng-container>
+                }
+            </div>
+        </div>
+    </div>
+} @else {
+    <ng-container *ngTemplateOutlet="formContent"></ng-container>
+}
+
+<ng-template #formContent>
+<div [@routerTransition]>
+    @if (!formLoader && !serialNumber) {
+        <div [class]="dialog ? 'form-dark' : containerClass + ' form-dark'">
+            @if (!dialog) {
+            <sub-header [description]="" [title]="title | localize">
+                <div role="title">
+                    @if (!this.id) {
+                        <h3 class="style-this mt-2 mb-0" role="title">
+                            <i class="fas fa-layer-group form-header-icon"></i>
+                            {{ l('CreateAccountGroup') }}
+                        </h3>
+                    }
+                    @if (this.id) {
+                        <h3 class="style-this mt-2 mb-0" role="title">
+                            <i class="fas fa-edit form-header-icon"></i>
+                            {{ l('EditAccountGroup') }}
+                        </h3>
+                    }
+                </div>
+                <div role="actions">
+                    @if (!dialog) {
+                        @if (this.id) {
+                            <button
+                                (click)="clearForm(id)"
+                                class="btn btn-sm btn-light-danger fw-bold me-2"
+                                title="{{ l('Delete') }}"
+                            >
+                                <i class="fas fa-trash-alt me-1"></i>
+                                {{ l('Delete') }}
+                            </button>
+                        }
+                        <button
+                            (click)="save()"
+                            [buttonBusy]="saving"
+                            [disabled]="form.invalid"
+                            class="btn btn-sm fw-bold btn-primary me-2"
+                            id="save"
+                            type="submit"
+                        >
+                            <i class="fas fa-save me-1"></i>
+                            {{ l(this.id ? 'Update' : 'Save') }}
+                        </button>
+                        <button (click)="close()" class="btn btn-sm fw-bold btn-light-success" id="cancel">
+                            <i class="fas fa-times-circle me-1"></i>
+                            {{ l('Cancel') }}
+                        </button>
+                    }
+                </div>
+            </sub-header>
+            }
+            <div [class]="dialog ? '' : 'card gutter-b'">
+                <div [class]="dialog ? '' : 'card-body'">
+                    <form [formGroup]="form" autocomplete="off">
+                        <div>
+                            <div class="row g-3 align-items-start">
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-12">
+                                    <div class="form-item mb-0">
+                                        <label class="required form-label fw-semibold text-gray-700 mb-2" for="AccountGroup_Name">
+                                            {{ l('AccountGroupName') }}
+                                        </label>
+                                        <div>
+                                            <input
+                                                #accountGroupName
+                                                (keyup)="gotoledger($event)"
+                                                [ngClass]="
+                                                    this.form.get('name').invalid &&
+                                                    (this.form.get('name').dirty || this.form.get('name').touched)
+                                                        ? 'is-danger'
+                                                        : 'is-success'
+                                                "
+                                                [readonly]="accountGroupNameFlag"
+                                                class="text-capitalize form-control"
+                                                formControlName="name"
+                                                id="AccountGroup_Name"
+                                                maxlength="100"
+                                                minlength="0"
+                                                name="name"
+                                                placeholder="{{ l('EnterAccountGroupName') }}"
+                                                type="text"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-12">
+                                    <div class="form-item mb-0">
+                                        <label class="required form-label fw-semibold text-gray-700 mb-2" for="groupUnder">
+                                            {{ l('GroupUnder') }}
+                                        </label>
+                                        <div>
+                                            <ng-select
+                                                #ledger
+                                                (change)="changeAccountGroup($event)"
+                                                (keyup)="gotoNature($event)"
+                                                [items]="allAccountLedgers"
+                                                appendTo=".modal-content"
+                                                bindLabel="displayName"
+                                                bindValue="id"
+                                                class="w-100"
+                                                [clearable]="false"
+                                                dropdownPosition="auto"
+                                                formControlName="groupUnder"
+                                                id="groupUnder"
+                                                placeholder="{{ l('SelectGroup') }}"
+                                            ></ng-select>
+                                        </div>
+                                        @if (
+                                            this.form.get('groupUnder').invalid &&
+                                            (this.form.get('groupUnder').dirty || this.form.get('groupUnder').touched)
+                                        ) {
+                                            <div>
+                                                <div
+                                                    class="alert alert-danger d-flex align-items-center mt-1 p-2"
+                                                    role="alert"
+                                                >
+                                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                                    <div>{{ l('GroupUnderRequired') }}</div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-12">
+                                    <div class="form-item mb-0">
+                                        <label class="required form-label fw-semibold text-gray-700 mb-2" for="AccountGroup_Nature">
+                                            {{ l('Nature') }}
+                                        </label>
+                                        <div>
+                                            <ng-select
+                                                #nature
+                                                (keyup)="gotoAffect($event)"
+                                                [items]="accountGroupNature"
+                                                [readonly]="!isPrimary"
+                                                appendTo=".modal-content"
+                                                bindLabel="displayName"
+                                                bindValue="value"
+                                                class="w-100"
+                                                [clearable]="false"
+                                                dropdownPosition="auto"
+                                                formControlName="nature"
+                                                id="AccountGroup_Nature"
+                                                placeholder="{{ l('SelectNature') }}"
+                                            ></ng-select>
+                                        </div>
+                                        @if (
+                                            this.form.get('nature').invalid &&
+                                            (this.form.get('nature').dirty || this.form.get('nature').touched)
+                                        ) {
+                                            <div>
+                                                <div
+                                                    class="alert alert-danger d-flex align-items-center mt-1 p-2"
+                                                    role="alert"
+                                                >
+                                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                                    <div>{{ l('NatureRequired') }}</div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-12">
+                                    <div class="form-item mb-0">
+                                        <label class="required form-label fw-semibold text-gray-700 mb-2" for="affectGrossProfit">
+                                            {{ l('AffectGrossProfit') }}
+                                        </label>
+                                        <div>
+                                            <ng-select
+                                                #affect
+                                                (keyup)="gotoNarration($event)"
+                                                [readonly]="!isPrimary"
+                                                appendTo=".modal-content"
+                                                class="w-100"
+                                                [clearable]="false"
+                                                dropdownPosition="auto"
+                                                formControlName="affectGrossProfit"
+                                                id="affectGrossProfit"
+                                                placeholder="{{ l('SelectOption') }}"
+                                            >
+                                                @for (item of affectGrossProfit; track item) {
+                                                    <ng-option [value]="item.value">
+                                                        {{ l(item.displayName) }}
+                                                    </ng-option>
+                                                }
+                                            </ng-select>
+                                        </div>
+                                        @if (
+                                            this.form.get('affectGrossProfit').invalid &&
+                                            (this.form.get('affectGrossProfit').dirty ||
+                                                this.form.get('affectGrossProfit').touched)
+                                        ) {
+                                            <div>
+                                                <div
+                                                    class="alert alert-danger d-flex align-items-center mt-1 p-2"
+                                                    role="alert"
+                                                >
+                                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                                    <div>{{ l('AffectGrossProfitRequired') }}</div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label fw-semibold text-gray-700 mb-2" for="narration">
+                                        {{ l('Narration') }}
+                                    </label>
+                                    <div>
+                                        <textarea
+                                            #narration
+                                            (keyup)="onSaveOnInput($event)"
+                                            class="form-control"
+                                            formControlName="narration"
+                                            id="narration"
+                                            placeholder="{{ l('EnterNarration') }}"
+                                            rows="2"
+                                            name="narration"
+                                        ></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<erp-key-event
+    (closeEvent)="keyClose($event)"
+    (deletEvent)="clearForm($event)"
+    (saveEvent)="keySave($event)"
+    [id]="this.id ? this.id : null"
+></erp-key-event>
+</ng-template>
+
+<ng-template #dialogActions>
+    <div class="modal-footer justify-content-between px-5 py-3">
+        @if (this.id) {
+            <button
+                (click)="clearForm(id)"
+                class="btn btn-sm btn-light-danger fw-bold"
+                title="{{ l('Delete') }}"
+                type="button"
+            >
+                {{ l('Delete') }}
+            </button>
+        }
+        <div class="d-flex flex-wrap gap-2 ms-auto">
+            <button
+                (click)="save()"
+                [buttonBusy]="saving"
+                [disabled]="form.invalid"
+                class="btn btn-sm fw-bold btn-primary"
+                type="submit"
+            >
+                {{ l(this.id ? 'Update' : 'Save') }}
+            </button>
+            <button (click)="close()" class="btn btn-sm fw-bold btn-light-success" type="button">
+                {{ l('Cancel') }}
+            </button>
+        </div>
+    </div>
+</ng-template>

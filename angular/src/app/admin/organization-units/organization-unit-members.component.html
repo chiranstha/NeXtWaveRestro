@@ -1,0 +1,42 @@
+<div class="row">
+    <div class="col-12 p-3">
+        @if (('Pages.Administration.OrganizationUnits.ManageMembers' | permission) && organizationUnit) {
+            <button
+                (click)="openAddMemberModal()"
+                class="btn btn-sm btn-outline btn-outline-primary btn-sm float-end mb-3"
+            >
+                <i class="fa fa-plus"></i>
+                {{ 'AddMember' | localize }}
+            </button>
+        }
+    </div>
+    <div class="col-12">
+        <div id="OuMembersTable">
+            <!--<AG-Grid-Start>-->
+            <div [busyIf]="isLoading" [hidden]="!organizationUnit" class="ag-grid-container">
+                <ag-grid-angular
+                    #agGrid
+                    (gridReady)="onGridReady($event)"
+                    (sortChanged)="onSortChanged($event)"
+                    [columnDefs]="columnDefs"
+                    [defaultColDef]="defaultColDef"
+                    [domLayout]="'autoHeight'"
+                    [rowData]="rowData"
+                    class="ag-theme-balham"
+                ></ag-grid-angular>
+                @if (totalRecordsCount == 0) {
+                    <div class="no-data">
+                        {{ 'NoData' | localize }}
+                    </div>
+                }
+            </div>
+            <!--<AG-Grid-End>-->
+        </div>
+    </div>
+</div>
+@if (!organizationUnit) {
+    <div class="text-muted">
+        {{ 'SelectAnOrganizationUnitToSeeMembers' | localize }}
+    </div>
+}
+<addMemberModal #addMemberModal (membersAdded)="addMembers($event)"></addMemberModal>

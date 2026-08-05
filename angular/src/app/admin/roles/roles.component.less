@@ -1,0 +1,60 @@
+.ag-grid-container {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.ag-grid-no-data {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
+
+.ag-theme-balham .ag-header {
+    background-color: var(--bs-light);
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.ag-theme-balham .ag-header-cell {
+    font-weight: 600;
+    color: var(--bs-dark);
+}
+
+/* Action icons styling */
+.fa {
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.fa:hover {
+    transform: scale(1.1);
+}
+
+.text-primary:hover {
+    color: var(--bs-primary) !important;
+}
+
+.text-danger:hover {
+    color: var(--bs-danger) !important;
+}
+
+.text-info:hover {
+    color: var(--bs-info) !important;
+}
+
+/* Badge styling for role names */
+.badge {
+    font-size: 0.75em;
+    padding: 0.25em 0.5em;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .ag-grid-container {
+        height: 400px !important;
+    }
+    
+    .ag-theme-balham {
+        height: 400px !important;
+    }
+}

@@ -1,0 +1,38 @@
+<form (ngSubmit)="getRecordsIfNeeds()" autocomplete="new-password" novalidate>
+    @if (this.options.isFilterEnabled) {
+        <div class="input-group mb-4">
+            <input
+                [(ngModel)]="filterText"
+                autoFocus
+                class="form-control"
+                name="filterText"
+                placeholder="{{ 'SearchWithThreeDot' | localize }}"
+                type="text"
+            />
+            <div class="input-group-append">
+                <button class="btn btn btn-sm btn-primary" type="submit">
+                    <i [attr.aria-label]="l('Search')" class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+        </div>
+    }
+    <!--<AG-Grid-Start>-->
+    <div [busyIf]="isLoading" class="ag-grid-container">
+        <ag-grid-angular
+            #agGrid
+            (gridReady)="onGridReady($event)"
+            (sortChanged)="onSortChanged($event)"
+            [columnDefs]="columnDefs"
+            [defaultColDef]="defaultColDef"
+            [domLayout]="'autoHeight'"
+            [rowData]="rowData"
+            class="ag-theme-balham"
+        ></ag-grid-angular>
+        @if (totalRecordsCount == 0) {
+            <div class="no-data">
+                {{ 'NoData' | localize }}
+            </div>
+        }
+    </div>
+    <!--<AG-Grid-End>-->
+</form>

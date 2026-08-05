@@ -1,0 +1,94 @@
+<div
+    #changeProfilePictureModal="bs-modal"
+    [config]="{ backdrop: 'true' }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="myLargeModalLabel"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            @if (active) {
+                <form #changeProfilePictureModalForm="ngForm" (ngSubmit)="save()">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <span>{{ 'ChangeProfilePicture' | localize }}</span>
+                        </h5>
+                        <button
+                            (click)="close()"
+                            [attr.aria-label]="l('Close')"
+                            class="btn-close"
+                            type="button"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        @if (canUseGravatar()) {
+                            <div class="mb-5">
+                                <label class="form-check form-check-custom form-check-solid py-1">
+                                    <input
+                                        [(ngModel)]="useGravatarProfilePicture"
+                                        class="form-check-input"
+                                        id="Profile_UseGravatarProfilePicture"
+                                        name="UseGravatarProfilePicture"
+                                        type="checkbox"
+                                    />
+                                    <span class="form-check-label">
+                                        {{ 'UseGravatarProfilePicture' | localize }}
+                                    </span>
+                                </label>
+                            </div>
+                        }
+                        <div class="mb-5">
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    <input
+                                        #uploadProfilePictureInput
+                                        (change)="fileChangeEvent($event)"
+                                        [disabled]="useGravatarProfilePicture"
+                                        class="form-control"
+                                        id="uploadProfilePicture"
+                                        type="file"
+                                    />
+                                </div>
+                                <span [hidden]="useGravatarProfilePicture" class="form-text text-muted col-lg-12">
+                                    {{
+                                        'ProfilePicture_Change_Info' | localize: maxProfilPictureBytesUserFriendlyValue
+                                    }}
+                                </span>
+                            </div>
+                        </div>
+                        <image-cropper
+                            (imageCropped)="imageCroppedFile($event)"
+                            [aspectRatio]="4 / 4"
+                            [hidden]="useGravatarProfilePicture"
+                            [imageChangedEvent]="imageChangedEvent"
+                            [maintainAspectRatio]="true"
+                            [resizeToWidth]="128"
+                            format="png"
+                        ></image-cropper>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            (click)="close()"
+                            [disabled]="saving"
+                            class="btn btn-sm btn-light-primary fw-bold"
+                            type="button"
+                        >
+                            {{ 'Cancel' | localize }}
+                        </button>
+                        <button
+                            [disabled]="!changeProfilePictureModalForm.form.valid || saving"
+                            class="btn btn-sm btn-primary fw-bold"
+                            type="submit"
+                        >
+                            <i class="fa fa-save"></i>
+                            <span>{{ 'Save' | localize }}</span>
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>

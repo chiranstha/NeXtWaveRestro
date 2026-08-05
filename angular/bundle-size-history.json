@@ -1,0 +1,765 @@
+[
+  {
+    "timestamp": "2026-05-17T00:09:20.553Z",
+    "date": "5/17/2026",
+    "totalSize": 493896,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 409688,
+        "gzipSize": 122906
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 83423,
+        "gzipSize": 25027
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-05-17T00:37:54.617Z",
+    "date": "5/17/2026",
+    "totalSize": 493896,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 409688,
+        "gzipSize": 122906
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 83423,
+        "gzipSize": 25027
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ],
+    "changes": {
+      "totalChange": 0,
+      "totalChangePercent": 0,
+      "bundleChanges": [
+        {
+          "name": "Main Bundle",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "ngsw (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "safety (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-05-18T01:58:49.977Z",
+    "date": "5/18/2026",
+    "totalSize": 493896,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 409688,
+        "gzipSize": 122906
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 83423,
+        "gzipSize": 25027
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ],
+    "changes": {
+      "totalChange": 0,
+      "totalChangePercent": 0,
+      "bundleChanges": [
+        {
+          "name": "Main Bundle",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "ngsw (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "safety (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-05-20T02:35:21.862Z",
+    "date": "5/20/2026",
+    "totalSize": 493896,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 409688,
+        "gzipSize": 122906
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 83423,
+        "gzipSize": 25027
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ],
+    "changes": {
+      "totalChange": 0,
+      "totalChangePercent": 0,
+      "bundleChanges": [
+        {
+          "name": "Main Bundle",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "ngsw (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "safety (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-05-20T02:38:11.345Z",
+    "date": "5/20/2026",
+    "totalSize": 493896,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 409688,
+        "gzipSize": 122906
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 83423,
+        "gzipSize": 25027
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ],
+    "changes": {
+      "totalChange": 0,
+      "totalChangePercent": 0,
+      "bundleChanges": [
+        {
+          "name": "Main Bundle",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "ngsw (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "safety (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-05-20T02:40:21.341Z",
+    "date": "5/20/2026",
+    "totalSize": 493896,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 409688,
+        "gzipSize": 122906
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 83423,
+        "gzipSize": 25027
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ],
+    "changes": {
+      "totalChange": 0,
+      "totalChangePercent": 0,
+      "bundleChanges": [
+        {
+          "name": "Main Bundle",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "ngsw (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "safety (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-05-20T02:49:53.626Z",
+    "date": "5/20/2026",
+    "totalSize": 493868,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 409660,
+        "gzipSize": 122898
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 83423,
+        "gzipSize": 25027
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ],
+    "changes": {
+      "totalChange": -28,
+      "totalChangePercent": -0.005669209712166124,
+      "bundleChanges": [
+        {
+          "name": "Main Bundle",
+          "sizeChange": -28,
+          "sizeChangePercent": -0.006834469157017047
+        },
+        {
+          "name": "ngsw (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "safety (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-05-24T17:17:44.560Z",
+    "date": "5/24/2026",
+    "totalSize": 529647,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 445439,
+        "gzipSize": 133632
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 83423,
+        "gzipSize": 25027
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ],
+    "changes": {
+      "totalChange": 35779,
+      "totalChangePercent": 7.244648367580001,
+      "bundleChanges": [
+        {
+          "name": "Main Bundle",
+          "sizeChange": 35779,
+          "sizeChangePercent": 8.733828052531367
+        },
+        {
+          "name": "ngsw (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "safety (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-06-01T05:54:49.172Z",
+    "date": "6/1/2026",
+    "totalSize": 529647,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 445439,
+        "gzipSize": 133632
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 83423,
+        "gzipSize": 25027
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ],
+    "changes": {
+      "totalChange": 0,
+      "totalChangePercent": 0,
+      "bundleChanges": [
+        {
+          "name": "Main Bundle",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "ngsw (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "safety (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-06-01T06:50:34.107Z",
+    "date": "6/1/2026",
+    "totalSize": 529647,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 445439,
+        "gzipSize": 133632
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 83423,
+        "gzipSize": 25027
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ],
+    "changes": {
+      "totalChange": 0,
+      "totalChangePercent": 0,
+      "bundleChanges": [
+        {
+          "name": "Main Bundle",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "ngsw (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "safety (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-06-03T03:08:52.952Z",
+    "date": "6/3/2026",
+    "totalSize": 533136,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 448928,
+        "gzipSize": 134678
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 83423,
+        "gzipSize": 25027
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ],
+    "changes": {
+      "totalChange": 3489,
+      "totalChangePercent": 0.6587406329121094,
+      "bundleChanges": [
+        {
+          "name": "Main Bundle",
+          "sizeChange": 3489,
+          "sizeChangePercent": 0.7832722325615852
+        },
+        {
+          "name": "ngsw (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "safety (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-06-03T03:10:36.062Z",
+    "date": "6/3/2026",
+    "totalSize": 533136,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 448928,
+        "gzipSize": 134678
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 83423,
+        "gzipSize": 25027
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ],
+    "changes": {
+      "totalChange": 0,
+      "totalChangePercent": 0,
+      "bundleChanges": [
+        {
+          "name": "Main Bundle",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "ngsw (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "safety (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-06-03T03:22:24.047Z",
+    "date": "6/3/2026",
+    "totalSize": 533136,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 448928,
+        "gzipSize": 134678
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 83423,
+        "gzipSize": 25027
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ],
+    "changes": {
+      "totalChange": 0,
+      "totalChangePercent": 0,
+      "bundleChanges": [
+        {
+          "name": "Main Bundle",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "ngsw (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "safety (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-06-03T03:26:53.422Z",
+    "date": "6/3/2026",
+    "totalSize": 533136,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 448928,
+        "gzipSize": 134678
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 83423,
+        "gzipSize": 25027
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ],
+    "changes": {
+      "totalChange": 0,
+      "totalChangePercent": 0,
+      "bundleChanges": [
+        {
+          "name": "Main Bundle",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "ngsw (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "safety (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-06-12T06:30:14.673Z",
+    "date": "6/12/2026",
+    "totalSize": 544451,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 460243,
+        "gzipSize": 138073
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 83423,
+        "gzipSize": 25027
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ],
+    "changes": {
+      "totalChange": 11315,
+      "totalChangePercent": 2.12234776867441,
+      "bundleChanges": [
+        {
+          "name": "Main Bundle",
+          "sizeChange": 11315,
+          "sizeChangePercent": 2.5204487133794284
+        },
+        {
+          "name": "ngsw (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "safety (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-31T06:31:02.942Z",
+    "date": "7/31/2026",
+    "totalSize": 2639356,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 2553928,
+        "gzipSize": 766178
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 84643,
+        "gzipSize": 25393
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ],
+    "changes": {
+      "totalChange": 2094905,
+      "totalChangePercent": 384.7738363966638,
+      "bundleChanges": [
+        {
+          "name": "Main Bundle",
+          "sizeChange": 2093685,
+          "sizeChangePercent": 454.9086026294805
+        },
+        {
+          "name": "ngsw (chunk)",
+          "sizeChange": 1220,
+          "sizeChangePercent": 1.4624264291622213
+        },
+        {
+          "name": "safety (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-31T06:40:30.065Z",
+    "date": "7/31/2026",
+    "totalSize": 2639358,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 2553930,
+        "gzipSize": 766179
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 84643,
+        "gzipSize": 25393
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ],
+    "changes": {
+      "totalChange": 2,
+      "totalChangePercent": 0.00007577606052385507,
+      "bundleChanges": [
+        {
+          "name": "Main Bundle",
+          "sizeChange": 2,
+          "sizeChangePercent": 0.00007831074329425105
+        },
+        {
+          "name": "ngsw (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "safety (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-31T06:42:20.719Z",
+    "date": "7/31/2026",
+    "totalSize": 2640703,
+    "bundles": [
+      {
+        "name": "Main Bundle",
+        "size": 2553930,
+        "gzipSize": 766179
+      },
+      {
+        "name": "ngsw (chunk)",
+        "size": 84643,
+        "gzipSize": 25393
+      },
+      {
+        "name": "chunk (chunk)",
+        "size": 1345,
+        "gzipSize": 404
+      },
+      {
+        "name": "safety (chunk)",
+        "size": 785,
+        "gzipSize": 236
+      }
+    ],
+    "changes": {
+      "totalChange": 1345,
+      "totalChangePercent": 0.05095936208729548,
+      "bundleChanges": [
+        {
+          "name": "Main Bundle",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "ngsw (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "chunk (chunk)",
+          "sizeChange": 1345,
+          "sizeChangePercent": 0
+        },
+        {
+          "name": "safety (chunk)",
+          "sizeChange": 0,
+          "sizeChangePercent": 0
+        }
+      ]
+    }
+  }
+]

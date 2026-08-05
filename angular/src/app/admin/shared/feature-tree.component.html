@@ -1,0 +1,29 @@
+<app-tree
+    (onNodeSelect)="nodeSelect($event)"
+    (onNodeUnselect)="onNodeUnselect($event)"
+    [(selection)]="selectedFeatures"
+    [propagateSelectionUp]="false"
+    [value]="treeData"
+    selectionMode="checkbox"
+>
+    <ng-template let-node appTemplate="default">
+        <span style="margin-right: 5px">{{ node.label }}</span>
+        @if (node.data.inputType.name === 'SINGLE_LINE_STRING') {
+            <input
+                (change)="onInputChange(node)"
+                [(ngModel)]="node.value"
+                [attr.name]="node.data.name"
+                type="{{ node.data.inputType.validator.name === 'NUMERIC' ? 'number' : 'text' }}"
+            />
+        }
+        @if (node.data.inputType.name === 'COMBOBOX') {
+            <select (change)="onDropdownChange(node)" [(ngModel)]="node.value">
+                @for (item of node.data.inputType.itemSource.items; track item) {
+                    <option [value]="item.value">
+                        {{ item.displayText }}
+                    </option>
+                }
+            </select>
+        }
+    </ng-template>
+</app-tree>

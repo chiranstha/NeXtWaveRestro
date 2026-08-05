@@ -1,0 +1,83 @@
+<div
+    #createOrEditModal="bs-modal"
+    [config]="{ backdrop: 'true' }"
+    aria-hidden="true"
+    aria-labelledby="createOrEditModal"
+    bsModal
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center">
+                <h4 class="modal-title">
+                    <span class="info-header">{{ l('FINANCIAL YEAR DETAILS') }}</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="row">
+                        <div class="mb-3 col-lg-6 col-xl-6 col-md-6 col-xs-12">
+                            <div class="display-flex">
+                                <span class="fs-16px mr-5px">{{ l('From Miti') }} :</span>
+                                &nbsp;
+                                <span class="fw-bold mt-2px">{{ item.fromMiti }}</span>
+                            </div>
+                        </div>
+                        <div class="mb-3 col-lg-6 col-xl-6 col-md-6 col-xs-12">
+                            <div class="display-flex">
+                                <span class="fs-16px mr-5px">{{ l('To Miti') }} :</span>
+                                &nbsp;
+                                <span class="fw-bold mt-2px">{{ item.toMiti }}</span>
+                            </div>
+                        </div>
+                        <div class="mb-3 col-lg-6 col-xl-6 col-md-6 col-xs-12">
+                            <div class="display-flex">
+                                <span class="fs-16px mr-5px">{{ l('Status') }} :</span>
+                                &nbsp;
+                                @if (item.status) {
+                                    <span class="text-left mt-2px">
+                                        <i class="pi pi-check-circle text-success" title="True"></i>
+                                    </span>
+                                }
+                                @if (!item.status) {
+                                    <span class="text-left mt-2px">
+                                        <i class="pi pi-times-circle" title="False"></i>
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        <div class="mb-3 col-lg-6 col-xl-6 col-md-6 col-xs-12">
+                            <div class="display-flex">
+                                <span class="fs-16px mr-5px">{{ l('Active') }} :</span>
+                                &nbsp;
+                                @if (item.active) {
+                                    <span class="text-left mt-2px">
+                                        <i class="pi pi-check-circle text-success" title="True"></i>
+                                    </span>
+                                }
+                                @if (!item.active) {
+                                    <span class="text-left mt-2px">
+                                        <i class="pi pi-times-circle" title="False"></i>
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer padding-1rem">
+                <button
+                    (click)="close()"
+                    [disabled]="saving"
+                    class="btn btn-sm btn-primary"
+                    fdType="emphasized"
+                    type="button"
+                >
+                    {{ l('Close') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

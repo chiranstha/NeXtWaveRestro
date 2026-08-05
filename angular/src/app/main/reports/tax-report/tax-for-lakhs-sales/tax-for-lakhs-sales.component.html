@@ -1,0 +1,83 @@
+<div [@routerTransition]>
+
+    <sub-header [title]="'Sales Over Lakhs Report'">
+        <div role="search">
+            <div class="position-relative w-md-400px me-md-2">
+                <i
+                    class="fa-duotone fa-magnifying-glass fs-3 text-gray-500 position-absolute top-50 translate-middle ms-6"><span
+                        class="path1"></span><span class="path2"></span></i>
+                <input (keyup.enter)="searchFilter($event.target.value)" [ngModelOptions]="{ standalone: true }"
+                    class="form-control form-control-solid ps-10 headerSearch" name="search" placeholder="Search"
+                    type="text" value="">
+            </div>
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card card-bordered p-4">
+                <div [hidden]="!advancedFiltersAreShown" class="col-12 px-0">
+                    <div class="hidden-filter">
+                        <div>
+                            <form [formGroup]="myForm">
+                                <div class="row">
+                                    <div class="col-md-2 col-xl-2 col-xs-12 col-sm-12">
+                                        <label class="form-label" for="fromMiti">From Miti</label>
+                                        <ne-datepicker [formControl]="myForm.controls['fromMiti']"
+                                            language="en"></ne-datepicker>
+                                    </div>
+                                    <div class="col-md-2 col-xl-2 col-xs-12 col-sm-12">
+                                        <label class="form-label" for="toMiti">To Miti</label>
+                                        <ne-datepicker [formControl]="myForm.controls['toMiti']"
+                                            language="en"></ne-datepicker>
+                                    </div>
+                                    <div class="col-md-2 col-xl-2 col-xs-12 col-sm-12">
+                                        <div class="mb-1   ">
+                                            <label class="form-label" for="type">Report View Type</label>
+                                            <ng-select (change)="getReport()" [items]="allTypes" bindLabel="displayName"
+                                                bindValue="id" formControlName="type" id="branchId" name="branchId"
+                                                placeholder="Select items"></ng-select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-xl-4 col-md-4 col-xs-12 mt-2 mb-2 mt-6">
+                                        <button (click)="getReport()" class="btn btn-sm fs-5 btn-primary"
+                                            glyph="fa-duotone fa-magnifying-glass" label="Search">
+                                            <i class="fa fa-search"></i>
+                                            Search
+                                        </button>
+                                        <button (click)="getExcel()" class="btn btn-sm fs-5 btn-primary"
+                                            glyph="fa-duotone fa-file-spreadsheet" label="Excel">
+                                            Excel
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-sm-12">
+                        <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
+                            *ngIf="!advancedFiltersAreShown" class="clickable-item text-muted">
+                            <i class="fa fa-angle-down"></i>
+                            {{ 'ShowAdvancedFilters' | localize }}
+                        </span>
+                        <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
+                            *ngIf="advancedFiltersAreShown" class="clickable-item text-muted">
+                            <i class="fa fa-angle-up"></i>
+                            {{ 'HideAdvancedFilters' | localize }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <ag-grid-angular class="ag-theme-balham" style="height: 600px; width: 100%;" [rowData]="rowData"
+                        [columnDefs]="columnDefs" [enableRangeSelection]="true" [animateRows]="true"
+                        [suppressExcelExport]="false" [suppressCsvExport]="false" [enableBrowserTooltips]="true"
+                        (gridReady)="onGridReady($event)">
+                    </ag-grid-angular>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

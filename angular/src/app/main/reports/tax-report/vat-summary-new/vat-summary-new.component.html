@@ -1,0 +1,56 @@
+<div>
+    <div [@routerTransition]>
+        <sub-header [title]="'VAT Summary Report'">
+            <div role="actions">
+                <button (click)="exportToExcel($event)" class="btn btn-sm btn-flex btn-secondary fw-bold" type="button">
+                    <i class="fa fa-file-excel"></i>
+                    Excel
+                </button>
+            </div>
+        </sub-header>
+        <div [class]="containerClass">
+            <div class="card card-bordered p-4">
+
+                <!-- Sales AG Grid -->
+                <div class="mb-4">
+                    <h5 class="mb-3">Sales Summary</h5>
+                    <div class="ag-theme-balham">
+                        <ag-grid-angular style="height: 400px; width: 100%;" [rowData]="salesRowData"
+                            [columnDefs]="salesColumnDefs" [defaultColDef]="defaultColDef"
+                            [getRowClass]="getRowClass.bind(this)" [suppressRowHoverHighlight]="true"
+                            [suppressCellFocus]="true" [headerHeight]="40" [rowHeight]="35"
+                            (gridReady)="onSalesGridReady($event)">
+                        </ag-grid-angular>
+                    </div>
+                </div>
+
+                <!-- Purchase AG Grid -->
+                <div class="mb-4">
+                    <h5 class="mb-3">Purchase Summary</h5>
+                    <div class="ag-theme-balham">
+                        <ag-grid-angular style="height: 400px; width: 100%;" [rowData]="purchaseRowData"
+                            [columnDefs]="purchaseColumnDefs" [defaultColDef]="defaultColDef"
+                            [getRowClass]="getRowClass.bind(this)" [suppressRowHoverHighlight]="true"
+                            [suppressCellFocus]="true" [headerHeight]="40" [rowHeight]="35"
+                            (gridReady)="onPurchaseGridReady($event)">
+                        </ag-grid-angular>
+                    </div>
+                </div>
+
+                <!-- Summary AG Grid -->
+                <div class="mb-4">
+                    <h5 class="mb-3">VAT Summary</h5>
+                    <div class="ag-theme-balham">
+                        <ag-grid-angular style="height: 150px; width: 100%;" [rowData]="summaryRowData"
+                            [columnDefs]="summaryColumnDefs" [defaultColDef]="defaultColDef"
+                            [getRowClass]="getRowClass.bind(this)" [suppressRowHoverHighlight]="true"
+                            [suppressCellFocus]="true" [headerHeight]="40" [rowHeight]="35"
+                            (gridReady)="onSummaryGridReady($event)">
+                        </ag-grid-angular>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

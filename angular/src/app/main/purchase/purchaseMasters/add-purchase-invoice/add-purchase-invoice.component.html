@@ -1,0 +1,499 @@
+<div [@routerTransition]>
+    <sub-header [description]="" [title]="title | localize">
+
+        <div role="actions">
+            <button *ngIf="this.id" (click)="clearForm(id)" class="btn btn-sm btn-light-danger fw-bold me-2">
+                <i class="fa-duotone fa-trash fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                    <span class="path4"></span>
+                </i>
+            </button>
+            <button (click)="checkSave()" [buttonBusy]="saving" [disabled]="form.invalid" class="mr-2"
+                class="btn btn-sm fw-bold btn-primary" id="save" label="{{ l(this.id ? 'Update' : 'Save') }}"
+                type="submit">
+                <i class="fa-duotone fa-circle-plus fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l(this.id ? 'Update' : 'Save') }}
+            </button>
+
+            <span *ngIf="this.id">
+                <button class="btn btn-light-success fw-bold me-2" routerLink="/app/main/purchase/pdf/3/{{ this.id }}">
+                    <i class="fa-duotone fa-file-spreadsheet ps-1 fs-2">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                        <span class="path4"></span>
+                    </i>
+                </button>
+            </span>
+
+            <button (click)="close()" class="mr-2" class="btn btn-sm fw-bold btn-light-success" id="cancel">
+                <i class="fa-duotone fa-circle-xmark fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l('Cancel') }}
+            </button>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <form [formGroup]="form" autocomplete="off">
+                    <div appCustomEnter>
+                        <div class="row">
+                            <div class="row p-4">
+                                <div class="col-lg-2 col-md-2 col-xl-2 col-sm-12 col-xs-12">
+                                    <div class="mb-1">
+                                        <label class="required form-label" for="voucherNo">{{ l('Voucher No') }}</label>
+                                        <input [ngClass]="
+                    this.form.get('voucherNo').invalid &&
+                    (this.form.get('voucherNo').dirty || this.form.get('voucherNo').touched)
+                      ? 'is-danger'
+                      : 'is-success'
+                  " [readonly]="this.automaticInput || this.id" class="form-control mt-4px" formControlName="voucherNo"
+                                            id="AccountGroup_voucherNo" placeholder="" type="text"
+                                            voucherNo="voucherNo" />
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-2 col-md-2 col-xl-2 col-sm-12 col-xs-12">
+                                    <div class="mb-1">
+                                        <label class="required form-label" for="datemiti">{{ l('Date-Miti') }}</label>
+                                        <ne-datepicker (keyup)="gotoInvoiceDate($event)"
+                                            [formControl]="form.controls['dateMiti']" language="en"></ne-datepicker>
+                                        <div *ngIf="
+                    this.form.get('dateMiti').invalid &&
+                    (this.form.get('dateMiti').dirty || this.form.get('dateMiti').touched)
+                  ">
+                                            <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                <div class="alert-div">Date Miti is required!</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- <div  colMd="4" colLg="3" colXl="3"></div> -->
+                                <div class="col-lg-3 col-md-3 col-xl-3 col-sm-12 col-xs-12">
+                                    <div class="mb-1">
+                                        <label #accLedger class="required form-label" for="ledgerId">{{ l('Cash /
+                                            Party') }}</label>
+
+                                        <ng-select #ledger (change)="onChangeAccLedger($event.creditPeriod)"
+                                            (keyup)="gotoVendorInvoice($event)" [items]="allAccountLedgers$ | async"
+                                            [searchFn]="customSearchFn" bindLabel="displayName" bindValue="id"
+                                            formControlName="ledgerId">
+                                            <ng-template let-item="item" let-search="searchTerm" ng-option-tmp>
+                                                <div class="main-item">
+                                                    <span>Name:</span>
+                                                    <span [ngOptionHighlight]="search" class="fw-bold">{{
+                                                        item.displayName }}</span>
+                                                </div>
+                                                <div *ngIf="item.mobileNo || item.panNo">
+                                                    <small class="secondary-item">
+                                                        <b>Mobile :</b>
+                                                        {{ item.mobileNo }}
+                                                    </small>
+                                                    &nbsp;&nbsp;
+                                                    <small>
+                                                        <b>PAN :</b>
+                                                        {{ item.panNo }}
+                                                    </small>
+                                                </div>
+                                            </ng-template>
+                                        </ng-select>
+
+
+                                        <div *ngIf="
+                    this.form.get('ledgerId').invalid &&
+                    (this.form.get('ledgerId').dirty || this.form.get('ledgerId').touched)
+                  ">
+                                            <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                <div class="alert-div">Ledger Name is required!</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5 col-md-2 col-xl-5 col-sm-12 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-2 col-xl-3 col-sm-12 col-xs-12">
+                                            <div class="mb-1">
+                                                <label class="required form-label" for="creditPeriod">{{ l('Credit
+                                                    Period')
+                                                    }}</label>
+                                                <input #creditPeriods (keyup)="gotoPurchaseType($event)" [ngClass]="
+                    this.form.get('creditPeriod').invalid &&
+                    (this.form.get('creditPeriod').dirty || this.form.get('creditPeriod').touched)
+                      ? 'is-danger'
+                      : 'is-success'
+                  " class="form-control" formControlName="creditPeriod" id="creditPeriod" min="0" placeholder=""
+                                                    required type="number" />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-5 col-md-3 col-xl-5 col-sm-12 col-xs-12">
+                                            <div class="mb-1">
+                                                <label class="required form-label" for="purchaseAccountId">Purchase
+                                                    Account</label>
+                                                <ng-select #purchaseAcs (keyup)="gotoPurchaseAgainst($event)"
+                                                    [items]="purchaseAccount$ | async" appendTo="body"
+                                                    bindLabel="displayName" bindValue="id"
+                                                    formControlName="purchaseAccountId" id="purchaseAccountId"
+                                                    placeholder="Select an item" required></ng-select>
+                                                <div *ngIf="
+                    this.form.get('purchaseAccountId').invalid &&
+                    (this.form.get('purchaseAccountId').dirty || this.form.get('purchaseAccountId').touched)
+                  ">
+                                                    <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                        <div class="alert-div">Purchase Account is required!</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-2 col-xl-4 col-sm-12 col-xs-12">
+                                            <div class="mb-1">
+                                                <label class="required form-label" for="vendorInvoiceNo">{{ l('Vendor
+                                                    IN')
+                                                    }}</label>
+                                                <input #vendorNo (keyup)="gotoCreditPeriod($event)"
+                                                    [ngClass]="this.form.get('vendorInvoiceNo').valid ? 'is-success' : 'is-danger'"
+                                                    class="form-control input" formControlName="vendorInvoiceNo"
+                                                    id="vendorInvoiceNo" placeholder="Mandatory" type="text" />
+                                                <!-- <div
+                                                                                class="text-danger"
+                                                                                *ngIf="
+                                                                                    this.form.get('vendorInvoiceNo').invalid &&
+                                                                                    (this.form.get('vendorInvoiceNo').dirty || this.form.get('vendorInvoiceNo').touched)
+                                                                                "
+                                                                            >
+                                                                                VendorInvoiceNo required
+                                                                            </div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div *ngIf="dataFilled" class="card  shadow-sm ">
+                                <div class="card-header">
+                                    <h3 class="card-title fw-bold">{{ l('Purchase Invoice Details') }}</h3>
+                                    <div class="card-toolbar">
+                                        <button (click)="keyEventsDetail()" [disabled]="this.purchaseDetail.invalid"
+                                            [label]="'Add Details'"
+                                            class="btn btn-sm btn-outline btn-outline-success btn-active-light-success"
+                                            id="add">
+                                            <i class="fa-duotone fa-grid-2-plus fs-2">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                                <span class="path3"></span>
+                                            </i>
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="table-responsives overflow-x-auto h-350px">
+                                    <table class="table table-row-dashed table-row-gray-300 table-striped"
+                                        formArrayName="purchaseDetail">
+                                        <thead class="bg-tableHead">
+                                            <tr class="text-center">
+                                                <th class="min-w-50px">S.N.</th>
+                                                <th class="min-w-200px">PRODUCT NAME</th>
+                                                <th class="min-w-100px">QTY</th>
+                                                <th class="min-w-150px">RATE</th>
+                                                <th class="min-w-100px">UNIT</th>
+                                                <th class="min-w-100px">GROSS AMT</th>
+                                                <!--
+                                                <th *ngIf="this.discountPercent" class="width-20">
+                                                    Discount % </th>
+                                                <th *ngIf="this.discountAmount" class="width-20">DISCOUNT</th>
+                                                <th class="min-w-100px">NET AMOUNT</th>
+                                                -->
+                                                <th>VAT</th>
+                                                <th class="min-w-100px">VAT AMOUNT</th>
+                                                <th class="min-w-150px">TOTAL AMOUNT</th>
+                                                <th>REMOVE</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let abcd of getPurchaseDetail(form); let i = index"
+                                                [formGroupName]="i">
+                                                <td class="sn_css text-center text-left">
+                                                    {{ i + 1 }}
+                                                </td>
+
+                                                <td appPadding>
+                                                    <div class="width-220px">
+                                                        <ng-select #productKey
+                                                            (change)="onGetProduct($event.id, abcd, i)"
+                                                            (keyup)="fromProduct($event, i, abcd)"
+                                                            [items]="allProducts$ | async" appendTo="body"
+                                                            bindLabel="displayName" bindValue="id"
+                                                            formControlName="productId" id="productId" name="productId"
+                                                            placeholder="Select an item"></ng-select>
+                                                        <div *ngIf="
+                            abcd.get('productId').invalid &&
+                            (abcd.get('productId').dirty || abcd.get('productId').touched)
+                          ">
+                                                            <div class="alert alert-danger alert-height mt-1"
+                                                                role="alert">
+                                                                <div class="alert-div">Product is Required</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td appPadding>
+                                                    <div class="min-w-80px">
+                                                        <input #qty (keyup)="calculateRow(abcd)"
+                                                            (keyup)="gotoFromQTY($event, i)" [ngStyle]="{
+                            border: abcd.get('qty').touched && abcd.get('qty').invalid ? '1px solid red' : null
+                          }" class="grid__input" class="form-control" formControlName="qty" min="0.01" type="number" />
+                                                    </div>
+                                                </td>
+                                                <td appPadding>
+                                                    <div class="min-w-140px">
+                                                        <input #rates
+                                                            (keyup)="calculateRow(abcd); goFromRate($event, i)"
+                                                            [ngStyle]="{
+                            border: abcd.get('rate').touched && abcd.get('rate').invalid ? '1px solid red' : null
+                          }" [readonly]="form.value.invoiceTypeEnum == 1" class="form-control" formControlName="rate"
+                                                            min="0" type="number" />
+                                                    </div>
+                                                </td>
+
+                                                <td appPadding>
+                                                    <div class="min-width-90px">
+                                                <td appPadding>
+                                                    <div class="min-w-100px">
+                                                        <ng-select #unit [items]="abcd.get('unitsList').value"
+                                                            appendTo="body" bindLabel="unitName" bindValue="unitId"
+                                                            formControlName="unitId" id="unitId" name="unitName"
+                                                            placeholder="Select an item"></ng-select>
+                                                        <div *ngIf="
+                                abcd.get('unitId').invalid && (abcd.get('unitId').dirty || abcd.get('unitId').touched)
+                              ">
+                                                            <div class="alert alert-danger alert-height mt-1"
+                                                                role="alert">
+                                                                <div class="alert-div">Required!</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <div *ngIf="
+                            abcd.get('unitId').invalid && (abcd.get('unitId').dirty || abcd.get('unitId').touched)
+                          ">
+                                                    <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                        <div class="alert-div">Required</div>
+                                                    </div>
+                                                </div>
+                                </div>
+                                </td>
+
+                                <td appPadding>
+                                    <div class="min-w-100px">
+                                        <input [ngStyle]="{
+                            border:
+                              abcd.get('grossAmount').touched && abcd.get('grossAmount').invalid
+                                ? '1px solid red'
+                                : null
+                          }" class="grid__input" class="form-control" formControlName="grossAmount" readonly
+                                            type="number" />
+                                    </div>
+                                </td>
+
+                                <!--
+                            
+                                    <td *ngIf="this.discountPercent" appPadding>
+                                    <div class="width-82px">
+                                        <input #discountPers (keyup)="calculateRow(abcd); fromDisPer($event, i)"
+                                            [ngStyle]="{
+                            border:
+                              abcd.get('discountPercent').touched && abcd.get('discountPercent').invalid
+                                ? '1px solid red'
+                                : null
+                          }" class="grid__input" class="form-control" formControlName="discountPercent" max="100"
+                                            maxlength="3" min="0" type="number" />
+                                    </div>
+                                </td>
+                                <td *ngIf="this.discountAmount" appPadding>
+                                    <div class="min-w-100px">
+                                        <input #dis (keyup)="calculateRow(abcd); fromDisAmt($event, i)" [ngStyle]="{
+                            border:
+                              abcd.get('discount').touched && abcd.get('discount').invalid ? '1px solid red' : null
+                          }" class="grid__input" class="form-control" formControlName="discount" type="number" />
+                                    </div>
+                                </td>
+                                <td appPadding>
+                                    <div class="min-w-100px">
+                                        <input [ngStyle]="{
+                            border:
+                              abcd.get('netAmount').touched && abcd.get('netAmount').invalid
+                                ? '1px solid red'
+                                : null
+                          }" class="grid__input" class="form-control" formControlName="netAmount" readonly
+                                            type="number" />
+                                    </div>
+                                </td>
+                                -->
+
+                                <td appPadding>
+                                    <div class="width-90px">
+                                        <ng-select #taxess (change)="calculateRow(abcd)" (keyup)="fromTaxes($event, i)"
+                                            [items]="allTaxes" appendTo="body" bindLabel="name" bindValue="id"
+                                            formControlName="taxId" id="taxId" name="taxId"
+                                            placeholder="Select an item"></ng-select>
+                                        <div *ngIf="
+                            abcd.get('taxId').invalid && (abcd.get('taxId').dirty || abcd.get('taxId').touched)
+                          ">
+                                            <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                <div class="alert-div">Required</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td appPadding>
+                                    <div class="width-90px">
+                                        <input (keyup)="calculateRow(abcd)" [ngStyle]="{
+                            border:
+                              abcd.get('taxAmount').touched && abcd.get('taxAmount').invalid
+                                ? '1px solid red'
+                                : null
+                          }" [readonly]="this.form.value.invoiceTypeEnum != 1" class="grid__input" class="form-control"
+                                            formControlName="taxAmount" type="number" />
+                                    </div>
+                                </td>
+
+                                <td appPadding>
+                                    <div class="min-w-100px">
+                                        <input #total (keyup)="calculateRow(abcd); fromTotalAmt($event)" [ngStyle]="{
+                            border:
+                              abcd.get('amount').touched && abcd.get('amount').invalid ? '1px solid red' : null
+                          }" [readonly]="form.value.invoiceTypeEnum == 1" class="grid__input" class="form-control"
+                                            formControlName="amount" type="number" />
+                                    </div>
+                                </td>
+
+                                <td appPadding class="text-center text-left">
+                                    <div (click)="removePurchaseDetailForm(i, form)" class="btn btn-sm">
+                                        <i class="fa-duotone fa-trash cursor-pointer"></i>
+                                    </div>
+                                </td>
+                                </tr>
+                                </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <div [noGap]="false" class="row">
+                                    <div class="col-lg-4 col-md-6 col-sm-6 col-xs-6">
+                                        <div class="mb-1">
+                                            <label for="lrNo">{{ l('LRNo.') }}</label>
+                                            <input #lrno (keyup)="gotdesc($event)" [ngClass]="
+                        this.form.get('lrNo').invalid &&
+                        (this.form.get('lrNo').dirty || this.form.get('lrNo').touched)
+                          ? 'is-danger'
+                          : 'is-success'
+                      " class="form-control" formControlName="lrNo" id="lrNo" type="text" />
+                                            <div *ngIf="
+                        this.form.get('lrNo').invalid &&
+                        (this.form.get('lrNo').dirty || this.form.get('lrNo').touched)
+                      " class="text-danger">
+                                                lr No required
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-xs-8 col-sm-8">
+                                        <div class="mb-1">
+                                            <label for="narration">{{ l('Description') }}</label>
+                                            <textarea #descrip (keyup)="fromDesc($event)" class="form-control"
+                                                formControlName="narration" id="narration" maxlength="400" minlength="0"
+                                                placeholder="" type="text"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-2 col-lg-2 col-md-4  col-xs-4 col-sm-4">
+                                        <div class="mt-2">
+                                            <input [(ngModel)]="isPrint" [ngModelOptions]="{ standalone: true }"
+                                                class="form-check-input" inputId="defaultCheckbox" label="Print"
+                                                required="true" type="checkbox" />
+                                            <label>{{ l(' Print') }}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <div class="row bg-deepgray">
+                                    <div *ngIf="form.value.invoiceTypeEnum == 1"
+                                        class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                        <div class="mb-1">
+                                            <label class="required form-label" for="totalCustomAmount">
+                                                {{ l('Total Custom Amount') }}
+                                            </label>
+                                            <input class="form-control" formControlName="totalCustomAmount"
+                                                id="totalCustomAmount" placeholder="" readonly required type="number" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-4">
+                                        <div class="mb-1">
+                                            <label class="required form-label" for="totalAmount">{{ l('Gross Amount')
+                                                }}</label>
+                                            <input class="form-control" formControlName="totalAmount" id="totalAmount"
+                                                placeholder="" readonly required type="number" />
+                                        </div>
+                                    </div>                                    
+
+                                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-4">
+                                        <div class="mb-1">
+                                            <label class="required form-label" for="totalTax">{{ l('Taxable Amount')
+                                                }}</label>
+                                            <input class="form-control" formControlName="taxableAmount"
+                                                id="taxableAmount" placeholder="" readonly required type="number" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-4">
+                                        <div class="mb-1">
+                                            <label class="required form-label" for="totalTax">{{ l('VAT Amount')
+                                                }}</label>
+                                            <input class="form-control" formControlName="totalTax" id="totalTax"
+                                                placeholder="" readonly required type="number" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-4">
+                                        <div class="mb-1">
+                                            <label class="required form-label" for="grandTotal">{{ l('Grand Total')
+                                                }}</label>
+                                            <input class="form-control" formControlName="grandTotal" id="creditPeriod"
+                                                placeholder="" readonly required type="number" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<app-add-account-ledgers (accountLedgerSave)="getAccountLedgers($event)" *ngIf="serialNumber === 2"
+    [serialNo]="serialNumber"></app-add-account-ledgers>
+<app-add-product (productSave)="getAllProduct($event)" *ngIf="serialNumber === 3"
+    [serialNo]="serialNumber"></app-add-product>
+<ng-keyboard-shortcuts [shortcuts]="shortcuts"></ng-keyboard-shortcuts>
+<erp-key-event (closeEvent)="keyClose($event)" (deletEvent)="clearForm($event)" (saveEvent)="keySave($event)"
+    [id]="this.id ? this.id : null"></erp-key-event>

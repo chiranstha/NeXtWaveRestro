@@ -1,0 +1,103 @@
+<div [@routerTransition]>
+    <sub-header [description]="'LoginAttemptsHeaderInfo' | localize" [title]="'LoginAttempts' | localize"></sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom">
+            <div class="card-body">
+                <div class="form">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-md-12">
+                            <div class="mb-5">
+                                <label class="form-label" for="LoginAttemptsFilter">
+                                    {{ 'Filter' | localize }}
+                                </label>
+                                <div class="input-group">
+                                    <input
+                                        [(ngModel)]="filter"
+                                        [attr.placeholder]="l('SearchWithThreeDot')"
+                                        class="form-control"
+                                        id="LoginAttemptsFilter"
+                                        type="text"
+                                        value=""
+                                    />
+                                    <span class="input-group-append">
+                                        <button
+                                            (click)="getLoginAttempts()"
+                                            class="btn btn-sm btn-primary"
+                                            id="GetLoginAttemptsButton"
+                                        >
+                                            <i [attr.aria-label]="l('Search')" class="fa-solid fa-magnifying-glass"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row align-items-center mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-5">
+                                <label class="form-label" for="StartEndRange">{{ 'DateRange' | localize }}</label>
+                                <input
+                                    #drp="bsDaterangepicker"
+                                    [(date)]="dateRange"
+                                    bsDaterangepicker
+                                    class="form-control"
+                                    dateRangePickerLuxonModifier
+                                    id="StartEndRange"
+                                    name="StartEndRange"
+                                    readonly="readonly"
+                                />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-5">
+                                <label class="form-label" for="LoginResultFilter">
+                                    {{ 'Result' | localize }}
+                                </label>
+                                <login-result-type-combo [(ngModel)]="loginResultFilter"></login-result-type-combo>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xl-12 text-end">
+                            <button (click)="getLoginAttempts()" class="btn btn-sm btn-primary" name="RefreshButton">
+                                <i class="la la-refresh btn-md-icon"></i>
+                                <span class="d-none d-md-inline-block">
+                                    {{ 'Refresh' | localize }}
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row align-items-center">
+                    <!--<AG-Grid-Start>-->
+                    <div
+                        [busyIf]="$safeNavigationMigration(dataTableHelper?.isLoading)"
+                        class="col ag-grid-container"
+                    >
+                        <ag-grid-angular
+                            #agGrid
+                            (gridReady)="onGridReady($event)"
+                            [columnDefs]="columnDefs"
+                            [defaultColDef]="{
+                                resizable: true,
+                                sortable: true,
+                                filter: true,
+                            }"
+                            [paginationPageSize]="dataTableHelper?.defaultRecordsCountPerPage || 10"
+                            [pagination]="false"
+                            [rowData]="rowData"
+                            class="ag-theme-balham"
+                            domLayout="autoHeight"
+                        ></ag-grid-angular>
+                        @if (rowData.length == 0) {
+                            <div class="ag-grid-no-data">
+                                {{ 'NoData' | localize }}
+                            </div>
+                        }
+                    </div>
+                    <!--<AG-Grid-End>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

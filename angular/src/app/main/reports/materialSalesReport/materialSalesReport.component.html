@@ -1,0 +1,101 @@
+<div [@routerTransition]>
+    <sub-header [title]="'Material Sales Report'">
+        <div role="search">
+            <div class="position-relative w-md-400px me-md-2">
+                <i
+                    class="fa-duotone fa-magnifying-glass fs-3 text-gray-500 position-absolute top-50 translate-middle ms-6"><span
+                        class="path1"></span><span class="path2"></span></i>
+                <input (keyup.enter)="searchFilter($event.target.value)" [ngModelOptions]="{ standalone: true }"
+                    class="form-control form-control-solid ps-10 headerSearch" name="search" placeholder="Search"
+                    type="text" value="">
+            </div>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="card card-bordered p-4">
+            <form [formGroup]="myForm">
+                <div [hidden]="!advancedFiltersAreShown" class="col-12 px-0">
+                    <div class="hidden-filter">
+                        <div class="row">
+                            <div class="col-md-2 col-xl-2 col-xs-2 col-sm-12">
+                                <label class="form-label" for="fromMiti">From Miti</label>
+                                <ne-datepicker [formControl]="myForm.controls['fromMiti']"
+                                    language="en"></ne-datepicker>
+                            </div>
+                            <div class="col-md-2 col-xl-2 col-xs-2 col-sm-12">
+                                <label class="form-label" for="toMiti">To Miti</label>
+                                <ne-datepicker [formControl]="myForm.controls['toMiti']" language="en"></ne-datepicker>
+                            </div>
+
+                            <div class="col-lg-6 col-xl-6 col-md-6 col-xs-6 pt-8">
+                                <a (click)="loadReport()" class="btn btn-sm btn-flex btn-primary fw-bold">
+                                    <i class="fa fa-search"></i>
+                                    Search
+                                </a>
+                                <a (click)="refreshLoad()" class="btn btn-sm btn-flex btn-primary fw-bold">
+                                    <i class="fa-duotone fa-rotate-right fs-6 text-light me-1">
+                                    </i>
+                                    Refresh
+                                </a>
+
+                                <a (click)="exportToExcel()" class="btn btn-sm btn-flex btn-primary fw-bold">
+                                    <i class="fa-duotone fa-file-excel fs-6 text-light me-1">
+                                    </i>
+                                    Export to Excel
+                                </a>
+
+
+                                <!-- <button (click)="syncWithIRD()" [buttonBusy]="saving" [disabled]="saving"
+                                    class="mr-2 btn btn-sm fw-bold btn-primary" id="save" type="submit">
+                                    <i class="fa-duotone fa-circle-plus fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                        <span class="path3"></span>
+                                    </i>
+                                    {{ l('Sync with IRD') }}
+                                </button> -->
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-sm-12">
+                        <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
+                            *ngIf="!advancedFiltersAreShown" class="clickable-item text-muted">
+                            <i class="fa fa-angle-down"></i>
+                            {{ 'ShowAdvancedFilters' | localize }}
+                        </span>
+                        <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
+                            *ngIf="advancedFiltersAreShown" class="clickable-item text-muted">
+                            <i class="fa fa-angle-up"></i>
+                            {{ 'HideAdvancedFilters' | localize }}
+                        </span>
+                    </div>
+                </div>
+            </form>
+
+            <div class="overflow-x-auto">
+                <div class="row">
+                    <div class="col-md-2">
+
+                    </div>
+                    <div class="col-md-2">
+
+                    </div>
+                </div>
+
+                <ag-grid-angular
+                    class="ag-theme-balham"
+                    style="width: 100%; height: 600px;"
+                    [columnDefs]="columnDefs"
+                    [defaultColDef]="defaultColDef"
+                    [rowData]="displayedRows"
+                ></ag-grid-angular>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,51 @@
+<div class="card card-custom h-100">
+    <div class="card-header align-items-center border-0">
+        <div class="card-title">
+            <span class="card-icon">
+                <i class="fas fa-user-plus text-primary"></i>
+            </span>
+            <h3 class="card-label text-primary">
+                {{ 'RecentTenants' | localize }}
+                @if (!loading) {
+                    <small class="text-muted">
+                        {{
+                            'RecentTenantsHelpText'
+                                | localize
+                                    : recentTenantsData.recentTenantsDayCount
+                                    : recentTenantsData.maxRecentTenantsShownCount
+                        }}
+                    </small>
+                }
+            </h3>
+        </div>
+    </div>
+    <div class="card-body" perfectScrollbar>
+        <div class="scroller chart" perfectScrollbar>
+            @if (!loading) {
+                <div [busyIf]="loading" class="ag-grid-container recent-tenants-table">
+                    <ag-grid-angular
+                        (gridReady)="onGridReady($event)"
+                        [columnDefs]="columnDefs"
+                        [defaultColDef]="defaultColDef"
+                        [domLayout]="'autoHeight'"
+                        [rowData]="recentTenantsData?.recentTenants || []"
+                        class="ag-theme-balham"
+                    ></ag-grid-angular>
+                    @if (recentTenantsData?.recentTenants?.length == 0) {
+                        <div class="app-no-data">
+                            {{ 'NoData' | localize }}
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+        <div class="scroller-footer">
+            <div class="btn-arrow-link pull-right">
+                <a (click)="gotoAllRecentTenants()" class="see-all-recent-tenants" href="javascript:;">
+                    {{ 'SeeAllRecords' | localize }}
+                </a>
+                <i class="icon-arrow-right"></i>
+            </div>
+        </div>
+    </div>
+</div>

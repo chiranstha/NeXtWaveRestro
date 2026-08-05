@@ -1,0 +1,406 @@
+<div [@routerTransition]>
+    <div [class]="containerClass">
+        <header class="page-intro card shadow-sm border animate__animated animate__fadeIn p-3 p-lg-4 mb-2">
+            <div class="row g-3 w-100 align-items-center">
+                <div class="col-lg">
+                    <div class="page-intro__content">
+                        <span class="page-intro__eyebrow text-primary fs-6 fw-bold mb-2">
+                            {{ 'Financial Report' | localize }}
+                        </span>
+                        <h1 class="page-intro__title text-body fs-5 fw-bold mb-1">{{ 'Trial Balance' | localize }}</h1>
+                        <p class="page-intro__subtitle text-muted m-0 fs-6">
+                            {{
+                                'A comprehensive snapshot of your financial ledger, ensuring all debits and credits are
+              perfectly
+              balanced.' | localize
+                            }}
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-auto">
+                    <div
+                        [ngClass]="
+                            isBalanced
+                                ? 'border-success bg-success-subtle text-success'
+                                : 'border-danger bg-danger-subtle text-danger'
+                        "
+                        class="page-intro__status card shadow-sm border d-flex align-items-center gap-3 px-4 py-3 rounded-3 transition-all"
+                    >
+                        <i
+                            [ngClass]="
+                                isBalanced ? 'fa-check-double text-success' : 'fa-exclamation-triangle text-danger'
+                            "
+                            class="fad fs-4"
+                        ></i>
+                        <div class="page-intro__status-text text-end">
+                            <span class="label fw-semibold text-uppercase opacity-75 d-block">
+                                {{ 'Balance Status' | localize }}
+                            </span>
+                            <strong class="value fs-4 fw-bold">
+                                {{
+                                    isBalanced
+                                        ? ('Balanced' | localize)
+                                        : (getTotalDebit() - getTotalCredit() | number: '1.2-2')
+                                }}
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="row g-3 page-metrics mb-2">
+            <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.1s">
+                <article
+                    class="stat-card stat-card--primary card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-primary transition-all position-relative overflow-hidden"
+                >
+                    <div
+                        class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-primary-subtle fs-5 w-11 h-11"
+                    >
+                        <i class="fad fa-file-invoice-dollar"></i>
+                    </div>
+                    <div class="stat-card__content flex-fill">
+                        <span class="stat-card__label text-muted fw-semibold text-uppercase">
+                            {{ 'Opening Debit' | localize }}
+                        </span>
+                        <h3 class="stat-card__value text-body fs-4 my-1">
+                            {{ getTotalOpeningDebit() | number: '1.2-2' }}
+                        </h3>
+                        <small class="stat-card__meta text-muted opacity-75">
+                            {{ 'Initial period balance' | localize }}
+                        </small>
+                    </div>
+                </article>
+            </div>
+            <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.2s">
+                <article
+                    class="stat-card stat-card--info card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-info transition-all position-relative overflow-hidden"
+                >
+                    <div
+                        class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-info-subtle fs-5 w-11 h-11"
+                    >
+                        <i class="fad fa-receipt"></i>
+                    </div>
+                    <div class="stat-card__content flex-fill">
+                        <span class="stat-card__label text-muted fw-semibold text-uppercase">
+                            {{ 'Opening Credit' | localize }}
+                        </span>
+                        <h3 class="stat-card__value text-body fs-4 my-1">
+                            {{ getTotalOpeningCredit() | number: '1.2-2' }}
+                        </h3>
+                        <small class="stat-card__meta text-muted opacity-75">
+                            {{ 'Initial period balance' | localize }}
+                        </small>
+                    </div>
+                </article>
+            </div>
+            <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.3s">
+                <article
+                    class="stat-card stat-card--success card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-success transition-all position-relative overflow-hidden"
+                >
+                    <div
+                        class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-success-subtle fs-5 w-11 h-11"
+                    >
+                        <i class="fad fa-chart-line"></i>
+                    </div>
+                    <div class="stat-card__content flex-fill">
+                        <span class="stat-card__label text-muted fw-semibold text-uppercase">
+                            {{ 'Closing Debit' | localize }}
+                        </span>
+                        <h3 class="stat-card__value text-body fs-4 my-1">
+                            {{ getTotalClosingDebit() | number: '1.2-2' }}
+                        </h3>
+                        <small class="stat-card__meta text-muted opacity-75">
+                            {{ 'Current net balance' | localize }}
+                        </small>
+                    </div>
+                </article>
+            </div>
+            <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.4s">
+                <article
+                    class="stat-card stat-card--warning card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-warning transition-all position-relative overflow-hidden"
+                >
+                    <div
+                        class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-warning-subtle fs-5 w-11 h-11"
+                    >
+                        <i class="fad fa-balance-scale-right"></i>
+                    </div>
+                    <div class="stat-card__content flex-fill">
+                        <span class="stat-card__label text-muted fw-semibold text-uppercase">
+                            {{ 'Closing Credit' | localize }}
+                        </span>
+                        <h3 class="stat-card__value text-body fs-4 my-1">
+                            {{ getTotalClosingCredit() | number: '1.2-2' }}
+                        </h3>
+                        <small class="stat-card__meta text-muted opacity-75">
+                            {{ 'Current net balance' | localize }}
+                        </small>
+                    </div>
+                </article>
+            </div>
+        </div>
+
+        <section class="filter-shell card shadow-sm border mb-3 overflow-visible position-relative">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                    <span
+                        class="badge-light-primary bg-primary-subtle text-primary fs-6 me-2 p-2 pe-3 rounded fw-semibold"
+                    >
+                        <i class="fad fa-filter me-2"></i>
+                        {{ 'Report Controls' | localize }}
+                    </span>
+                    <h2 class="card-label mb-0 text-body fs-6 fw-bold">{{ 'Filter Period & Branch' | localize }}</h2>
+                </div>
+                <div class="d-flex gap-2">
+                    <button
+                        (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
+                        [ngClass]="advancedFiltersAreShown ? 'btn-light-danger' : 'btn-light-primary'"
+                        class="btn btn-sm"
+                    >
+                        <i
+                            [ngClass]="advancedFiltersAreShown ? 'fa-chevron-up me-2' : 'fa-chevron-down me-2'"
+                            class="fad"
+                        ></i>
+                        {{ (advancedFiltersAreShown ? 'Hide Filters' : 'Show Filters') | localize }}
+                    </button>
+                    <button (click)="loadReport()" [disabled]="loading" class="btn btn-sm btn-light-info">
+                        <i [class.fa-spin]="loading" class="fad fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            @if (advancedFiltersAreShown) {
+                <div class="filter-form animate__animated animate__slideInDown p-3">
+                    <form [formGroup]="myForm" class="row g-3 align-items-end">
+                        <div class="col-xl-4 col-md-6">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">
+                                <i class="fad fa-calendar-star text-info me-2"></i>
+                                {{ 'From Miti' | localize }}
+                            </label>
+                            <div class="input-group">
+                                <ne-datepicker
+                                    #fromMiti
+                                    [disableFinancialYear]="true"
+                                    [formControl]="myForm.controls['fromMiti']"
+                                    [npDatePickerId]="'fromMiti'"
+                                    language="en"
+                                    placeholder="Select an item"
+                                    name="fromMiti"
+                                ></ne-datepicker>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-md-6">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">
+                                <i class="fad fa-calendar-star text-info me-2"></i>
+                                {{ 'To Miti' | localize }}
+                            </label>
+                            <div class="input-group">
+                                <ne-datepicker
+                                    #toMiti
+                                    [disableFinancialYear]="true"
+                                    [formControl]="myForm.controls['toMiti']"
+                                    [npDatePickerId]="'toMiti'"
+                                    language="en"
+                                    placeholder="Select an item"
+                                    name="toMiti"
+                                ></ne-datepicker>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-md-6 d-flex flex-column">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">
+                                <i class="fad fa-layer-group text-success me-2"></i>
+                                {{ 'Breakdown' | localize }}
+                            </label>
+                            <div class="form-check form-switch py-2">
+                                <input
+                                    (change)="enabledorDisabled()"
+                                    class="form-check-input"
+                                    formControlName="isShowOpenClosing"
+                                    id="flexSwitchCheckDefault"
+                                    type="checkbox"
+                                    name="isShowOpenClosing"
+                                />
+                                <label class="form-check-label text-muted small" for="flexSwitchCheckDefault">
+                                    {{ 'Show Details' | localize }}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-md-6">
+                            <button
+                                (click)="onAdvanceSearch()"
+                                [disabled]="loading"
+                                class="btn btn-primary w-100 shadow-sm"
+                            >
+                                <i class="fad fa-search me-2"></i>
+                                {{ 'Apply Filters' | localize }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            }
+        </section>
+
+        <main class="report-surface d-flex flex-column gap-3">
+            <div
+                class="report-toolbar card shadow-sm border d-flex align-items-center justify-content-between gap-3 p-2 p-md-3 bg-body position-relative"
+            >
+                <div
+                    class="search-inline flex-grow-1 me-3 d-flex align-items-center"
+                    style="flex: 0 0 60%; max-width: 60%; min-width: 280px"
+                >
+                    <span class="me-3 text-muted d-flex align-items-center"><i class="fad fa-search fs-5"></i></span>
+                    <input
+                        (input)="searchDataTable($event.target.value)"
+                        class="form-control flex-grow-1 border bg-body rounded-pill"
+                        placeholder="{{ 'Search ledgers, groups or amounts...' | localize }}"
+                        type="text"
+                    />
+                </div>
+                <div class="report-toolbar__buttons d-flex gap-2">
+                    <div class="btn-group shadow-sm">
+                        <button (click)="expandAll()" class="btn btn-sm btn-white text-success border">
+                            <i class="fad fa-expand-arrows me-2"></i>
+                            {{ 'Expand' | localize }}
+                        </button>
+                        <button (click)="collapseAll()" class="btn btn-sm btn-white text-danger border">
+                            <i class="fad fa-compress-arrows me-2"></i>
+                            {{ 'Collapse' | localize }}
+                        </button>
+                    </div>
+                    <div #exportDropdown class="dropdown">
+                        <button
+                            (click)="toggleExportDropdown($event)"
+                            [attr.aria-expanded]="exportDropdownOpen"
+                            class="btn btn-sm btn-white border dropdown-toggle shadow-sm"
+                            type="button"
+                        >
+                            <i class="fad fa-cloud-download me-2 text-primary"></i>
+                            {{ 'Export Report' | localize }}
+                        </button>
+                        <ul
+                            [class.show]="exportDropdownOpen"
+                            class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-2"
+                        >
+                            <li>
+                                <a
+                                    (click)="onExportToExcel(); exportDropdownOpen = false"
+                                    class="dropdown-item rounded-2 py-2"
+                                >
+                                    <i class="fad fa-file-excel text-success me-3"></i>
+                                    {{ 'Export to Excel' | localize }}
+                                </a>
+                            </li>
+                            <li>
+                                <a (click)="showPdf(); exportDropdownOpen = false" class="dropdown-item rounded-2 py-2">
+                                    <i class="fad fa-file-pdf text-danger me-3"></i>
+                                    {{ 'Download PDF' | localize }}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="report-grid position-relative card shadow-sm border">
+                @if (loading) {
+                    <div
+                        class="loader-overlay position-absolute inset-0 d-flex align-items-center justify-content-center"
+                    >
+                        <div class="text-center">
+                            <div class="spinner-grow text-primary mb-3" role="status"></div>
+                            <p class="text-muted fw-bold small text-uppercase letter-spacing-1">
+                                {{
+                                    'Analyzing Ledger
+                    Data...' | localize
+                                }}
+                            </p>
+                        </div>
+                    </div>
+                }
+                @if (!loading && (!rowData || rowData.length === 0)) {
+                    <div class="empty-state text-center py-5 px-4">
+                        <i class="fad fa-folders empty-state__icon text-muted fs-1 mb-4 opacity-50"></i>
+                        <h3 class="fw-bold">{{ 'No Data Found' | localize }}</h3>
+                        <p class="text-muted">{{ 'Try adjusting your filters to see results' | localize }}</p>
+                    </div>
+                }
+                @if (!loading && rowData && rowData.length > 0) {
+                    <div class="ag-theme-balham w-100" style="height: auto; width: 100%">
+                        <ag-grid-angular
+                            #agGrid
+                            (gridReady)="onGridReady($event)"
+                            [columnDefs]="columnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [gridOptions]="gridOptions"
+                            [rowData]="rowData"
+                            class="ag-theme-balham w-100"
+                            domLayout="autoHeight"
+                         [loading]="$any(this)['loading'] || $any(this)['isLoading'] || false"></ag-grid-angular>
+                    </div>
+                }
+            </div>
+
+            <footer
+                class="report-summary card shadow-sm border animate__animated animate__fadeInUp d-flex align-items-center justify-content-between gap-3 p-3 bg-body"
+            >
+                <div class="report-summary__info d-flex align-items-center gap-4">
+                    <div class="d-flex flex-column">
+                        <span class="text-muted small text-uppercase fw-bold">{{ 'Total Records' | localize }}</span>
+                        <span class="fs-5 fw-bold text-primary">{{ treeLength() || 0 }}</span>
+                    </div>
+                </div>
+                <div class="report-summary__totals d-flex gap-3 ms-auto">
+                    <div
+                        class="total-chip total-chip--debit shadow-sm d-flex align-items-center rounded-3 bg-success-subtle text-success border-success fw-bold gap-3 border border-transparent p-2 px-4 py-2"
+                    >
+                        <i class="fad fa-arrow-alt-down"></i>
+                        <div class="d-flex flex-column">
+                            <span class="small opacity-75 fw-bold" style="font-size: 0.65rem">
+                                {{ 'TOTAL DEBIT' | localize }}
+                            </span>
+                            <span class="fs-6">{{ getTotalDebit() | number: '1.2-2' }}</span>
+                        </div>
+                    </div>
+                    <div
+                        class="total-chip total-chip--credit shadow-sm d-flex align-items-center rounded-3 bg-danger-subtle text-danger border-danger fw-bold gap-3 border border-transparent p-2 px-4 py-2"
+                    >
+                        <i class="fad fa-arrow-alt-up"></i>
+                        <div class="d-flex flex-column">
+                            <span class="small opacity-75 fw-bold" style="font-size: 0.65rem">
+                                {{ 'TOTAL CREDIT' | localize }}
+                            </span>
+                            <span class="fs-6">{{ getTotalCredit() | number: '1.2-2' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </main>
+
+        @if (showPdfOk) {
+            <div
+                class="report-pdf-overlay animate__animated animate__fadeIn bg-body position-fixed shadow-lg overflow-hidden"
+            >
+                <div class="card h-100 border-0 shadow-lg">
+                    <div
+                        class="card-header bg-white py-3 border-bottom-0 d-flex justify-content-between align-items-center"
+                    >
+                        <h3 class="card-title fw-bold text-dark mb-0">
+                            <i class="fad fa-file-pdf me-2 text-danger"></i>
+                            {{ 'Generated PDF Report' | localize }}
+                        </h3>
+                        <button (click)="back()" class="btn btn-light-danger btn-sm shadow-sm rounded-pill px-4">
+                            <i class="fad fa-times me-2"></i>
+                            {{ 'Close Preview' | localize }}
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <app-report-pdf [pdfdata]="pdfUrl" [title]="title" class="h-100"></app-report-pdf>
+                    </div>
+                </div>
+            </div>
+        }
+        <app-addproduct
+            #productCreateModal
+            (modalSave)="loadReport()"
+            [dialog]="true"
+        ></app-addproduct>
+    </div>
+</div>

@@ -1,0 +1,44 @@
+<div [@routerTransition]>
+    <sub-header
+        [description]="'OrganizationUnitsHeaderInfo' | localize"
+        [title]="'OrganizationUnits' | localize"
+    ></sub-header>
+    <div [class]="containerClass">
+        <div class="row">
+            <div class="col-6">
+                <organization-tree #ouTree (ouSelected)="ouSelected($event)"></organization-tree>
+            </div>
+            <div class="col-6">
+                <div class="card card-custom gutter-b">
+                    <div class="card-header align-items-center border-0">
+                        <h3 class="card-title align-items-start flex-column">
+                            <span class="fw-bolder text-dark">
+                                @if (organizationUnit) {
+                                    <span>{{ organizationUnit.displayName }}</span>
+                                }
+                            </span>
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <tabset class="tab-container">
+                            <tab [active]="true" heading="{{ 'Members' | localize }}">
+                                <organization-unit-members
+                                    #ouMembers
+                                    (memberRemoved)="ouTree.memberRemoved($event)"
+                                    (membersAdded)="ouTree.membersAdded($event)"
+                                ></organization-unit-members>
+                            </tab>
+                            <tab heading="{{ 'Roles' | localize }}">
+                                <organization-unit-roles
+                                    #ouRoles
+                                    (roleRemoved)="ouTree.roleRemoved($event)"
+                                    (rolesAdded)="ouTree.rolesAdded($event)"
+                                ></organization-unit-roles>
+                            </tab>
+                        </tabset>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

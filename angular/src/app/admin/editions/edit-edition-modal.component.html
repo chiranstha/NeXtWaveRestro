@@ -1,0 +1,78 @@
+<div
+    #editModal="bs-modal"
+    (onShown)="onShown()"
+    [config]="{ backdrop: 'static', keyboard: !saving }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="editModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            @if (active) {
+                <form #editionForm="ngForm" (ngSubmit)="save()" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <span>{{ l('EditEdition') }}: {{ edition.edition.displayName }}</span>
+                        </h5>
+                        <button
+                            (click)="close()"
+                            [attr.aria-label]="l('Close')"
+                            [disabled]="saving"
+                            class="btn-close"
+                            type="button"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <tabset>
+                            <tab class="p-5" heading="{{ l('EditionProperties') }}">
+                                <div class="mb-5">
+                                    <label class="form-label required" for="EditionDisplayName">
+                                        {{ l('EditionName') }}
+                                    </label>
+                                    <input
+                                        #editionNameInput="ngModel"
+                                        [(ngModel)]="edition.edition.displayName"
+                                        [ngClass]="edition.edition.displayName"
+                                        class="form-control"
+                                        id="EditionDisplayName"
+                                        maxlength="64"
+                                        name="EditionDisplayName"
+                                        required
+                                        type="text"
+                                    />
+                                    <validation-messages [formCtrl]="editionNameInput"></validation-messages>
+                                </div>
+                            </tab>
+                            <tab class="p-5" heading="{{ l('Features') }}">
+                                <feature-tree #featureTree></feature-tree>
+                            </tab>
+                        </tabset>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            (click)="close()"
+                            [disabled]="saving"
+                            class="btn btn-sm btn-light-primary fw-bold"
+                            type="button"
+                        >
+                            {{ l('Cancel') }}
+                        </button>
+                        <button
+                            [busyText]="l('SavingWithThreeDot')"
+                            [buttonBusy]="saving"
+                            [disabled]="!isFormValid"
+                            class="btn btn-sm btn-primary fw-bold"
+                            type="submit"
+                        >
+                            <i class="fa fa-save"></i>
+                            <span>{{ l('Save') }}</span>
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,136 @@
+<div class="card card-custom gutter-b">
+    <div class="card-header align-items-center border-0">
+        <h3 class="card-title align-items-start flex-column">
+            <span class="fw-bolder text-dark">
+                {{ 'DateAndTimePickers' | localize }}
+            </span>
+        </h3>
+    </div>
+    <div class="card-body">
+        <form class="form" role="form">
+            <div class="mb-5 row">
+                <label class="col-md-12 form-label" for="SampleDatePicker">Default date picker</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <abp-datetime-picker
+                        #SampleDatePicker="ngModel"
+                        [(ngModel)]="sampleDate"
+                        [bsConfig]="{ adaptivePosition: true }"
+                        id="SampleDatePicker"
+                        name="SampleDatePicker"
+                        required
+                    ></abp-datetime-picker>
+                    <validation-messages [formCtrl]="SampleDatePicker"></validation-messages>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-4">
+                    <button
+                        (click)="submitDate()"
+                        [disabled]="SampleDatePicker.invalid"
+                        class="btn btn-sm btn-primary"
+                        type="button"
+                    >
+                        {{ 'Submit' | localize }}
+                    </button>
+                </div>
+            </div>
+        </form>
+        <form class="form" role="form">
+            <div class="mb-5 row">
+                <label class="col-md-12 form-label" for="SampleDateTimePicker">Default date time picker</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <abp-datetime-picker
+                        #SampleDateTimePicker="ngModel"
+                        [(ngModel)]="sampleDateTime"
+                        [bsConfig]="{
+                            withTimepicker: true,
+                            rangeInputFormat: 'YYYY-MM-DD HH:mm',
+                            dateInputFormat: 'YYYY-MM-DD HH:mm',
+                            adaptivePosition: true,
+                        }"
+                        id="SampleDateTimePicker"
+                        name="SampleDateTimePicker"
+                        required
+                    ></abp-datetime-picker>
+                    <validation-messages [formCtrl]="SampleDateTimePicker"></validation-messages>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-4">
+                    <button
+                        (click)="submitDateTime()"
+                        [disabled]="SampleDateTimePicker.invalid"
+                        class="btn btn-sm btn-primary"
+                        type="button"
+                    >
+                        {{ 'Submit' | localize }}
+                    </button>
+                </div>
+            </div>
+        </form>
+        <form>
+            <div class="mb-5 row">
+                <label class="col-md-12 form-label" for="SampleDateRangePicker">Default daterange picker</label>
+                <div class="col-lg-10 col-md-9 col-sm-8">
+                    <abp-date-range-picker
+                        #SampleDateRangePicker="ngModel"
+                        [(ngModel)]="sampleDateRange"
+                        [bsConfig]="{ adaptivePosition: true }"
+                        id="SampleDateRangePicker"
+                        name="SampleDateRangePicker"
+                        required
+                    ></abp-date-range-picker>
+                    <validation-messages [formCtrl]="SampleDateRangePicker"></validation-messages>
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-4">
+                    <button
+                        (click)="submitDateRange()"
+                        [disabled]="SampleDateRangePicker.invalid"
+                        class="btn btn-sm btn-primary"
+                        type="button"
+                    >
+                        {{ 'Submit' | localize }}
+                    </button>
+                </div>
+            </div>
+        </form>
+        <form>
+            <h5 class="col-md-12" for="SampleDatePickerWithText">Date picker with text</h5>
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-5">
+                        <label class="form-label" for="SampleDatePickerWithText">Date</label>
+                        <abp-datetime-picker
+                            #SampleDatePickerWithText="ngModel"
+                            [(ngModel)]="sampleDateWithTextInput.date"
+                            [bsConfig]="{ adaptivePosition: true }"
+                            id="SampleDatePickerWithText"
+                            name="SampleDatePickerWithText"
+                            required
+                        ></abp-datetime-picker>
+                        <validation-messages [formCtrl]="SampleDatePickerWithText"></validation-messages>
+                    </div>
+                    <div class="col-5">
+                        <label class="form-label" for="textValue">Text</label>
+                        <input
+                            #textValue="ngModel"
+                            [(ngModel)]="sampleDateWithTextInput.text"
+                            class="form-control"
+                            id="textValue"
+                            name="textValue"
+                            required
+                            type="text"
+                        />
+                        <validation-messages [formCtrl]="textValue"></validation-messages>
+                    </div>
+                    <div class="col-2">
+                        <button
+                            (click)="submitDateWithText()"
+                            [disabled]="SampleDatePickerWithText.invalid || textValue.invalid"
+                            class="btn btn-sm btn-primary mt-8"
+                            type="button"
+                        >
+                            {{ 'Submit' | localize }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

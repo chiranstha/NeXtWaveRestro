@@ -1,0 +1,67 @@
+<div [@routerTransition]>
+    <sub-header [title]="'Ledger Wise Monthly'">
+        <div role="search">
+            <div class="position-relative w-md-400px me-md-2">
+                <i
+                    class="fa-duotone fa-magnifying-glass fs-3 text-gray-500 position-absolute top-50 translate-middle ms-6"><span
+                        class="path1"></span><span class="path2"></span></i>
+                <input (keyup.enter)="searchFilter($event.target.value)" [ngModelOptions]="{ standalone: true }"
+                    class="form-control form-control-solid ps-10 headerSearch" name="search" placeholder="Search"
+                    type="text" value="">
+            </div>
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-bordered p-4">
+            <div [hidden]="!advancedFiltersAreShown" class="col-12 p-3">
+                <div class="hidden-filter">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-xl-6 col-sm-12 col-xs-12">
+                            <label class="form-label" for="branchId">Search By Account Group</label>
+                            <ng-select (change)="loadreport($event?.id || emptyGuId)" [formControl]="accountGroupId"
+                                [items]="allAccountGroup$ | async" bindLabel="displayName" bindValue="id"
+                                id="searchTypes">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <div class="col-sm-6">
+                    <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown" *ngIf="!advancedFiltersAreShown"
+                        class="clickable-item text-muted">
+                        <i class="fa fa-angle-down"></i>
+                        {{ 'ShowAdvancedFilters' | localize }}
+                    </span>
+                    <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown" *ngIf="advancedFiltersAreShown"
+                        class="clickable-item text-muted">
+                        <i class="fa fa-angle-up"></i>
+                        {{ 'HideAdvancedFilters' | localize }}
+                    </span>
+                </div>
+                <div class="col-sm-6 text-end">
+                    <button class="btn btn-success me-2" (click)="exportToExcel()">
+                        <i class="fa fa-file-excel me-1"></i> Export to Excel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading indicator -->
+            <div *ngIf="loading" class="text-center p-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Loading data, please wait...</p>
+            </div>
+
+            <!-- AG Grid component -->
+            <div *ngIf="!loading" class="ag-theme-balham" style="width: 100%; height: 600px;">
+                <ag-grid-angular style="width: 100%;" [style.height.px]="screenHeight" [columnDefs]="columnDefs"
+                    [pinnedBottomRowData]="gridOptions.pinnedBottomRowData" [defaultColDef]="defaultColDef"
+                    [rowData]="ledgerData" [gridOptions]="gridOptions" (gridReady)="onGridReady($event)"
+                    class="ag-theme-balham">
+                </ag-grid-angular>
+            </div>
+        </div>
+    </div>
+</div>

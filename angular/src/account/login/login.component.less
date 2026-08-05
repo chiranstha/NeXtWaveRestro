@@ -1,0 +1,240 @@
+.login__options {
+    a {
+        cursor: pointer;
+       
+        &.btn + .btn{
+            margin-left: 0 !important;
+        }
+
+        i.fa-openidconnect {
+            &::before{
+                content: "\f19b";
+            }
+        }
+
+        i.fa-wsfederation {
+            margin-right: 2px;
+
+            &::before{
+                content: "\f20e";
+            }
+        }
+    }
+}
+
+.password-toggle {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+    right: 10px;
+    z-index: 10;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+}
+
+.hidden-toggle {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.password-toggle:hover {
+    opacity: 1;
+}
+
+.password-toggle:hover .eye-outline,
+.password-toggle:hover .eyelash {
+    stroke: #3699FF;
+}
+
+.password-toggle:hover .eye-pupil {
+    fill: #3699FF;
+}
+
+.password-toggle:active {
+    transform: scale(0.95);
+}
+
+/* Simple Eye Styling */
+.simple-eye {
+    width: 30px;
+    height: 20px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+/* SVG Eye Icons */
+.open-eye-icon, 
+.closed-eye-icon {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* SVG Paths styling */
+.eye-outline {
+    fill: none;
+    stroke: #333;
+    stroke-width: 4px;
+}
+
+.eye-pupil {
+    fill: #333;
+    transition: cx 0.2s ease, cy 0.2s ease;
+}
+
+.eyelash {
+    fill: none;
+    stroke: #333;
+    stroke-width: 4px;
+    stroke-linecap: round;
+}
+
+.eye-strike {
+    fill: none;
+    stroke: #333;
+    stroke-width: 4px;
+    stroke-linecap: round;
+    opacity: 0.8;
+}
+
+.eye-mask {
+    fill: none;
+    stroke: #333;
+    stroke-width: 0;
+    stroke-linecap: round;
+    transition: all 0.3s ease;
+}
+
+/* Eye states */
+.eye-closed .open-eye-icon {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.eye-closed .closed-eye-icon {
+    opacity: 1;
+    transform: scale(1.05) rotate(180deg); /* Rotated 180 degrees when closed */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.eye-open .open-eye-icon {
+    opacity: 1;
+    transform: scale(1);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.eye-open .closed-eye-icon {
+    opacity: 0;
+    transform: scale(0.8) rotate(180deg);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Styling for eye states */
+.eye-open .eye-outline,
+.eye-open .eye-pupil {
+    stroke: #28a745; /* Green for open eye */
+    transition: all 0.3s ease;
+}
+
+.eye-open .eye-pupil {
+    fill: #28a745;
+    transition: all 0.3s ease;
+}
+
+.eye-closed .eye-outline,
+.eye-closed .eyelash,
+.eye-closed .eye-strike {
+    stroke: #6c757d; /* Gray for closed eye */
+    transition: all 0.3s ease;
+}
+
+/* Animation styling */
+.password-animating .eye-outline,
+.password-animating .eyelash {
+    stroke: #ffc107; /* Yellow during animation */
+    animation: stroke-pulse 0.5s infinite alternate;
+}
+
+.password-animating .eye-pupil {
+    fill: #ffc107;
+    animation: fill-pulse 0.5s infinite alternate;
+}
+
+.password-animating .eye-strike {
+    stroke: #ff6b6b; /* Red during animation */
+    animation: strike-animation 0.5s infinite alternate;
+}
+
+.password-animating .eye-mask {
+    stroke-width: 4px;
+    animation: mask-animation 0.5s ease-in-out;
+}
+
+/* For masking, have the eye-mask change attributes */
+.eye-closed .eye-mask {
+    fill: rgba(108, 117, 125, 0.1); /* Light gray fill when eye is closed */
+    stroke-width: 2px;
+}
+
+/* Enhanced eye animations */
+@keyframes stroke-pulse {
+    0% { stroke: #ffc107; }
+    50% { stroke: #ffdb4d; }
+    100% { stroke: #ffc107; }
+}
+
+@keyframes fill-pulse {
+    0% { fill: #ffc107; }
+    50% { fill: #ffdb4d; }
+    100% { fill: #ffc107; }
+}
+
+/* Add a subtle rotation animation for the eye when toggling */
+.password-animating .simple-eye {
+    animation: wiggle 0.5s ease;
+}
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
+}
+
+@keyframes strike-animation {
+    0% { stroke: #ff6b6b; opacity: 1; }
+    50% { stroke: #ff8f8f; opacity: 0.8; }
+    100% { stroke: #ff6b6b; opacity: 1; }
+}
+
+@keyframes mask-animation {
+    0% { stroke-width: 0; fill-opacity: 0; }
+    50% { stroke-width: 3px; fill-opacity: 0.1; }
+    100% { stroke-width: 2px; fill-opacity: 0.1; }
+}
+
+/* Eye tracking styles */
+.eye-open .eye-pupil {
+    /* Add smoother transitions for the cursor tracking */
+    transition: cx 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                cy 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                fill 0.3s ease;
+}
+
+/* Smooth transitions for all eye movements */
+circle[class="eye-pupil"] {
+    transition: cx 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                cy 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                fill 0.3s ease;
+}

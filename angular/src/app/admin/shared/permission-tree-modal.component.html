@@ -1,0 +1,43 @@
+@if (!dontAddOpenerButton) {
+    <button (click)="openPermissionTreeModal()" class="btn btn-secondary w-100">
+        {{ 'SelectPermissions' | localize }} ({{ NumberOfFilteredPermission }})
+    </button>
+}
+<div
+    #permissionTreeModal="bs-modal"
+    [config]="{ backdrop: 'true' }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="permissionTreeModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg permissionFilterTreeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    {{ 'SelectPermissions' | localize }}
+                </h4>
+                <button
+                    (click)="closePermissionTreeModal()"
+                    [attr.aria-label]="l('Close')"
+                    class="btn-close"
+                    type="button"
+                ></button>
+            </div>
+            <div class="modal-body">
+                <permission-tree
+                    #permissionTree
+                    [disableCascade]="disableCascade"
+                    [singleSelect]="singleSelect"
+                ></permission-tree>
+            </div>
+            <div class="modal-footer">
+                <button (click)="closePermissionTreeModal()" class="btn btn-sm btn-primary fw-bold" type="button">
+                    {{ 'Select' | localize }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

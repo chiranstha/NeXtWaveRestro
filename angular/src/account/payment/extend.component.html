@@ -1,0 +1,94 @@
+<div [@routerTransition] class="login-form">
+    <div class="pb-5 pt-lg-0 pt-5">
+        <h3 class="fw-bolder text-dark fs-h4 fs-h1-lg">
+            {{ 'PaymentInfo' | localize }}
+        </h3>
+    </div>
+    <div class="separator separator-border-dashed"></div>
+    <form class="login-form form mt-2" method="post">
+        <h4 class="mb-5">
+            {{ 'Extend_Edition_Description' | localize: edition.displayName }}
+        </h4>
+        <div class="radio-inline">
+            @if (edition.dailyPrice > 0) {
+                <div class="mb-5 me-2">
+                    <label class="radio">
+                        <input
+                            (change)="onPaymentPeriodChangeChange(paymentPeriodType.Daily)"
+                            [checked]="selectedPaymentPeriodType === paymentPeriodType.Daily"
+                            [value]="paymentPeriodType.Daily"
+                            class="form-check-input"
+                            name="PaymentPeriodType"
+                            type="radio"
+                        />
+                        <span></span>
+                        {{ 'DailyPrice' | localize }}: {{ appSession.application.currencySign
+                        }}{{ edition.dailyPrice | number: '1.2-2' }}
+                    </label>
+                </div>
+            }
+            @if (edition.weeklyPrice > 0) {
+                <div class="mb-5">
+                    <label class="radio">
+                        <input
+                            (change)="onPaymentPeriodChangeChange(paymentPeriodType.Weekly)"
+                            [checked]="selectedPaymentPeriodType === paymentPeriodType.Weekly"
+                            [value]="paymentPeriodType.Weekly"
+                            class="form-check-input"
+                            name="PaymentPeriodType"
+                            type="radio"
+                        />
+                        <span></span>
+                        {{ 'WeeklyPrice' | localize }}: {{ appSession.application.currencySign
+                        }}{{ edition.weeklyPrice | number: '1.2-2' }}
+                    </label>
+                </div>
+            }
+        </div>
+        <div class="radio-inline">
+            @if (edition.monthlyPrice > 0) {
+                <div class="mb-5 me-2">
+                    <label class="radio">
+                        <input
+                            (change)="onPaymentPeriodChangeChange(paymentPeriodType.Monthly)"
+                            [checked]="selectedPaymentPeriodType === paymentPeriodType.Monthly"
+                            [value]="paymentPeriodType.Monthly"
+                            class="form-check-input"
+                            name="PaymentPeriodType"
+                            type="radio"
+                        />
+                        <span></span>
+                        {{ 'MonthlyPrice' | localize }}: {{ appSession.application.currencySign
+                        }}{{ edition.monthlyPrice | number: '1.2-2' }}
+                    </label>
+                </div>
+            }
+            @if (edition.annualPrice > 0) {
+                <div class="mb-5">
+                    <label class="radio">
+                        <input
+                            (change)="onPaymentPeriodChangeChange(paymentPeriodType.Annual)"
+                            [checked]="selectedPaymentPeriodType === paymentPeriodType.Annual"
+                            [value]="paymentPeriodType.Annual"
+                            class="form-check-input"
+                            name="PaymentPeriodType"
+                            type="radio"
+                        />
+                        <span></span>
+                        {{ 'AnnualPrice' | localize }}: {{ appSession.application.currencySign
+                        }}{{ edition.annualPrice | number: '1.2-2' }}
+                    </label>
+                </div>
+            }
+        </div>
+        <div class="pb-lg-0 pb-5">
+            @for (paymentGateway of paymentGateways; track paymentGateway) {
+                <div class="mb-5">
+                    <button (click)="checkout(paymentGateway.gatewayType)" class="btn btn-success w-100">
+                        {{ 'CheckoutWith' + getPaymentGatewayType(paymentGateway.gatewayType) | localize }}
+                    </button>
+                </div>
+            }
+        </div>
+    </form>
+</div>

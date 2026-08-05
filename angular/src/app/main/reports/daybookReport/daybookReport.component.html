@@ -1,0 +1,183 @@
+<div class="daybook-page" *ngIf="myForm">
+    <sub-header [title]="'Daybook Report'">
+        <div role="search">
+            <div class="position-relative w-md-400px me-md-2">
+                <i class="fa-duotone fa-magnifying-glass fs-3 text-gray-500 position-absolute top-50 translate-middle ms-6"></i>
+                <input
+                    (keyup)="searchValueOnApiCall($event.target.value)"
+                    [(ngModel)]="filterText"
+                    [ngModelOptions]="{ standalone: true }"
+                    class="form-control form-control-solid ps-10 headerSearch"
+                    name="search"
+                    placeholder="Search daybook"
+                    type="text"
+                />
+            </div>
+        </div>
+        <div role="actions" class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-secondary" type="button" (click)="advancedFiltersAreShown = !advancedFiltersAreShown">
+                <i class="fa" [ngClass]="advancedFiltersAreShown ? 'fa-angle-up' : 'fa-angle-down'"></i>
+                {{ advancedFiltersAreShown ? ('HideAdvancedFilters' | localize) : ('ShowAdvancedFilters' | localize) }}
+            </button>
+            <button class="btn btn-sm btn-primary" type="button" (click)="exportToExcel()" [disabled]="loading">
+                <i class="fa-duotone fa-file-excel"></i>
+                Excel
+            </button>
+            <button class="btn btn-sm btn-danger" type="button" (click)="exportToPdf()" [disabled]="loading">
+                <i class="fa-duotone fa-file-pdf"></i>
+                PDF
+            </button>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="daybook-workspace">
+            <div class="daybook-hero">
+                <div>
+                    <span class="daybook-kicker">Accounting</span>
+                    <h3>Daybook Report</h3>
+                    <p>{{ myForm.get('fromMiti')?.value }} - {{ myForm.get('toMiti')?.value }}</p>
+                </div>
+                <div class="daybook-hero-stats">
+                    <div>
+                        <span>Vouchers</span>
+                        <strong>{{ voucherCount | number: '1.0-0' }}</strong>
+                    </div>
+                    <div>
+                        <span>Lines</span>
+                        <strong>{{ summary.totalRows | number: '1.0-0' }}</strong>
+                    </div>
+                    <div>
+                        <span>Net Side</span>
+                        <strong>{{ netSide }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <form [formGroup]="myForm" [hidden]="!advancedFiltersAreShown" class="daybook-filter-panel">
+                <div class="row g-3 align-items-end">
+                    <div class="col-12 col-md-3 col-xl-2">
+                        <label class="form-label" for="fromMiti">From Date(NP)</label>
+                        <ne-datepicker
+                            id="fromMiti"
+                            [dateFormat]="'yyyy/MM/dd'"
+                            [formControl]="myForm.controls['fromMiti']"
+                            [placeholder]="'yyyy/MM/dd'"
+                            [todayBtn]="true"
+                            language="en"
+                        ></ne-datepicker>
+                    </div>
+                    <div class="col-12 col-md-3 col-xl-2">
+                        <label class="form-label" for="toMiti">To Date(NP)</label>
+                        <ne-datepicker
+                            id="toMiti"
+                            [dateFormat]="'yyyy/MM/dd'"
+                            [formControl]="myForm.controls['toMiti']"
+                            [placeholder]="'yyyy/MM/dd'"
+                            [todayBtn]="true"
+                            language="en"
+                        ></ne-datepicker>
+                    </div>
+                    <div class="col-12 col-md-3 col-xl-3">
+                        <label class="form-label" for="ledgerId">Ledger</label>
+                        <ng-select
+                            id="ledgerId"
+                            [items]="ledgers"
+                            bindLabel="displayName"
+                            bindValue="id"
+                            formControlName="ledgerId"
+                            [clearable]="true"
+                            placeholder="All Ledgers"
+                        ></ng-select>
+                    </div>
+                    <div class="col-12 col-md-3 col-xl-3">
+                        <label class="form-label" for="voucherTypeId">Voucher Type</label>
+                        <ng-select
+                            id="voucherTypeId"
+                            [items]="voucherTypes"
+                            bindLabel="displayName"
+                            bindValue="id"
+                            formControlName="voucherTypeId"
+                            [clearable]="true"
+                            placeholder="All Voucher Types"
+                        ></ng-select>
+                    </div>
+                    <div class="col-12 col-md-auto">
+                        <button class="btn btn-primary w-100" type="button" (click)="loadReport()" [disabled]="loading">
+                            <i class="fa-duotone fa-magnifying-glass"></i>
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="alert alert-danger py-3" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+            <div class="daybook-summary-grid">
+                <div class="daybook-summary-tile">
+                    <span>Total Debit</span>
+                    <strong>{{ formatAmount(summary.totalDebit) }}</strong>
+                </div>
+                <div class="daybook-summary-tile">
+                    <span>Total Credit</span>
+                    <strong>{{ formatAmount(summary.totalCredit) }}</strong>
+                </div>
+                <div class="daybook-summary-tile">
+                    <span>Receipt/In</span>
+                    <strong>{{ formatAmount(summary.totalIn) }}</strong>
+                </div>
+                <div class="daybook-summary-tile">
+                    <span>Payment/Out</span>
+                    <strong>{{ formatAmount(summary.totalOut) }}</strong>
+                </div>
+                <div class="daybook-summary-tile">
+                    <span>Net</span>
+                    <strong>{{ formatAmount(summary.difference) }}</strong>
+                </div>
+            </div>
+
+            <div class="daybook-layout">
+                <div class="daybook-grid-card">
+                    <div class="daybook-card-header">
+                        <div>
+                            <h4>Transaction Lines</h4>
+                            <span>{{ rowData.length | number: '1.0-0' }} lines</span>
+                        </div>
+                    </div>
+                    <ag-grid-angular
+                        class="ag-theme-balham daybook-grid"
+                        [gridOptions]="gridOptions"
+                        [columnDefs]="columnDefs"
+                        [defaultColDef]="defaultColDef"
+                        [rowData]="rowData"
+                        [pinnedBottomRowData]="gridOptions.pinnedBottomRowData"
+                        (gridReady)="onGridReady($event)"
+                        [style.height.px]="screenHeight"
+                    ></ag-grid-angular>
+                </div>
+
+                <div class="daybook-side-panel">
+                    <div class="daybook-card-header">
+                        <div>
+                            <h4>Daily Summary</h4>
+                            <span>{{ daySummaries.length | number: '1.0-0' }} days</span>
+                        </div>
+                    </div>
+                    <div class="day-summary-list">
+                        <div class="day-summary-row" *ngFor="let item of daySummaries">
+                            <div>
+                                <strong>{{ item.miti || item.date }}</strong>
+                                <span>{{ item.voucherCount }} vouchers, {{ item.lineCount }} lines</span>
+                            </div>
+                            <div>
+                                <span>Dr {{ formatAmount(item.debit) }}</span>
+                                <span>Cr {{ formatAmount(item.credit) }}</span>
+                            </div>
+                        </div>
+                        <div class="day-summary-empty" *ngIf="!daySummaries.length">No daybook rows found.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

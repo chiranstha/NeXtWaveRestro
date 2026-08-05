@@ -1,0 +1,37 @@
+<div class="widget-card">
+    <div class="widget-header">
+        <div class="header-content">
+            <h3 class="widget-title">Student Distribution</h3>
+            <span class="widget-subtitle">By Gender & Class</span>
+        </div>
+        <div class="header-stats">
+            <div class="stat-item">
+                <span class="stat-label">Male</span>
+                <span class="stat-value text-male">{{ totalMale }}</span>
+            </div>
+            <div class="stat-separator"></div>
+            <div class="stat-item">
+                <span class="stat-label">Female</span>
+                <span class="stat-value text-female">{{ totalFemale }}</span>
+            </div>
+            <div class="stat-separator"></div>
+            <div class="stat-item">
+                <span class="stat-label">Total</span>
+                <span class="stat-value">{{ totalStudents }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="widget-body">
+        @if (loading) {
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <span>Loading insights...</span>
+            </div>
+        }
+        @if (!loading) {
+            <div class="chart-wrapper">
+                <ag-charts [options]="chartOptions" style="width: 100%; height: 100%; display: block"></ag-charts>
+            </div>
+        }
+    </div>
+</div>

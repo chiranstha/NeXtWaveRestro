@@ -1,0 +1,140 @@
+<div [class]="menuClass" data-kt-menu="true" data-kt-menu-expand="false" id="#kt_app_sidebar_menu">
+    <div
+        *ngIf="currentTheme.baseSettings.menu.searchActive"
+        aria-haspopup="true"
+        class="menu-item mb-5 mt-5"
+        data-ktmenu-submenu-toggle="hover"
+    >
+        <menu-search-bar></menu-search-bar>
+    </div>
+    <ng-container [ngTemplateOutlet]="menuListTemplate"></ng-container>
+</div>
+<!-- </div> -->
+<ng-template #menuListTemplate>
+    <ng-container *ngFor="let child of menu.items">
+        <ng-container
+            *ngIf="showMenuItem(child)"
+            [ngTemplateOutletContext]="{ item: child, parentItem: null }"
+            [ngTemplateOutlet]="mMenuItem"
+        ></ng-container>
+    </ng-container>
+</ng-template>
+<ng-template #mMenuItem let-item="item" let-parentItem="parentItem">
+    <div
+        *ngIf="showMenuItem(item)"
+        [attr.data-kt-menu-trigger]="getTriggerCssClass(item, parentItem)"
+        [ngClass]="getItemCssClasses(item, parentItem)"
+    >
+        <ng-container
+            *ngIf="!item.items.length && !item.external"
+            [ngTemplateOutletContext]="{ item: item, parentItem: parentItem }"
+            [ngTemplateOutlet]="mMenuItemText"
+        ></ng-container>
+        <!-- <ng-container
+            [ngTemplateOutlet]="mMenuItemText"
+            [ngTemplateOutletContext]="{ item: item, parentItem: parentItem }"
+        ></ng-container> -->
+        <ng-container
+            *ngIf="item.items.length"
+            [ngTemplateOutletContext]="{ item: item, parentItem: parentItem }"
+            [ngTemplateOutlet]="msubMenuItemText"
+        ></ng-container>
+        <!-- if menu item has submenu child then recursively call new menu item component -->
+        <div
+            *ngIf="item.items.length"
+            [class]="getSubMenuItemCssClass(item, parentItem)"
+            [style]="ui.getLeftAsideSubMenuStyles()"
+        >
+            <div class="menu-subnav">
+                <div *ngIf="iconMenu && !parentItem" class="menu-item">
+                    <!--begin:Menu content-->
+                    <div class="menu-content">
+                        <span class="menu-section fs-5 fw-bolder ps-1 py-1">{{ item.name }}</span>
+                    </div>
+                    <!--end:Menu content-->
+                </div>
+                <ng-container *ngFor="let child of item.items">
+                    <ng-container
+                        [ngTemplateOutletContext]="{ item: child, parentItem: item }"
+                        [ngTemplateOutlet]="mMenuItem"
+                    ></ng-container>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<ng-template #mMenuItemText let-item="item" let-parentItem="parentItem">
+    <!-- if menu item has submenu child  -->
+    <a
+        [adaptivePosition]="false"
+        [container]="'body'"
+        [ngClass]="{ 'without-sub': !item.items.length }"
+        [placement]="'right'"
+        [queryParams]="item.parameters"
+        [routerLink]="item.route"
+        [tooltip]="iconMenu && parentItem == null ? l(item.name) : ''"
+        class="menu-link"
+        routerLinkActive="active"
+    >
+        <span class="menu-item-here"></span>
+        <!-- if menu item has icon -->
+        <span *ngIf="item.icon" class="menu-icon m-auto">
+            <i [ngClass]="item.icon"></i>
+        </span>
+        <ng-container *ngIf="!item.badge; else mMenuLinkBadge">
+            <!-- menu item title text -->
+            <span *ngIf="!iconMenu || parentItem != null" class="menu-title">{{ item.name | localize }}</span>
+        </ng-container>
+        <ng-template #mMenuLinkBadge>
+            <!-- menu item with badge -->
+            <span class="menu-link-title">
+                <span class="menu-link-wrap">
+                    <span class="menu-text">
+                        {{ item.name | localize }}
+                    </span>
+                    <span class="menu-link-badge">
+                        <span [ngClass]="item.badge.type" class="badge badge-primary">{{ item.badge.value }}</span>
+                    </span>
+                </span>
+            </span>
+        </ng-template>
+        <!-- if menu item has submenu child then put arrow icon -->
+        <span *ngIf="item.items.length && (!iconMenu || parentItem != null)" class="menu-arrow"></span>
+    </a>
+</ng-template>
+<!-- END: Left Aside -->
+<ng-template #msubMenuItemText let-item="item" let-parentItem="parentItem">
+    <!-- if menu item has submenu child  -->
+    <a
+        *ngIf="item.items.length"
+        [class]="{ active: isMenuItemIsActive(item) }"
+        class="menu-link menu-toggle"
+        href="javascript:;"
+    >
+        <span class="menu-item-here"></span>
+        <!-- if menu item has icon -->
+        <span *ngIf="item.icon" class="menu-icon m-auto">
+            <i [ngClass]="item.icon"></i>
+        </span>
+        <ng-container *ngIf="!item.badge; else mMenuLinkBadge">
+            <!-- menu item title text -->
+            <span *ngIf="!iconMenu || parentItem != null" class="menu-title">{{ item.name | localize }}</span>
+        </ng-container>
+        <ng-template #mMenuLinkBadge>
+            <!-- menu item with badge -->
+            <span class="menu-link-title">
+                <span class="menu-link-wrap">
+                    <span class="menu-text">
+                        {{ item.name | localize }}
+                    </span>
+                    <span class="menu-link-badge">
+                        <span [ngClass]="item.badge.type" class="badge badge-primary">{{ item.badge.value }}</span>
+                    </span>
+                </span>
+            </span>
+        </ng-template>
+        <!-- if menu item has submenu child then put arrow icon -->
+        <span *ngIf="item.items.length && (!iconMenu || parentItem != null)" class="menu-arrow"></span>
+    </a>
+</ng-template>
+<!-- END: Left Aside -->

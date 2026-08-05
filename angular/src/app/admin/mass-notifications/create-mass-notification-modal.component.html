@@ -1,0 +1,163 @@
+<div
+    #createOrEditModal="bs-modal"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="createOrEditModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            @if (active) {
+                <form #notificationNewForm="ngForm" (ngSubmit)="save()" autocomplete="off" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            <span>{{ l('CreateNewMassNotification') }}</span>
+                        </h4>
+                        <button
+                            (click)="close()"
+                            [disabled]="saving"
+                            aria-label="Close"
+                            class="btn-close"
+                            type="button"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="my-3">
+                            <label class="form-label" for="UserName">{{ l('User') }}</label>
+                            <div class="input-group">
+                                <input
+                                    [(ngModel)]="userNames"
+                                    class="form-control"
+                                    disabled
+                                    id="UserName"
+                                    name="userName"
+                                    type="text"
+                                />
+                                <button
+                                    (click)="openSelectUserModal()"
+                                    class="btn btn-sm btn-primary blue"
+                                    type="button"
+                                >
+                                    <i class="fa fa-search"></i>
+                                    {{ l('Pick') }}
+                                </button>
+                                <button (click)="setUserIdNull()" class="btn btn-danger btn-icon" type="button">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="my-3">
+                            <label class="form-label" for="OrganizationUnitDisplayName">
+                                {{ l('OrganizationUnit') }}
+                            </label>
+                            <div class="input-group">
+                                <input
+                                    [(ngModel)]="organizationUnitDisplayNames"
+                                    class="form-control"
+                                    disabled
+                                    id="OrganizationUnitDisplayName"
+                                    name="organizationUnitDisplayName"
+                                    type="text"
+                                />
+                                <button
+                                    (click)="openSelectOrganizationUnitModal()"
+                                    class="btn btn-sm btn-primary blue"
+                                    type="button"
+                                >
+                                    <i class="fa fa-search"></i>
+                                    {{ l('Pick') }}
+                                </button>
+                                <button
+                                    (click)="setOrganizationUnitIdNull()"
+                                    class="btn btn-danger btn-icon"
+                                    type="button"
+                                >
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="my-3">
+                            <label class="form-label required" for="MassNotification_Severity">
+                                {{ l('Severity') }}
+                            </label>
+                            <select
+                                #MassNotification_Severity="ngModel"
+                                [(ngModel)]="createMassNotificationInput.severity"
+                                class="form-select"
+                                id="MassNotification_Severity"
+                                name="Severity"
+                                required
+                            >
+                                <option value="0">{{ l('Info') }}</option>
+                                <option value="1">{{ l('Success') }}</option>
+                                <option value="2">{{ l('Warn') }}</option>
+                                <option value="3">{{ l('Error') }}</option>
+                                <option value="4">{{ l('Fatal') }}</option>
+                            </select>
+                            <validation-messages [formCtrl]="MassNotification_Severity"></validation-messages>
+                        </div>
+                        <div class="my-3">
+                            <label class="form-label" for="MassNotification_TargetNotifiers">
+                                {{ l('TargetNotifiers') }}*
+                            </label>
+                            <select
+                                #MassNotification_Severity="ngModel"
+                                (change)="onTargetNotifiersChanged()"
+                                [(ngModel)]="createMassNotificationInput.targetNotifiers"
+                                class="form-select"
+                                id="MassNotification_Severity"
+                                multiple="multiple"
+                                name="Severity"
+                            >
+                                >
+                                @for (web of notifiers; track web) {
+                                    <option [value]="web">{{ web | localize }}</option>
+                                }
+                            </select>
+                            @if (showSMSTargetNotifierMessage) {
+                                <small class="form-text text-muted">
+                                    {{ 'NotificationTargetNotifierSmsLengthInfo' | localize }}
+                                </small>
+                            }
+                        </div>
+                        <div class="my-3">
+                            <label class="form-label required" for="MassNotification_Message">{{ l('Message') }}</label>
+                            <textarea
+                                #MassNotification_Message="ngModel"
+                                [(ngModel)]="createMassNotificationInput.message"
+                                class="form-control"
+                                id="MassNotification_Message"
+                                name="Message"
+                                required
+                                type="text"
+                            ></textarea>
+                            <validation-messages [formCtrl]="MassNotification_Message"></validation-messages>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button (click)="close()" [disabled]="saving" class="btn btn-default" type="button">
+                            {{ l('Cancel') }}
+                        </button>
+                        <button
+                            [busyText]="l('SavingWithThreeDot')"
+                            [buttonBusy]="saving"
+                            [disabled]="!isFormValid"
+                            class="btn btn-sm btn-primary blue"
+                            type="submit"
+                        >
+                            <i class="fa fa-save"></i>
+                            <span>{{ l('Save') }}</span>
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>
+<user-lookup-table-modal #userLookupTableModalComponent (modalSave)="onUsersSelected($event)"></user-lookup-table-modal>
+<organization-unit-lookup-table-modal
+    #organizationUnitLookupTableModalComponent
+    (modalSave)="onOrganizationUnitsSelected($event)"
+></organization-unit-lookup-table-modal>

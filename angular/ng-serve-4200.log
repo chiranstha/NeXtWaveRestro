@@ -1,0 +1,1817 @@
+
+> abp-zero-template@13.3.0 start
+> node --max-old-space-size=8096 ./node_modules/@angular/cli/bin/ng serve --host 0.0.0.0 --port 4200
+
+> Building...
+√ Building...
+Initial chunk files                   | Names                     |  Raw size
+chunk-OYNJWOSM.js                     | -                         |   2.86 MB | 
+polyfills.js                          | polyfills                 |   1.06 MB | 
+scripts.js                            | scripts                   | 701.17 kB | 
+styles.css                            | styles                    | 643.39 kB | 
+chunk-E3IHFPNU.js                     | -                         | 502.68 kB | 
+chunk-DFDT5S5I.js                     | -                         |  93.58 kB | 
+chunk-MZCMW4I5.js                     | -                         |  67.54 kB | 
+main.js                               | main                      |  58.75 kB | 
+chunk-FXVOSDP3.js                     | -                         |  33.74 kB | 
+chunk-JPSNCDJN.js                     | -                         |  32.72 kB | 
+chunk-H47GHBKH.js                     | -                         |  14.75 kB | 
+chunk-APLVDZGF.js                     | -                         |  14.15 kB | 
+chunk-JNEZBWBO.js                     | -                         |  13.84 kB | 
+chunk-7H5ORIIN.js                     | -                         |  13.69 kB | 
+chunk-OCJYDQX5.js                     | -                         |  13.21 kB | 
+chunk-FX3UPRLF.js                     | -                         |  12.55 kB | 
+chunk-LB4MIPMM.js                     | -                         |  11.49 kB | 
+chunk-4FKGZPMQ.js                     | -                         |  11.36 kB | 
+chunk-3GDLBIZR.js                     | -                         |  10.78 kB | 
+chunk-DYR746YV.js                     | -                         |  10.69 kB | 
+chunk-IBSX44XR.js                     | -                         |   7.53 kB | 
+chunk-PIUPRSYK.js                     | -                         |   7.24 kB | 
+chunk-WOKQ7HR3.js                     | -                         |   6.74 kB | 
+chunk-TNHUVHLU.js                     | -                         |   6.11 kB | 
+chunk-G2BFOFR4.js                     | -                         |   5.92 kB | 
+chunk-TDUGMXRH.js                     | -                         |   5.71 kB | 
+chunk-SG6QXBAP.js                     | -                         |   5.11 kB | 
+chunk-IIM6SOJP.js                     | -                         |   4.39 kB | 
+chunk-MOPQTDFO.js                     | -                         |   4.30 kB | 
+chunk-XAGTJ2WY.js                     | -                         |   4.22 kB | 
+chunk-MXVJFRA5.js                     | -                         |   4.14 kB | 
+chunk-2D2PXQB6.js                     | -                         |   3.33 kB | 
+chunk-IJ7J5U46.js                     | -                         |   3.33 kB | 
+chunk-MJEZ2C5G.js                     | -                         |   3.11 kB | 
+chunk-W5YXXGGX.js                     | -                         |   3.11 kB | 
+chunk-4VZDSK6C.js                     | -                         |   3.08 kB | 
+chunk-VRQEJG73.js                     | -                         |   2.83 kB | 
+chunk-6LNGNUQO.js                     | -                         |   2.68 kB | 
+chunk-K6IZVR5Y.js                     | -                         |   2.16 kB | 
+chunk-ALYAWXAU.js                     | -                         |   1.88 kB | 
+chunk-4SFBXP2H.js                     | -                         |   1.78 kB | 
+chunk-URZEPLDT.js                     | -                         |   1.71 kB | 
+chunk-Y5RQAIA6.js                     | -                         |   1.55 kB | 
+chunk-JF3T6W47.js                     | -                         |   1.51 kB | 
+chunk-XVX4TZ6Y.js                     | -                         |   1.37 kB | 
+chunk-NODZ7BK6.js                     | -                         |   1.21 kB | 
+chunk-I75KH6F2.js                     | -                         |   1.15 kB | 
+chunk-QBRQFUGP.js                     | -                         |   1.06 kB | 
+chunk-C43AJYUM.js                     | -                         | 979 bytes | 
+chunk-LJ5UIWCF.js                     | -                         | 925 bytes | 
+chunk-6J75KSQ5.js                     | -                         | 909 bytes | 
+
+                                      | Initial total             |   6.28 MB
+
+Lazy chunk files                      | Names                     |  Raw size
+transaction.module-SKX4TCJI.js        | transaction-module        | 472.04 kB | 
+restaurant.module-VLSP7W7T.js         | restaurant-module         | 438.91 kB | 
+purchase.module-Z4I3AM5M.js           | purchase-module           | 298.57 kB | 
+accounting.module-EAMA2HB3.js         | accounting-module         | 275.17 kB | 
+sales.module-IMPBOM7I.js              | sales-module              | 258.44 kB | 
+chunk-TIDPX4PL.js                     | -                         | 233.49 kB | 
+reports.module-GTYAXQGH.js            | reports-module            | 221.35 kB | 
+inventory.module-DIRLHIBB.js          | inventory-module          | 182.80 kB | 
+chunk-I4T6WMQ2.js                     | -                         | 152.35 kB | 
+financialStatement.module-PKSDIY3V.js | financialStatement-module | 147.77 kB | 
+chunk-TZFZ63AA.js                     | -                         | 138.84 kB | 
+chunk-5G2RT67Q.js                     | -                         | 106.31 kB | 
+tax-report.module-S6BIMECN.js         | tax-report-module         |  96.48 kB | 
+chunk-AUELPEZX.js                     | -                         |  80.75 kB | 
+chunk-CJNKDMA2.js                     | -                         |  78.77 kB | 
+...and 158 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [15.912 seconds] - 2026-07-30T17:48:41.296Z
+
+Watch mode enabled. Watching for file changes...
+NOTE: Raw file sizes do not reflect development server per-request transformations.
+  ➜  Local:   http://localhost:4200/
+  ➜  Network: http://192.168.1.101:4200/
+  ➜  press h + enter to show help
+11:33:43 PM [vite] (client) [optimizer] bundling dependencies...
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files | Names  |  Raw size
+styles.css          | styles | 642.52 kB | 
+
+Application bundle generation complete. [0.864 seconds] - 2026-07-30T17:50:02.363Z
+
+Stylesheet update sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files      | Names        |  Raw size
+main.js                  | main         |  58.75 kB | 
+
+Lazy chunk files         | Names        |  Raw size
+sales.module-BMM6IRHT.js | sales-module | 267.15 kB | 
+main.module-7IVPAZUG.js  | main-module  |   6.05 kB | 
+
+Application bundle generation complete. [2.591 seconds] - 2026-07-30T17:51:11.201Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files      | Names        |  Raw size
+main.js                  | main         |  58.75 kB | 
+
+Lazy chunk files         | Names        |  Raw size
+sales.module-QL7RZGB6.js | sales-module | 266.78 kB | 
+main.module-6JU7UA2R.js  | main-module  |   6.05 kB | 
+
+Application bundle generation complete. [2.261 seconds] - 2026-07-30T17:51:35.885Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files      | Names        |  Raw size
+main.js                  | main         |  58.75 kB | 
+
+Lazy chunk files         | Names        |  Raw size
+sales.module-6WIPUDQC.js | sales-module | 267.19 kB | 
+main.module-D3VTA3CO.js  | main-module  |   6.05 kB | 
+
+Application bundle generation complete. [1.208 seconds] - 2026-07-30T17:53:28.052Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files      | Names        |  Raw size
+main.js                  | main         |  58.75 kB | 
+
+Lazy chunk files         | Names        |  Raw size
+sales.module-HZN4GPMD.js | sales-module | 267.28 kB | 
+main.module-LUFCEKGT.js  | main-module  |   6.05 kB | 
+
+Application bundle generation complete. [2.609 seconds] - 2026-07-30T17:54:27.197Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files      | Names        |  Raw size
+main.js                  | main         |  58.75 kB | 
+
+Lazy chunk files         | Names        |  Raw size
+sales.module-XYSQNCXU.js | sales-module | 260.51 kB | 
+main.module-J24V5PKA.js  | main-module  |   6.05 kB | 
+
+Application bundle generation complete. [3.187 seconds] - 2026-07-30T17:54:31.135Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files      | Names        |  Raw size
+main.js                  | main         |  58.75 kB | 
+
+Lazy chunk files         | Names        |  Raw size
+sales.module-ZTI5KAUY.js | sales-module | 270.70 kB | 
+main.module-4YWQYZ26.js  | main-module  |   6.05 kB | 
+
+Application bundle generation complete. [1.257 seconds] - 2026-07-30T17:58:07.628Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files            | Names              |  Raw size
+main.js                        | main               |  58.75 kB | 
+
+Lazy chunk files               | Names              |  Raw size
+transaction.module-E7MLNJJK.js | transaction-module | 472.04 kB | 
+restaurant.module-R7E2VARJ.js  | restaurant-module  | 438.83 kB | 
+main.module-UL2QJXJT.js        | main-module        |   6.05 kB | 
+chunk-UNGX6E3W.js              | -                  |   3.94 kB | 
+
+Application bundle generation complete. [2.979 seconds] - 2026-07-30T17:58:22.691Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-XSGHJOW4.js | restaurant-module | 438.83 kB | 
+main.module-4BMSSABO.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [1.686 seconds] - 2026-07-30T17:59:12.155Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files      | Names        |  Raw size
+main.js                  | main         |  58.75 kB | 
+
+Lazy chunk files         | Names        |  Raw size
+sales.module-XYSQNCXU.js | sales-module | 260.51 kB | 
+main.module-MYQVNVQG.js  | main-module  |   6.05 kB | 
+
+Application bundle generation complete. [3.740 seconds] - 2026-07-30T18:00:14.056Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-QM2SQGGM.js | restaurant-module | 438.90 kB | 
+main.module-QPZHJG6W.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [1.393 seconds] - 2026-07-30T18:00:57.207Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-IANVZKFU.js | restaurant-module | 445.48 kB | 
+main.module-VMQIZGR3.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [1.392 seconds] - 2026-07-30T18:10:12.065Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-YAGK6EIW.js | restaurant-module | 445.58 kB | 
+main.module-WKHTNJM3.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [3.101 seconds] - 2026-07-30T18:11:09.796Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-TOZ6SHOT.js | restaurant-module | 445.60 kB | 
+main.module-GQ3LNKCE.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [3.227 seconds] - 2026-07-30T18:11:19.719Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-VSURRV47.js | restaurant-module | 445.57 kB | 
+main.module-F7FVJIHK.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [1.294 seconds] - 2026-07-30T18:12:20.356Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files                   | Names                     |  Raw size
+chunk-MF53HITP.js                     | -                         |   2.86 MB | 
+chunk-OA63VTX4.js                     | -                         | 502.68 kB | 
+chunk-2OS7UTK2.js                     | -                         |  67.54 kB | 
+main.js                               | main                      |  58.75 kB | 
+chunk-2BINA4B7.js                     | -                         |  33.74 kB | 
+chunk-HK74RVTB.js                     | -                         |  14.75 kB | 
+chunk-GKCZNMGU.js                     | -                         |  14.15 kB | 
+chunk-I2B3WOGS.js                     | -                         |  13.84 kB | 
+chunk-ADI3LBVE.js                     | -                         |  13.69 kB | 
+chunk-XM5ANSHU.js                     | -                         |  13.21 kB | 
+chunk-X7BUOJQY.js                     | -                         |  12.55 kB | 
+chunk-NUPE6MGD.js                     | -                         |  11.49 kB | 
+chunk-ONCQ3B3P.js                     | -                         |  10.78 kB | 
+chunk-AMYRKAOB.js                     | -                         |  10.69 kB | 
+chunk-KIZ7G6KF.js                     | -                         |   7.53 kB | 
+chunk-C5I6G6CG.js                     | -                         |   7.24 kB | 
+chunk-63AYHJF2.js                     | -                         |   6.74 kB | 
+chunk-IZ2NTC7J.js                     | -                         |   6.11 kB | 
+chunk-EAZUVGHQ.js                     | -                         |   5.92 kB | 
+chunk-IJFTUCDD.js                     | -                         |   4.39 kB | 
+chunk-DQNYLMYO.js                     | -                         |   4.30 kB | 
+chunk-HB6COUDC.js                     | -                         |   3.33 kB | 
+chunk-JOC75S3X.js                     | -                         |   3.33 kB | 
+chunk-3FQOEKUZ.js                     | -                         |   3.11 kB | 
+chunk-6OOQYVLN.js                     | -                         |   3.08 kB | 
+chunk-VWIRC7NF.js                     | -                         |   2.83 kB | 
+chunk-O6SYQZHG.js                     | -                         |   2.68 kB | 
+chunk-QSQTMIFA.js                     | -                         |   1.78 kB | 
+chunk-6INULYLG.js                     | -                         |   1.51 kB | 
+chunk-INKZ244Q.js                     | -                         |   1.37 kB | 
+chunk-FEGZF7NO.js                     | -                         |   1.15 kB | 
+chunk-UAE7CGJH.js                     | -                         | 909 bytes | 
+
+Lazy chunk files                      | Names                     |  Raw size
+transaction.module-HYXKVOVW.js        | transaction-module        | 472.04 kB | 
+restaurant.module-CHSBUFAU.js         | restaurant-module         | 445.57 kB | 
+purchase.module-PINN4JI3.js           | purchase-module           | 298.57 kB | 
+accounting.module-JQRHDB5K.js         | accounting-module         | 275.17 kB | 
+sales.module-BTAUVEJE.js              | sales-module              | 260.51 kB | 
+chunk-7METEUSK.js                     | -                         | 233.49 kB | 
+reports.module-PMEGRUL3.js            | reports-module            | 221.35 kB | 
+inventory.module-H7G2NF73.js          | inventory-module          | 182.80 kB | 
+chunk-27FRI6WP.js                     | -                         | 152.35 kB | 
+financialStatement.module-2DUYZGBX.js | financialStatement-module | 147.77 kB | 
+chunk-DTHUHPYP.js                     | -                         | 138.84 kB | 
+chunk-J4266JP6.js                     | -                         | 106.31 kB | 
+tax-report.module-23GQ4HQF.js         | tax-report-module         |  96.48 kB | 
+chunk-VFMGU6GS.js                     | -                         |  80.75 kB | 
+chunk-7F4HEFKH.js                     | -                         |  78.77 kB | 
+...and 155 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [18.403 seconds] - 2026-07-30T18:15:32.602Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files            | Names              |  Raw size
+main.js                        | main               |  58.75 kB | 
+
+Lazy chunk files               | Names              |  Raw size
+transaction.module-HKICPXLJ.js | transaction-module | 472.04 kB | 
+restaurant.module-EUOVZEMQ.js  | restaurant-module  | 445.57 kB | 
+main.module-SVMKEV7O.js        | main-module        |   6.05 kB | 
+chunk-WVUK5E4T.js              | -                  |   3.92 kB | 
+
+Application bundle generation complete. [2.962 seconds] - 2026-07-30T18:19:45.369Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-ZXGPPMY6.js | restaurant-module | 445.57 kB | 
+main.module-LU3LKR65.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.519 seconds] - 2026-07-30T18:20:00.954Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files            | Names              |  Raw size
+main.js                        | main               |  58.75 kB | 
+
+Lazy chunk files               | Names              |  Raw size
+transaction.module-3BZIY4W7.js | transaction-module | 472.04 kB | 
+restaurant.module-3SL75P6F.js  | restaurant-module  | 445.57 kB | 
+main.module-WGOBZ37D.js        | main-module        |   6.05 kB | 
+chunk-HDPY3R3I.js              | -                  |   3.92 kB | 
+
+Application bundle generation complete. [2.416 seconds] - 2026-07-30T18:22:45.119Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-23KSE6OF.js | restaurant-module | 445.57 kB | 
+main.module-LWBCCY6W.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.662 seconds] - 2026-07-31T03:25:25.268Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [1.891 seconds] - 2026-07-31T03:25:35.654Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [1.897 seconds] - 2026-07-31T03:25:40.319Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [1.797 seconds] - 2026-07-31T03:25:52.433Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [1.971 seconds] - 2026-07-31T03:26:02.682Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files                   | Names                     |  Raw size
+chunk-CGK6GH7A.js                     | -                         |   2.86 MB | 
+polyfills.js                          | polyfills                 |   1.06 MB | 
+scripts.js                            | scripts                   | 701.17 kB | 
+styles.css                            | styles                    | 642.52 kB | 
+chunk-GOTZUMNG.js                     | -                         | 502.68 kB | 
+chunk-DFDT5S5I.js                     | -                         |  93.58 kB | 
+chunk-RT26GP3K.js                     | -                         |  67.54 kB | 
+main.js                               | main                      |  58.75 kB | 
+chunk-Y2CMAPYN.js                     | -                         |  33.74 kB | 
+chunk-JPSNCDJN.js                     | -                         |  32.72 kB | 
+chunk-RS5VCUUR.js                     | -                         |  14.75 kB | 
+chunk-BL3D5CPS.js                     | -                         |  14.15 kB | 
+chunk-KXCXYEGN.js                     | -                         |  13.84 kB | 
+chunk-B6SN74M2.js                     | -                         |  13.69 kB | 
+chunk-QC4CXZGD.js                     | -                         |  13.21 kB | 
+chunk-VOE26LAE.js                     | -                         |  12.55 kB | 
+chunk-NDRZDFDL.js                     | -                         |  11.49 kB | 
+chunk-4FKGZPMQ.js                     | -                         |  11.36 kB | 
+chunk-D6FTRRQG.js                     | -                         |  10.78 kB | 
+chunk-GFYTBOGT.js                     | -                         |  10.69 kB | 
+chunk-FPOTJE3Y.js                     | -                         |   7.53 kB | 
+chunk-YAPTXNWM.js                     | -                         |   7.24 kB | 
+chunk-YS2CJ6VH.js                     | -                         |   6.74 kB | 
+chunk-RHBDYUMK.js                     | -                         |   6.11 kB | 
+chunk-Q477QKWC.js                     | -                         |   5.92 kB | 
+chunk-TDUGMXRH.js                     | -                         |   5.71 kB | 
+chunk-SG6QXBAP.js                     | -                         |   5.11 kB | 
+chunk-4Q4BEOL3.js                     | -                         |   4.39 kB | 
+chunk-NWIDTJ6F.js                     | -                         |   4.30 kB | 
+chunk-XAGTJ2WY.js                     | -                         |   4.22 kB | 
+chunk-MXVJFRA5.js                     | -                         |   4.14 kB | 
+chunk-DUPKP2XH.js                     | -                         |   3.33 kB | 
+chunk-LATUXUSC.js                     | -                         |   3.33 kB | 
+chunk-OL4MHMEX.js                     | -                         |   3.11 kB | 
+chunk-W5YXXGGX.js                     | -                         |   3.11 kB | 
+chunk-AEMIL7OH.js                     | -                         |   3.08 kB | 
+chunk-IC7Q4O3R.js                     | -                         |   2.83 kB | 
+chunk-Z6MEPKWH.js                     | -                         |   2.68 kB | 
+chunk-K6IZVR5Y.js                     | -                         |   2.16 kB | 
+chunk-ALYAWXAU.js                     | -                         |   1.88 kB | 
+chunk-FMNN2LAH.js                     | -                         |   1.78 kB | 
+chunk-URZEPLDT.js                     | -                         |   1.71 kB | 
+chunk-Y5RQAIA6.js                     | -                         |   1.55 kB | 
+chunk-RMRREABZ.js                     | -                         |   1.51 kB | 
+chunk-NXEGA4CG.js                     | -                         |   1.37 kB | 
+chunk-NODZ7BK6.js                     | -                         |   1.21 kB | 
+chunk-YHVMQMUO.js                     | -                         |   1.15 kB | 
+chunk-QBRQFUGP.js                     | -                         |   1.06 kB | 
+chunk-C43AJYUM.js                     | -                         | 979 bytes | 
+chunk-LJ5UIWCF.js                     | -                         | 925 bytes | 
+chunk-MOW4EGAQ.js                     | -                         | 909 bytes | 
+
+                                      | Initial total             |   6.28 MB
+
+Lazy chunk files                      | Names                     |  Raw size
+transaction.module-77HBR22X.js        | transaction-module        | 472.04 kB | 
+restaurant.module-JUSMSX4H.js         | restaurant-module         | 446.50 kB | 
+purchase.module-O6TTRK5O.js           | purchase-module           | 298.57 kB | 
+accounting.module-WHNNLDUY.js         | accounting-module         | 275.17 kB | 
+sales.module-ZKIAAOGN.js              | sales-module              | 260.51 kB | 
+chunk-CC5SDLGG.js                     | -                         | 233.49 kB | 
+reports.module-D2ZWW4UP.js            | reports-module            | 221.35 kB | 
+inventory.module-YG5GWAZW.js          | inventory-module          | 182.80 kB | 
+chunk-ZKMYD6EN.js                     | -                         | 152.35 kB | 
+financialStatement.module-IW2P5SYG.js | financialStatement-module | 147.77 kB | 
+chunk-WHGSINBI.js                     | -                         | 138.84 kB | 
+chunk-W3PG6IDG.js                     | -                         | 106.31 kB | 
+tax-report.module-BXTUSMQW.js         | tax-report-module         |  96.48 kB | 
+chunk-6NCU6RIP.js                     | -                         |  80.75 kB | 
+chunk-O44CIZBL.js                     | -                         |  78.77 kB | 
+...and 158 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [3.440 seconds] - 2026-07-31T03:26:18.573Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-R4GKEBEI.js | restaurant-module | 446.68 kB | 
+main.module-QWBREYEB.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.489 seconds] - 2026-07-31T03:26:41.145Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-2GRRMZPY.js | restaurant-module | 446.66 kB | 
+main.module-KCZBORFW.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.234 seconds] - 2026-07-31T03:26:46.236Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-4UEEBMQ7.js | restaurant-module | 446.63 kB | 
+main.module-LNWUXXRR.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.483 seconds] - 2026-07-31T03:26:52.665Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-N2HQRJNB.js | restaurant-module | 446.63 kB | 
+main.module-WKBCEIAQ.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.515 seconds] - 2026-07-31T03:29:10.344Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [1.922 seconds] - 2026-07-31T03:29:37.884Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [1.921 seconds] - 2026-07-31T03:30:17.587Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [1.853 seconds] - 2026-07-31T03:30:31.582Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files                   | Names                     |  Raw size
+chunk-C5DMBSB4.js                     | -                         |   2.87 MB | 
+polyfills.js                          | polyfills                 |   1.06 MB | 
+scripts.js                            | scripts                   | 701.17 kB | 
+styles.css                            | styles                    | 642.52 kB | 
+chunk-3LSPG5G6.js                     | -                         | 502.68 kB | 
+chunk-DFDT5S5I.js                     | -                         |  93.58 kB | 
+chunk-NALNKOBP.js                     | -                         |  67.54 kB | 
+main.js                               | main                      |  58.75 kB | 
+chunk-TNU2MAIA.js                     | -                         |  33.74 kB | 
+chunk-JPSNCDJN.js                     | -                         |  32.72 kB | 
+chunk-AHJJ5KJE.js                     | -                         |  14.75 kB | 
+chunk-3IRGDY6R.js                     | -                         |  14.15 kB | 
+chunk-V4ZF3HO5.js                     | -                         |  13.84 kB | 
+chunk-HND65K5L.js                     | -                         |  13.69 kB | 
+chunk-VK5U6RH3.js                     | -                         |  13.21 kB | 
+chunk-7GSNODW3.js                     | -                         |  12.55 kB | 
+chunk-Y3462VOY.js                     | -                         |  11.49 kB | 
+chunk-4FKGZPMQ.js                     | -                         |  11.36 kB | 
+chunk-HIXD2VJZ.js                     | -                         |  10.78 kB | 
+chunk-VOQAXWCA.js                     | -                         |  10.69 kB | 
+chunk-VUEYF44K.js                     | -                         |   7.53 kB | 
+chunk-MR6NMNFP.js                     | -                         |   7.24 kB | 
+chunk-UTCNDOY4.js                     | -                         |   6.74 kB | 
+chunk-ZDX4E7L2.js                     | -                         |   6.11 kB | 
+chunk-5AAY4SEH.js                     | -                         |   5.92 kB | 
+chunk-TDUGMXRH.js                     | -                         |   5.71 kB | 
+chunk-SG6QXBAP.js                     | -                         |   5.11 kB | 
+chunk-IZ55Q46L.js                     | -                         |   4.39 kB | 
+chunk-VH4GTJJX.js                     | -                         |   4.30 kB | 
+chunk-XAGTJ2WY.js                     | -                         |   4.22 kB | 
+chunk-MXVJFRA5.js                     | -                         |   4.14 kB | 
+chunk-NYR2ETVP.js                     | -                         |   3.33 kB | 
+chunk-A7OY3WUF.js                     | -                         |   3.33 kB | 
+chunk-BWYSOW4L.js                     | -                         |   3.11 kB | 
+chunk-W5YXXGGX.js                     | -                         |   3.11 kB | 
+chunk-VMFB7MGZ.js                     | -                         |   3.08 kB | 
+chunk-LPPRVWIH.js                     | -                         |   2.83 kB | 
+chunk-WQHG5KWC.js                     | -                         |   2.68 kB | 
+chunk-K6IZVR5Y.js                     | -                         |   2.16 kB | 
+chunk-ALYAWXAU.js                     | -                         |   1.88 kB | 
+chunk-E3TTOCUW.js                     | -                         |   1.78 kB | 
+chunk-URZEPLDT.js                     | -                         |   1.71 kB | 
+chunk-Y5RQAIA6.js                     | -                         |   1.55 kB | 
+chunk-7YZVHP74.js                     | -                         |   1.51 kB | 
+chunk-GQJAPVZA.js                     | -                         |   1.37 kB | 
+chunk-NODZ7BK6.js                     | -                         |   1.21 kB | 
+chunk-CHWO7S5Y.js                     | -                         |   1.15 kB | 
+chunk-QBRQFUGP.js                     | -                         |   1.06 kB | 
+chunk-C43AJYUM.js                     | -                         | 979 bytes | 
+chunk-LJ5UIWCF.js                     | -                         | 925 bytes | 
+chunk-THRIT3MX.js                     | -                         | 909 bytes | 
+
+                                      | Initial total             |   6.29 MB
+
+Lazy chunk files                      | Names                     |  Raw size
+transaction.module-MO3ULNNU.js        | transaction-module        | 472.04 kB | 
+restaurant.module-WMBIOOIT.js         | restaurant-module         | 447.25 kB | 
+purchase.module-NHOS77GE.js           | purchase-module           | 298.57 kB | 
+accounting.module-QNWCQK4B.js         | accounting-module         | 275.17 kB | 
+sales.module-EMMI2NJF.js              | sales-module              | 260.51 kB | 
+chunk-5LSIIGBU.js                     | -                         | 233.49 kB | 
+reports.module-KBBB7FLW.js            | reports-module            | 221.35 kB | 
+inventory.module-LUTMES34.js          | inventory-module          | 182.80 kB | 
+chunk-BLRZ76NP.js                     | -                         | 152.35 kB | 
+financialStatement.module-IFHPNOFX.js | financialStatement-module | 147.77 kB | 
+chunk-BPG2FUI4.js                     | -                         | 138.84 kB | 
+chunk-T2NFZJ7I.js                     | -                         | 106.31 kB | 
+tax-report.module-2F5CP3CO.js         | tax-report-module         |  96.48 kB | 
+chunk-LXAKNYTP.js                     | -                         |  80.75 kB | 
+chunk-VIE2ZS6T.js                     | -                         |  78.77 kB | 
+...and 158 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [2.371 seconds] - 2026-07-31T03:30:59.865Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files                   | Names                     |  Raw size
+chunk-UUW5EDJS.js                     | -                         |   2.87 MB | 
+chunk-2ZNUSKRI.js                     | -                         | 502.68 kB | 
+chunk-WVVXX6EL.js                     | -                         |  67.54 kB | 
+main.js                               | main                      |  58.75 kB | 
+chunk-ENXJHBDI.js                     | -                         |  33.74 kB | 
+chunk-EOEVUAIC.js                     | -                         |  14.75 kB | 
+chunk-UJAOUF4Z.js                     | -                         |  14.15 kB | 
+chunk-IQ52REUZ.js                     | -                         |  13.84 kB | 
+chunk-7IBJVGRJ.js                     | -                         |  13.69 kB | 
+chunk-4NRWP7L5.js                     | -                         |  13.21 kB | 
+chunk-Z65CQO3G.js                     | -                         |  12.55 kB | 
+chunk-XQWIDZFC.js                     | -                         |  11.49 kB | 
+chunk-MVVOF65N.js                     | -                         |  10.78 kB | 
+chunk-EGUN6X5W.js                     | -                         |  10.69 kB | 
+chunk-MOWW4N42.js                     | -                         |   7.53 kB | 
+chunk-7AZ5EFGK.js                     | -                         |   7.24 kB | 
+chunk-RVCRT3DJ.js                     | -                         |   6.74 kB | 
+chunk-2FBF75LF.js                     | -                         |   6.11 kB | 
+chunk-IBKA2J4Q.js                     | -                         |   5.92 kB | 
+chunk-RZY4FXHV.js                     | -                         |   4.39 kB | 
+chunk-XM7KBD7R.js                     | -                         |   4.30 kB | 
+chunk-W2F3RVJL.js                     | -                         |   3.33 kB | 
+chunk-NVALQPVO.js                     | -                         |   3.33 kB | 
+chunk-LXQHWDW3.js                     | -                         |   3.11 kB | 
+chunk-LGKKJZN6.js                     | -                         |   3.08 kB | 
+chunk-WGIDKBS5.js                     | -                         |   2.83 kB | 
+chunk-LLXMODIA.js                     | -                         |   2.68 kB | 
+chunk-2IOYAD2M.js                     | -                         |   1.78 kB | 
+chunk-AVJT2GHG.js                     | -                         |   1.51 kB | 
+chunk-VBVNKGPY.js                     | -                         |   1.37 kB | 
+chunk-XHMG66OP.js                     | -                         |   1.15 kB | 
+chunk-P32DCVYQ.js                     | -                         | 909 bytes | 
+
+Lazy chunk files                      | Names                     |  Raw size
+transaction.module-4XQI5WSG.js        | transaction-module        | 472.04 kB | 
+restaurant.module-4DL4ELG2.js         | restaurant-module         | 447.25 kB | 
+purchase.module-6UJAUHNJ.js           | purchase-module           | 298.57 kB | 
+accounting.module-OB3CUNM4.js         | accounting-module         | 275.17 kB | 
+sales.module-HXR4A7DA.js              | sales-module              | 260.51 kB | 
+chunk-Z6IF3E47.js                     | -                         | 233.49 kB | 
+reports.module-LAUSNRBX.js            | reports-module            | 221.35 kB | 
+inventory.module-POL35NBA.js          | inventory-module          | 182.80 kB | 
+chunk-JJU7LHCX.js                     | -                         | 152.35 kB | 
+financialStatement.module-CKI4YFXL.js | financialStatement-module | 147.77 kB | 
+chunk-ING5YT7F.js                     | -                         | 138.84 kB | 
+chunk-F623LRUH.js                     | -                         | 106.31 kB | 
+tax-report.module-HKS4PUIA.js         | tax-report-module         |  96.48 kB | 
+chunk-BMHDBZXL.js                     | -                         |  80.75 kB | 
+chunk-Q5WZGAHA.js                     | -                         |  78.77 kB | 
+...and 155 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [18.167 seconds] - 2026-07-31T05:57:38.329Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files          | Names            |  Raw size
+main.js                      | main             |  58.75 kB | 
+
+Lazy chunk files             | Names            |  Raw size
+inventory.module-3JJPSEAL.js | inventory-module | 183.64 kB | 
+main.module-VFUAM3WD.js      | main-module      |   6.05 kB | 
+
+Application bundle generation complete. [2.770 seconds] - 2026-07-31T05:57:41.113Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files                   | Names                     |  Raw size
+chunk-C5DMBSB4.js                     | -                         |   2.87 MB | 
+chunk-3LSPG5G6.js                     | -                         | 502.68 kB | 
+chunk-NALNKOBP.js                     | -                         |  67.54 kB | 
+main.js                               | main                      |  58.75 kB | 
+chunk-TNU2MAIA.js                     | -                         |  33.74 kB | 
+chunk-AHJJ5KJE.js                     | -                         |  14.75 kB | 
+chunk-3IRGDY6R.js                     | -                         |  14.15 kB | 
+chunk-V4ZF3HO5.js                     | -                         |  13.84 kB | 
+chunk-HND65K5L.js                     | -                         |  13.69 kB | 
+chunk-VK5U6RH3.js                     | -                         |  13.21 kB | 
+chunk-7GSNODW3.js                     | -                         |  12.55 kB | 
+chunk-Y3462VOY.js                     | -                         |  11.49 kB | 
+chunk-HIXD2VJZ.js                     | -                         |  10.78 kB | 
+chunk-VOQAXWCA.js                     | -                         |  10.69 kB | 
+chunk-VUEYF44K.js                     | -                         |   7.53 kB | 
+chunk-MR6NMNFP.js                     | -                         |   7.24 kB | 
+chunk-UTCNDOY4.js                     | -                         |   6.74 kB | 
+chunk-ZDX4E7L2.js                     | -                         |   6.11 kB | 
+chunk-5AAY4SEH.js                     | -                         |   5.92 kB | 
+chunk-IZ55Q46L.js                     | -                         |   4.39 kB | 
+chunk-VH4GTJJX.js                     | -                         |   4.30 kB | 
+chunk-NYR2ETVP.js                     | -                         |   3.33 kB | 
+chunk-A7OY3WUF.js                     | -                         |   3.33 kB | 
+chunk-BWYSOW4L.js                     | -                         |   3.11 kB | 
+chunk-VMFB7MGZ.js                     | -                         |   3.08 kB | 
+chunk-LPPRVWIH.js                     | -                         |   2.83 kB | 
+chunk-WQHG5KWC.js                     | -                         |   2.68 kB | 
+chunk-E3TTOCUW.js                     | -                         |   1.78 kB | 
+chunk-7YZVHP74.js                     | -                         |   1.51 kB | 
+chunk-GQJAPVZA.js                     | -                         |   1.37 kB | 
+chunk-CHWO7S5Y.js                     | -                         |   1.15 kB | 
+chunk-THRIT3MX.js                     | -                         | 909 bytes | 
+
+Lazy chunk files                      | Names                     |  Raw size
+transaction.module-MO3ULNNU.js        | transaction-module        | 472.04 kB | 
+restaurant.module-WMBIOOIT.js         | restaurant-module         | 447.25 kB | 
+purchase.module-NHOS77GE.js           | purchase-module           | 298.57 kB | 
+accounting.module-QNWCQK4B.js         | accounting-module         | 275.17 kB | 
+sales.module-EMMI2NJF.js              | sales-module              | 260.51 kB | 
+chunk-5LSIIGBU.js                     | -                         | 233.49 kB | 
+reports.module-KBBB7FLW.js            | reports-module            | 221.35 kB | 
+inventory.module-4KG65EVD.js          | inventory-module          | 183.64 kB | 
+chunk-BLRZ76NP.js                     | -                         | 152.35 kB | 
+financialStatement.module-IFHPNOFX.js | financialStatement-module | 147.77 kB | 
+chunk-BPG2FUI4.js                     | -                         | 138.84 kB | 
+chunk-T2NFZJ7I.js                     | -                         | 106.31 kB | 
+tax-report.module-2F5CP3CO.js         | tax-report-module         |  96.48 kB | 
+chunk-LXAKNYTP.js                     | -                         |  80.75 kB | 
+chunk-VIE2ZS6T.js                     | -                         |  78.77 kB | 
+...and 155 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [17.063 seconds] - 2026-07-31T05:58:32.215Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files                   | Names                     |  Raw size
+chunk-DUEXUGQF.js                     | -                         |   2.87 MB | 
+chunk-CQEM5WIO.js                     | -                         | 502.68 kB | 
+chunk-YZTJQPRW.js                     | -                         |  67.54 kB | 
+main.js                               | main                      |  58.75 kB | 
+chunk-7CPGMTF5.js                     | -                         |  33.74 kB | 
+chunk-OWUWUPBT.js                     | -                         |  14.75 kB | 
+chunk-WWJBDYHD.js                     | -                         |  14.15 kB | 
+chunk-KDPFYBDF.js                     | -                         |  13.84 kB | 
+chunk-L4J7OYNM.js                     | -                         |  13.69 kB | 
+chunk-UNULN5U6.js                     | -                         |  13.21 kB | 
+chunk-YADCPG3B.js                     | -                         |  12.55 kB | 
+chunk-5DBNJQZZ.js                     | -                         |  11.49 kB | 
+chunk-UF2LHJDA.js                     | -                         |  10.78 kB | 
+chunk-B3PKKNC7.js                     | -                         |  10.69 kB | 
+chunk-7WZUDU6A.js                     | -                         |   7.53 kB | 
+chunk-YYVQWIYA.js                     | -                         |   7.24 kB | 
+chunk-5TV3NMST.js                     | -                         |   6.74 kB | 
+chunk-PDHFOHXR.js                     | -                         |   6.11 kB | 
+chunk-YQRZ7367.js                     | -                         |   5.92 kB | 
+chunk-6PP74WGY.js                     | -                         |   4.39 kB | 
+chunk-DRYNRREA.js                     | -                         |   4.30 kB | 
+chunk-VM46V4XF.js                     | -                         |   3.33 kB | 
+chunk-53AHFZSJ.js                     | -                         |   3.33 kB | 
+chunk-CD54Z2GE.js                     | -                         |   3.11 kB | 
+chunk-FKV3JHPI.js                     | -                         |   3.08 kB | 
+chunk-KD5QRDAT.js                     | -                         |   2.83 kB | 
+chunk-IQHOFL7R.js                     | -                         |   2.68 kB | 
+chunk-XE3WFE6H.js                     | -                         |   1.78 kB | 
+chunk-RFLKWQQI.js                     | -                         |   1.51 kB | 
+chunk-DCOVHQUY.js                     | -                         |   1.37 kB | 
+chunk-OCIQI2QE.js                     | -                         |   1.15 kB | 
+chunk-NI3NUBNJ.js                     | -                         | 909 bytes | 
+
+Lazy chunk files                      | Names                     |  Raw size
+transaction.module-VM67KQT5.js        | transaction-module        | 472.04 kB | 
+restaurant.module-STTTBJQI.js         | restaurant-module         | 447.25 kB | 
+purchase.module-Q4M22TLB.js           | purchase-module           | 298.57 kB | 
+accounting.module-XWPLZ6NQ.js         | accounting-module         | 275.17 kB | 
+sales.module-AY3SDNCU.js              | sales-module              | 260.51 kB | 
+chunk-BN3KCDYO.js                     | -                         | 233.49 kB | 
+reports.module-7H2VKALX.js            | reports-module            | 221.35 kB | 
+inventory.module-DYS5SX4K.js          | inventory-module          | 183.64 kB | 
+chunk-QRVNLDC5.js                     | -                         | 152.35 kB | 
+financialStatement.module-ILQMFKBF.js | financialStatement-module | 147.77 kB | 
+chunk-LV24KCDW.js                     | -                         | 138.84 kB | 
+chunk-UGMTCS6E.js                     | -                         | 106.31 kB | 
+tax-report.module-PDYAHVZQ.js         | tax-report-module         |  96.48 kB | 
+chunk-6H2GDLSZ.js                     | -                         |  80.75 kB | 
+chunk-3YHEXUSM.js                     | -                         |  78.77 kB | 
+...and 155 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [16.085 seconds] - 2026-07-31T06:00:36.116Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files          | Names            |  Raw size
+main.js                      | main             |  58.75 kB | 
+
+Lazy chunk files             | Names            |  Raw size
+inventory.module-LAIOUMR6.js | inventory-module | 183.44 kB | 
+main.module-7M7THKBU.js      | main-module      |   6.05 kB | 
+
+Application bundle generation complete. [2.612 seconds] - 2026-07-31T06:02:06.280Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [2.201 seconds] - 2026-07-31T06:05:27.200Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [2.167 seconds] - 2026-07-31T06:07:05.045Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [2.081 seconds] - 2026-07-31T06:07:14.208Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [2.287 seconds] - 2026-07-31T06:07:26.031Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [2.122 seconds] - 2026-07-31T06:07:42.117Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [1.914 seconds] - 2026-07-31T06:07:51.714Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [0.162 seconds] - 2026-07-31T06:08:03.921Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [1.877 seconds] - 2026-07-31T06:08:49.995Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [1.822 seconds] - 2026-07-31T06:08:56.649Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files                   | Names                     |  Raw size
+chunk-74ZY62TQ.js                     | -                         |   2.89 MB | 
+polyfills.js                          | polyfills                 |   1.06 MB | 
+scripts.js                            | scripts                   | 701.17 kB | 
+styles.css                            | styles                    | 642.52 kB | 
+chunk-LGQJFYC3.js                     | -                         | 502.68 kB | 
+chunk-DFDT5S5I.js                     | -                         |  93.58 kB | 
+chunk-X3UFKLZI.js                     | -                         |  67.54 kB | 
+main.js                               | main                      |  58.75 kB | 
+chunk-JSQ5ANLO.js                     | -                         |  33.74 kB | 
+chunk-JPSNCDJN.js                     | -                         |  32.72 kB | 
+chunk-SGBKVCUJ.js                     | -                         |  14.75 kB | 
+chunk-ELY6HYJ6.js                     | -                         |  14.15 kB | 
+chunk-RPYMU6FS.js                     | -                         |  13.84 kB | 
+chunk-ZQ5Y542L.js                     | -                         |  13.84 kB | 
+chunk-CXGDQKZQ.js                     | -                         |  13.21 kB | 
+chunk-EFWV4YDE.js                     | -                         |  12.55 kB | 
+chunk-NUNMFJE6.js                     | -                         |  11.49 kB | 
+chunk-4FKGZPMQ.js                     | -                         |  11.36 kB | 
+chunk-R6RLDWB2.js                     | -                         |  10.78 kB | 
+chunk-CXTILHFI.js                     | -                         |  10.69 kB | 
+chunk-ZFIZL42C.js                     | -                         |   7.53 kB | 
+chunk-LBA4GJLP.js                     | -                         |   7.24 kB | 
+chunk-N7AL5JOU.js                     | -                         |   6.74 kB | 
+chunk-6RTJJRL7.js                     | -                         |   6.11 kB | 
+chunk-BWKHHWOL.js                     | -                         |   5.92 kB | 
+chunk-TDUGMXRH.js                     | -                         |   5.71 kB | 
+chunk-SG6QXBAP.js                     | -                         |   5.11 kB | 
+chunk-F4QVDPH6.js                     | -                         |   4.39 kB | 
+chunk-C2W6PQNB.js                     | -                         |   4.30 kB | 
+chunk-XAGTJ2WY.js                     | -                         |   4.22 kB | 
+chunk-MXVJFRA5.js                     | -                         |   4.14 kB | 
+chunk-GIMFG2CS.js                     | -                         |   3.33 kB | 
+chunk-KMBCIABA.js                     | -                         |   3.33 kB | 
+chunk-Z6IP4WHO.js                     | -                         |   3.11 kB | 
+chunk-W5YXXGGX.js                     | -                         |   3.11 kB | 
+chunk-7HWJLWH5.js                     | -                         |   3.08 kB | 
+chunk-64SENWRQ.js                     | -                         |   2.83 kB | 
+chunk-HNBD3H6O.js                     | -                         |   2.68 kB | 
+chunk-K6IZVR5Y.js                     | -                         |   2.16 kB | 
+chunk-ALYAWXAU.js                     | -                         |   1.88 kB | 
+chunk-7CTSO2OF.js                     | -                         |   1.78 kB | 
+chunk-URZEPLDT.js                     | -                         |   1.71 kB | 
+chunk-Y5RQAIA6.js                     | -                         |   1.55 kB | 
+chunk-GK5VROMC.js                     | -                         |   1.51 kB | 
+chunk-P4BX7MDU.js                     | -                         |   1.37 kB | 
+chunk-NODZ7BK6.js                     | -                         |   1.21 kB | 
+chunk-KIHDUVXL.js                     | -                         |   1.15 kB | 
+chunk-QBRQFUGP.js                     | -                         |   1.06 kB | 
+chunk-C43AJYUM.js                     | -                         | 979 bytes | 
+chunk-LJ5UIWCF.js                     | -                         | 925 bytes | 
+chunk-UIHDPGDC.js                     | -                         | 909 bytes | 
+
+                                      | Initial total             |   6.30 MB
+
+Lazy chunk files                      | Names                     |  Raw size
+transaction.module-QK672AXK.js        | transaction-module        | 472.33 kB | 
+restaurant.module-CAK4RFDX.js         | restaurant-module         | 446.56 kB | 
+purchase.module-HCP2TJIK.js           | purchase-module           | 298.57 kB | 
+accounting.module-CGOFJSYD.js         | accounting-module         | 275.17 kB | 
+sales.module-AG4QSJPH.js              | sales-module              | 260.51 kB | 
+chunk-WW2QGJSE.js                     | -                         | 233.49 kB | 
+reports.module-RSBYUHK4.js            | reports-module            | 221.35 kB | 
+inventory.module-YHLFVBRG.js          | inventory-module          | 183.44 kB | 
+chunk-BQKAVEHR.js                     | -                         | 152.35 kB | 
+financialStatement.module-32O2VIHA.js | financialStatement-module | 147.77 kB | 
+chunk-JIRIK4I2.js                     | -                         | 138.84 kB | 
+chunk-GE4EOB44.js                     | -                         | 106.31 kB | 
+tax-report.module-OYJOJCVA.js         | tax-report-module         |  96.48 kB | 
+chunk-JGESOGVF.js                     | -                         |  80.75 kB | 
+chunk-Z7SP5I65.js                     | -                         |  78.77 kB | 
+...and 157 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [2.467 seconds] - 2026-07-31T06:09:03.144Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files | Names  |  Raw size
+styles.css          | styles | 642.96 kB | 
+
+Application bundle generation complete. [0.995 seconds] - 2026-07-31T06:11:59.712Z
+
+Stylesheet update sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-HZ3GQAT3.js | restaurant-module | 458.45 kB | 
+main.module-WGY5PMEJ.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.854 seconds] - 2026-07-31T06:19:24.790Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-KVPBXNB3.js | restaurant-module | 459.61 kB | 
+main.module-KFBHJIWM.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.276 seconds] - 2026-07-31T06:19:58.887Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-B4QZDZGJ.js | restaurant-module | 459.68 kB | 
+main.module-O4FJXQAE.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.488 seconds] - 2026-07-31T06:20:05.190Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-JD5554GX.js | restaurant-module | 459.95 kB | 
+main.module-YMFYS4LG.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.212 seconds] - 2026-07-31T06:20:11.334Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-2DJYVC3Q.js | restaurant-module | 423.86 kB | 
+main.module-NGT36NTC.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.231 seconds] - 2026-07-31T06:21:55.968Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-SMJK7CCC.js | restaurant-module | 424.66 kB | 
+main.module-5XUJHKBQ.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.324 seconds] - 2026-07-31T06:26:58.561Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-Z6EG5GVH.js | restaurant-module | 424.87 kB | 
+main.module-Z6SQU2OB.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [1.401 seconds] - 2026-07-31T06:27:03.984Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-GON3RFDC.js | restaurant-module | 425.16 kB | 
+main.module-BP6PG2YW.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [1.138 seconds] - 2026-07-31T06:27:10.297Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-W2QXEOLM.js | restaurant-module | 425.29 kB | 
+main.module-PFC552UB.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.547 seconds] - 2026-07-31T06:28:06.457Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-QBQCNBYW.js | restaurant-module | 425.41 kB | 
+main.module-PDJVKO4Q.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.222 seconds] - 2026-07-31T06:28:11.636Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files               | Names                 |  Raw size
+main.js                           | main                  |  58.75 kB | 
+
+Lazy chunk files                  | Names                 |  Raw size
+host-dashboard.module-NWUJCWNO.js | host-dashboard-module | 159.11 kB | 
+admin.module-IRBAYH47.js          | admin-module          |   9.80 kB | 
+main.module-OJYWGHIS.js           | main-module           |   6.05 kB | 
+dashboard.module-JODAQBXH.js      | dashboard-module      |   4.97 kB | 
+
+Application bundle generation complete. [2.665 seconds] - 2026-07-31T06:29:17.048Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files                   | Names                     |  Raw size
+chunk-74ZY62TQ.js                     | -                         |   2.89 MB | 
+polyfills.js                          | polyfills                 |   1.06 MB | 
+scripts.js                            | scripts                   | 701.17 kB | 
+styles.css                            | styles                    | 642.96 kB | 
+chunk-LGQJFYC3.js                     | -                         | 502.68 kB | 
+chunk-DFDT5S5I.js                     | -                         |  93.58 kB | 
+chunk-X3UFKLZI.js                     | -                         |  67.54 kB | 
+main.js                               | main                      |  58.75 kB | 
+chunk-JSQ5ANLO.js                     | -                         |  33.74 kB | 
+chunk-JPSNCDJN.js                     | -                         |  32.72 kB | 
+chunk-SGBKVCUJ.js                     | -                         |  14.75 kB | 
+chunk-ELY6HYJ6.js                     | -                         |  14.15 kB | 
+chunk-RPYMU6FS.js                     | -                         |  13.84 kB | 
+chunk-ZQ5Y542L.js                     | -                         |  13.84 kB | 
+chunk-CXGDQKZQ.js                     | -                         |  13.21 kB | 
+chunk-EFWV4YDE.js                     | -                         |  12.55 kB | 
+chunk-NUNMFJE6.js                     | -                         |  11.49 kB | 
+chunk-4FKGZPMQ.js                     | -                         |  11.36 kB | 
+chunk-R6RLDWB2.js                     | -                         |  10.78 kB | 
+chunk-CXTILHFI.js                     | -                         |  10.69 kB | 
+chunk-ZFIZL42C.js                     | -                         |   7.53 kB | 
+chunk-LBA4GJLP.js                     | -                         |   7.24 kB | 
+chunk-N7AL5JOU.js                     | -                         |   6.74 kB | 
+chunk-6RTJJRL7.js                     | -                         |   6.11 kB | 
+chunk-BWKHHWOL.js                     | -                         |   5.92 kB | 
+chunk-TDUGMXRH.js                     | -                         |   5.71 kB | 
+chunk-SG6QXBAP.js                     | -                         |   5.11 kB | 
+chunk-F4QVDPH6.js                     | -                         |   4.39 kB | 
+chunk-C2W6PQNB.js                     | -                         |   4.30 kB | 
+chunk-XAGTJ2WY.js                     | -                         |   4.22 kB | 
+chunk-MXVJFRA5.js                     | -                         |   4.14 kB | 
+chunk-GIMFG2CS.js                     | -                         |   3.33 kB | 
+chunk-KMBCIABA.js                     | -                         |   3.33 kB | 
+chunk-Z6IP4WHO.js                     | -                         |   3.11 kB | 
+chunk-W5YXXGGX.js                     | -                         |   3.11 kB | 
+chunk-7HWJLWH5.js                     | -                         |   3.08 kB | 
+chunk-64SENWRQ.js                     | -                         |   2.83 kB | 
+chunk-HNBD3H6O.js                     | -                         |   2.68 kB | 
+chunk-K6IZVR5Y.js                     | -                         |   2.16 kB | 
+chunk-ALYAWXAU.js                     | -                         |   1.88 kB | 
+chunk-7CTSO2OF.js                     | -                         |   1.78 kB | 
+chunk-URZEPLDT.js                     | -                         |   1.71 kB | 
+chunk-Y5RQAIA6.js                     | -                         |   1.55 kB | 
+chunk-GK5VROMC.js                     | -                         |   1.51 kB | 
+chunk-P4BX7MDU.js                     | -                         |   1.37 kB | 
+chunk-NODZ7BK6.js                     | -                         |   1.21 kB | 
+chunk-KIHDUVXL.js                     | -                         |   1.15 kB | 
+chunk-QBRQFUGP.js                     | -                         |   1.06 kB | 
+chunk-C43AJYUM.js                     | -                         | 979 bytes | 
+chunk-LJ5UIWCF.js                     | -                         | 925 bytes | 
+chunk-UIHDPGDC.js                     | -                         | 909 bytes | 
+
+                                      | Initial total             |   6.30 MB
+
+Lazy chunk files                      | Names                     |  Raw size
+transaction.module-QK672AXK.js        | transaction-module        | 472.33 kB | 
+restaurant.module-QBQCNBYW.js         | restaurant-module         | 425.41 kB | 
+purchase.module-HCP2TJIK.js           | purchase-module           | 298.57 kB | 
+accounting.module-CGOFJSYD.js         | accounting-module         | 275.17 kB | 
+sales.module-AG4QSJPH.js              | sales-module              | 260.51 kB | 
+chunk-WW2QGJSE.js                     | -                         | 233.49 kB | 
+reports.module-RSBYUHK4.js            | reports-module            | 221.35 kB | 
+inventory.module-YHLFVBRG.js          | inventory-module          | 183.44 kB | 
+host-dashboard.module-NWUJCWNO.js     | host-dashboard-module     | 159.11 kB | 
+financialStatement.module-32O2VIHA.js | financialStatement-module | 147.77 kB | 
+chunk-JIRIK4I2.js                     | -                         | 138.84 kB | 
+chunk-GE4EOB44.js                     | -                         | 106.31 kB | 
+tax-report.module-OYJOJCVA.js         | tax-report-module         |  96.48 kB | 
+chunk-JGESOGVF.js                     | -                         |  80.75 kB | 
+chunk-Z7SP5I65.js                     | -                         |  78.77 kB | 
+...and 156 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [0.543 seconds] - 2026-07-31T06:30:11.434Z
+
+Stylesheet update sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+chunk-LMONUKVO.js             | -                 |  45.59 kB | 
+account.module-MICVVB63.js    | account-module    |  12.33 kB | 
+account.component-HTPWFI4F.js | account-component | 673 bytes | 
+
+Application bundle generation complete. [1.750 seconds] - 2026-07-31T06:35:17.599Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files                   | Names                     |  Raw size
+chunk-U2WZBZGY.js                     | -                         |   2.89 MB | 
+chunk-DAYWZXEP.js                     | -                         | 502.68 kB | 
+chunk-66RCTMFR.js                     | -                         |  67.54 kB | 
+main.js                               | main                      |  58.75 kB | 
+chunk-YPHYKHCQ.js                     | -                         |  33.74 kB | 
+chunk-JFPBYB7J.js                     | -                         |  14.75 kB | 
+chunk-ISKXILRJ.js                     | -                         |  14.15 kB | 
+chunk-KNCK7PEQ.js                     | -                         |  13.84 kB | 
+chunk-3RD3IFKJ.js                     | -                         |  13.84 kB | 
+chunk-IMUK522U.js                     | -                         |  13.21 kB | 
+chunk-6FBOBXTV.js                     | -                         |  12.55 kB | 
+chunk-WSKOXFIZ.js                     | -                         |  11.49 kB | 
+chunk-TXMFJKRB.js                     | -                         |  10.78 kB | 
+chunk-DS4P24SH.js                     | -                         |  10.69 kB | 
+chunk-57EFLT4G.js                     | -                         |   7.53 kB | 
+chunk-REDYJK6L.js                     | -                         |   7.24 kB | 
+chunk-RAQZ5XCY.js                     | -                         |   6.74 kB | 
+chunk-KVQFNQR5.js                     | -                         |   6.11 kB | 
+chunk-VANR2MLG.js                     | -                         |   5.92 kB | 
+chunk-5UP3UHE6.js                     | -                         |   4.39 kB | 
+chunk-SO3BT4IM.js                     | -                         |   4.30 kB | 
+chunk-KWQIAAW7.js                     | -                         |   3.33 kB | 
+chunk-2ANOA6OC.js                     | -                         |   3.33 kB | 
+chunk-TLYOI3VG.js                     | -                         |   3.11 kB | 
+chunk-M7H3JWRJ.js                     | -                         |   3.08 kB | 
+chunk-G5VPOX5Y.js                     | -                         |   2.83 kB | 
+chunk-HWDPW2XL.js                     | -                         |   2.68 kB | 
+chunk-XZC7HGDC.js                     | -                         |   1.78 kB | 
+chunk-QAZ25XWP.js                     | -                         |   1.51 kB | 
+chunk-TJ3H4KZ6.js                     | -                         |   1.37 kB | 
+chunk-N4SI6QB4.js                     | -                         |   1.15 kB | 
+chunk-EIP6WRGD.js                     | -                         | 909 bytes | 
+
+Lazy chunk files                      | Names                     |  Raw size
+transaction.module-SGRMI4EA.js        | transaction-module        | 472.33 kB | 
+restaurant.module-KXOQD6ZY.js         | restaurant-module         | 391.49 kB | 
+purchase.module-JLNOI3B3.js           | purchase-module           | 298.57 kB | 
+accounting.module-DZAE6G3D.js         | accounting-module         | 275.17 kB | 
+sales.module-VGL2SEP7.js              | sales-module              | 260.51 kB | 
+chunk-RWJBWB44.js                     | -                         | 233.49 kB | 
+reports.module-3RRNVUCB.js            | reports-module            | 221.35 kB | 
+inventory.module-JPASH5GU.js          | inventory-module          | 183.44 kB | 
+host-dashboard.module-ETYHHNLS.js     | host-dashboard-module     | 159.11 kB | 
+financialStatement.module-6UDXMM4A.js | financialStatement-module | 147.77 kB | 
+chunk-A6DOWT4S.js                     | -                         | 138.84 kB | 
+chunk-2QMDR4S5.js                     | -                         | 106.31 kB | 
+tax-report.module-VMRCYOJB.js         | tax-report-module         |  96.48 kB | 
+chunk-WFG5SXZE.js                     | -                         |  80.75 kB | 
+chunk-LZCR6WUA.js                     | -                         |  78.77 kB | 
+...and 154 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [1.657 seconds] - 2026-07-31T06:39:40.285Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files          | Names            | Raw size
+main.js                      | main             | 58.75 kB | 
+
+Lazy chunk files             | Names            | Raw size
+dashboard.module-HMFH7EAN.js | dashboard-module | 30.75 kB | 
+main.module-EFNJ4TMZ.js      | main-module      |  6.05 kB | 
+
+Application bundle generation complete. [2.317 seconds] - 2026-07-31T06:39:54.092Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files                   | Names                     |  Raw size
+chunk-U2WZBZGY.js                     | -                         |   2.89 MB | 
+polyfills.js                          | polyfills                 |   1.06 MB | 
+scripts.js                            | scripts                   | 701.17 kB | 
+styles.css                            | styles                    | 642.96 kB | 
+chunk-DAYWZXEP.js                     | -                         | 502.68 kB | 
+chunk-DFDT5S5I.js                     | -                         |  93.58 kB | 
+chunk-66RCTMFR.js                     | -                         |  67.54 kB | 
+main.js                               | main                      |  58.75 kB | 
+chunk-YPHYKHCQ.js                     | -                         |  33.74 kB | 
+chunk-JPSNCDJN.js                     | -                         |  32.72 kB | 
+chunk-JFPBYB7J.js                     | -                         |  14.75 kB | 
+chunk-ISKXILRJ.js                     | -                         |  14.15 kB | 
+chunk-KNCK7PEQ.js                     | -                         |  13.84 kB | 
+chunk-3RD3IFKJ.js                     | -                         |  13.84 kB | 
+chunk-IMUK522U.js                     | -                         |  13.21 kB | 
+chunk-6FBOBXTV.js                     | -                         |  12.55 kB | 
+chunk-WSKOXFIZ.js                     | -                         |  11.49 kB | 
+chunk-4FKGZPMQ.js                     | -                         |  11.36 kB | 
+chunk-TXMFJKRB.js                     | -                         |  10.78 kB | 
+chunk-DS4P24SH.js                     | -                         |  10.69 kB | 
+chunk-57EFLT4G.js                     | -                         |   7.53 kB | 
+chunk-REDYJK6L.js                     | -                         |   7.24 kB | 
+chunk-RAQZ5XCY.js                     | -                         |   6.74 kB | 
+chunk-KVQFNQR5.js                     | -                         |   6.11 kB | 
+chunk-VANR2MLG.js                     | -                         |   5.92 kB | 
+chunk-TDUGMXRH.js                     | -                         |   5.71 kB | 
+chunk-SG6QXBAP.js                     | -                         |   5.11 kB | 
+chunk-5UP3UHE6.js                     | -                         |   4.39 kB | 
+chunk-SO3BT4IM.js                     | -                         |   4.30 kB | 
+chunk-XAGTJ2WY.js                     | -                         |   4.22 kB | 
+chunk-MXVJFRA5.js                     | -                         |   4.14 kB | 
+chunk-KWQIAAW7.js                     | -                         |   3.33 kB | 
+chunk-2ANOA6OC.js                     | -                         |   3.33 kB | 
+chunk-TLYOI3VG.js                     | -                         |   3.11 kB | 
+chunk-W5YXXGGX.js                     | -                         |   3.11 kB | 
+chunk-M7H3JWRJ.js                     | -                         |   3.08 kB | 
+chunk-G5VPOX5Y.js                     | -                         |   2.83 kB | 
+chunk-HWDPW2XL.js                     | -                         |   2.68 kB | 
+chunk-K6IZVR5Y.js                     | -                         |   2.16 kB | 
+chunk-ALYAWXAU.js                     | -                         |   1.88 kB | 
+chunk-XZC7HGDC.js                     | -                         |   1.78 kB | 
+chunk-URZEPLDT.js                     | -                         |   1.71 kB | 
+chunk-Y5RQAIA6.js                     | -                         |   1.55 kB | 
+chunk-QAZ25XWP.js                     | -                         |   1.51 kB | 
+chunk-TJ3H4KZ6.js                     | -                         |   1.37 kB | 
+chunk-NODZ7BK6.js                     | -                         |   1.21 kB | 
+chunk-N4SI6QB4.js                     | -                         |   1.15 kB | 
+chunk-QBRQFUGP.js                     | -                         |   1.06 kB | 
+chunk-C43AJYUM.js                     | -                         | 979 bytes | 
+chunk-LJ5UIWCF.js                     | -                         | 925 bytes | 
+chunk-EIP6WRGD.js                     | -                         | 909 bytes | 
+
+                                      | Initial total             |   6.30 MB
+
+Lazy chunk files                      | Names                     |  Raw size
+transaction.module-SGRMI4EA.js        | transaction-module        | 472.33 kB | 
+restaurant.module-KXOQD6ZY.js         | restaurant-module         | 391.49 kB | 
+purchase.module-JLNOI3B3.js           | purchase-module           | 298.57 kB | 
+accounting.module-DZAE6G3D.js         | accounting-module         | 275.17 kB | 
+sales.module-VGL2SEP7.js              | sales-module              | 260.51 kB | 
+chunk-RWJBWB44.js                     | -                         | 233.49 kB | 
+reports.module-3RRNVUCB.js            | reports-module            | 221.35 kB | 
+inventory.module-JPASH5GU.js          | inventory-module          | 183.44 kB | 
+host-dashboard.module-ETYHHNLS.js     | host-dashboard-module     | 159.11 kB | 
+financialStatement.module-6UDXMM4A.js | financialStatement-module | 147.77 kB | 
+chunk-A6DOWT4S.js                     | -                         | 138.84 kB | 
+chunk-2QMDR4S5.js                     | -                         | 106.31 kB | 
+tax-report.module-VMRCYOJB.js         | tax-report-module         |  96.48 kB | 
+chunk-WFG5SXZE.js                     | -                         |  80.75 kB | 
+chunk-LZCR6WUA.js                     | -                         |  78.77 kB | 
+...and 157 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [0.542 seconds] - 2026-07-31T06:39:56.769Z
+
+Stylesheet update sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files          | Names            | Raw size
+main.js                      | main             | 58.75 kB | 
+
+Lazy chunk files             | Names            | Raw size
+dashboard.module-QSTS5LX3.js | dashboard-module | 31.97 kB | 
+main.module-FGZW5FCU.js      | main-module      |  6.05 kB | 
+
+Application bundle generation complete. [1.468 seconds] - 2026-07-31T06:41:49.155Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files                   | Names                     |  Raw size
+chunk-U2WZBZGY.js                     | -                         |   2.89 MB | 
+polyfills.js                          | polyfills                 |   1.06 MB | 
+scripts.js                            | scripts                   | 701.17 kB | 
+styles.css                            | styles                    | 642.96 kB | 
+chunk-DAYWZXEP.js                     | -                         | 502.68 kB | 
+chunk-DFDT5S5I.js                     | -                         |  93.58 kB | 
+chunk-66RCTMFR.js                     | -                         |  67.54 kB | 
+main.js                               | main                      |  58.75 kB | 
+chunk-YPHYKHCQ.js                     | -                         |  33.74 kB | 
+chunk-JPSNCDJN.js                     | -                         |  32.72 kB | 
+chunk-JFPBYB7J.js                     | -                         |  14.75 kB | 
+chunk-ISKXILRJ.js                     | -                         |  14.15 kB | 
+chunk-KNCK7PEQ.js                     | -                         |  13.84 kB | 
+chunk-3RD3IFKJ.js                     | -                         |  13.84 kB | 
+chunk-IMUK522U.js                     | -                         |  13.21 kB | 
+chunk-6FBOBXTV.js                     | -                         |  12.55 kB | 
+chunk-WSKOXFIZ.js                     | -                         |  11.49 kB | 
+chunk-4FKGZPMQ.js                     | -                         |  11.36 kB | 
+chunk-TXMFJKRB.js                     | -                         |  10.78 kB | 
+chunk-DS4P24SH.js                     | -                         |  10.69 kB | 
+chunk-57EFLT4G.js                     | -                         |   7.53 kB | 
+chunk-REDYJK6L.js                     | -                         |   7.24 kB | 
+chunk-RAQZ5XCY.js                     | -                         |   6.74 kB | 
+chunk-KVQFNQR5.js                     | -                         |   6.11 kB | 
+chunk-VANR2MLG.js                     | -                         |   5.92 kB | 
+chunk-TDUGMXRH.js                     | -                         |   5.71 kB | 
+chunk-SG6QXBAP.js                     | -                         |   5.11 kB | 
+chunk-5UP3UHE6.js                     | -                         |   4.39 kB | 
+chunk-SO3BT4IM.js                     | -                         |   4.30 kB | 
+chunk-XAGTJ2WY.js                     | -                         |   4.22 kB | 
+chunk-MXVJFRA5.js                     | -                         |   4.14 kB | 
+chunk-KWQIAAW7.js                     | -                         |   3.33 kB | 
+chunk-2ANOA6OC.js                     | -                         |   3.33 kB | 
+chunk-TLYOI3VG.js                     | -                         |   3.11 kB | 
+chunk-W5YXXGGX.js                     | -                         |   3.11 kB | 
+chunk-M7H3JWRJ.js                     | -                         |   3.08 kB | 
+chunk-G5VPOX5Y.js                     | -                         |   2.83 kB | 
+chunk-HWDPW2XL.js                     | -                         |   2.68 kB | 
+chunk-K6IZVR5Y.js                     | -                         |   2.16 kB | 
+chunk-ALYAWXAU.js                     | -                         |   1.88 kB | 
+chunk-XZC7HGDC.js                     | -                         |   1.78 kB | 
+chunk-URZEPLDT.js                     | -                         |   1.71 kB | 
+chunk-Y5RQAIA6.js                     | -                         |   1.55 kB | 
+chunk-QAZ25XWP.js                     | -                         |   1.51 kB | 
+chunk-TJ3H4KZ6.js                     | -                         |   1.37 kB | 
+chunk-NODZ7BK6.js                     | -                         |   1.21 kB | 
+chunk-N4SI6QB4.js                     | -                         |   1.15 kB | 
+chunk-QBRQFUGP.js                     | -                         |   1.06 kB | 
+chunk-C43AJYUM.js                     | -                         | 979 bytes | 
+chunk-LJ5UIWCF.js                     | -                         | 925 bytes | 
+chunk-EIP6WRGD.js                     | -                         | 909 bytes | 
+
+                                      | Initial total             |   6.30 MB
+
+Lazy chunk files                      | Names                     |  Raw size
+transaction.module-SGRMI4EA.js        | transaction-module        | 472.33 kB | 
+restaurant.module-KXOQD6ZY.js         | restaurant-module         | 391.49 kB | 
+purchase.module-JLNOI3B3.js           | purchase-module           | 298.57 kB | 
+accounting.module-DZAE6G3D.js         | accounting-module         | 275.17 kB | 
+sales.module-VGL2SEP7.js              | sales-module              | 260.51 kB | 
+chunk-RWJBWB44.js                     | -                         | 233.49 kB | 
+reports.module-3RRNVUCB.js            | reports-module            | 221.35 kB | 
+inventory.module-JPASH5GU.js          | inventory-module          | 183.44 kB | 
+host-dashboard.module-ETYHHNLS.js     | host-dashboard-module     | 159.11 kB | 
+financialStatement.module-6UDXMM4A.js | financialStatement-module | 147.77 kB | 
+chunk-A6DOWT4S.js                     | -                         | 138.84 kB | 
+chunk-2QMDR4S5.js                     | -                         | 106.31 kB | 
+tax-report.module-VMRCYOJB.js         | tax-report-module         |  96.48 kB | 
+chunk-WFG5SXZE.js                     | -                         |  80.75 kB | 
+chunk-LZCR6WUA.js                     | -                         |  78.77 kB | 
+...and 157 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [0.308 seconds] - 2026-07-31T06:41:55.647Z
+
+Stylesheet update sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-4Q55E7FK.js | restaurant-module | 391.61 kB | 
+main.module-ZGFTPD3K.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.693 seconds] - 2026-07-31T06:46:12.052Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-VTEJRAY3.js | restaurant-module | 392.18 kB | 
+main.module-FWHHXLX5.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.676 seconds] - 2026-07-31T06:48:11.662Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files        | Names          |  Raw size
+main.js                    | main           |  58.75 kB | 
+
+Lazy chunk files           | Names          |  Raw size
+reports.module-TIIYIBF6.js | reports-module | 224.19 kB | 
+main.module-ZKNJO4IL.js    | main-module    |   6.05 kB | 
+
+Application bundle generation complete. [2.842 seconds] - 2026-07-31T06:52:29.743Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files        | Names          |  Raw size
+main.js                    | main           |  58.75 kB | 
+
+Lazy chunk files           | Names          |  Raw size
+reports.module-CKHI7FZP.js | reports-module | 224.21 kB | 
+main.module-26JROXIJ.js    | main-module    |   6.05 kB | 
+
+Application bundle generation complete. [1.189 seconds] - 2026-07-31T06:52:55.092Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [1.139 seconds] - 2026-07-31T06:53:52.476Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Application bundle generation failed. [0.838 seconds] - 2026-07-31T06:54:05.513Z
+
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files                   | Names                     |  Raw size
+chunk-U2WZBZGY.js                     | -                         |   2.89 MB | 
+polyfills.js                          | polyfills                 |   1.06 MB | 
+scripts.js                            | scripts                   | 701.17 kB | 
+styles.css                            | styles                    | 642.96 kB | 
+chunk-DAYWZXEP.js                     | -                         | 502.68 kB | 
+chunk-DFDT5S5I.js                     | -                         |  93.58 kB | 
+chunk-66RCTMFR.js                     | -                         |  67.54 kB | 
+main.js                               | main                      |  58.75 kB | 
+chunk-YPHYKHCQ.js                     | -                         |  33.74 kB | 
+chunk-JPSNCDJN.js                     | -                         |  32.72 kB | 
+chunk-JFPBYB7J.js                     | -                         |  14.75 kB | 
+chunk-ISKXILRJ.js                     | -                         |  14.15 kB | 
+chunk-KNCK7PEQ.js                     | -                         |  13.84 kB | 
+chunk-3RD3IFKJ.js                     | -                         |  13.84 kB | 
+chunk-IMUK522U.js                     | -                         |  13.21 kB | 
+chunk-6FBOBXTV.js                     | -                         |  12.55 kB | 
+chunk-WSKOXFIZ.js                     | -                         |  11.49 kB | 
+chunk-4FKGZPMQ.js                     | -                         |  11.36 kB | 
+chunk-TXMFJKRB.js                     | -                         |  10.78 kB | 
+chunk-DS4P24SH.js                     | -                         |  10.69 kB | 
+chunk-57EFLT4G.js                     | -                         |   7.53 kB | 
+chunk-REDYJK6L.js                     | -                         |   7.24 kB | 
+chunk-RAQZ5XCY.js                     | -                         |   6.74 kB | 
+chunk-KVQFNQR5.js                     | -                         |   6.11 kB | 
+chunk-VANR2MLG.js                     | -                         |   5.92 kB | 
+chunk-TDUGMXRH.js                     | -                         |   5.71 kB | 
+chunk-SG6QXBAP.js                     | -                         |   5.11 kB | 
+chunk-5UP3UHE6.js                     | -                         |   4.39 kB | 
+chunk-SO3BT4IM.js                     | -                         |   4.30 kB | 
+chunk-XAGTJ2WY.js                     | -                         |   4.22 kB | 
+chunk-MXVJFRA5.js                     | -                         |   4.14 kB | 
+chunk-KWQIAAW7.js                     | -                         |   3.33 kB | 
+chunk-2ANOA6OC.js                     | -                         |   3.33 kB | 
+chunk-TLYOI3VG.js                     | -                         |   3.11 kB | 
+chunk-W5YXXGGX.js                     | -                         |   3.11 kB | 
+chunk-M7H3JWRJ.js                     | -                         |   3.08 kB | 
+chunk-G5VPOX5Y.js                     | -                         |   2.83 kB | 
+chunk-HWDPW2XL.js                     | -                         |   2.68 kB | 
+chunk-K6IZVR5Y.js                     | -                         |   2.16 kB | 
+chunk-ALYAWXAU.js                     | -                         |   1.88 kB | 
+chunk-XZC7HGDC.js                     | -                         |   1.78 kB | 
+chunk-URZEPLDT.js                     | -                         |   1.71 kB | 
+chunk-Y5RQAIA6.js                     | -                         |   1.55 kB | 
+chunk-QAZ25XWP.js                     | -                         |   1.51 kB | 
+chunk-TJ3H4KZ6.js                     | -                         |   1.37 kB | 
+chunk-NODZ7BK6.js                     | -                         |   1.21 kB | 
+chunk-N4SI6QB4.js                     | -                         |   1.15 kB | 
+chunk-QBRQFUGP.js                     | -                         |   1.06 kB | 
+chunk-C43AJYUM.js                     | -                         | 979 bytes | 
+chunk-LJ5UIWCF.js                     | -                         | 925 bytes | 
+chunk-EIP6WRGD.js                     | -                         | 909 bytes | 
+
+                                      | Initial total             |   6.30 MB
+
+Lazy chunk files                      | Names                     |  Raw size
+transaction.module-SGRMI4EA.js        | transaction-module        | 472.33 kB | 
+restaurant.module-VTEJRAY3.js         | restaurant-module         | 392.18 kB | 
+purchase.module-JLNOI3B3.js           | purchase-module           | 298.57 kB | 
+accounting.module-DZAE6G3D.js         | accounting-module         | 275.17 kB | 
+sales.module-VGL2SEP7.js              | sales-module              | 260.51 kB | 
+reports.module-RTC5RZNO.js            | reports-module            | 237.11 kB | 
+chunk-RWJBWB44.js                     | -                         | 233.49 kB | 
+inventory.module-JPASH5GU.js          | inventory-module          | 183.44 kB | 
+host-dashboard.module-ETYHHNLS.js     | host-dashboard-module     | 159.11 kB | 
+financialStatement.module-6UDXMM4A.js | financialStatement-module | 147.77 kB | 
+chunk-A6DOWT4S.js                     | -                         | 138.84 kB | 
+chunk-2QMDR4S5.js                     | -                         | 106.31 kB | 
+tax-report.module-VMRCYOJB.js         | tax-report-module         |  96.48 kB | 
+chunk-WFG5SXZE.js                     | -                         |  80.75 kB | 
+chunk-LZCR6WUA.js                     | -                         |  78.77 kB | 
+...and 157 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [1.302 seconds] - 2026-07-31T06:54:21.567Z
+
+Page reload sent to client(s).
+12:39:25 PM [vite] (client) [optimizer] bundling dependencies...
+12:39:27 PM [vite] (client) dependency optimized: pdf-lib
+12:39:27 PM [vite] (client) optimized dependencies changed. reloading
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files                   | Names                     |  Raw size
+chunk-Z45R2L5S.js                     | -                         |   2.89 MB | 
+chunk-BCX4KSVA.js                     | -                         | 502.68 kB | 
+chunk-JZXQX755.js                     | -                         |  67.54 kB | 
+main.js                               | main                      |  58.75 kB | 
+chunk-XRUQAXQY.js                     | -                         |  33.86 kB | 
+chunk-LOHBAYKY.js                     | -                         |  14.75 kB | 
+chunk-57LM7HYA.js                     | -                         |  14.15 kB | 
+chunk-D7ER3ZDS.js                     | -                         |  13.84 kB | 
+chunk-JZYUW4VS.js                     | -                         |  13.84 kB | 
+chunk-RLHUIUUO.js                     | -                         |  13.21 kB | 
+chunk-65ZRCNON.js                     | -                         |  12.55 kB | 
+chunk-ZSNCNNZF.js                     | -                         |  11.49 kB | 
+chunk-ULJEDEFV.js                     | -                         |  10.78 kB | 
+chunk-RCFOLGMH.js                     | -                         |  10.69 kB | 
+chunk-AW4UBFX6.js                     | -                         |   7.53 kB | 
+chunk-NX4UR5CD.js                     | -                         |   7.24 kB | 
+chunk-PE2NMUI4.js                     | -                         |   6.74 kB | 
+chunk-U6ASZRD4.js                     | -                         |   6.11 kB | 
+chunk-MV366MJT.js                     | -                         |   5.92 kB | 
+chunk-TJPYNDTI.js                     | -                         |   4.39 kB | 
+chunk-KDXGFFT7.js                     | -                         |   4.30 kB | 
+chunk-4NBH7O5K.js                     | -                         |   3.33 kB | 
+chunk-OCO6NXS2.js                     | -                         |   3.33 kB | 
+chunk-N3SIEZPI.js                     | -                         |   3.11 kB | 
+chunk-TP2KZHAU.js                     | -                         |   3.08 kB | 
+chunk-2BTMSZPE.js                     | -                         |   2.83 kB | 
+chunk-3UI4K3AX.js                     | -                         |   2.68 kB | 
+chunk-DMLK4MRR.js                     | -                         |   1.78 kB | 
+chunk-IJY3ONNF.js                     | -                         |   1.51 kB | 
+chunk-GN2WIGYM.js                     | -                         |   1.37 kB | 
+chunk-UBIIDGWL.js                     | -                         |   1.15 kB | 
+chunk-5KVDNWVQ.js                     | -                         | 909 bytes | 
+
+Lazy chunk files                      | Names                     |  Raw size
+transaction.module-KIAD5CWM.js        | transaction-module        | 472.33 kB | 
+restaurant.module-RY6SPS3Q.js         | restaurant-module         | 392.18 kB | 
+purchase.module-BLALYQJF.js           | purchase-module           | 298.57 kB | 
+accounting.module-KZKAQAYD.js         | accounting-module         | 275.17 kB | 
+reports.module-3W7MUIUS.js            | reports-module            | 266.91 kB | 
+sales.module-RGZSSSB4.js              | sales-module              | 260.51 kB | 
+chunk-4TFVXMN6.js                     | -                         | 233.49 kB | 
+inventory.module-IUITKZEP.js          | inventory-module          | 183.44 kB | 
+host-dashboard.module-ALZKCX2I.js     | host-dashboard-module     | 159.11 kB | 
+financialStatement.module-PIMALNPP.js | financialStatement-module | 147.77 kB | 
+chunk-YDJDH4LD.js                     | -                         | 138.84 kB | 
+chunk-6M2FATPG.js                     | -                         | 106.31 kB | 
+tax-report.module-6ZGCIGLU.js         | tax-report-module         |  96.48 kB | 
+chunk-24KJTNUA.js                     | -                         |  80.75 kB | 
+chunk-JRYX5X5O.js                     | -                         |  78.77 kB | 
+...and 153 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [3.072 seconds] - 2026-07-31T07:02:48.996Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files        | Names          |  Raw size
+main.js                    | main           |  58.75 kB | 
+
+Lazy chunk files           | Names          |  Raw size
+reports.module-YPVWQ3G6.js | reports-module | 266.95 kB | 
+main.module-CL7Y2JE4.js    | main-module    |   6.05 kB | 
+
+Application bundle generation complete. [2.461 seconds] - 2026-07-31T07:04:00.333Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files                   | Names                     |  Raw size
+chunk-GOIZFJ5F.js                     | -                         | 502.68 kB | 
+main.js                               | main                      |  58.75 kB | 
+chunk-UV37J72J.js                     | -                         |  33.85 kB | 
+chunk-6PWSSWM4.js                     | -                         |  13.84 kB | 
+chunk-I4UXJ5CS.js                     | -                         |  13.21 kB | 
+chunk-J4O6KJCG.js                     | -                         |   1.37 kB | 
+
+Lazy chunk files                      | Names                     |  Raw size
+transaction.module-V5TMDX5Q.js        | transaction-module        | 472.33 kB | 
+restaurant.module-NZ3HLHNL.js         | restaurant-module         | 392.18 kB | 
+purchase.module-5UYYUW4F.js           | purchase-module           | 298.57 kB | 
+accounting.module-NQOH5D57.js         | accounting-module         | 275.17 kB | 
+reports.module-CUROPKNN.js            | reports-module            | 266.95 kB | 
+sales.module-TAYMKNUW.js              | sales-module              | 260.51 kB | 
+inventory.module-22QEOC4P.js          | inventory-module          | 183.44 kB | 
+host-dashboard.module-5HLNNCOK.js     | host-dashboard-module     | 159.11 kB | 
+financialStatement.module-ZSPIKBTR.js | financialStatement-module | 147.77 kB | 
+tax-report.module-PERPYDIN.js         | tax-report-module         |  96.48 kB | 
+audit-logs.module-JF72FICU.js         | audit-logs-module         |  58.50 kB | 
+editions.module-5UWBG35T.js           | editions-module           |  50.89 kB | 
+dashboard.module-IS7JL3Z4.js          | dashboard-module          |  31.97 kB | 
+language-texts.module-WOO2MGCY.js     | language-texts-module     |  26.43 kB | 
+languages.module-R4DHBXIF.js          | languages-module          |  22.17 kB | 
+...and 54 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [2.324 seconds] - 2026-07-31T07:05:27.870Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-HCALLPG4.js | restaurant-module | 396.31 kB | 
+main.module-Q6UNFSSI.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.666 seconds] - 2026-07-31T07:08:53.985Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-A6U4HODY.js | restaurant-module | 399.17 kB | 
+main.module-E6RR4T3G.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.235 seconds] - 2026-07-31T07:09:16.124Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-GIXONBH7.js | restaurant-module | 399.92 kB | 
+main.module-4NBI6VZZ.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.301 seconds] - 2026-07-31T07:09:22.973Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-A3SWHKZC.js | restaurant-module | 402.63 kB | 
+main.module-NSTEELH6.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.285 seconds] - 2026-07-31T07:09:36.183Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-UBL5NFMH.js | restaurant-module | 402.71 kB | 
+main.module-7NYBIJDK.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.392 seconds] - 2026-07-31T07:09:41.200Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-5HXIOSX7.js | restaurant-module | 403.64 kB | 
+main.module-DQVY3EN3.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.202 seconds] - 2026-07-31T07:09:50.058Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-QSJ5CFEU.js | restaurant-module | 405.38 kB | 
+main.module-NJREX7SD.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.162 seconds] - 2026-07-31T07:10:06.430Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-CAJV3IDM.js | restaurant-module | 405.60 kB | 
+main.module-WSF3VN2O.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.209 seconds] - 2026-07-31T07:10:12.268Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-WDSBNRMR.js | restaurant-module | 407.19 kB | 
+main.module-MIRAUUY6.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.237 seconds] - 2026-07-31T07:10:26.314Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+restaurant.module-WDYDGAPC.js | restaurant-module | 407.19 kB | 
+chunk-5XUUAKGR.js             | -                 |  36.28 kB | 
+dashboard.module-T5ZNCSUO.js  | dashboard-module  |  31.97 kB | 
+main.module-36GWSMQP.js       | main-module       |   6.05 kB | 
+
+Application bundle generation complete. [2.249 seconds] - 2026-07-31T07:10:48.398Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files           | Names             |  Raw size
+chunk-KFVB3NCQ.js             | -                 | 502.70 kB | 
+main.js                       | main              |  58.75 kB | 
+
+Lazy chunk files              | Names             |  Raw size
+chunk-5HBULFHR.js             | -                 |  45.60 kB | 
+account.module-6DD5R65B.js    | account-module    |  12.33 kB | 
+app.component-VSAXEI54.js     | app-component     |   1.11 kB | 
+account.component-7XRI7DCO.js | account-component | 673 bytes | 
+
+Application bundle generation complete. [2.572 seconds] - 2026-07-31T07:14:53.429Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files                   | Names                     | Raw size
+main.js                               | main                      | 58.75 kB | 
+
+Lazy chunk files                      | Names                     | Raw size
+chunk-NUP5HNYY.js                     | -                         | 78.77 kB | 
+audit-logs.module-ZZ7ZK2D6.js         | audit-logs-module         | 58.48 kB | 
+chunk-PIGR2MZV.js                     | -                         | 33.65 kB | 
+chunk-WA66Q6VA.js                     | -                         | 15.70 kB | 
+chunk-L5KOVI7P.js                     | -                         | 12.71 kB | 
+account.module-SYSKF3ER.js            | account-module            | 12.33 kB | 
+chunk-C2S2EBIF.js                     | -                         | 11.57 kB | 
+admin.module-VOBRRSPU.js              | admin-module              |  9.80 kB | 
+chunk-36USG2YF.js                     | -                         |  6.62 kB | 
+chunk-ZZJUAEK2.js                     | -                         |  4.01 kB | 
+roles.module-KQPAOQ2P.js              | roles-module              |  3.99 kB | 
+demo-ui-components.module-TIWV4XSV.js | demo-ui-components-module |  3.97 kB | 
+register-tenant.module-MQZ323ZI.js    | register-tenant-module    |  3.56 kB | 
+register.module-VBIGFEWN.js           | register-module           |  3.41 kB | 
+users.module-TGCCUWME.js              | users-module              |  1.71 kB | 
+...and 5 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [2.885 seconds] - 2026-07-31T07:57:12.367Z
+
+Page reload sent to client(s).
+> Changes detected. Rebuilding...
+√ Changes detected. Rebuilding...
+Initial chunk files                   | Names                     |  Raw size
+chunk-4FHTGA6Z.js                     | -                         | 502.68 kB | 
+main.js                               | main                      |  58.75 kB | 
+chunk-2TFCPT5X.js                     | -                         |  32.71 kB | 
+chunk-VY2JYK4X.js                     | -                         |  13.84 kB | 
+chunk-2BPBYOMY.js                     | -                         |  13.21 kB | 
+chunk-4L6DGLRQ.js                     | -                         |  10.67 kB | 
+chunk-JO3S3EBR.js                     | -                         |   1.37 kB | 
+
+Lazy chunk files                      | Names                     |  Raw size
+transaction.module-LPNFEZMD.js        | transaction-module        | 472.33 kB | 
+restaurant.module-T5IAXPHO.js         | restaurant-module         | 407.19 kB | 
+purchase.module-LCPZVB7D.js           | purchase-module           | 298.57 kB | 
+accounting.module-3TNHI4TI.js         | accounting-module         | 275.17 kB | 
+reports.module-PHJSGIH6.js            | reports-module            | 266.95 kB | 
+sales.module-GFXDQE46.js              | sales-module              | 260.51 kB | 
+inventory.module-MHDCZI75.js          | inventory-module          | 183.44 kB | 
+host-dashboard.module-Y3GSGN4F.js     | host-dashboard-module     | 159.11 kB | 
+financialStatement.module-KCUXDBRW.js | financialStatement-module | 147.77 kB | 
+tax-report.module-VY47AVO6.js         | tax-report-module         |  96.48 kB | 
+chunk-SI5JRVJW.js                     | -                         |  80.75 kB | 
+chunk-CPX3FKUJ.js                     | -                         |  78.75 kB | 
+audit-logs.module-ZEEHGMVX.js         | audit-logs-module         |  58.48 kB | 
+chunk-ARDXDQHN.js                     | -                         |  56.84 kB | 
+editions.module-WPF2SQEO.js           | editions-module           |  50.89 kB | 
+...and 81 more lazy chunks files. Use "--verbose" to show all the files.
+
+Application bundle generation complete. [3.308 seconds] - 2026-07-31T07:57:26.170Z
+
+Page reload sent to client(s).

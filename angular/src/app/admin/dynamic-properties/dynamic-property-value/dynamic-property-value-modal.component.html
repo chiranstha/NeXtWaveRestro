@@ -1,0 +1,116 @@
+<div
+    #createOrEditModal="bs-modal"
+    [config]="{ backdrop: 'static', keyboard: !saving }"
+    appBsModal
+    aria-hidden="true"
+    aria-labelledby="createOrEditModal"
+    class="modal fade"
+    role="dialog"
+    tabindex="-1"
+>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    @if (dynamicPropertyValue && !dynamicPropertyValue.id) {
+                        <span>
+                            {{ 'AddNewDynamicPropertyValue' | localize }}
+                        </span>
+                    }
+                    @if (dynamicPropertyValue && dynamicPropertyValue.id) {
+                        <span>
+                            {{ 'EditDynamicPropertyValue' | localize }}
+                        </span>
+                    }
+                </h4>
+                <button
+                    (click)="close()"
+                    [attr.aria-label]="l('Close')"
+                    [disabled]="saving"
+                    class="btn-close"
+                    type="button"
+                ></button>
+            </div>
+            @if (dynamicPropertyValue) {
+                <div class="modal-body">
+                    <div class="row justify-content-end px-5">
+                        <button
+                            (click)="getDynamicProperties()"
+                            class="btn btn-sm btn-outline-brand btn-sm btn-icon btn-icon-md"
+                        >
+                            <i class="fa-solid fa-rotate"></i>
+                        </button>
+                        @if ('Pages.Administration.DynamicPropertyValue.Create' | permission) {
+                            <button
+                                (click)="createDynamicPropertyValue()"
+                                class="btn btn-sm btn-outline-brand btn-sm btn-icon btn-icon-md"
+                            >
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        }
+                    </div>
+                    @if (createOrEditValueEnabled) {
+                        <div class="row">
+                            <div class="mb-5 col">
+                                <label class="form-label required" for="Name">{{ 'Value' | localize }}</label>
+                                <div class="input-group">
+                                    <input
+                                        [(ngModel)]="dynamicPropertyValue.value"
+                                        class="form-control col"
+                                        name="Name"
+                                        required
+                                        type="text"
+                                    />
+                                    <div class="input-group-append">
+                                        <button (click)="save()" class="btn btn-sm btn-primary" type="button">
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <div class="row align-items-center">
+                        <!--<AG-Grid-Start>-->
+                        <div
+                            [busyIf]="$safeNavigationMigration(dataTableHelper?.isLoading)"
+                            class="col ag-grid-container"
+                        >
+                            <ag-grid-angular
+                                #agGrid
+                                (gridReady)="onGridReady($event)"
+                                [columnDefs]="columnDefs"
+                                [defaultColDef]="{
+                                    resizable: true,
+                                    sortable: true,
+                                    filter: true,
+                                }"
+                                [paginationPageSize]="dataTableHelper?.defaultRecordsCountPerPage || 10"
+                                [pagination]="false"
+                                [rowData]="rowData"
+                                class="ag-theme-balham"
+                                domLayout="autoHeight"
+                            ></ag-grid-angular>
+                            @if (rowData.length == 0) {
+                                <div class="ag-grid-no-data">
+                                    {{ 'NoData' | localize }}
+                                </div>
+                            }
+                        </div>
+                        <!--<AG-Grid-End>-->
+                    </div>
+                </div>
+            }
+            <div class="modal-footer">
+                <button
+                    (click)="close()"
+                    [disabled]="saving"
+                    class="btn btn-sm btn-light-primary fw-bold"
+                    type="button"
+                >
+                    {{ 'Close' | localize }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

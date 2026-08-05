@@ -1,0 +1,54 @@
+<div [@routerTransition] class="login-form">
+    <div class="card card-bordered">
+        <div class="card-header align-items-center">
+            <h3 class="fw-bolder text-dark fs-h4 fs-h1-lg">
+                {{ 'TenantSignUp' | localize }}
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="mb-5 row">
+                <label class="col-sm-4">{{ l('Item') }}</label>
+                <div class="col-sm-8 text-end">
+                    <p class="fw-bold">
+                        {{ description }}
+                    </p>
+                </div>
+            </div>
+            <div class="mb-5 row">
+                <label class="col-sm-4">{{ l('Price') }}</label>
+                <div class="col-sm-8 text-end">
+                    <p class="fw-bold" id="totalPrice">
+                        {{ appSession.application.currencySign }}{{ totalAmount | number: '1.2-2' }}
+                    </p>
+                </div>
+            </div>
+            @if (config && config.demoUsername && config.demoPassword) {
+                <div class="alert bg-light-primary d-flex align-items-center p-5 mb-10">
+                    <span class="svg-icon svg-icon-2hx svg-icon-primary me-4">
+                        <i class="fa-duotone fa-info-circle fs-1"></i>
+                    </span>
+                    <div class="d-flex flex-column">
+                        <h4 class="mb-1 text-primary">{{ l('DemoPayPalAccount') }}</h4>
+                        <span>
+                            <p>
+                                <span>
+                                    {{ l('UserName') }}:
+                                    <strong>{{ config.demoUsername }}</strong>
+                                </span>
+                                <br />
+                                <span>
+                                    {{ l('Password') }}:
+                                    <strong>{{ config.demoPassword }}</strong>
+                                </span>
+                            </p>
+                        </span>
+                    </div>
+                </div>
+            }
+            <div id="paypal-button"></div>
+            @if (paypalIsLoading) {
+                <div [busyIf]="paypalIsLoading"></div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,401 @@
+<div [@routerTransition] *ngIf="serialNumber === 0">
+
+    <sub-header [description]="" [title]="title | localize">
+
+        <div role="actions">
+
+            <button *ngIf="this.id" (click)="clearForm(id)" class="btn btn-sm btn-light-danger fw-bold me-2">
+                <i class="fa-duotone fa-trash fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                    <span class="path4"></span>
+                </i>
+            </button>
+
+
+            <button (click)="save()" [buttonBusy]="saving" [disabled]="form.invalid" class="mr-2"
+                class="btn btn-sm fw-bold btn-primary" id="save" label="{{ l(this.id ? 'Update' : 'Save') }}"
+                type="submit">
+                <i class="fa-duotone fa-circle-plus fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l(this.id ? 'Update' : 'Save') }}
+            </button>
+
+
+
+            <button (click)="close()" class="mr-2" class="btn btn-sm fw-bold btn-light-success" id="cancel">
+                <i class="fa-duotone fa-circle-xmark fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l('Cancel') }}
+            </button>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <form [formGroup]="form" autocomplete="off">
+                    <div class="row">
+                        <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-2">
+                            <div>
+                                <label class="required form-label" for="name">{{ l('Ledger Name') }}</label>
+
+                                <input #ledger (input)="titleCase(form,$event.target.value,'name')"
+                                    (keyup)="gotoAccountGroup($event)" [ngClass]="
+                  this.form.get('name').invalid && (this.form.get('name').dirty || this.form.get('name').touched)
+                    ? 'is-danger'
+                    : 'is-success'
+                " [readonly]="this.isDefault" class="form-control" formControlName="name" id="name" maxlength="100"
+                                    minlength="0" name="name" type="text" />
+                            </div>
+                        </div>
+
+                        <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-2">
+                            <div>
+                                <label class="required form-label" for="accountGroupId">{{ l('Account Group') }}</label>
+                                <ng-select #accountgrp (change)="onChangeAccountGroup($event)"
+                                    (keyup)="gotoOpeningBalanc($event)" [items]="accountGroupall"
+                                    [readonly]="this.isDefault" appendTo="body" bindLabel="displayName" bindValue="id"
+                                    formControlName="accountGroupId" id="accountGroupId" name="accountGroupId"
+                                    placeholder="Select items" required></ng-select>
+                            </div>
+                            <div *ngIf="
+                this.form.get('accountGroupId').invalid &&
+                (this.form.get('accountGroupId').dirty || this.form.get('accountGroupId').touched)
+              ">
+                                <div class="alert alert-danger alert-height mt-1" role="alert">
+                                    <div class="alert-div">Account Group is required!</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div *ngIf="!isSundry" class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-2">
+                            <div>
+                                <label class="required form-label" for="openingBalance">{{
+                                    l('OpeningBalance')
+                                    }}</label>
+                                <input #openinbalac (focus)="$event.target.select()" (keyup)="gotodebit($event)"
+                                    [ngClass]="
+                  this.form.get('openingBalance').invalid &&
+                  (this.form.get('name').dirty || this.form.get('openingBalance').touched)
+                    ? 'is-danger'
+                    : 'is-succes'
+                " class="form-control" formControlName="openingBalance" id="openingBalance" maxlength="10" min="0"
+                                    minlength="0" name="openingBalance"
+                                    onkeydown="return event.keyCode !== 39 && event.keyCode !== 189" placeholder=""
+                                    type="number" />
+                            </div>
+                        </div>
+                        <div *ngIf="!isSundry" class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-2">
+                            <div>
+                                <label class="required form-label" for="crOrDr">{{ l('DebitorCredit') }}</label>
+                                <ng-select #debit (keyup)="saves($event)" [items]="debitOrCredit" appendTo="body"
+                                    bindLabel="displayName" bindValue="id" formControlName="crOrDr" id="crOrDr"
+                                    required></ng-select>
+                            </div>
+                            <div *ngIf="
+                this.form.get('crOrDr').invalid && (this.form.get('crOrDr').dirty || this.form.get('crOrDr').touched)
+              ">
+                                <div class="alert alert-danger alert-height mt-1" role="alert">
+                                    <div class="alert-div">Debit or Credit is required!</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div *ngIf="isSundry" class="card card-custom shadow-sm mt-10  mb-3">
+                        <!-- begin::Header -->
+                        <div class="card-header card-header-stretch overflow-auto">
+                            <ul class="nav nav-stretch nav-line-tabs fw-bold border-transparent flex-nowrap"
+                                role="tablist">
+                                <li class="nav-item">
+                                    <a (click)="setActiveTab('Necessities')"
+                                        [ngClass]="{ active: activeTab === 'Necessities' }"
+                                        class="nav-link cursor-pointer" role="tab"><i
+                                            class="fa-duotone fa-list-ul tab-icon me-2 fs-4"
+                                            style="--fa-primary-color: #004ccf; --fa-secondary-color: #2482ff;">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                        Necessities
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a (click)="setActiveTab('Accounting')"
+                                        [ngClass]="{ active: activeTab === 'Accounting' }"
+                                        class="nav-link cursor-pointer" role="tab">
+                                        <i class="fa-duotone fa-money-check-dollar tab-icon me-2 fs-4"
+                                            style="--fa-primary-color: #004ccf; --fa-secondary-color: #2482ff;">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                        Accounting
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a (click)="setActiveTab('Contact')" [ngClass]="{ active: activeTab === 'Contact' }"
+                                        class="nav-link cursor-pointer" role="tab">
+                                        <i class="fa-duotone fa-address-book tab-icon me-2 fs-4"
+                                            style="--fa-primary-color: #004ccf; --fa-secondary-color: #2482ff;">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                        Contact
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a (click)="setActiveTab('Other')" [ngClass]="{ active: activeTab === 'Other' }"
+                                        class="nav-link cursor-pointer" role="tab">
+                                        <i class="fa-duotone fa-list-check tab-icon me-2 fs-4"
+                                            style="--fa-primary-color: #004ccf; --fa-secondary-color: #2482ff;">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                        Others
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- end::Header -->
+                        <!-- begin::Form -->
+                        <div class="card-body">
+                            <div class="tab-content pt-3">
+                                <!-- begin::Header -->
+                                <div [ngClass]="{ active: activeTab === 'Necessities' }" class="tab-pane">
+                                    <div>
+                                        <div class="row">
+                                            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-4">
+                                                <div>
+                                                    <label class="form-label" for="address">{{ l('Address') }}</label>
+                                                    <input #addes (keyup)="gotoPrimaryphone($event)"
+                                                        class="form-control" formControlName="address" id="address"
+                                                        name="address" type="text" />
+                                                </div>
+                                            </div>
+                                            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-4">
+                                                <div>
+                                                    <label class="form-label" for="phone">{{
+                                                        l('Primary Phone')
+                                                        }}</label>
+                                                    <input #primaryp (focus)="$event.target.select()"
+                                                        (keyup)="gotoPan($event)" [ngClass]="
+                                  form.get('phone').invalid &&
+                                  (form.get('phone').dirty || form.get('phone').touched)
+                                    ? 'is-danger'
+                                    : 'is-success'
+                                " class="form-control" formControlName="phone" id="phone" min="0" name="phone"
+                                                        type="text" />
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-4">
+                                                <div>
+                                                    <label class="form-label" for="pan">{{ l('PAN') }}</label>
+                                                    <input #pan (focus)="$event.target.select()"
+                                                        (keyup)="gotoPricingLevel($event)" class="form-control"
+                                                        formControlName="pan" id="pan" name="pan" type="text" />
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-4">
+                                                <div>
+
+                                                    <input class="form-check-input" formControlName="isCompany"
+                                                        name="rememberMe" type="checkbox" value="true" />
+                                                    <span class="form-check-label">
+                                                        {{ 'Company' | localize }}
+                                                    </span>
+
+                                                </div>
+                                                <div *ngIf="
+                                  this.form.get('isCompany').invalid &&
+                                  (this.form.get('isCompany').dirty || this.form.get('isCompany').touched)
+                                ">
+                                                    <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                        <div class="alert-div">Company is required!</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end::Header -->
+
+                                <!-- begin::Header -->
+                                <div [ngClass]="{ active: activeTab === 'Accounting' }" class="tab-pane">
+                                    <div>
+                                        <div class="row">
+                                            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-4">
+                                                <div>
+                                                    <label class="required form-label" for="openingBalance">{{
+                                                        l('OpeningBalance')
+                                                        }}</label>
+                                                    <input #opp (focus)="$event.target.select()"
+                                                        (keyup)="gotoDrCr($event)" [ngClass]="
+                                    form.get('openingBalance').invalid &&
+                                    (form.get('openingBalance').dirty || form.get('openingBalance').touched)
+                                      ? 'is-danger'
+                                      : 'is-success'
+                                  " class="form-control" formControlName="openingBalance" id="openingBalance" min="0"
+                                                        name="openingBalance"
+                                                        onkeydown="return event.keyCode !== 39 && event.keyCode !== 189"
+                                                        type="number" />
+                                                </div>
+                                            </div>
+                                            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-4">
+                                                <div>
+                                                    <label class="required form-label" for="drOrcr">{{
+                                                        l('DrCr')
+                                                        }}</label>
+                                                    <ng-select #drcr (keyup)="gotobillByBill($event)" [items]="drOrcr"
+                                                        appendTo="body" bindLabel="displayName" bindValue="id"
+                                                        formControlName="crOrDr" id="crOrDr" required></ng-select>
+                                                </div>
+                                                <div *ngIf="
+                                    this.form.get('crOrDr').invalid &&
+                                    (this.form.get('crOrDr').dirty || this.form.get('crOrDr').touched)
+                                  ">
+                                                    <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                        <div class="alert-div">Dr/Cr is required!</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-4">
+                                                <div class="mb-1">
+                                                    <label [required]="true" class="form-label" for="isBillByBill">{{
+                                                        l('Bill by Bill')
+                                                        }}</label>
+                                                    <ng-select #billbybill (keyup)="gotoCredit($event)" [items]="yesno"
+                                                        appendTo="body" bindLabel="displayName" bindValue="id"
+                                                        formControlName="isBillByBill" id="isBillByBill"
+                                                        placeholder="Select an item" required></ng-select>
+                                                </div>
+                                                <div *ngIf="
+                                    this.form.get('isBillByBill').invalid &&
+                                    (this.form.get('isBillByBill').dirty || this.form.get('isBillByBill').touched)
+                                  ">
+                                                    <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                        <div class="alert-div">Bill by Bill is required!</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-4">
+                                                <div>
+                                                    <label class="required form-label" for="creditPeriod">{{
+                                                        l('CreditPeriod')
+                                                        }}</label>
+                                                    <input #creditperiod (focus)="$event.target.select()"
+                                                        (keyup)="gotoLimit($event)" [ngClass]="
+                                  form.get('creditPeriod').invalid &&
+                                  (form.get('creditPeriod').dirty || form.get('creditPeriod').touched)
+                                    ? 'is-danger'
+                                    : 'is-success'
+                                " class="form-control" formControlName="creditPeriod" id="creditPeriod" min="0"
+                                                        name="creditPeriod"
+                                                        onkeydown="return event.keyCode !== 39 && event.keyCode !== 189"
+                                                        type="number" />
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-4">
+                                                <div>
+                                                    <label class="required form-label" for="creditLimit">{{
+                                                        l('Credit
+                                                        Limit')
+                                                        }}</label>
+                                                    <input #creditlimit (focus)="$event.target.select()"
+                                                        (keyup)="gotoCustomer($event)" [ngClass]="
+                                  form.get('creditLimit').invalid &&
+                                  (form.get('creditLimit').dirty || form.get('creditLimit').touched)
+                                    ? 'is-danger'
+                                    : 'is-success'
+                                " class="form-control" formControlName="creditLimit" id="creditLimit" min="0"
+                                                        name="creditLimit"
+                                                        onkeydown="return event.keyCode !== 39 && event.keyCode !== 189"
+                                                        type="number" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- end::Header -->
+                                <!-- begin::Header -->
+                                <div [ngClass]="{ active: activeTab === 'Contact' }" class="tab-pane">
+                                    <div class="row">
+
+                                        
+                                        <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3 mb-4">
+                                            <div>
+                                                <label class="form-label" for="email">{{ l('Email') }}</label>
+                                                <input #email [ngClass]="
+                                  form.get('email').invalid &&
+                                  (form.get('email').dirty || form.get('email').touched)
+                                    ? 'is-danger'
+                                    : 'is-success'
+                                " class="form-control" formControlName="email" id="email" name="email" type="email" />
+                                            </div>
+                                            <div *ngIf="
+                                  this.form.get('email').invalid && (this.form.get('email').dirty || this.form.get('email').touched)
+                                ">
+                                                <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                    <div class="alert-div">Please enter valid email!</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                                <!-- end::Header -->
+
+                                <div [ngClass]="{ active: activeTab === 'Other' }" class="tab-pane">
+                                    <div class="row">
+                                        <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-3 col-sm-3">
+                                            <div class="mb-1">
+                                                <label class="form-label" for="cst">{{ l('Narration') }}</label>
+                                                <textarea #narration (keyup)="saveSundary($event)" class="form-control"
+                                                    formControlName="narration" id="narration" placeholder=""
+                                                    style="height: 32px !important"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <!-- end::Form -->
+                    </div>
+                    <!-- {{this.form.getRawValue() | json}} -->
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<ng-keyboard-shortcuts [shortcuts]="shortcuts"></ng-keyboard-shortcuts>
+<app-add-or-edit-account-group (accountGroupSave)="getAllAccountGroups()" *ngIf="serialNumber === 2"
+    [serialNo]="serialNumber"></app-add-or-edit-account-group>
+
+<erp-key-event (closeEvent)="keyClose($event)" (deletEvent)="clearForm($event)" (saveEvent)="keySave($event)"
+    [id]="this.id ? this.id : null"></erp-key-event>
+
+<ng-keyboard-shortcuts [shortcuts]="shortcuts"></ng-keyboard-shortcuts>
+<app-add-or-edit-account-group (accountGroupSave)="getAllAccountGroups()" *ngIf="serialNumber === 2"
+    [serialNo]="serialNumber"></app-add-or-edit-account-group>
+
+<erp-key-event (closeEvent)="keyClose($event)" (deletEvent)="clearForm($event)" (saveEvent)="keySave($event)"
+    [id]="this.id ? this.id : null"></erp-key-event>

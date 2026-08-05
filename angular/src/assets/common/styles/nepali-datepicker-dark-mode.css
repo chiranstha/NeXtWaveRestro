@@ -1,0 +1,247 @@
+[data-bs-theme=dark] .nepali-date-picker {
+  /* Set dark mode styling for the datepicker container */
+  --ne-datepicker-primary-color: #009ef7; /* Match primary color in dark theme */
+  width: 100%;
+  display: block;
+  position: relative !important;
+}
+
+/* Core input styles */
+[data-bs-theme=dark] .nepali-date-picker .np_datepicker_input,
+[data-bs-theme=dark] ne-datepicker input,
+[data-bs-theme=dark] .dark-mode-datepicker input {
+  background-color: #1e1e2d !important;
+  border-color: #2b2b40 !important;
+  color: #ffffff !important;
+  padding: 0.5rem !important;
+  border-radius: 4px !important;
+  width: 100% !important;
+  height: 36px !important;
+  line-height: 1.5 !important;
+  display: block !important;
+  border: 1px solid #2b2b40 !important;
+  outline: none !important;
+}
+
+/* Focus state */
+[data-bs-theme=dark] .nepali-date-picker .np_datepicker_input:focus,
+[data-bs-theme=dark] ne-datepicker input:focus,
+[data-bs-theme=dark] .dark-mode-datepicker input:focus,
+[data-bs-theme=dark] .nepali-date-picker .np_datepicker_input--active {
+  border-color: #3699ff !important;
+  box-shadow: 0 0 0 0.2rem rgba(54, 153, 255, 0.25) !important;
+  outline-color: var(--ne-datepicker-primary-color);
+}
+
+/* Hover state */
+[data-bs-theme=dark] .nepali-date-picker .np_datepicker_input:hover,
+[data-bs-theme=dark] ne-datepicker input:hover,
+[data-bs-theme=dark] .dark-mode-datepicker input:hover {
+  border-color: #3699ff !important;
+}
+
+[data-bs-theme=dark] .nepali-date-picker .form-icon svg {
+  fill: #9899ac;
+  opacity: 0.7;
+}
+
+[data-bs-theme=dark] .nepali-date-picker a.active svg {
+  fill: var(--ne-datepicker-primary-color);
+  opacity: 0.9;
+}
+
+/* Nepali Datepicker dropdown container */
+[data-bs-theme=dark] .datepicker__container {
+  background-color: #1e1e2d;
+  border: 1px solid #2b2b40;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+}
+
+[data-bs-theme=dark] .datepicker__options-container,
+[data-bs-theme=dark] .ne-datepicker-header,
+[data-bs-theme=dark] .ne-calendar-header,
+[data-bs-theme=dark] .datepicker__header {
+  background-color: #1a1a27 !important;
+  border-bottom: 1px solid #2b2b40 !important;
+  color: #ffffff !important;
+}
+
+/* This is critical for fixing the blue toolbar issue */
+body [data-bs-theme=dark] .datepicker__options-container,
+body .datepicker__options-container,
+body .ne-calendar-header,
+body .ne-datepicker-header {
+  background-color: #1a1a27 !important;
+  border-color: #2b2b40 !important;
+  color: #ffffff !important;
+}
+
+[data-bs-theme=dark] .datepicker__container__select,
+[data-bs-theme=dark] .ne-calendar-header select,
+[data-bs-theme=dark] .ne-datepicker-header select {
+  background-color: #1e1e2d !important;
+  border: 1px solid #2b2b40 !important;
+  color: #ffffff !important;
+}
+
+[data-bs-theme=dark] .datepicker__container__select option,
+[data-bs-theme=dark] .ne-calendar-header select option,
+[data-bs-theme=dark] .ne-datepicker-header select option {
+  background-color: #1e1e2d !important;
+  color: #ffffff !important;
+}
+
+/* Fix hover state for selects and toolbar buttons */
+[data-bs-theme=dark] .datepicker__options-container select:hover,
+[data-bs-theme=dark] .datepicker__container__select:hover,
+[data-bs-theme=dark] .ne-calendar-header select:hover,
+[data-bs-theme=dark] .ne-datepicker-header select:hover,
+[data-bs-theme=dark] .ne-calendar-header button:hover,
+[data-bs-theme=dark] .ne-datepicker-header button:hover {
+  background-color: #2b2b40 !important;
+  border-color: #3699ff !important;
+  color: #ffffff !important;
+}
+
+[data-bs-theme=dark] .datepicker__weekday {
+  color: #9899ac;
+  border-bottom: 1px solid #2b2b40;
+}
+
+[data-bs-theme=dark] .datepicker__days-container {
+  color: #9899ac;
+}
+
+[data-bs-theme=dark] .prev-month,
+[data-bs-theme=dark] .next-month {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme=dark] .prev-month:hover,
+[data-bs-theme=dark] .next-month:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-bs-theme=dark] .prev-month svg,
+[data-bs-theme=dark] .next-month svg {
+  fill: #ffffff;
+}
+
+[data-bs-theme=dark] .nepali-date-picker .prev-month svg,
+[data-bs-theme=dark] .nepali-date-picker .next-month svg {
+  fill: #ffffff;  /* Make arrow icons white in dark mode */
+}
+
+[data-bs-theme=dark] .nepali-date-picker .prev-month,
+[data-bs-theme=dark] .nepali-date-picker .next-month {
+  background-color: rgba(255, 255, 255, 0.1);  /* Subtle background for better contrast */
+  opacity: 1;  /* Ensure full visibility */
+}
+
+[data-bs-theme=dark] .nepali-date-picker .prev-month:hover,
+[data-bs-theme=dark] .nepali-date-picker .next-month:hover {
+  background-color: rgba(255, 255, 255, 0.25);  /* Lighter background on hover */
+}
+
+[data-bs-theme=dark] .datepicker__date {
+  color: #ffffff;
+}
+
+/* Date cell hover state - improved visibility */
+[data-bs-theme=dark] .datepicker__date:hover:not(.datepicker__date--active),
+[data-bs-theme=dark] .ne-datepicker-date:hover:not(.ne-datepicker-date--active),
+[data-bs-theme=dark] .ne-calendar-day:hover:not(.selected) {
+  background-color: rgba(54, 153, 255, 0.3) !important;
+  color: #ffffff !important;
+  border-radius: 4px !important;
+  transition: background-color 0.2s ease-in-out !important;
+}
+
+[data-bs-theme=dark] .datepicker__date--disabled {
+  background-color: #151521 !important;
+  color: #565674 !important;
+  text-decoration: line-through;
+}
+
+[data-bs-theme=dark] .datepicker__date--current-day {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Active date cell - improved visibility */
+[data-bs-theme=dark] .datepicker__date--active,
+[data-bs-theme=dark] .ne-datepicker-date--active,
+[data-bs-theme=dark] .datepicker__date--selected,
+[data-bs-theme=dark] .ne-datepicker-date--selected,
+[data-bs-theme=dark] .ne-calendar-day.selected {
+  background-color: #3699ff !important;
+  color: #ffffff !important;
+  border-radius: 4px !important;
+  font-weight: bold !important;
+}
+
+/* Navigation buttons - enhanced styling for better visibility on hover */
+[data-bs-theme=dark] .datepicker__prev-button:hover,
+[data-bs-theme=dark] .datepicker__next-button:hover,
+[data-bs-theme=dark] .ne-datepicker-prev-button:hover,
+[data-bs-theme=dark] .ne-datepicker-next-button:hover {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+  border-radius: 4px !important;
+}
+
+/* Dropdown container enhanced styling */
+[data-bs-theme=dark] .ne-datepicker-dropdown,
+[data-bs-theme=dark] .ne-datepicker-popup,
+[data-bs-theme=dark] .ne-calendar-container,
+[data-bs-theme=dark] .datepicker__dropdown,
+[data-bs-theme=dark] .datepicker__container,
+body .ne-datepicker-dropdown,
+body .ne-datepicker-popup,
+body .ne-calendar-container,
+body .datepicker__dropdown,
+body .datepicker__container {
+  background-color: #1e1e2d !important;
+  border-color: #2b2b40 !important;
+  color: #ffffff !important;
+  z-index: 9999999 !important;
+  position: absolute !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Additional selector to make sure we override any remaining instances */
+body[data-bs-theme=dark] .datepicker__options-container,
+body[data-bs-theme=dark] .ne-datepicker-header,
+body[data-bs-theme=dark] .ne-calendar-header {
+  background-color: #1a1a27 !important;
+  border-color: #2b2b40 !important;
+}
+
+/* Calendar day styling */
+[data-bs-theme=dark] .ne-calendar-day,
+[data-bs-theme=dark] .datepicker__day {
+  color: white !important;
+}
+
+/* Calendar day hover state */
+[data-bs-theme=dark] .ne-calendar-day:hover,
+[data-bs-theme=dark] .datepicker__day:hover {
+  background-color: rgba(0, 158, 247, 0.3) !important;
+}
+
+/* Calendar selected day */
+[data-bs-theme=dark] .ne-calendar-day.selected,
+[data-bs-theme=dark] .ne-calendar-day--selected,
+[data-bs-theme=dark] .datepicker__day--selected {
+  background-color: #009ef7 !important;
+  color: white !important;
+}
+
+/* Apply to all possible toolbar/header variations */
+.datepicker__options-container,
+.ne-calendar-header,
+.ne-datepicker-header,
+body .datepicker__options-container,
+body .ne-calendar-header,
+body .ne-datepicker-header {
+  background-color: #1a1a27 !important;
+  border-color: #2b2b40 !important;
+}

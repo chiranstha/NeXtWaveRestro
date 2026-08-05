@@ -1,0 +1,14 @@
+<div [class]="containerClass">
+    <sub-header [description]="title | localize" [title]="title">
+        <div role="actions">
+            <button (click)="close()" [label]="'Back'" class="btn btn-sm fw-bold btn-primary">Close</button>
+        </div>
+    </sub-header>
+    <div class="card card-custom  ">
+        <div class="card-body">
+            <ngx-extended-pdf-viewer [showOpenFileButton]="false" [showSidebarButton]="false" [src]="pdfUrl"
+                                     height="80vh" useBrowserLocale="true">
+            </ngx-extended-pdf-viewer>
+        </div>
+    </div>
+</div>

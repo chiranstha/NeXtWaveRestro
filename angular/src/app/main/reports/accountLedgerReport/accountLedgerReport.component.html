@@ -1,0 +1,96 @@
+<div>
+    <sub-header [description]="" [title]="'Account Ledger Report'">
+        <div role="search">
+            <div class="position-relative w-md-400px me-md-2">
+                <i
+                    class="fa-duotone fa-magnifying-glass fs-3 text-gray-500 position-absolute top-50 translate-middle ms-6"><span
+                        class="path1"></span><span class="path2"></span></i>
+                <input (keyup.enter)="searchValueOnApiCall($event.target.value)" [(ngModel)]="filterText"
+                    class="form-control form-control-solid ps-10 headerSearch" name="search" placeholder="Search"
+                    type="text" value="">
+            </div>
+        </div>
+        <div role="actions" class="d-flex gap-2">
+            <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown" *ngIf="!advancedFiltersAreShown"
+                class="btn btn-sm btn-outline-secondary clickable-item">
+                <i class="fa fa-angle-down"></i>
+                {{ 'ShowAdvancedFilters' | localize }}
+            </span>
+            <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown" *ngIf="advancedFiltersAreShown"
+                class="btn btn-sm btn-outline-secondary clickable-item">
+                <i class="fa fa-angle-up"></i>
+                {{ 'HideAdvancedFilters' | localize }}
+            </span>
+        </div>
+    </sub-header>
+    <!-- account-ledger-report.component.html -->
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <div>
+                    <form [formGroup]="myForm">
+                        <div [hidden]="!advancedFiltersAreShown">
+                            <div>
+                                <div class="row">
+                                    <div class="col-xxl-3 col-xl-3 col-lg-4 col-md-4 col-sm-4">
+                                        <label class="form-label" for="fromMiti">From Date(NP)</label>
+                                        <div>
+                                            <ne-datepicker [dateFormat]="'yyyy/MM/dd'"
+                                                [formControl]="myForm.controls['fromMiti']" [placeholder]="'yyyy/MM/dd'"
+                                                (ngModelChange)="loadreport()" [todayBtn]="true"
+                                                language="en"></ne-datepicker>
+                                        </div>
+                                    </div>
+                                    <div class="col-xxl-3 col-xl-3 col-lg-4 col-md-4 col-sm-4">
+                                        <label class="form-label" for="toMiti">To Date(NP)</label>
+                                        <div>
+                                            <ne-datepicker [dateFormat]="'yyyy/MM/dd'"
+                                                [formControl]="myForm.controls['toMiti']" (ngModelChange)="loadreport()"
+                                                [placeholder]="'yyyy/MM/dd'" [todayBtn]="true"
+                                                language="en"></ne-datepicker>
+                                        </div>
+                                    </div>
+                                    <div class="col-xxl-3 col-xl-3 col-lg-4 col-md-4 col-sm-4">
+                                        <label class="form-label" for="accountGroupId">Account Group</label>
+                                        <ng-select [items]="allAccountGroups" bindLabel="displayName" bindValue="id"
+                                            formControlName="groupId" id="groupId" (change)="loadreport()"></ng-select>
+                                    </div>
+                                    <div class="col-xxl-2 col-xl-2 col-lg-4 col-md-4 col-sm-4">
+                                        <label class="form-label" for="showProduct">{{ l('Show 0 value') }}</label>
+                                        <div>
+                                            <input (change)="toggleVisibility($event)" class="form-check-input"
+                                                formControlName="isZeroBalance" label="Show 0 value" name="Filter"
+                                                type="checkbox" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="row mb-4">
+                            <div class="col-sm-12">
+                                <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
+                                    *ngIf="!advancedFiltersAreShown" class="clickable-item text-muted">
+                                    <i class="fa fa-angle-down"></i>
+                                    {{ 'ShowAdvancedFilters' | localize }}
+                                </span>
+                                <span (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
+                                    *ngIf="advancedFiltersAreShown" class="clickable-item text-muted">
+                                    <i class="fa fa-angle-up"></i>
+                                    {{ 'HideAdvancedFilters' | localize }}
+                                </span>
+                            </div>
+                        </div> -->
+                    </form>
+                </div>
+                <div class="ag-theme-balham">
+                    <ag-grid-angular [gridOptions]="gridOptions" (gridReady)="onGridReady($event)"
+                        [columnDefs]="columnDefs" [rowData]="rowData" (cellDoubleClicked)="onCellDoubleClicked($event)"
+                        [pinnedBottomRowData]="gridOptions.pinnedBottomRowData" style="width: 100%; "
+                        [style.height.px]="screenHeight">
+                    </ag-grid-angular>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<ng-keyboard-shortcuts-help [closeKey]="'escape'" [key]="'f1'" [title]="'Help'"></ng-keyboard-shortcuts-help>

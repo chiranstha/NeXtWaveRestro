@@ -1,0 +1,121 @@
+<div [@routerTransition]>
+    <sub-header [description]="" [title]="title | localize">
+        <div role="actions">
+            <button *ngIf="this.id" (click)="clearForm(id)" class="btn btn-sm btn-light-danger fw-bold me-2">
+                <i class="fa-duotone fa-trash fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                    <span class="path4"></span>
+                </i>
+            </button>
+            <button (click)="save()" [buttonBusy]="saving" [disabled]="form.invalid" class="mr-2"
+                class="btn btn-sm fw-bold btn-primary" id="save" label="{{ l(this.id ? 'Update' : 'Save') }}"
+                type="submit">
+                <i class="fa-duotone fa-circle-plus fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l(this.id ? 'Update' : 'Save') }}
+            </button>
+            <button (click)="close()" class="mr-2" class="btn btn-sm fw-bold btn-light-success" id="cancel">
+                <i class="fa-duotone fa-circle-xmark fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l('Cancel') }}
+            </button>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <form [formGroup]="form" autocomplete="off">
+                    <div class="row">
+                        <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-2">
+                            <div>
+                                <label class="required form-label" for="AccountGroupName">{{ l('Account Group Name')
+                                    }}</label>
+                                <input #accountGroupName (input)="titleCase(form, $event.target.value, 'name')"
+                                    (keyup)="gotoledger($event)" [ngClass]="this.form.get('name').invalid && (this.form.get('name').dirty || this.form.get('name').touched)
+                            ? 'is-danger'
+                            : 'is-success'" [readonly]="accountGroupNameFlag" class="form-control"
+                                    formControlName="name" id="AccountGroupName" maxlength="100" minlength="0"
+                                    name="name" placeholder="" type="text" />
+                            </div>
+                        </div>
+                        <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-2">
+                            <div>
+                                <label class="required form-label" for="groupUnder">{{ l('Group Under') }}</label>
+                                <div>
+                                    <ng-select #ledger (change)="changeAccountGroup($event)"
+                                        (keyup)="gotoNature($event)" [items]="allAccountGroups" bindLabel="displayName"
+                                        bindValue="id" formControlName="groupUnder" id="groupUnder"
+                                        placeholder="Select an item">
+                                    </ng-select>
+                                    <div *ngIf="this.form.get('groupUnder').invalid &&
+                                (this.form.get('groupUnder').dirty || this.form.get('groupUnder').touched)">
+                                        <div class="alert alert-danger alert-height mt-1" role="alert">
+                                            <div class="alert-div">Group Under is required!</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-2">
+                            <div>
+                                <label class="required form-label" for="AccountGroup_Nature">{{ l('Nature') }}</label>
+                                <div>
+                                    <ng-select #nature (keyup)="gotoAffect($event)" [items]="accountGroupNature"
+                                        [readonly]="!isPrimary" bindLabel="displayName" bindValue="value"
+                                        formControlName="nature" id="AccountGroup_Nature" placeholder="Select an item">
+                                    </ng-select>
+                                    <div *ngIf="this.form.get('nature').invalid &&
+                                (this.form.get('nature').dirty || this.form.get('nature').touched)">
+                                        <div class="alert alert-danger alert-height mt-1" role="alert">
+                                            <div class="alert-div">Nature is required!</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-2">
+                            <div>
+                                <label class="required form-label" for="affectGrossProfit">{{
+                                    l('Affect Gross Profit')
+                                    }}</label>
+                                <div>
+                                    <ng-select #affectGrossProfit (keyup)="gotoNarration($event)"
+                                        [items]="affectGrossProfits" [readonly]="!isPrimary" bindLabel="displayName"
+                                        bindValue="value" formControlName="affectGrossProfit" id="affectGrossProfit"
+                                        placeholder="Select an item">
+                                    </ng-select>
+                                    <div
+                                        *ngIf="
+                                this.form.get('affectGrossProfit').invalid &&
+                                (this.form.get('affectGrossProfit').dirty || this.form.get('affectGrossProfit').touched)">
+                                        <div class="alert alert-danger alert-height mt-1" role="alert">
+                                            <div class="alert-div">Affect Gross Profit is required!</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 col-sm-6 mb-2">
+                            <div>
+                                <label class="form-label" for="narration">{{ l('Narration') }}</label>
+                                <div>
+                                    <textarea #narration (keyup)="onSaveOnInput($event)" class="form-control"
+                                        formControlName="narration" id="narration" placeholder=""></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

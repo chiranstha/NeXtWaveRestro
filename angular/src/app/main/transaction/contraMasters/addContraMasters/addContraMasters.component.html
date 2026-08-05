@@ -1,0 +1,306 @@
+<div>
+
+    <sub-header [description]="" [title]="title | localize">
+
+        <div role="actions">
+            <button *ngIf="this.id" (click)="clearForm(id)" class="btn btn-sm btn-light-danger fw-bold me-2">
+                <i class="fa-duotone fa-trash fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                    <span class="path4"></span>
+                </i>
+            </button>
+
+
+            <button (click)="checkandSave()" [buttonBusy]="saving" [disabled]="form.invalid" class="mr-2"
+                class="btn btn-sm fw-bold btn-primary" id="save" label="{{ l(this.id ? 'Update' : 'Save') }}"
+                type="submit">
+                <i class="fa-duotone fa-circle-plus fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l(this.id ? 'Update' : 'Save') }}
+            </button>
+
+            <span *ngIf="this.id">
+                <button class="btn btn-light-success fw-bold me-2"
+                    routerLink="/app/main/transaction/pdf/0/{{ this.id }}">
+                    <i class="fa-duotone fa-file-spreadsheet ps-1 fs-2">
+                        <span class="path1"></span>
+                        <span class="path2"></span>
+                        <span class="path3"></span>
+                        <span class="path4"></span>
+                    </i>
+                </button>
+            </span>
+
+            <button (click)="close()" class="mr-2" class="btn btn-sm fw-bold btn-light-success" id="cancel">
+                <i class="fa-duotone fa-circle-xmark fs-2">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                </i>
+                {{ l('Cancel') }}
+            </button>
+        </div>
+    </sub-header>
+
+    <div>
+
+
+        <div [class]="containerClass">
+            <div class="card card-custom gutter-b">
+
+                <div class="card-body">
+                    <form [formGroup]="form" autocomplete="off">
+                        <div appCustomEnter>
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <!-- <div [ngStyle]="{ display: branchDropdown.length <= 1 ? 'none' : '' }"
+                                        class="col-lg-3 col-md-3 col-sm-3 col-xs-6 mb-1">
+                                        <div class="mb-1">
+                                            <label class="required form-label" for="branchId">{{ l('Branch Name')
+                                                }}</label>
+                                            <ng-select #branch (change)="getBid($event.id)" (keyup.enter)="gotoDate()"
+                                                [items]="branchDropdown" bindLabel="displayName" bindValue="id"
+                                                formControlName="branchId" id="branchId" name="branchId"
+                                                placeholder="Select an item" required></ng-select>
+
+                                            <div *ngIf="
+                        this.form.get('branchId').invalid &&
+                        (this.form.get('branchId').dirty || this.form.get('branchId').touched)
+                      ">
+                                                <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                    <div class="alert-div">Branch Name is required!</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 mb-1">
+                                        <div class="mb-1">
+                                            <label class="required form-label" for="datemiti">{{ l('Date-Miti')
+                                                }}</label>
+
+                                            <ne-datepicker (keyup)="gotoAccLeder($event)" [dateFormat]="'yyyy/MM/dd'"
+                                                [formControl]="form.controls['dateMiti']" [placeholder]="'yyyy/MM/dd'"
+                                                [todayBtn]="true" id="dateMiti" language="en"></ne-datepicker>
+
+                                            <div *ngIf="
+                      this.form.get('dateMiti').invalid &&
+                      (this.form.get('dateMiti').dirty || this.form.get('dateMiti').touched)
+                    ">
+                                                <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                    <div class="alert-div">DateMiti is required!</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 mb-1">
+                                        <div class="mb-1">
+                                            <label class="required form-label" for="AccountGroup_Name">
+                                                {{ l('Voucher No') }}
+                                            </label>
+                                            <input #vouchernum (keyup)="goFromVoucher($event)" [ngClass]="
+                        this.form.get('voucherNo').invalid &&
+                        (this.form.get('voucherNo').dirty || this.form.get('voucherNo').touched)
+                          ? 'is-danger'
+                          : 'is-success'
+                      " [readonly]="this.automaticInput || this.id" class="form-control" formControlName="voucherNo"
+                                                id="AccountGroup_voucherNo" placeholder="" type="text"
+                                                voucherNo="voucherNo" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 mb-1">
+                                        <div class="mb-1">
+                                            <label class="required form-label" for="ledgerId">{{ l('Ledger Name')
+                                                }}</label>
+                                            <ng-select #accLedger (keyup)="gotoTableAccLedger($event)"
+                                                [items]="cashOrBank$ | async" bindLabel="displayName" bindValue="id"
+                                                formControlName="ledgerId" id="ledgerId" name="ledgerId"
+                                                placeholder="Select an item" required></ng-select>
+                                            <div *ngIf="
+                        this.form.get('ledgerId').invalid &&
+                        (this.form.get('ledgerId').dirty || this.form.get('ledgerId').touched)
+                      ">
+                                                <div class="alert alert-danger alert-height mt-1" role="alert">
+                                                    <div class="alert-div">Ledger is required!</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 mt-8">
+                                        <label *ngFor="let opt of radioInput" class="radiobutton">
+                                            <input [formControlName]="'type'" [name]="'type'"
+                                                [selectedValue]="form.controls.type.value" [value]="opt.value"
+                                                class="radioInput" type="radio" />
+                                            {{ opt.name }}
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="card  shadow-sm my-5 p-2">
+                                    <div class="card-header">
+                                        <h3 class="card-title fw-bold">{{ l('Contra Details') }}</h3>
+                                        <div *ngIf="ledgerBalanceStatus$ | async">
+                                            <div class="card-toolbar">
+                                                <h5 class="detail-title mt-2 mb-2 fs-15px fs-15px">
+                                                    Current Balance:
+                                                    <span class="border-radius">{{ balance }}</span>
+                                                </h5>
+                                            </div>
+                                        </div>
+
+                                        <div class="card-toolbar">
+                                            <button (click)="keyEventsContra()"
+                                                [disabled]="this.form.get('contraDetails').invalid"
+                                                [label]="'Add Details'"
+                                                class="btn btn-sm btn-outline btn-outline-success btn-active-light-success"
+                                                id="add">
+                                                <i class="fa-duotone fa-grid-2-plus fs-2">
+                                                    <span class="path1"></span>
+                                                    <span class="path2"></span>
+                                                    <span class="path3"></span>
+                                                </i>
+                                                Add
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsives overflow-x-auto h-450px">
+                                        <table class="table table-row-dashed table-row-gray-300 table-striped"
+                                            formArrayName="contraDetails">
+                                            <thead class="bg-tableHead">
+                                                <tr class="text-center">
+                                                    <th class="min-w-10px">S.N.</th>
+                                                    <th class="min-w-250px">ACCOUNT LEDGER</th>
+                                                    <th class="min-w-150px">AMOUNT</th>
+                                                    <th class="min-w-150px">CHEQUE DATE</th>
+                                                    <th class="min-w-150px">CHEQUE NUMBER</th>
+                                                    <th class="min-w-50px">EDIT</th>
+                                                    <th class="min-w-50px">REMOVE</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let abcd of getcontraDetails(form); let i = index"
+                                                    [formGroupName]="i" class="text-center" class="tablebordered">
+                                                    <td>
+                                                        {{ i + 1 }}
+                                                    </td>
+                                                    <td appPadding>
+                                                        <div>
+                                                            <ng-select #tableLedger
+                                                                (change)="getledgerBalanceStatus($event.id)"
+                                                                (keyup)="gotoAmout($event, i)"
+                                                                [items]="allLedgers$ | async" appendTo="body"
+                                                                bindLabel="displayName" bindValue="id"
+                                                                formControlName="ledgerId" id="ledgerId" name="ledgerId"
+                                                                placeholder="Select an item" required></ng-select>
+                                                            <div *ngIf="
+                                abcd.get('ledgerId').invalid &&
+                                (abcd.get('ledgerId').dirty || abcd.get('ledgerId').touched)
+                              ">
+                                                                <div class="alert alert-danger alert-height mt-1"
+                                                                    role="alert">
+                                                                    <div class="alert-div">Required!</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding>
+                                                        <div>
+                                                            <input #amount (focus)="$event.target.select()"
+                                                                (keyup)="amountCalculation($event)" [ngClass]="
+                                abcd.get('amount').invalid && (abcd.get('amount').dirty || abcd.get('amount').touched)
+                                  ? 'is-danger'
+                                  : 'is-success'
+                              " class="form-control" formControlName="amount" min="0"
+                                                                onkeydown="return event.keyCode !== 69 && event.keyCode !== 189"
+                                                                required type="number" />
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding>
+                                                        <div>
+                                                            <ne-datepicker (keyup)="gotoChequeNo($event, i)"
+                                                                [dateFormat]="'yyyy/MM/dd'"
+                                                                [formControl]="abcd.controls['chequeMiti']"
+                                                                [placeholder]="'yyyy/MM/dd'" [todayBtn]="true"
+                                                                id="chequeMiti" language="en"></ne-datepicker>
+                                                            <div *ngIf="
+                                abcd.get('chequeMiti').invalid &&
+                                (abcd.get('chequeMiti').dirty || abcd.get('chequeMiti').touched)
+                              ">
+                                                                <div class="alert alert-danger alert-height mt-1"
+                                                                    role="alert">
+                                                                    <div class="alert-div">Required!</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding>
+                                                        <div>
+                                                            <input #chequeno
+                                                                (input)="uppercase(abcd, $event.target.value, 'chequeNo')"
+                                                                (keyup)="gotoNarration($event)" [ngClass]="
+                                abcd.get('chequeNo').invalid &&
+                                (abcd.get('chequeNo').dirty || abcd.get('chequeNo').touched)
+                                  ? 'is-danger'
+                                  : 'is-success'
+                              " class="form-control" formControlName="chequeNo" type="text" />
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding>
+                                                        <div (click)="enablecontraDetailsFormGroup(i, form)"
+                                                            class="btn btn-sm">
+                                                            <i
+                                                                class="mt-2 fa-duotone fa-pen-to-square fs-20 cursor-pointer"></i>
+                                                        </div>
+                                                    </td>
+                                                    <td appPadding>
+                                                        <div (click)="removecontraDetailsForm(i, form)"
+                                                            class="btn btn-sm">
+                                                            <i
+                                                                class="mt-2 fa-duotone fa-trash fs-20 cursor-pointer"></i>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-8 col-xl-8 col-md-8 col-xs-12">
+                                    <div class="mb-1">
+                                        <label class="form-label" for="narration">{{ l('Narration') }}</label>
+                                        <textarea #narration (keyup)="checkss($event)" class="form-control"
+                                            formControlName="narration" id="narration" maxlength="100" minlength="0"
+                                            placeholder="" type="text"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-xl-4 col-md-4 col-xs-12">
+                                    <div class="mb-1">
+                                        <label class="required form-label" for="totalAmount">{{ l('Total Amount')
+                                            }}</label>
+                                        <input class="form-control" formControlName="totalAmount" id="totalAmount"
+                                            maxlength="100" minlength="0" placeholder="" readonly type="number" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <label class="form-label me-2" for="Print">{{ l('Print') }}</label>
+                                <input [(ngModel)]="isPrint" [ngModelOptions]="{ standalone: true }"
+                                    class="form-check-input" label="Print" type="checkbox" />
+                            </div>
+                        </div>
+                        <!-- {{ this.form.getRawValue() | json }} -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ng-keyboard-shortcuts [shortcuts]="shortcuts"></ng-keyboard-shortcuts>
+    <app-add-account-ledgers (accountLedgerSave)="getAccountsLedger($event)" *ngIf="serialNumber === 2"
+        [serialNo]="serialNumber"></app-add-account-ledgers>
+    <erp-key-event (closeEvent)="keyClose($event)" (deletEvent)="clearForm($event)" (saveEvent)="keySave($event)"
+        [id]="this.id ? this.id : null"></erp-key-event>

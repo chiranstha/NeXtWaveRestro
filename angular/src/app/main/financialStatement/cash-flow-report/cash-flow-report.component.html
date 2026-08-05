@@ -1,0 +1,81 @@
+<div [@routerTransition] class="cash-flow-page">
+    <div class="card mb-3">
+        <div class="card-body">
+            <form [formGroup]="form" class="filter-row">
+                <div>
+                    <label class="form-label">From Miti</label>
+                    <ne-datepicker formControlName="fromMiti"></ne-datepicker>
+                </div>
+                <div>
+                    <label class="form-label">To Miti</label>
+                    <ne-datepicker formControlName="toMiti"></ne-datepicker>
+                </div>
+                <div>
+                    <label class="form-label">Comparison</label>
+                    <select class="form-select" formControlName="comparisonPeriod">
+                        <option value="previous-year">Previous Year</option>
+                        <option value="previous-quarter">Previous Quarter</option>
+                        <option value="previous-month">Previous Month</option>
+                    </select>
+                </div>
+                <div class="btn-wrap">
+                    <button type="button" class="btn btn-primary" (click)="loadReport()" [disabled]="loading">
+                        Load Cash Flow
+                    </button>
+                    <button type="button" class="btn btn-outline-success ms-2" (click)="exportToExcel()" [disabled]="loading">
+                        Excel
+                    </button>
+                    <button type="button" class="btn btn-outline-danger ms-2" (click)="showPdf()" [disabled]="loading">
+                        PDF
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (showPdfOk) {
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>{{ title }}</strong>
+                <button type="button" class="btn btn-light-primary btn-sm" (click)="back()">Back</button>
+            </div>
+            <div class="card-body p-0">
+                <ngx-extended-pdf-viewer [src]="pdfUrl" height="80vh"></ngx-extended-pdf-viewer>
+            </div>
+        </div>
+    }
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <strong>Cash Flow Statement</strong>
+            @if (loading) {
+                <span class="badge text-bg-secondary">Loading...</span>
+            }
+        </div>
+        <div class="card-body table-wrap">
+            <table class="table table-sm table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Particular</th>
+                        <th>Type</th>
+                        <th>Current Amount</th>
+                        <th>Previous Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (row of rows; track $index) {
+                        <tr>
+                            <td>{{ row.name }}</td>
+                            <td>{{ row.groupType }}</td>
+                            <td class="text-end">{{ row.currentAmount | number: '1.2-2' }}</td>
+                            <td class="text-end">{{ row.previousAmount | number: '1.2-2' }}</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (rows.length === 0 && !loading) {
+                <div class="text-muted">No cash flow rows found for selected period.</div>
+            }
+        </div>
+    </div>
+</div>

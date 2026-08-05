@@ -1,0 +1,63 @@
+<div [@routerTransition]>
+    <sub-header [description]="'RolesHeaderInfo' | localize" [title]="'Roles' | localize">
+        <div role="actions">
+            @if ('Pages.Administration.Roles.Create' | permission) {
+                <button (click)="createRole()" class="btn btn-sm btn-primary float-end">
+                    <i class="fa fa-plus btn-md-icon"></i>
+                    <span class="d-none d-md-inline-block">
+                        {{ 'CreateNewRole' | localize }}
+                    </span>
+                </button>
+            }
+        </div>
+    </sub-header>
+    <div [class]="containerClass">
+        <div class="card card-custom">
+            <div class="card-body">
+                <div class="form">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-5">
+                                <permission-tree-modal
+                                    #permissionFilterTreeModal
+                                    (onModalclose)="getRoles()"
+                                ></permission-tree-modal>
+                            </div>
+                        </div>
+                        <div class="col-6 text-end">
+                            <button (click)="getRoles()" class="btn btn-sm btn-primary float-end" name="RefreshButton">
+                                <i class="la la-refresh btn-md-icon"></i>
+                                <span class="d-none d-md-inline-block">
+                                    {{ 'Refresh' | localize }}
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row align-items-center">
+                    <!--<AG-Grid-Start>-->
+                    <div [busyIf]="isLoading" class="ag-theme-balham">
+                        <ag-grid-angular
+                            #dataGrid
+                            (gridReady)="onGridReady($event)"
+                            [animateRows]="true"
+                            [columnDefs]="columnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [rowData]="rowData"
+                            [rowSelection]="rowSelection"
+                            style="width: 100%; height: 500px"
+                        ></ag-grid-angular>
+                        @if (rowData && rowData.length === 0) {
+                            <div class="ag-grid-no-data">
+                                {{ 'NoData' | localize }}
+                            </div>
+                        }
+                    </div>
+                    <!--<AG-Grid-End>-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <createOrEditRoleModal #createOrEditRoleModal (modalSave)="getRoles()"></createOrEditRoleModal>
+    <entityTypeHistoryModal #entityTypeHistoryModal></entityTypeHistoryModal>
+</div>
