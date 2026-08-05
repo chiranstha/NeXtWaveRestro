@@ -1,0 +1,38 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
+{{Threading_Tasks_Namespace_Here}}
+using Abp.Runtime.Session;
+using Abp.Timing.Timezone;
+{{Excel_Reporter_Using_Here}}
+using {{Namespace_Here}}.{{Namespace_Relative_Full_Here}}.Dtos;
+using {{Namespace_Here}}.Dto;
+using {{Namespace_Here}}.Storage;
+
+namespace {{Namespace_Here}}.{{Namespace_Relative_Full_Here}}.Exporting;
+
+public class {{Entity_Name_Plural_Here}}ExcelExporter : {{Excel_Reporter_Base_Here}}, I{{Entity_Name_Plural_Here}}ExcelExporter
+{
+    private readonly ITimeZoneConverter _timeZoneConverter;
+    private readonly IAbpSession _abpSession;
+    {{Property_Info_Helper_Property_Here}}
+
+    public {{Entity_Name_Plural_Here}}ExcelExporter(
+        ITimeZoneConverter timeZoneConverter,
+        IAbpSession abpSession,
+        ITempFileCacheManager tempFileCacheManager{{Property_Info_Helper_Constructor_Here}}) :  
+base(tempFileCacheManager)
+    {
+        _timeZoneConverter = timeZoneConverter;
+        _abpSession = abpSession;
+        {{Property_Info_Helper_Constructor_Assignment_Here}}
+    }
+
+    public {{Return_Type_Here}} ExportToFile(List<Get{{Entity_Name_Here}}ForViewDto> {{entity_Name_Plural_Here}}{{Excel_Selected_Column_Parameter_Here}})
+    {
+        {{ExportToFile_Method_Content_Here}}
+    }
+    
+    {{List_Handle_Method_Here}}
+}
+

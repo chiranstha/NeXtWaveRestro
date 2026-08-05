@@ -1,0 +1,15 @@
+{
+"propertyTemplates":[
+	],
+"navigationPropertyTemplates":[
+	],
+"enumTemplates":[
+	],
+"conditionalTemplates":[
+	    {
+            "placeholder": "{{Primary_Key_Inside_Tag_Here}}",
+            "condition": "{{Primary_Key_Here}} != 'int'",
+            "content": "<{{Primary_Key_Here}}>"
+        },  
+	]
+}

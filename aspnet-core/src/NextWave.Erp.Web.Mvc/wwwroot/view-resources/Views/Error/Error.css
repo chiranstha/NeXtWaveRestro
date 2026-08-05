@@ -1,0 +1,39 @@
+.error{
+    background-image: url(/Common/Images/error-bg.png) !important;
+    background-size: cover;
+}
+
+.error .card  {
+ min-height: 514px;
+}
+
+.error .card .card-body{
+    padding:30px 60px ;
+    color:  #061542;
+}
+
+@media screen and (max-width:768px) {
+    .error .card .card-body{
+        padding:30px 30px ;
+    }
+}
+
+.error .card h1{
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 30px; 
+    margin-bottom: 16px;
+}
+.error .card h3{ 
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 30px; 
+    margin-bottom: 16px;
+}
+.error .card p{
+    color: #6B6B7E ;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 22px; 
+    margin-bottom: 16px;
+}

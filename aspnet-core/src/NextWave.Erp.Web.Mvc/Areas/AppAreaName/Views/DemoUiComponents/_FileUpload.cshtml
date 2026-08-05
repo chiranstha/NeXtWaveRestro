@@ -1,0 +1,46 @@
+﻿<div class="card-header">
+    <div class="card-title">
+        <h3 class="card-label">
+            @L("FileUpload")
+        </h3>
+    </div>
+</div>
+<div class="card-body">
+    <form id="fileuploadForm" role="form" class="form">
+
+        <div class="row">
+            <div class="col-md-2">
+                <label class="form-label">Default file uploader</label>
+            </div>
+            <div class="col-md-10">
+
+                <div class="mb-5">
+                    <label for="DefaultFileUploadTextInput" class="form-label">Free text</label>
+                    <input id="DefaultFileUploadTextInput" type="text" name="DefaultFileUploadTextInput" class="form-control">
+                </div>
+
+                <div class="mb-5" id="fileupload">
+
+                    <!-- The fileinput-button span is used to style the file input field as button -->
+                    <div  class="dropzone-panel mb-lg-0 mb-2">
+                        <a class="dropzone-select btn btn-primary fileinput-button" href="javascript:;">Select files...</a>
+                    </div>
+                    <br>
+                    <br>
+
+                    <!-- The global progress bar -->
+                    <div id="progress" class="progress">
+                        <div class="progress-bar progress-bar-success"></div>
+                    </div>
+
+                    <!-- The container for the uploaded files -->
+                    <div id="files" class="files"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+</div>

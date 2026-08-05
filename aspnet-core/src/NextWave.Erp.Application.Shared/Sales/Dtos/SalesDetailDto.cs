@@ -1,0 +1,31 @@
+﻿using Abp.Application.Services.Dto;
+using NextWave.Erp.Enums;
+using NextWave.Erp.Purchase.Dtos;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace NextWave.Erp.Sales.Dtos
+{
+    public class SalesDetailDto : EntityDto<Guid?>
+    {
+        public decimal Qty { get; set; }
+        public decimal Rate { get; set; }
+        public decimal? TaxAmount { get; set; }
+        public decimal? TaxValue { get; set; }
+        public decimal? DiscountPer { get; set; }
+        public decimal? Discount { get; set; }
+        public decimal? GrossAmount { get; set; }
+        public decimal? NetAmount { get; set; }
+        public decimal? Amount { get; set; }
+        public ProductTypeEnum ProductType { get; set; }
+        public Guid ProductId { get; set; }
+        public Guid UnitId { get; set; }
+        public decimal StockQty { get; set; }
+        public Guid? SalesDetailId { get; set; }
+        public Guid TaxId { get; set; }
+        public string ProductCode { get; set; }
+    }
+}

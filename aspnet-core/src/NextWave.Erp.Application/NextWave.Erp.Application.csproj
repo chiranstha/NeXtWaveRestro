@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props">
+  </Import>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+    <AssemblyName>NextWave.Erp.Application</AssemblyName>
+    <PackageId>NextWave.Erp.Application</PackageId>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <RootNamespace>NextWave.Erp</RootNamespace>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="GeneralSetting\MergeLedgerAppService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MiniExcel" Version="1.45.0" />
+    <PackageReference Include="NepDate" Version="2.0.7" />
+    <PackageReference Include="NPOI" Version="2.8.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NextWave.Erp.Application.Shared\NextWave.Erp.Application.Shared.csproj" />
+    <ProjectReference Include="..\NextWave.Erp.Core\NextWave.Erp.Core.csproj" />
+    <ProjectReference Include="..\NextWave.Erp.EntityFrameworkCore\NextWave.Erp.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\QuestPDF\QuestPDF.csproj" />
+  </ItemGroup>
+</Project>

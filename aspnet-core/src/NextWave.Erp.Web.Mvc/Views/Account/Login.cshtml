@@ -1,0 +1,48 @@
+﻿@using Abp.Extensions
+@model NextWave.Erp.Web.Models.Account.LoginFormViewModel
+@addTagHelper *, Owl.reCAPTCHA
+
+@{
+    ViewBag.IsQrLoginEnabled = Model.IsQrLoginEnabled;
+}
+
+@section Scripts
+{
+    @if (ViewBag.UseCaptcha)
+    {
+        <recaptcha-script-v3 />
+        <recaptcha-script-v3-js action="login" execute="false" />
+    }
+    <script src="@(ApplicationPath)view-resources/Areas/AppAreaName/Views/_Bundles/signalr.bundle.min.js" asp-append-version="true"></script>
+    @if (Model.IsQrLoginEnabled)
+    {
+        <script abp-src="/view-resources/Views/Account/QrLogin.js" asp-append-version="true"></script>
+    }
+    <script abp-src="/view-resources/Views/Account/Login.js" asp-append-version="true"></script>
+
+}
+
+@if (!Model.SuccessMessage.IsNullOrEmpty())
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @Model.SuccessMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (Model.IsQrLoginEnabled)
+{
+    <div class="row">
+        <div class="col">
+            <partial name="_LoginForm" model="Model" />
+        </div>
+        <div class="col d-flex justify-content-center align-items-center">
+            <partial name="_QrLogin" />
+        </div>
+    </div>
+}
+else
+{
+    <partial name="_LoginForm" model="Model" />
+}
+

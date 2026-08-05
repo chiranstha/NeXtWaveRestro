@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Title>Abp.AspNetZeroCore</Title>
+    <FileVersion>5.1.0.0</FileVersion>
+    <AssemblyVersion>5.1.0.0</AssemblyVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Abp" Version="10.5.0" />
+    <PackageReference Include="Abp.Zero.Common" Version="10.5.0" />
+  </ItemGroup>
+</Project>

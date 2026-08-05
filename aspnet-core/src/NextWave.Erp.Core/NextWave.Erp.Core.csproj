@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\common.props">
+  </Import>
+  <PropertyGroup>
+    <TargetFrameworks>net10.0</TargetFrameworks>
+    <AssetTargetFallback>$(AssetTargetFallback);portable-net45+win8+wp8+wpa81;</AssetTargetFallback>
+    <AssemblyName>NextWave.Erp.Core</AssemblyName>
+    <PackageId>NextWave.Erp.Core</PackageId>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <UserSecretsId>NextWave-Erp-894FDFC1-6482-4A56-926A-3C46C9FE0329</UserSecretsId>
+    <RootNamespace>NextWave.Erp</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Localization\Erp\*.xml;Net\Emailing\EmailTemplates\default.html" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Abp.Web.Common" Version="10.5.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.10" />
+    <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.5.1" />
+    <PackageReference Include="Azure.Identity" Version="1.21.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.10" />
+    <PackageReference Include="Castle.Windsor.MsDependencyInjection" Version="6.0.0" />
+    <PackageReference Include="NepDate" Version="2.0.7" />
+    <PackageReference Include="PayPalHttp" Version="1.0.1" />
+    <PackageReference Include="PayPalCheckoutSdk" Version="1.0.4" />
+    <PackageReference Include="QRCoder" Version="1.8.0" />
+    <PackageReference Include="Stripe.net" Version="52.2.0" />
+    <PackageReference Include="TimeZoneConverter" Version="7.2.0" />
+    <PackageReference Include="SkiaSharp" Version="4.150.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Abp.ZeroCore.EntityFrameworkCore" Version="10.5.0" />
+    <PackageReference Include="Abp.AutoMapper" Version="10.5.0" />
+    <PackageReference Include="Abp.MailKit" Version="10.5.0" />
+    <PackageReference Include="Abp.Zero.Ldap" Version="10.5.0" />
+    <PackageReference Include="Abp.ZeroCore.OpenIddict" Version="10.5.0" />
+    <PackageReference Include="Twilio" Version="7.14.9" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Abp.AspNetZeroCore\Abp.AspNetZeroCore.csproj" />
+    <ProjectReference Include="..\NextWave.Erp.Application.Shared\NextWave.Erp.Application.Shared.csproj" />
+    <ProjectReference Include="..\NextWave.Erp.Core.Shared\NextWave.Erp.Core.Shared.csproj" />
+  </ItemGroup>
+</Project>
