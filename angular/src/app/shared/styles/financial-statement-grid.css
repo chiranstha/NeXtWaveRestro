@@ -1,0 +1,160 @@
+.financial-statement-grid {
+    --ag-border-color: transparent;
+    --ag-row-border-color: #edf2f7;
+    --ag-header-background-color: #f8fafc;
+    --ag-odd-row-background-color: #ffffff;
+    --ag-row-hover-color: #f6f9fd;
+    --ag-selected-row-background-color: transparent;
+    font-family: inherit;
+}
+
+.financial-statement-grid .ag-root-wrapper {
+    overflow: hidden;
+    border: 0;
+    background: var(--statement-panel);
+    color: var(--statement-ink);
+}
+
+.financial-statement-grid .ag-header {
+    border-bottom: 1px solid var(--statement-border);
+    background: #f8fafc;
+}
+
+.financial-statement-grid .ag-header-cell {
+    padding-inline: 18px;
+    border-right: 0;
+}
+
+.financial-statement-grid .ag-header-cell-label {
+    gap: 8px;
+}
+
+.financial-statement-grid .ag-header-cell-text {
+    color: var(--statement-ink);
+    text-transform: uppercase;
+}
+
+.financial-statement-grid .ag-right-aligned-header .ag-header-cell-label {
+    justify-content: flex-end;
+}
+
+.financial-statement-grid :is(.ag-header-cell-menu-button, .ag-header-cell-filter-button) {
+    display: none;
+}
+
+.financial-statement-grid .ag-row {
+    border-color: #edf2f7;
+    background: #ffffff;
+    transition: background-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.financial-statement-grid .ag-row-hover {
+    background: #f6f9fd !important;
+    box-shadow: inset 3px 0 0 var(--statement-hover-shadow);
+}
+
+.financial-statement-grid :is(.ag-row-selected, .ag-row-hover)::before {
+    background: transparent !important;
+}
+
+.financial-statement-grid .ag-cell {
+    display: flex;
+    align-items: center;
+    padding-inline: 18px;
+    border-right: 0;
+    color: var(--statement-ink);
+    font-size: 0.9rem;
+    line-height: 1.25;
+}
+
+.financial-statement-grid :is(
+    .ag-cell-focus,
+    .ag-cell.ag-cell-focus:not(.ag-cell-range-selected),
+    .ag-cell-focus.ag-cell-range-single-cell
+) {
+    border-color: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.financial-statement-grid .ag-cell-value {
+    width: 100%;
+}
+
+.financial-statement-grid :is(.ag-group-expanded, .ag-group-contracted) {
+    display: inline-flex;
+    width: 24px;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    color: #64748b;
+}
+
+.financial-statement-grid :is(.balance-sheet-tree-cell, .profit-loss-tree-cell) {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 10px;
+}
+
+.financial-statement-grid :is(.balance-sheet-tree-cell__icon, .profit-loss-tree-cell__icon) {
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.financial-statement-grid :is(.balance-sheet-tree-cell__label, .profit-loss-tree-cell__label) {
+    overflow: hidden;
+    min-width: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.financial-statement-grid :is(.balance-sheet-row--group, .profit-loss-row--group) .ag-cell {
+    font-weight: 800;
+}
+
+.financial-statement-grid :is(.balance-sheet-row--summary, .profit-loss-row--summary) .ag-cell {
+    border-top: 1px solid #dbe7d8;
+    color: var(--statement-ink);
+    font-weight: 900;
+}
+
+.financial-statement-grid :is(.balance-sheet-amount-cell, .profit-loss-amount-cell) {
+    justify-content: flex-end;
+    font-variant-numeric: tabular-nums;
+}
+
+.financial-statement-grid :is(.balance-sheet-amount-cell, .profit-loss-amount-cell) .ag-cell-value {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.financial-statement-grid :is(.balance-sheet-amount, .profit-loss-amount) {
+    display: inline-flex;
+    min-width: 128px;
+    min-height: 30px;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 10px;
+    border-radius: 8px;
+    font-size: 0.86rem;
+    font-weight: 900;
+}
+
+.financial-statement-grid :is(.balance-sheet-amount--empty, .profit-loss-amount--empty) {
+    min-width: 0;
+    padding: 0;
+    background: transparent;
+}
+
+.financial-statement-grid :is(.balance-sheet-row--summary, .profit-loss-row--summary)
+    :is(.balance-sheet-amount, .profit-loss-amount) {
+    padding-right: 0;
+    background: transparent;
+    font-size: 0.94rem;
+}

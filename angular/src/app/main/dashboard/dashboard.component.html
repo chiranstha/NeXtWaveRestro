@@ -1,7 +1,8 @@
 <div [@routerTransition]>
+    <restaurant-styles></restaurant-styles>
     <sub-header [title]="'Restaurant Dashboard' | localize">
-        <div class="restaurant-dashboard-header-actions" role="actions">
-            <span class="restaurant-refresh-note">
+        <div class="align-items-start align-items-sm-center d-inline-flex flex-column flex-sm-row gap-2" role="actions">
+            <span class="fs-8 fw-bold text-gray-600 text-wrap text-sm-nowrap">
                 {{ 'Last refreshed' | localize }}:
                 {{ lastRefreshedAt ? lastRefreshedAt.toFormat('HH:mm:ss') : '-' }}
             </span>
@@ -12,14 +13,14 @@
     </sub-header>
 
     <div [class]="containerClass">
-        <div class="restaurant-page restaurant-dashboard-page">
-            <div class="card card-custom gutter-b restaurant-card">
+        <div class="restaurant-page mw-100 d-grid gap-3 min-w-0">
+            <div class="card card-custom gutter-b restaurant-card min-w-0">
                 <div class="card-body">
-                    <div class="restaurant-filterbar restaurant-dashboard-filterbar">
-                        <div>
+                    <div class="restaurant-filterbar row g-3 align-items-end">
+                        <div class="col-12 col-md-6 col-xl-auto">
                             <label class="form-label">{{ 'From Date' | localize }} (BS)</label>
                             <ne-datepicker
-                                class="restaurant-date-filter restaurant-dashboard-date-filter"
+                                class="restaurant-date-filter d-block min-w-xl-175px w-100"
                                 [date]="filter.fromDate"
                                 [dateFormat]="'yyyy/mm/dd'"
                                 dateIn="AD"
@@ -28,10 +29,10 @@
                                 (dateInAD)="setFilterDate('fromDate', $event)"
                             ></ne-datepicker>
                         </div>
-                        <div>
+                        <div class="col-12 col-md-6 col-xl-auto">
                             <label class="form-label">{{ 'To Date' | localize }} (BS)</label>
                             <ne-datepicker
-                                class="restaurant-date-filter restaurant-dashboard-date-filter"
+                                class="restaurant-date-filter d-block min-w-xl-175px w-100"
                                 [date]="filter.toDate"
                                 [dateFormat]="'yyyy/mm/dd'"
                                 dateIn="AD"
@@ -40,10 +41,10 @@
                                 (dateInAD)="setFilterDate('toDate', $event)"
                             ></ne-datepicker>
                         </div>
-                        <div>
+                        <div *ngIf="canUseTableFilter" class="col-12 col-md-6 col-xl-auto">
                             <label class="form-label">{{ 'Table' | localize }}</label>
                             <ng-select
-                                class="w-200px"
+                                class="w-100 w-xl-200px"
                                 [items]="tables"
                                 bindLabel="name"
                                 bindValue="id"
@@ -52,10 +53,10 @@
                                 appendTo="body"
                             ></ng-select>
                         </div>
-                        <div>
+                        <div class="col-12 col-md-6 col-xl-auto">
                             <label class="form-label">{{ 'Waiter' | localize }}</label>
                             <ng-select
-                                class="w-200px"
+                                class="w-100 w-xl-200px"
                                 [items]="waiters"
                                 bindLabel="name"
                                 bindValue="id"
@@ -64,10 +65,10 @@
                                 appendTo="body"
                             ></ng-select>
                         </div>
-                        <div>
+                        <div *ngIf="canUseCategoryFilter" class="col-12 col-md-6 col-xl-auto">
                             <label class="form-label">{{ 'Category' | localize }}</label>
                             <ng-select
-                                class="w-200px"
+                                class="w-100 w-xl-200px"
                                 [items]="categories"
                                 bindLabel="name"
                                 bindValue="id"
@@ -76,63 +77,68 @@
                                 appendTo="body"
                             ></ng-select>
                         </div>
-                        <button class="btn btn-primary" type="button" [disabled]="loading" (click)="refresh()">
+                        <button class="btn btn-primary col-12 col-md-auto" type="button" [disabled]="loading" (click)="refresh()">
                             <i class="fa fa-filter"></i>
                             {{ 'Filter' | localize }}
                         </button>
-                        <button class="btn btn-light" type="button" (click)="clearFilters()">
+                        <button class="btn btn-light col-12 col-md-auto" type="button" (click)="clearFilters()">
                             {{ 'Clear' | localize }}
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="restaurant-dashboard-metrics">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
                 @for (metric of kpiMetrics; track metric.label) {
-                    <div class="restaurant-dashboard-metric" [ngClass]="'restaurant-dashboard-accent-' + metric.accent">
-                        <div class="restaurant-dashboard-metric-icon">
+                    <div class="col">
+                    <div class="align-items-center bg-white border border-gray-300 border-start border-4 d-flex gap-3 h-100 min-w-0 p-4 rounded-3" [ngClass]="'border-' + metric.accent">
+                        <div class="align-items-center d-inline-flex flex-shrink-0 h-45px justify-content-center rounded-3 w-45px" [ngClass]="'bg-light-' + metric.accent + ' text-' + metric.accent">
                             <i class="fa" [ngClass]="metric.icon"></i>
                         </div>
                         <div>
-                            <span class="restaurant-metric-label">{{ metric.label }}</span>
-                            <strong class="restaurant-dashboard-metric-value">{{ metric.value }}</strong>
+                            <span class="restaurant-metric-label d-block text-uppercase">{{ metric.label }}</span>
+                            <strong class="d-block fs-4 fw-bolder lh-sm my-1 text-break text-gray-900">{{ metric.value }}</strong>
                             <span class="restaurant-muted">{{ metric.subText }}</span>
                         </div>
+                    </div>
                     </div>
                 }
             </div>
 
-            <div class="restaurant-dashboard-metrics restaurant-dashboard-ops">
-                @for (metric of operationMetrics; track metric.label) {
-                    <div class="restaurant-dashboard-metric" [ngClass]="'restaurant-dashboard-accent-' + metric.accent">
-                        <div class="restaurant-dashboard-metric-icon">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
+                @for (metric of decisionMetrics; track metric.label) {
+                    <div class="col">
+                    <div class="align-items-center bg-white border border-gray-300 border-start border-4 d-flex gap-3 h-100 min-w-0 p-4 rounded-3" [ngClass]="'border-' + metric.accent">
+                        <div class="align-items-center d-inline-flex flex-shrink-0 h-45px justify-content-center rounded-3 w-45px" [ngClass]="'bg-light-' + metric.accent + ' text-' + metric.accent">
                             <i class="fa" [ngClass]="metric.icon"></i>
                         </div>
                         <div>
-                            <span class="restaurant-metric-label">{{ metric.label }}</span>
-                            <strong class="restaurant-dashboard-metric-value">{{ metric.value }}</strong>
+                            <span class="restaurant-metric-label d-block text-uppercase">{{ metric.label }}</span>
+                            <strong class="d-block fs-4 fw-bolder lh-sm my-1 text-break text-gray-900">{{ metric.value }}</strong>
                             <span class="restaurant-muted">{{ metric.subText }}</span>
                         </div>
+                    </div>
                     </div>
                 }
             </div>
 
-            <div class="restaurant-dashboard-grid">
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Top Selling Items' | localize }}</div>
+            <div class="row g-3">
+                <div class="col-12 col-lg-6" *ngIf="canViewSalesReports">
+                <div class="card card-custom restaurant-card h-100 min-w-0">
+                    <div class="card-header align-items-center d-flex justify-content-between">
+                        <div class="card-title fs-7 lh-sm m-0">{{ 'Top Selling Items' | localize }}</div>
                     </div>
                     <div class="card-body p-0">
                         @if (topItems.length) {
-                            <table class="restaurant-table restaurant-compact-table">
+                            <table class="restaurant-table restaurant-compact-table table table-sm table-row-bordered align-middle mb-0 w-100">
                                 <tbody>
                                     @for (item of topItems; track item.productId) {
                                         <tr>
-                                            <td>
+                                            <td class="align-middle">
                                                 <div class="fw-bold">{{ item.productName || '-' }}</div>
                                                 <div class="restaurant-muted">{{ item.categoryName || '-' }}</div>
                                             </td>
-                                            <td class="text-end">
+                                            <td class="text-end align-middle">
                                                 <div class="fw-bold">{{ formatMoney(item.grandTotal) }}</div>
                                                 <div class="restaurant-muted">{{ formatNumber(item.qty, 2) }} {{ 'Qty' | localize }}</div>
                                             </td>
@@ -141,126 +147,157 @@
                                 </tbody>
                             </table>
                         } @else {
-                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                            <div class="restaurant-empty m-5 text-center">{{ 'NoData' | localize }}</div>
                         }
                     </div>
                 </div>
+                </div>
 
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Table Sales' | localize }}</div>
+                <div class="col-12 col-lg-6" *ngIf="canViewOperationsReports">
+                <div class="card card-custom restaurant-card h-100 min-w-0">
+                    <div class="card-header align-items-center d-flex justify-content-between">
+                        <div class="card-title fs-7 lh-sm m-0">{{ 'Table Sales' | localize }}</div>
                     </div>
                     <div class="card-body p-0">
                         @if (topTables.length) {
-                            <table class="restaurant-table restaurant-compact-table">
+                            <table class="restaurant-table restaurant-compact-table table table-sm table-row-bordered align-middle mb-0 w-100">
                                 <tbody>
                                     @for (table of topTables; track table.tableId || table.tableName) {
                                         <tr>
-                                            <td>
+                                            <td class="align-middle">
                                                 <div class="fw-bold">{{ table.tableName || '-' }}</div>
                                                 <div class="restaurant-muted">{{ table.orderCount || 0 }} {{ 'Orders' | localize }}</div>
                                             </td>
-                                            <td class="text-end fw-bold">{{ formatMoney(table.grandTotal) }}</td>
+                                            <td class="text-end fw-bold align-middle">{{ formatMoney(table.grandTotal) }}</td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
                         } @else {
-                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                            <div class="restaurant-empty m-5 text-center">{{ 'NoData' | localize }}</div>
                         }
                     </div>
                 </div>
+                </div>
 
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Waiter Performance' | localize }}</div>
+                <div class="col-12 col-lg-6" *ngIf="canViewOperationsReports">
+                <div class="card card-custom restaurant-card h-100 min-w-0">
+                    <div class="card-header align-items-center d-flex justify-content-between">
+                        <div class="card-title fs-7 lh-sm m-0">{{ 'Waiter Performance' | localize }}</div>
                     </div>
                     <div class="card-body p-0">
                         @if (topWaiters.length) {
-                            <table class="restaurant-table restaurant-compact-table">
+                            <table class="restaurant-table restaurant-compact-table table table-sm table-row-bordered align-middle mb-0 w-100">
                                 <tbody>
                                     @for (waiter of topWaiters; track waiter.waiterUserId || waiter.waiterName) {
                                         <tr>
-                                            <td>
+                                            <td class="align-middle">
                                                 <div class="fw-bold">{{ waiter.waiterName || '-' }}</div>
                                                 <div class="restaurant-muted">{{ waiter.orderCount || 0 }} {{ 'Orders' | localize }}</div>
                                             </td>
-                                            <td class="text-end fw-bold">{{ formatMoney(waiter.grandTotal) }}</td>
+                                            <td class="text-end fw-bold align-middle">{{ formatMoney(waiter.grandTotal) }}</td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
                         } @else {
-                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                            <div class="restaurant-empty m-5 text-center">{{ 'NoData' | localize }}</div>
                         }
                     </div>
                 </div>
+                </div>
 
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Payment Mix' | localize }}</div>
+                <div class="col-12 col-lg-6" *ngIf="canViewAuditReports">
+                <div class="card card-custom restaurant-card h-100 min-w-0">
+                    <div class="card-header align-items-center d-flex justify-content-between">
+                        <div class="card-title fs-7 lh-sm m-0">{{ 'Payment Mix' | localize }}</div>
                     </div>
                     <div class="card-body">
                         @if (topPayments.length) {
-                            <div class="restaurant-dashboard-payment-list">
+                            <div class="d-grid gap-3">
                                 @for (payment of topPayments; track payment.paymentMethod) {
-                                    <div class="restaurant-dashboard-payment-row">
+                                    <div class="align-items-start align-items-sm-center d-flex flex-column flex-sm-row gap-3 justify-content-between">
                                         <div>
                                             <div class="fw-bold">{{ payment.paymentMethodName || '-' }}</div>
                                             <div class="restaurant-muted">{{ payment.orderCount || 0 }} {{ 'Orders' | localize }}</div>
                                         </div>
-                                        <div class="text-end">
+                                        <div class="text-start text-sm-end w-100 w-sm-50">
                                             <div class="fw-bold">{{ formatMoney(payment.grandTotal) }}</div>
-                                            <div class="restaurant-dashboard-bar">
-                                                <span [style.width.%]="paymentShare(payment)"></span>
+                                            <div class="progress h-10px mt-2 overflow-hidden rounded-pill w-100">
+                                                <span class="progress-bar bg-primary" [style.width.%]="paymentShare(payment)"></span>
                                             </div>
                                         </div>
                                     </div>
                                 }
                             </div>
                         } @else {
-                            <div class="restaurant-empty">{{ 'NoData' | localize }}</div>
+                            <div class="restaurant-empty text-center">{{ 'NoData' | localize }}</div>
                         }
                     </div>
                 </div>
+                </div>
 
-                <div class="card card-custom gutter-b restaurant-card restaurant-dashboard-wide">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Low Stock Alerts' | localize }}</div>
+                <div class="col-12" *ngIf="canViewInventoryReports">
+                <div class="card card-custom restaurant-card min-w-0">
+                    <div class="card-header align-items-center d-flex justify-content-between">
+                        <div class="card-title fs-7 lh-sm m-0">{{ 'Low Stock Alerts' | localize }}</div>
                     </div>
                     <div class="card-body p-0">
                         @if (urgentLowStock.length) {
-                            <table class="restaurant-table restaurant-compact-table">
-                                <thead>
+                            <table class="restaurant-table restaurant-compact-table table table-sm table-row-bordered align-middle mb-0 w-100">
+                                <thead class="align-middle text-uppercase">
                                     <tr>
-                                        <th>{{ 'Item' | localize }}</th>
-                                        <th>{{ 'Available' | localize }}</th>
-                                        <th>{{ 'Suggested' | localize }}</th>
-                                        <th>{{ 'Supplier' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Item' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Available' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Suggested' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Supplier' | localize }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @for (item of urgentLowStock; track item.productId) {
                                         <tr>
-                                            <td>
+                                            <td class="align-middle">
                                                 <div class="fw-bold">{{ item.productName || '-' }}</div>
                                                 @if (item.missingSupplierMapping) {
-                                                    <span class="restaurant-status restaurant-status-danger">
+                                                    <span class="restaurant-status restaurant-status-danger align-items-center d-inline-flex lh-1 mw-100 text-nowrap">
                                                         {{ 'Mapping Missing' | localize }}
                                                     </span>
                                                 }
                                             </td>
-                                            <td>{{ formatNumber(item.availableQty, 2) }} {{ item.unitName || '' }}</td>
-                                            <td>{{ formatNumber(item.suggestedQty, 2) }} {{ item.unitName || '' }}</td>
-                                            <td>{{ item.supplierName || '-' }}</td>
+                                            <td class="align-middle">{{ formatNumber(item.availableQty, 2) }} {{ item.unitName || '' }}</td>
+                                            <td class="align-middle">{{ formatNumber(item.suggestedQty, 2) }} {{ item.unitName || '' }}</td>
+                                            <td class="align-middle">{{ item.supplierName || '-' }}</td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
                         } @else {
-                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                            <div class="restaurant-empty m-5 text-center">{{ 'NoData' | localize }}</div>
                         }
                     </div>
+                </div>
+                </div>
+
+                <div class="col-12" *ngIf="canViewPayrollReports">
+                <div class="card card-custom restaurant-card min-w-0">
+                    <div class="card-header align-items-center d-flex justify-content-between">
+                        <div class="card-title fs-7 lh-sm m-0">{{ 'Payroll & Attendance' | localize }}</div>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (payrollReport.attendance.length) {
+                            <table class="restaurant-table restaurant-compact-table table table-sm table-row-bordered align-middle mb-0 w-100">
+                                <thead><tr><th>{{ 'Status' | localize }}</th><th class="text-end">{{ 'Records' | localize }}</th><th class="text-end">{{ 'Regular Hours' | localize }}</th><th class="text-end">{{ 'Overtime' | localize }}</th></tr></thead>
+                                <tbody>
+                                    @for (row of payrollReport.attendance; track row.status) {
+                                        <tr><td class="fw-bold">{{ row.statusName }}</td><td class="text-end">{{ row.recordCount }}</td><td class="text-end">{{ formatNumber(row.regularHours) }}</td><td class="text-end">{{ formatNumber(row.overtimeHours) }}</td></tr>
+                                    }
+                                </tbody>
+                            </table>
+                        } @else {
+                            <div class="restaurant-empty m-5 text-center">{{ 'NoData' | localize }}</div>
+                        }
+                    </div>
+                </div>
                 </div>
             </div>
         </div>

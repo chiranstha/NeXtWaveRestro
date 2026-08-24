@@ -1,4 +1,5 @@
 <div [@routerTransition]>
+    <restaurant-styles></restaurant-styles>
     <sub-header [title]="'Restaurant Channels' | localize">
         <div role="actions">
             <button
@@ -13,85 +14,89 @@
     </sub-header>
 
     <div [class]="containerClass">
-        <div class="restaurant-page">
-            <div class="restaurant-nav">
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/pos" routerLinkActive="active">
+        <div class="restaurant-page overflow-x-hidden gap-5 mw-100 d-grid min-w-0">
+            <div class="restaurant-nav align-items-center bg-white border border-gray-300 d-flex gap-2 overflow-x-auto p-2 rounded-3">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/pos" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-cash-register"></i>
                     {{ 'POS' | localize }}
                 </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/setup" routerLinkActive="active">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/setup" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-sliders"></i>
                     {{ 'Setup' | localize }}
                 </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/menu" routerLinkActive="active">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/menu" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-utensils"></i>
                     {{ 'Menu' | localize }}
                 </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/inventory" routerLinkActive="active">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/inventory" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-boxes-stacked"></i>
                     {{ 'Inventory' | localize }}
                 </a>
-                <a class="restaurant-nav-link active" routerLink="/app/main/restaurant/channels">
+                <a class="restaurant-nav-link active bg-hover-light bg-light-primary flex-shrink-0 text-gray-600 text-hover-dark text-primary align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/channels">
                     <i class="fa fa-store"></i>
                     {{ 'Channels' | localize }}
                 </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/kds" routerLinkActive="active">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/kds" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-tv"></i>
                     {{ 'KDS' | localize }}
                 </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/reports" routerLinkActive="active">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/reports" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-chart-line"></i>
                     {{ 'Reports' | localize }}
                 </a>
+                <a *ngIf="isGranted('Pages.Restaurant.Payroll')" class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/payroll" routerLinkActive="active bg-light-primary text-primary">
+                    <i class="fa fa-money-check-dollar"></i>
+                    {{ 'Payroll' | localize }}
+                </a>
             </div>
 
-            <div class="restaurant-section-tabs">
-                <button class="nav-link" [class.active]="activeTab === 'channels'" (click)="setTab('channels')">
+            <div class="restaurant-section-tabs align-items-center bg-white border border-gray-300 d-flex flex-wrap gap-2 p-2 rounded-3">
+                <button class="nav-link bg-hover-light border-0 fw-bolder min-h-35px px-3 py-2 rounded-2 text-gray-600 text-hover-dark" [class.active]="activeTab === 'channels'" [class.bg-light-primary]="activeTab === 'channels'" [class.text-primary]="activeTab === 'channels'" (click)="setTab('channels')">
                     <i class="fa fa-store me-1"></i>
                     {{ 'Channels' | localize }}
                 </button>
-                <button class="nav-link" [class.active]="activeTab === 'mapping'" (click)="setTab('mapping')">
+                <button class="nav-link bg-hover-light border-0 fw-bolder min-h-35px px-3 py-2 rounded-2 text-gray-600 text-hover-dark" [class.active]="activeTab === 'mapping'" [class.bg-light-primary]="activeTab === 'mapping'" [class.text-primary]="activeTab === 'mapping'" (click)="setTab('mapping')">
                     <i class="fa fa-link me-1"></i>
                     {{ 'Menu Mapping' | localize }}
                 </button>
-                <button class="nav-link" [class.active]="activeTab === 'orders'" (click)="setTab('orders')">
+                <button class="nav-link bg-hover-light border-0 fw-bolder min-h-35px px-3 py-2 rounded-2 text-gray-600 text-hover-dark" [class.active]="activeTab === 'orders'" [class.bg-light-primary]="activeTab === 'orders'" [class.text-primary]="activeTab === 'orders'" (click)="setTab('orders')">
                     <i class="fa fa-inbox me-1"></i>
                     {{ 'Incoming Orders' | localize }}
                 </button>
-                <button class="nav-link" [class.active]="activeTab === 'payouts'" (click)="setTab('payouts')">
+                <button class="nav-link bg-hover-light border-0 fw-bolder min-h-35px px-3 py-2 rounded-2 text-gray-600 text-hover-dark" [class.active]="activeTab === 'payouts'" [class.bg-light-primary]="activeTab === 'payouts'" [class.text-primary]="activeTab === 'payouts'" (click)="setTab('payouts')">
                     <i class="fa fa-money-check-dollar me-1"></i>
                     {{ 'Payouts' | localize }}
                 </button>
             </div>
 
-            <div class="restaurant-metric-row">
-                <div class="restaurant-metric">
-                    <span class="restaurant-metric-label">{{ 'Active Channels' | localize }}</span>
-                    <span class="restaurant-metric-value">{{ activeChannelsCount }}</span>
+            <div class="restaurant-metric-row d-grid gap-4">
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
+                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Active Channels' | localize }}</span>
+                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ activeChannelsCount }}</span>
                 </div>
-                <div class="restaurant-metric">
-                    <span class="restaurant-metric-label">{{ 'Mapped Items' | localize }}</span>
-                    <span class="restaurant-metric-value">{{ channelItems.length }}</span>
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
+                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Mapped Items' | localize }}</span>
+                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ channelItems.length }}</span>
                 </div>
-                <div class="restaurant-metric">
-                    <span class="restaurant-metric-label">{{ 'Pending Orders' | localize }}</span>
-                    <span class="restaurant-metric-value">{{ pendingOrdersCount }}</span>
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
+                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Pending Orders' | localize }}</span>
+                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ pendingOrdersCount }}</span>
                 </div>
-                <div class="restaurant-metric">
-                    <span class="restaurant-metric-label">{{ 'Payout Issues' | localize }}</span>
-                    <span class="restaurant-metric-value">{{ payoutIssueCount }}</span>
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
+                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Payout Issues' | localize }}</span>
+                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ payoutIssueCount }}</span>
                 </div>
             </div>
 
             <ng-container *ngIf="activeTab === 'channels'">
-                <div class="restaurant-grid-2">
-                    <div class="card card-custom gutter-b restaurant-card">
-                        <div class="card-header">
-                            <div class="card-title">
+                <div class="restaurant-grid-2 d-grid gap-5">
+                    <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                        <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                            <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">
                                 {{ channelForm.id ? ('Edit Channel' | localize) : ('New Channel' | localize) }}
                             </div>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body p-2">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="required form-label">{{ 'Name' | localize }}</label>
@@ -130,7 +135,7 @@
                                     <input class="form-control" type="number" [(ngModel)]="channelForm.sortOrder" />
                                 </div>
                             </div>
-                            <div class="restaurant-actionbar">
+                            <div class="restaurant-actionbar gap-2 align-items-center d-flex flex-wrap min-w-0">
                                 <label class="form-check form-check-sm">
                                     <input class="form-check-input" type="checkbox" [(ngModel)]="channelForm.isOnline" />
                                     <span class="form-check-label">{{ 'Online' | localize }}</span>
@@ -150,11 +155,11 @@
                         </div>
                     </div>
 
-                    <div class="card card-custom gutter-b restaurant-card">
-                        <div class="card-header">
-                            <div class="card-title">{{ 'Channel Accounts' | localize }}</div>
+                    <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                        <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                            <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Channel Accounts' | localize }}</div>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body p-2">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="required form-label">{{ 'Channel' | localize }}</label>
@@ -187,7 +192,7 @@
                                     <input class="form-control" [(ngModel)]="accountForm.apiBaseUrl" />
                                 </div>
                             </div>
-                            <div class="restaurant-actionbar">
+                            <div class="restaurant-actionbar gap-2 align-items-center d-flex flex-wrap min-w-0">
                                 <label class="form-check form-check-sm">
                                     <input class="form-check-input" type="checkbox" [(ngModel)]="accountForm.isOnline" />
                                     <span class="form-check-label">{{ 'Online' | localize }}</span>
@@ -205,42 +210,42 @@
                     </div>
                 </div>
 
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Configured Channels' | localize }}</div>
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Configured Channels' | localize }}</div>
                     </div>
-                    <div class="card-body p-0 restaurant-table-wrap">
-                        <table class="restaurant-table" *ngIf="channels.length; else noChannels">
-                            <thead>
+                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="channels.length; else noChannels">
+                            <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
                                 <tr>
-                                    <th>{{ 'Channel' | localize }}</th>
-                                    <th>{{ 'Type' | localize }}</th>
-                                    <th>{{ 'Provider' | localize }}</th>
-                                    <th class="text-end">{{ 'Commission' | localize }}</th>
-                                    <th>{{ 'Status' | localize }}</th>
-                                    <th class="text-end"></th>
+                                    <th class="align-middle text-uppercase">{{ 'Channel' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Type' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Provider' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase">{{ 'Commission' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Status' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let channel of channels">
-                                    <td class="fw-bold">{{ channel.name }}</td>
-                                    <td>{{ channelTypeText(channel.channelType) }}</td>
-                                    <td>{{ providerText(channel.provider) }}</td>
-                                    <td class="text-end">{{ channel.commissionPercent | number: '1.2-2' }}%</td>
-                                    <td>
+                                    <td class="fw-bold align-middle">{{ channel.name }}</td>
+                                    <td class="align-middle">{{ channelTypeText(channel.channelType) }}</td>
+                                    <td class="align-middle">{{ providerText(channel.provider) }}</td>
+                                    <td class="text-end align-middle">{{ channel.commissionPercent | number: '1.2-2' }}%</td>
+                                    <td class="align-middle">
                                         <span
-                                            class="restaurant-status"
-                                            [class.restaurant-status-success]="channel.isOnline"
-                                            [class.restaurant-status-neutral]="!channel.isOnline"
+                                            class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
+                                            [class.bg-light-success]="channel.isOnline" [class.text-success]="channel.isOnline"
+                                            [class.bg-light]="!channel.isOnline" [class.text-gray-600]="!channel.isOnline"
                                         >
                                             {{ channel.isOnline ? ('Online' | localize) : ('Offline' | localize) }}
                                         </span>
                                     </td>
-                                    <td class="text-end">
-                                        <button class="btn btn-xs btn-light-primary me-1" (click)="editChannel(channel)">
+                                    <td class="text-end align-middle">
+                                        <button class="btn btn-xs btn-light-primary me-1 align-items-center d-inline-flex fs-9 justify-content-center" (click)="editChannel(channel)">
                                             <i class="fa fa-pencil"></i>
                                         </button>
-                                        <button class="btn btn-xs btn-light-success" [buttonBusy]="saving" (click)="queuePublish(channel)">
+                                        <button class="btn btn-xs btn-light-success align-items-center d-inline-flex fs-9 justify-content-center" [buttonBusy]="saving" (click)="queuePublish(channel)">
                                             <i class="fa fa-cloud-arrow-up"></i>
                                         </button>
                                     </td>
@@ -248,36 +253,36 @@
                             </tbody>
                         </table>
                         <ng-template #noChannels>
-                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                            <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'NoData' | localize }}</div>
                         </ng-template>
                     </div>
                 </div>
 
-                <div class="card card-custom gutter-b restaurant-card" *ngIf="accounts.length">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Accounts' | localize }}</div>
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0" *ngIf="accounts.length">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Accounts' | localize }}</div>
                     </div>
-                    <div class="card-body p-0 restaurant-table-wrap">
-                        <table class="restaurant-table">
-                            <thead>
+                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100">
+                            <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
                                 <tr>
-                                    <th>{{ 'Account' | localize }}</th>
-                                    <th>{{ 'Channel' | localize }}</th>
-                                    <th>{{ 'Store' | localize }}</th>
-                                    <th>{{ 'Last Sync' | localize }}</th>
-                                    <th class="text-end"></th>
+                                    <th class="align-middle text-uppercase">{{ 'Account' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Channel' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Store' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Last Sync' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let account of accounts">
-                                    <td class="fw-bold">{{ account.displayName }}</td>
-                                    <td>{{ account.channelName }}</td>
-                                    <td>{{ account.externalStoreId || '-' }}</td>
-                                    <td>
+                                    <td class="fw-bold align-middle">{{ account.displayName }}</td>
+                                    <td class="align-middle">{{ account.channelName }}</td>
+                                    <td class="align-middle">{{ account.externalStoreId || '-' }}</td>
+                                    <td class="align-middle">
                                         {{ account.lastMenuSyncAt ? (account.lastMenuSyncAt | date: 'yyyy-MM-dd HH:mm') : '-' }}
                                     </td>
-                                    <td class="text-end">
-                                        <button class="btn btn-xs btn-light-primary" (click)="editAccount(account)">
+                                    <td class="text-end align-middle">
+                                        <button class="btn btn-xs btn-light-primary align-items-center d-inline-flex fs-9 justify-content-center" (click)="editAccount(account)">
                                             <i class="fa fa-pencil"></i>
                                         </button>
                                     </td>
@@ -289,11 +294,11 @@
             </ng-container>
 
             <ng-container *ngIf="activeTab === 'mapping'">
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Channel Menu Mapping' | localize }}</div>
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Channel Menu Mapping' | localize }}</div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-2">
                         <div class="row">
                             <div class="col-md-3 mb-3">
                                 <label class="required form-label">{{ 'Channel' | localize }}</label>
@@ -328,7 +333,7 @@
                                 <input class="form-control" type="number" [(ngModel)]="itemForm.channelPrice" />
                             </div>
                         </div>
-                        <div class="restaurant-actionbar restaurant-actionbar-end">
+                        <div class="restaurant-actionbar gap-2 restaurant-actionbar-end align-items-center d-flex flex-wrap justify-content-start justify-content-sm-end min-w-0">
                             <label class="form-check form-check-sm">
                                 <input class="form-check-input" type="checkbox" [(ngModel)]="itemForm.isOnline" />
                                 <span class="form-check-label">{{ 'Online' | localize }}</span>
@@ -342,38 +347,38 @@
                     </div>
                 </div>
 
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Mapped Items' | localize }}</div>
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Mapped Items' | localize }}</div>
                     </div>
-                    <div class="card-body p-0 restaurant-table-wrap">
-                        <table class="restaurant-table" *ngIf="channelItems.length; else noMappings">
-                            <thead>
+                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="channelItems.length; else noMappings">
+                            <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
                                 <tr>
-                                    <th>{{ 'Channel' | localize }}</th>
-                                    <th>{{ 'Menu Item' | localize }}</th>
-                                    <th>{{ 'External' | localize }}</th>
-                                    <th class="text-end">{{ 'Base' | localize }}</th>
-                                    <th class="text-end">{{ 'Channel Price' | localize }}</th>
-                                    <th>{{ 'Sync' | localize }}</th>
-                                    <th class="text-end"></th>
+                                    <th class="align-middle text-uppercase">{{ 'Channel' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Menu Item' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'External' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase">{{ 'Base' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase">{{ 'Channel Price' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Sync' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let item of channelItems">
-                                    <td>{{ item.channelName }}</td>
-                                    <td class="fw-bold">{{ item.menuItemName }}</td>
-                                    <td>{{ item.externalItemId || item.externalSku || '-' }}</td>
-                                    <td class="text-end">{{ item.basePrice | number: '1.2-2' }}</td>
-                                    <td class="text-end">{{ item.channelPrice | number: '1.2-2' }}</td>
-                                    <td>
-                                        <span class="restaurant-status" [ngClass]="statusClass(item.syncStatus)">
+                                    <td class="align-middle">{{ item.channelName }}</td>
+                                    <td class="fw-bold align-middle">{{ item.menuItemName }}</td>
+                                    <td class="align-middle">{{ item.externalItemId || item.externalSku || '-' }}</td>
+                                    <td class="text-end align-middle">{{ item.basePrice | number: '1.2-2' }}</td>
+                                    <td class="text-end align-middle">{{ item.channelPrice | number: '1.2-2' }}</td>
+                                    <td class="align-middle">
+                                        <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap" [ngClass]="statusClass(item.syncStatus)">
                                             {{ syncStatusText(item.syncStatus) }}
                                         </span>
-                                        <div class="restaurant-muted">{{ item.lastSyncMessage || '-' }}</div>
+                                        <div class="restaurant-muted text-gray-600">{{ item.lastSyncMessage || '-' }}</div>
                                     </td>
-                                    <td class="text-end">
-                                        <button class="btn btn-xs btn-light-primary" (click)="editItem(item)">
+                                    <td class="text-end align-middle">
+                                        <button class="btn btn-xs btn-light-primary align-items-center d-inline-flex fs-9 justify-content-center" (click)="editItem(item)">
                                             <i class="fa fa-pencil"></i>
                                         </button>
                                     </td>
@@ -381,33 +386,33 @@
                             </tbody>
                         </table>
                         <ng-template #noMappings>
-                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                            <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'NoData' | localize }}</div>
                         </ng-template>
                     </div>
                 </div>
 
-                <div class="card card-custom gutter-b restaurant-card" *ngIf="syncLogs.length">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Latest Sync Logs' | localize }}</div>
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0" *ngIf="syncLogs.length">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Latest Sync Logs' | localize }}</div>
                     </div>
-                    <div class="card-body p-0 restaurant-table-wrap">
-                        <table class="restaurant-table">
-                            <thead>
+                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100">
+                            <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
                                 <tr>
-                                    <th>{{ 'Time' | localize }}</th>
-                                    <th>{{ 'Provider' | localize }}</th>
-                                    <th>{{ 'Operation' | localize }}</th>
-                                    <th>{{ 'Status' | localize }}</th>
-                                    <th>{{ 'Message' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Time' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Provider' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Operation' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Status' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Message' | localize }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let log of syncLogs">
-                                    <td>{{ log.createdAt | date: 'yyyy-MM-dd HH:mm' }}</td>
-                                    <td>{{ providerText(log.provider) }}</td>
-                                    <td>{{ log.operation }}</td>
-                                    <td>{{ syncStatusText(log.status) }}</td>
-                                    <td>{{ log.message }}</td>
+                                    <td class="align-middle">{{ log.createdAt | date: 'yyyy-MM-dd HH:mm' }}</td>
+                                    <td class="align-middle">{{ providerText(log.provider) }}</td>
+                                    <td class="align-middle">{{ log.operation }}</td>
+                                    <td class="align-middle">{{ syncStatusText(log.status) }}</td>
+                                    <td class="align-middle">{{ log.message }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -416,49 +421,49 @@
             </ng-container>
 
             <ng-container *ngIf="activeTab === 'orders'">
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Incoming Aggregator Orders' | localize }}</div>
-                        <div class="card-toolbar restaurant-actionbar">
-                            <input class="form-control w-150px" type="date" [(ngModel)]="filter.fromDate" />
-                            <input class="form-control w-150px" type="date" [(ngModel)]="filter.toDate" />
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Incoming Aggregator Orders' | localize }}</div>
+                        <div class="card-toolbar restaurant-actionbar gap-2 align-items-center d-flex flex-wrap min-w-0">
+                            <input class="form-control w-100 w-sm-150px" type="date" [(ngModel)]="filter.fromDate" />
+                            <input class="form-control w-100 w-sm-150px" type="date" [(ngModel)]="filter.toDate" />
                             <button class="btn btn-sm btn-light-primary" [buttonBusy]="loading" (click)="refresh()">
                                 <i class="fa fa-filter"></i>
                             </button>
                         </div>
                     </div>
-                    <div class="card-body p-0 restaurant-table-wrap">
-                        <table class="restaurant-table" *ngIf="orders.length; else noOrders">
-                            <thead>
+                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="orders.length; else noOrders">
+                            <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
                                 <tr>
-                                    <th>{{ 'Received' | localize }}</th>
-                                    <th>{{ 'Provider' | localize }}</th>
-                                    <th>{{ 'External Order' | localize }}</th>
-                                    <th>{{ 'Customer' | localize }}</th>
-                                    <th class="text-end">{{ 'Expected' | localize }}</th>
-                                    <th>{{ 'Status' | localize }}</th>
-                                    <th>{{ 'Accept As' | localize }}</th>
-                                    <th class="text-end"></th>
+                                    <th class="align-middle text-uppercase">{{ 'Received' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Provider' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'External Order' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Customer' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase">{{ 'Expected' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Status' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Accept As' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let order of orders">
-                                    <td>{{ order.receivedAt | date: 'yyyy-MM-dd HH:mm' }}</td>
-                                    <td>{{ providerText(order.provider) }}</td>
-                                    <td class="fw-bold">{{ order.externalOrderId }}</td>
-                                    <td>
+                                    <td class="align-middle">{{ order.receivedAt | date: 'yyyy-MM-dd HH:mm' }}</td>
+                                    <td class="align-middle">{{ providerText(order.provider) }}</td>
+                                    <td class="fw-bold align-middle">{{ order.externalOrderId }}</td>
+                                    <td class="align-middle">
                                         <div>{{ order.customerName || '-' }}</div>
-                                        <div class="restaurant-muted">{{ order.customerPhoneNo || '-' }}</div>
+                                        <div class="restaurant-muted text-gray-600">{{ order.customerPhoneNo || '-' }}</div>
                                     </td>
-                                    <td class="text-end">{{ order.expectedAmount | number: '1.2-2' }}</td>
-                                    <td>
-                                        <span class="restaurant-status" [ngClass]="statusClass(order.status)">
+                                    <td class="text-end align-middle">{{ order.expectedAmount | number: '1.2-2' }}</td>
+                                    <td class="align-middle">
+                                        <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap" [ngClass]="statusClass(order.status)">
                                             {{ orderStatusText(order.status) }}
                                         </span>
-                                        <div class="restaurant-muted" *ngIf="order.orderNo">{{ order.orderNo }}</div>
+                                        <div class="restaurant-muted text-gray-600" *ngIf="order.orderNo">{{ order.orderNo }}</div>
                                     </td>
-                                    <td>
-                                        <div class="restaurant-actionbar">
+                                    <td class="align-middle">
+                                        <div class="restaurant-actionbar gap-2 align-items-center d-flex flex-wrap min-w-0">
                                             <ng-select
                                                 class="w-225px"
                                                 [items]="menuItems"
@@ -474,9 +479,9 @@
                                             />
                                         </div>
                                     </td>
-                                    <td class="text-end">
+                                    <td class="text-end align-middle">
                                         <button
-                                            class="btn btn-xs btn-light-success me-1"
+                                            class="btn btn-xs btn-light-success me-1 align-items-center d-inline-flex fs-9 justify-content-center"
                                             [disabled]="order.status !== 0"
                                             [buttonBusy]="saving"
                                             (click)="acceptOrder(order)"
@@ -484,14 +489,14 @@
                                             <i class="fa fa-check"></i>
                                         </button>
                                         <button
-                                            class="btn btn-xs btn-light-warning me-1"
+                                            class="btn btn-xs btn-light-warning me-1 align-items-center d-inline-flex fs-9 justify-content-center"
                                             [disabled]="order.status !== 0"
                                             (click)="updateOrder(order, 2)"
                                         >
                                             <i class="fa fa-ban"></i>
                                         </button>
                                         <button
-                                            class="btn btn-xs btn-light-danger"
+                                            class="btn btn-xs btn-light-danger align-items-center d-inline-flex fs-9 justify-content-center"
                                             [disabled]="order.status === 3"
                                             (click)="updateOrder(order, 3)"
                                         >
@@ -502,18 +507,18 @@
                             </tbody>
                         </table>
                         <ng-template #noOrders>
-                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                            <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'NoData' | localize }}</div>
                         </ng-template>
                     </div>
                 </div>
             </ng-container>
 
             <ng-container *ngIf="activeTab === 'payouts'">
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Import Payout' | localize }}</div>
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Import Payout' | localize }}</div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-2">
                         <div class="row">
                             <div class="col-md-2 mb-3">
                                 <label class="form-label">{{ 'Provider' | localize }}</label>
@@ -541,35 +546,35 @@
                             </div>
                         </div>
 
-                        <div class="restaurant-table-wrap">
-                            <table class="restaurant-table">
-                                <thead>
+                        <div class="restaurant-table-wrap overflow-x-auto">
+                            <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100">
+                                <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
                                     <tr>
-                                        <th>{{ 'External Order' | localize }}</th>
-                                        <th>{{ 'Expected' | localize }}</th>
-                                        <th>{{ 'Commission' | localize }}</th>
-                                        <th>{{ 'Discount' | localize }}</th>
-                                        <th>{{ 'Delivery Fee' | localize }}</th>
-                                        <th>{{ 'Paid' | localize }}</th>
-                                        <th></th>
+                                        <th class="align-middle text-uppercase">{{ 'External Order' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Expected' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Commission' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Discount' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Delivery Fee' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Paid' | localize }}</th>
+                                        <th class="align-middle text-uppercase"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr *ngFor="let line of payoutForm.lines; let i = index">
-                                        <td><input class="form-control" [(ngModel)]="line.externalOrderId" /></td>
-                                        <td><input class="form-control" type="number" [(ngModel)]="line.expectedAmount" /></td>
-                                        <td><input class="form-control" type="number" [(ngModel)]="line.commissionAmount" /></td>
-                                        <td>
+                                        <td class="align-middle"><input class="form-control" [(ngModel)]="line.externalOrderId" /></td>
+                                        <td class="align-middle"><input class="form-control" type="number" [(ngModel)]="line.expectedAmount" /></td>
+                                        <td class="align-middle"><input class="form-control" type="number" [(ngModel)]="line.commissionAmount" /></td>
+                                        <td class="align-middle">
                                             <input
                                                 class="form-control"
                                                 type="number"
                                                 [(ngModel)]="line.restaurantDiscountAmount"
                                             />
                                         </td>
-                                        <td><input class="form-control" type="number" [(ngModel)]="line.deliveryFeeAmount" /></td>
-                                        <td><input class="form-control" type="number" [(ngModel)]="line.paidAmount" /></td>
-                                        <td class="text-end">
-                                            <button class="btn btn-xs btn-light-danger" (click)="removePayoutLine(i)">
+                                        <td class="align-middle"><input class="form-control" type="number" [(ngModel)]="line.deliveryFeeAmount" /></td>
+                                        <td class="align-middle"><input class="form-control" type="number" [(ngModel)]="line.paidAmount" /></td>
+                                        <td class="text-end align-middle">
+                                            <button class="btn btn-xs btn-light-danger align-items-center d-inline-flex fs-9 justify-content-center" (click)="removePayoutLine(i)">
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </td>
@@ -577,7 +582,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="restaurant-actionbar restaurant-actionbar-end mt-4">
+                        <div class="restaurant-actionbar gap-2 restaurant-actionbar-end mt-4 align-items-center d-flex flex-wrap justify-content-start justify-content-sm-end min-w-0">
                             <button class="btn btn-sm btn-light-primary" (click)="addPayoutLine()">
                                 <i class="fa fa-plus"></i>
                                 {{ 'Add Line' | localize }}
@@ -590,49 +595,49 @@
                     </div>
                 </div>
 
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Payout Reconciliation' | localize }}</div>
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Payout Reconciliation' | localize }}</div>
                     </div>
-                    <div class="card-body p-0 restaurant-table-wrap">
-                        <table class="restaurant-table" *ngIf="payouts.length; else noPayouts">
-                            <thead>
+                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="payouts.length; else noPayouts">
+                            <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
                                 <tr>
-                                    <th>{{ 'Payout' | localize }}</th>
-                                    <th>{{ 'Period' | localize }}</th>
-                                    <th class="text-end">{{ 'Gross' | localize }}</th>
-                                    <th class="text-end">{{ 'Commission' | localize }}</th>
-                                    <th class="text-end">{{ 'Net Paid' | localize }}</th>
-                                    <th>{{ 'Lines' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Payout' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Period' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase">{{ 'Gross' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase">{{ 'Commission' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase">{{ 'Net Paid' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Lines' | localize }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let payout of payouts">
-                                    <td>
+                                    <td class="align-middle">
                                         <div class="fw-bold">{{ payout.externalPayoutId }}</div>
-                                        <div class="restaurant-muted">{{ providerText(payout.provider) }}</div>
+                                        <div class="restaurant-muted text-gray-600">{{ providerText(payout.provider) }}</div>
                                     </td>
-                                    <td>
+                                    <td class="align-middle">
                                         {{ payout.periodFrom | date: 'yyyy-MM-dd' }} -
                                         {{ payout.periodTo | date: 'yyyy-MM-dd' }}
                                     </td>
-                                    <td class="text-end">{{ payout.grossAmount | number: '1.2-2' }}</td>
-                                    <td class="text-end">{{ payout.commissionAmount | number: '1.2-2' }}</td>
-                                    <td class="text-end fw-bold">{{ payout.netPaidAmount | number: '1.2-2' }}</td>
-                                    <td>
+                                    <td class="text-end align-middle">{{ payout.grossAmount | number: '1.2-2' }}</td>
+                                    <td class="text-end align-middle">{{ payout.commissionAmount | number: '1.2-2' }}</td>
+                                    <td class="text-end fw-bold align-middle">{{ payout.netPaidAmount | number: '1.2-2' }}</td>
+                                    <td class="align-middle">
                                         <div class="mb-1" *ngFor="let line of payout.lines || []">
                                             <span class="fw-bold">{{ line.externalOrderId }}</span>
-                                            <span class="restaurant-status ms-2" [ngClass]="statusClass(line.matchStatus)">
+                                            <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 ms-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap" [ngClass]="statusClass(line.matchStatus)">
                                                 {{ payoutStatusText(line.matchStatus) }}
                                             </span>
-                                            <span class="restaurant-muted ms-2">{{ line.matchMessage }}</span>
+                                            <span class="restaurant-muted text-gray-600 ms-2">{{ line.matchMessage }}</span>
                                         </div>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                         <ng-template #noPayouts>
-                            <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                            <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'NoData' | localize }}</div>
                         </ng-template>
                     </div>
                 </div>

@@ -28,30 +28,9 @@ import { SelectModule } from '@shared/ui-compat';
 import { FileUploadModule } from 'ng2-file-upload';
 import { FileUploadModule as AppFileUploadModule } from '@shared/ui-compat';
 
-import {
-    AllEnterpriseModule,
-    ClientSideRowModelModule,
-    ColumnsToolPanelModule,
-    FiltersToolPanelModule,
-    LicenseManager,
-    ModuleRegistry,
-    SetFilterModule,
-    ValidationModule,
-} from 'ag-grid-enterprise';
-import { AgGridModule } from 'ag-grid-angular';
+import { AgGridFeatureModule } from '@app/shared/common/ag-grid/ag-grid-feature.module';
 import { PaginationComponent } from './pagination.component';
 import { ActionCellRendererComponent } from './action-cell-renderer.component';
-ModuleRegistry.registerModules([
-    AllEnterpriseModule,
-    ClientSideRowModelModule,
-    ColumnsToolPanelModule,
-    FiltersToolPanelModule,
-    SetFilterModule,
-    ValidationModule,
-]);
-LicenseManager.setLicenseKey(
-    atob('RG93bmxvYWREZXZUb29sc19DT01fTkRFd01qTTBOVGd3TURBd01BPT01OTE1OGI1MjI1NDAwODc5YTEyYTk2NjM0NTQ0ZjViNg=='),
-);
 @NgModule({
     imports: [
         AppSharedModule,
@@ -76,7 +55,7 @@ LicenseManager.setLicenseKey(
         SelectModule,
         FileUploadModule,
         AppFileUploadModule,
-        AgGridModule,
+        AgGridFeatureModule,
         RoleComboComponent,
         PermissionTreeComponent,
         PermissionTreeModalComponent,
@@ -119,7 +98,7 @@ LicenseManager.setLicenseKey(
         CommonModule,
         FileUploadModule,
         AppFileUploadModule,
-        AgGridModule,
+        AgGridFeatureModule,
     ],
 })
 export class AdminSharedModule {}

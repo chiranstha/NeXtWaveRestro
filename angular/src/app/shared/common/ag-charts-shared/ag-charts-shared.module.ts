@@ -1,27 +1,35 @@
 import { NgModule, Injectable } from '@angular/core';
-import { AgChartsModule } from 'ag-charts-angular';
-import { LicenseManager, ModuleRegistry, AllEnterpriseModule } from 'ag-charts-enterprise';
+import { AgCharts, AgGauge } from 'ag-charts-angular';
+import { AllEnterpriseModule, LicenseManager, ModuleRegistry } from 'ag-charts-enterprise';
+import { AppConsts } from '@shared/AppConsts';
+
 @Injectable({
-    providedIn: 'root',
+    providedIn: 'root'
 })
 export class AgChartsConfigService {
     private static initialized = false;
+
     static initializeOnce(): void {
         if (!this.initialized) {
-            LicenseManager.setLicenseKey(
-                atob(
-                    'RG93bmxvYWREZXZUb29sc0NPTVtGVUxMXVtCT1RIXVt2MzNdX05ERXdNak0xT0RRd01EQXdNQT09NGVhNDRkMTY3OGJmZDM4ZDA2MmZmYTRkZDY0YWJiODc=',
-                ),
-            );
+            // The Enterprise bundle includes Community modules, so existing Community charts
+            // continue to work while Enterprise-only dashboard features are enabled once.
+            // Enterprise Bundle keys are valid for both AG Grid and AG Charts.
+            // A dedicated chart key, when supplied by deployment configuration, takes precedence.
+            const licenseKey = AppConsts.agChartsLicenseKey?.trim() || globalThis.atob(AppConsts.agLicenseKey);
+            if (licenseKey) {
+                LicenseManager.setLicenseKey(licenseKey);
+            }
+
             ModuleRegistry.registerModules(AllEnterpriseModule);
             this.initialized = true;
         }
     }
 }
+
 @NgModule({
-    imports: [AgChartsModule],
-    exports: [AgChartsModule],
-    providers: [AgChartsConfigService],
+    imports: [AgCharts, AgGauge],
+    exports: [AgCharts, AgGauge],
+    providers: [AgChartsConfigService]
 })
 export class AgChartsSharedModule {
     constructor() {

@@ -1,8 +1,9 @@
 <div [@routerTransition]>
+    <restaurant-styles></restaurant-styles>
     <sub-header [title]="'Restaurant Inventory' | localize">
-        <div role="actions">
+        <div class="d-flex flex-wrap gap-2" role="actions">
             <button
-                class="btn btn-sm btn-light-primary me-2"
+                class="btn btn-sm btn-light-primary"
                 [buttonBusy]="loading"
                 (click)="refresh()"
                 tooltip="{{ 'Refresh' | localize }}"
@@ -17,158 +18,162 @@
     </sub-header>
 
     <div [class]="containerClass">
-        <div class="restaurant-page">
-            <div class="restaurant-nav">
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/pos" routerLinkActive="active">
+        <div class="restaurant-page overflow-x-hidden gap-5 mw-100 d-grid min-w-0">
+            <div class="restaurant-nav align-items-center bg-white border border-gray-300 d-flex gap-2 overflow-x-auto p-2 rounded-3">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/pos" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-cash-register"></i>
                     {{ 'POS' | localize }}
                 </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/setup" routerLinkActive="active">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/setup" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-sliders"></i>
                     {{ 'Setup' | localize }}
                 </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/menu" routerLinkActive="active">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/menu" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-utensils"></i>
                     {{ 'Menu' | localize }}
                 </a>
-                <a class="restaurant-nav-link active" routerLink="/app/main/restaurant/inventory">
+                <a class="restaurant-nav-link active bg-hover-light bg-light-primary flex-shrink-0 text-gray-600 text-hover-dark text-primary align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/inventory">
                     <i class="fa fa-boxes-stacked"></i>
                     {{ 'Inventory' | localize }}
                 </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/channels" routerLinkActive="active">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/channels" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-store"></i>
                     {{ 'Channels' | localize }}
                 </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/kds" routerLinkActive="active">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/kds" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-tv"></i>
                     {{ 'KDS' | localize }}
                 </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/reports" routerLinkActive="active">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/reports" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-chart-line"></i>
                     {{ 'Reports' | localize }}
                 </a>
+                <a *ngIf="isGranted('Pages.Restaurant.Payroll')" class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/payroll" routerLinkActive="active bg-light-primary text-primary">
+                    <i class="fa fa-money-check-dollar"></i>
+                    {{ 'Payroll' | localize }}
+                </a>
             </div>
 
-            <div class="restaurant-section-tabs">
-                <button class="nav-link" [class.active]="activeTab === 'reorder'" (click)="setTab('reorder')">
+            <div class="restaurant-section-tabs align-items-center bg-white border border-gray-300 d-flex flex-nowrap flex-md-wrap gap-2 overflow-x-auto p-2 rounded-3">
+                <button class="nav-link bg-hover-light border-0 fw-bolder min-h-35px px-3 py-2 rounded-2 text-gray-600 text-hover-dark" [class.active]="activeTab === 'reorder'" [class.bg-light-primary]="activeTab === 'reorder'" [class.text-primary]="activeTab === 'reorder'" (click)="setTab('reorder')">
                     <i class="fa fa-arrow-trend-down me-1"></i>
                     {{ 'Low Stock' | localize }}
                 </button>
-                <button class="nav-link" [class.active]="activeTab === 'consumption'" (click)="setTab('consumption')">
+                <button class="nav-link bg-hover-light border-0 fw-bolder min-h-35px px-3 py-2 rounded-2 text-gray-600 text-hover-dark" [class.active]="activeTab === 'consumption'" [class.bg-light-primary]="activeTab === 'consumption'" [class.text-primary]="activeTab === 'consumption'" (click)="setTab('consumption')">
                     <i class="fa fa-fire-burner me-1"></i>
                     {{ 'Consumption' | localize }}
                 </button>
-                <button class="nav-link" [class.active]="activeTab === 'coverage'" (click)="setTab('coverage')">
+                <button class="nav-link bg-hover-light border-0 fw-bolder min-h-35px px-3 py-2 rounded-2 text-gray-600 text-hover-dark" [class.active]="activeTab === 'coverage'" [class.bg-light-primary]="activeTab === 'coverage'" [class.text-primary]="activeTab === 'coverage'" (click)="setTab('coverage')">
                     <i class="fa fa-list-check me-1"></i>
                     {{ 'Recipe Coverage' | localize }}
                 </button>
-                <button class="nav-link" [class.active]="activeTab === 'mapping'" (click)="setTab('mapping')">
+                <button class="nav-link bg-hover-light border-0 fw-bolder min-h-35px px-3 py-2 rounded-2 text-gray-600 text-hover-dark" [class.active]="activeTab === 'mapping'" [class.bg-light-primary]="activeTab === 'mapping'" [class.text-primary]="activeTab === 'mapping'" (click)="setTab('mapping')">
                     <i class="fa fa-link me-1"></i>
                     {{ 'Supplier Mapping' | localize }}
                 </button>
-                <button class="nav-link" [class.active]="activeTab === 'adjustment'" (click)="setTab('adjustment')">
+                <button class="nav-link bg-hover-light border-0 fw-bolder min-h-35px px-3 py-2 rounded-2 text-gray-600 text-hover-dark" [class.active]="activeTab === 'adjustment'" [class.bg-light-primary]="activeTab === 'adjustment'" [class.text-primary]="activeTab === 'adjustment'" (click)="setTab('adjustment')">
                     <i class="fa fa-scale-balanced me-1"></i>
                     {{ 'Adjustment' | localize }}
                 </button>
-                <button class="nav-link" [class.active]="activeTab === 'wastage'" (click)="setTab('wastage')">
+                <button class="nav-link bg-hover-light border-0 fw-bolder min-h-35px px-3 py-2 rounded-2 text-gray-600 text-hover-dark" [class.active]="activeTab === 'wastage'" [class.bg-light-primary]="activeTab === 'wastage'" [class.text-primary]="activeTab === 'wastage'" (click)="setTab('wastage')">
                     <i class="fa fa-trash-can me-1"></i>
                     {{ 'Wastage' | localize }}
                 </button>
             </div>
 
-            <div class="restaurant-metric-row">
-                <div class="restaurant-metric">
-                    <span class="restaurant-metric-label">{{ 'Low Stock' | localize }}</span>
-                    <span class="restaurant-metric-value">{{ lowStock.length }}</span>
+            <div class="restaurant-metric-row d-grid gap-4">
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-3 px-sm-5 py-4 rounded-3">
+                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Low Stock' | localize }}</span>
+                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ lowStock.length }}</span>
                 </div>
-                <div class="restaurant-metric">
-                    <span class="restaurant-metric-label">{{ 'Mapping Missing' | localize }}</span>
-                    <span class="restaurant-metric-value">{{ missingMappingCount }}</span>
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-3 px-sm-5 py-4 rounded-3">
+                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Mapping Missing' | localize }}</span>
+                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ missingMappingCount }}</span>
                 </div>
-                <div class="restaurant-metric">
-                    <span class="restaurant-metric-label">{{ 'Suppliers' | localize }}</span>
-                    <span class="restaurant-metric-value">{{ mappings.length }}</span>
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-3 px-sm-5 py-4 rounded-3">
+                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Suppliers' | localize }}</span>
+                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ mappings.length }}</span>
                 </div>
-                <div class="restaurant-metric">
-                    <span class="restaurant-metric-label">{{ 'Consumption' | localize }}</span>
-                    <span class="restaurant-metric-value">{{ consumptionAmount | number: '1.0-0' }}</span>
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-3 px-sm-5 py-4 rounded-3">
+                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Consumption' | localize }}</span>
+                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ consumptionAmount | number: '1.0-0' }}</span>
                 </div>
-                <div class="restaurant-metric">
-                    <span class="restaurant-metric-label">{{ 'Missing Recipes' | localize }}</span>
-                    <span class="restaurant-metric-value">{{ missingRecipeCount }}</span>
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-3 px-sm-5 py-4 rounded-3">
+                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Missing Recipes' | localize }}</span>
+                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ missingRecipeCount }}</span>
                 </div>
-                <div class="restaurant-metric">
-                    <span class="restaurant-metric-label">{{ 'Adjustments' | localize }}</span>
-                    <span class="restaurant-metric-value">{{ adjustments.length }}</span>
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-3 px-sm-5 py-4 rounded-3">
+                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Adjustments' | localize }}</span>
+                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ adjustments.length }}</span>
                 </div>
             </div>
 
             <ng-container *ngIf="activeTab === 'reorder'">
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Low Stock and Reorder' | localize }}</div>
-                        <div class="card-toolbar">
-                            <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="generateDraftOrders()">
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-stretch align-items-sm-center d-flex flex-column flex-sm-row justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Low Stock and Reorder' | localize }}</div>
+                        <div class="card-toolbar w-100 w-sm-auto">
+                            <button class="btn btn-sm btn-primary w-100 w-sm-auto" [buttonBusy]="saving" (click)="generateDraftOrders()">
                                 <i class="fa fa-cart-plus"></i>
                                 {{ 'Create Draft PO' | localize }}
                             </button>
                         </div>
                     </div>
-                    <div class="card-body p-0 restaurant-table-wrap">
-                        <table class="restaurant-table" *ngIf="lowStock.length; else noLowStock">
-                            <thead>
+                    <div class="card-body p-0 restaurant-table-wrap table-responsive">
+                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="lowStock.length; else noLowStock">
+                            <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
                                 <tr>
-                                    <th>{{ 'Raw Material' | localize }}</th>
-                                    <th>{{ 'Available' | localize }}</th>
-                                    <th>{{ 'Min / Max' | localize }}</th>
-                                    <th>{{ 'Pending PO' | localize }}</th>
-                                    <th>{{ 'Supplier' | localize }}</th>
-                                    <th class="text-end">{{ 'Suggested Qty' | localize }}</th>
-                                    <th class="text-end">{{ 'Amount' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Raw Material' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Available' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Min / Max' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Pending PO' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Supplier' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase">{{ 'Suggested Qty' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase">{{ 'Amount' | localize }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let item of lowStock">
-                                    <td>
+                                    <td class="align-middle">
                                         <div class="fw-bold">{{ item.productName }}</div>
                                         <span
-                                            class="restaurant-status restaurant-status-danger"
+                                            class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-danger text-danger align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
                                             *ngIf="item.missingSupplierMapping"
                                         >
                                             {{ 'Mapping Missing' | localize }}
                                         </span>
                                     </td>
-                                    <td>{{ item.availableQty | number: '1.2-3' }} {{ item.unitName }}</td>
-                                    <td>
+                                    <td class="align-middle">{{ item.availableQty | number: '1.2-3' }} {{ item.unitName }}</td>
+                                    <td class="align-middle">
                                         {{ item.minimumStock | number: '1.2-3' }} /
                                         {{ item.maximumStock | number: '1.2-3' }}
                                     </td>
-                                    <td>{{ item.pendingPurchaseQty | number: '1.2-3' }}</td>
-                                    <td>
+                                    <td class="align-middle">{{ item.pendingPurchaseQty | number: '1.2-3' }}</td>
+                                    <td class="align-middle">
                                         <div class="fw-bold">{{ item.supplierName || '-' }}</div>
-                                        <div class="restaurant-muted">{{ item.supplierSku || '-' }}</div>
+                                        <div class="restaurant-muted text-gray-600">{{ item.supplierSku || '-' }}</div>
                                     </td>
-                                    <td class="text-end fw-bold">{{ item.suggestedQty | number: '1.2-3' }}</td>
-                                    <td class="text-end">{{ item.amount | number: '1.2-2' }}</td>
+                                    <td class="text-end fw-bold align-middle">{{ item.suggestedQty | number: '1.2-3' }}</td>
+                                    <td class="text-end align-middle">{{ item.amount | number: '1.2-2' }}</td>
                                 </tr>
                             </tbody>
                         </table>
                         <ng-template #noLowStock>
-                            <div class="restaurant-empty m-5">{{ 'No low-stock raw materials' | localize }}</div>
+                            <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'No low-stock raw materials' | localize }}</div>
                         </ng-template>
                     </div>
                 </div>
             </ng-container>
 
             <ng-container *ngIf="activeTab === 'consumption'">
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Raw Item Consumption' | localize }}</div>
-                        <div class="card-toolbar restaurant-actionbar">
-                            <input class="form-control w-150px" type="date" [(ngModel)]="consumptionFilter.FromDate" />
-                            <input class="form-control w-150px" type="date" [(ngModel)]="consumptionFilter.ToDate" />
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-stretch align-items-sm-center d-flex flex-column flex-sm-row justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Raw Item Consumption' | localize }}</div>
+                        <div class="card-toolbar restaurant-actionbar gap-2 align-items-center d-flex flex-wrap min-w-0 w-100 w-sm-auto">
+                            <input class="form-control w-100 w-sm-150px" type="date" [(ngModel)]="consumptionFilter.FromDate" />
+                            <input class="form-control w-100 w-sm-150px" type="date" [(ngModel)]="consumptionFilter.ToDate" />
                             <ng-select
-                                class="w-250px"
+                                class="w-100 w-md-250px"
                                 [items]="rawMaterials"
                                 bindLabel="displayName"
                                 bindValue="id"
@@ -177,111 +182,116 @@
                                 appendTo="body"
                                 [placeholder]="'Raw Material' | localize"
                             ></ng-select>
-                            <button class="btn btn-sm btn-light-primary" [buttonBusy]="loading" (click)="refresh()">
+                            <button class="btn btn-sm btn-light-primary w-100 w-sm-auto" [buttonBusy]="loading" (click)="refresh()">
                                 <i class="fa fa-rotate"></i>
                                 {{ 'Refresh' | localize }}
                             </button>
                         </div>
                     </div>
-                    <div class="card-body p-0 restaurant-table-wrap">
-                        <table class="restaurant-table" *ngIf="consumptionLedger.length; else noConsumptionLedger">
-                            <thead>
+                    <div class="card-body p-0 restaurant-table-wrap table-responsive">
+                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="consumptionLedger.length; else noConsumptionLedger">
+                            <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
                                 <tr>
-                                    <th>{{ 'Date' | localize }}</th>
-                                    <th>{{ 'Bill' | localize }}</th>
-                                    <th>{{ 'Order' | localize }}</th>
-                                    <th>{{ 'Menu Item' | localize }}</th>
-                                    <th>{{ 'Raw Material' | localize }}</th>
-                                    <th class="text-end">{{ 'Qty' | localize }}</th>
-                                    <th class="text-end">{{ 'Rate' | localize }}</th>
-                                    <th class="text-end">{{ 'Amount' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Date' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Bill' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Order' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Menu Item' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Raw Material' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase">{{ 'Qty' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase">{{ 'Rate' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase">{{ 'Amount' | localize }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let row of consumptionLedger">
-                                    <td>
+                                    <td class="align-middle">
                                         <div>{{ row.date | date: 'yyyy-MM-dd' }}</div>
-                                        <div class="restaurant-muted">{{ row.dateMiti }}</div>
+                                        <div class="restaurant-muted text-gray-600">{{ row.dateMiti }}</div>
                                     </td>
-                                    <td>
-                                        <div class="fw-bold">{{ row.voucherNo }}</div>
-                                        <div class="restaurant-muted">{{ row.salesMasterId }}</div>
+                                    <td class="align-middle">
+                                        <div class="fw-bold text-nowrap">{{ row.salesVoucherNo || row.voucherNo || '-' }}</div>
+                                        <div
+                                            class="restaurant-muted text-gray-600 text-nowrap"
+                                            *ngIf="row.salesVoucherNo && row.voucherNo"
+                                        >
+                                            {{ 'Consumption' | localize }}: {{ row.voucherNo || '-' }}
+                                        </div>
                                     </td>
-                                    <td class="fw-bold">{{ row.orderNo }}</td>
-                                    <td>
+                                    <td class="fw-bold align-middle">{{ row.orderNo }}</td>
+                                    <td class="align-middle">
                                         <div class="fw-bold">{{ row.menuItemName || row.menuProductName }}</div>
-                                        <div class="restaurant-muted">{{ row.menuProductName }}</div>
+                                        <div class="restaurant-muted text-gray-600">{{ row.menuProductName }}</div>
                                     </td>
-                                    <td class="fw-bold">{{ row.rawMaterialName }}</td>
-                                    <td class="text-end">{{ row.qty | number: '1.2-3' }} {{ row.unitName }}</td>
-                                    <td class="text-end">{{ row.rate | number: '1.2-2' }}</td>
-                                    <td class="text-end fw-bold">{{ row.amount | number: '1.2-2' }}</td>
+                                    <td class="fw-bold align-middle">{{ row.rawMaterialName }}</td>
+                                    <td class="text-end align-middle">{{ row.qty | number: '1.2-3' }} {{ row.unitName }}</td>
+                                    <td class="text-end align-middle">{{ row.rate | number: '1.2-2' }}</td>
+                                    <td class="text-end fw-bold align-middle">{{ row.amount | number: '1.2-2' }}</td>
                                 </tr>
                             </tbody>
                         </table>
                         <ng-template #noConsumptionLedger>
-                            <div class="restaurant-empty m-5">{{ 'No raw item consumption found' | localize }}</div>
+                            <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'No raw item consumption found' | localize }}</div>
                         </ng-template>
                     </div>
                 </div>
             </ng-container>
 
             <ng-container *ngIf="activeTab === 'coverage'">
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Recipe Coverage' | localize }}</div>
-                        <div class="card-toolbar">
-                            <button class="btn btn-sm btn-light-primary" [buttonBusy]="loading" (click)="refresh()">
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-stretch align-items-sm-center d-flex flex-column flex-sm-row justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Recipe Coverage' | localize }}</div>
+                        <div class="card-toolbar w-100 w-sm-auto">
+                            <button class="btn btn-sm btn-light-primary w-100 w-sm-auto" [buttonBusy]="loading" (click)="refresh()">
                                 <i class="fa fa-rotate"></i>
                                 {{ 'Refresh' | localize }}
                             </button>
                         </div>
                     </div>
-                    <div class="card-body p-0 restaurant-table-wrap">
-                        <table class="restaurant-table" *ngIf="recipeCoverage.length; else noRecipeCoverage">
-                            <thead>
+                    <div class="card-body p-0 restaurant-table-wrap table-responsive">
+                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="recipeCoverage.length; else noRecipeCoverage">
+                            <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
                                 <tr>
-                                    <th>{{ 'Menu Item' | localize }}</th>
-                                    <th>{{ 'Category' | localize }}</th>
-                                    <th>{{ 'Recipe' | localize }}</th>
-                                    <th class="text-end">{{ 'Lines' | localize }}</th>
-                                    <th class="text-end">{{ 'Recipe Cost' | localize }}</th>
-                                    <th class="text-end">{{ 'Menu Price' | localize }}</th>
-                                    <th class="text-end">{{ 'Food Cost %' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Menu Item' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Category' | localize }}</th>
+                                    <th class="align-middle text-uppercase">{{ 'Recipe' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase">{{ 'Lines' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase">{{ 'Recipe Cost' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase">{{ 'Menu Price' | localize }}</th>
+                                    <th class="text-end align-middle text-uppercase">{{ 'Food Cost %' | localize }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let row of recipeCoverage">
-                                    <td>
+                                    <td class="align-middle">
                                         <div class="fw-bold">{{ row.productName }}</div>
-                                        <span class="restaurant-status restaurant-status-danger" *ngIf="row.missingRawMaterialSetup">
+                                        <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-danger text-danger align-items-center d-inline-flex lh-1 mw-100 text-nowrap" *ngIf="row.missingRawMaterialSetup">
                                             {{ 'Missing Recipe' | localize }}
                                         </span>
-                                        <span class="restaurant-status restaurant-status-success" *ngIf="!row.missingRawMaterialSetup">
+                                        <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-success text-success align-items-center d-inline-flex lh-1 mw-100 text-nowrap" *ngIf="!row.missingRawMaterialSetup">
                                             {{ 'Ready' | localize }}
                                         </span>
                                     </td>
-                                    <td>{{ row.categoryName || '-' }}</td>
-                                    <td>{{ row.hasRecipe ? ('BOM active' | localize) : ('No BOM' | localize) }}</td>
-                                    <td class="text-end">{{ row.activeRecipeLineCount }}</td>
-                                    <td class="text-end">{{ row.estimatedRecipeCost | number: '1.2-2' }}</td>
-                                    <td class="text-end">{{ row.menuPrice | number: '1.2-2' }}</td>
-                                    <td class="text-end fw-bold">{{ row.foodCostPercent | number: '1.2-2' }}%</td>
+                                    <td class="align-middle">{{ row.categoryName || '-' }}</td>
+                                    <td class="align-middle">{{ row.hasRecipe ? ('BOM active' | localize) : ('No BOM' | localize) }}</td>
+                                    <td class="text-end align-middle">{{ row.activeRecipeLineCount }}</td>
+                                    <td class="text-end align-middle">{{ row.estimatedRecipeCost | number: '1.2-2' }}</td>
+                                    <td class="text-end align-middle">{{ row.menuPrice | number: '1.2-2' }}</td>
+                                    <td class="text-end fw-bold align-middle">{{ row.foodCostPercent | number: '1.2-2' }}%</td>
                                 </tr>
                             </tbody>
                         </table>
                         <ng-template #noRecipeCoverage>
-                            <div class="restaurant-empty m-5">{{ 'No menu items found' | localize }}</div>
+                            <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'No menu items found' | localize }}</div>
                         </ng-template>
                     </div>
                 </div>
             </ng-container>
 
             <ng-container *ngIf="activeTab === 'mapping'">
-                <div class="restaurant-grid-2">
-                    <div class="card card-custom gutter-b restaurant-card">
-                        <div class="card-header">
-                            <div class="card-title">
+                <div class="restaurant-grid-2 d-grid gap-5">
+                    <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                        <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-stretch align-items-sm-center d-flex flex-column flex-sm-row justify-content-between">
+                            <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">
                                 {{
                                     mappingForm.id
                                         ? ('Edit Supplier Mapping' | localize)
@@ -289,9 +299,9 @@
                                 }}
                             </div>
                         </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
+                        <div class="card-body p-2">
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6">
                                     <label class="required form-label">{{ 'Raw Material' | localize }}</label>
                                     <ng-select
                                         [items]="rawMaterials"
@@ -301,7 +311,7 @@
                                         appendTo="body"
                                     ></ng-select>
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-12 col-md-6">
                                     <label class="required form-label">{{ 'Supplier' | localize }}</label>
                                     <ng-select
                                         [items]="suppliers"
@@ -311,7 +321,7 @@
                                         appendTo="body"
                                     ></ng-select>
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-12 col-md-6">
                                     <label class="required form-label">{{ 'Unit' | localize }}</label>
                                     <ng-select
                                         [items]="units"
@@ -321,24 +331,24 @@
                                         appendTo="body"
                                     ></ng-select>
                                 </div>
-                                <div class="col-md-6 mb-3">
+                                <div class="col-12 col-md-6">
                                     <label class="form-label">{{ 'Supplier SKU' | localize }}</label>
                                     <input class="form-control" [(ngModel)]="mappingForm.supplierSku" />
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-sm-4">
                                     <label class="form-label">{{ 'Rate' | localize }}</label>
                                     <input class="form-control" type="number" [(ngModel)]="mappingForm.rate" />
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-sm-4">
                                     <label class="form-label">{{ 'Lead Days' | localize }}</label>
                                     <input class="form-control" type="number" [(ngModel)]="mappingForm.leadTimeDays" />
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-12 col-sm-4">
                                     <label class="form-label">{{ 'MOQ' | localize }}</label>
                                     <input class="form-control" type="number" [(ngModel)]="mappingForm.minimumOrderQty" />
                                 </div>
                             </div>
-                            <div class="restaurant-actionbar">
+                            <div class="restaurant-actionbar gap-2 align-items-center d-flex flex-wrap min-w-0 mt-4">
                                 <label class="form-check form-check-sm">
                                     <input class="form-check-input" type="checkbox" [(ngModel)]="mappingForm.isPreferred" />
                                     <span class="form-check-label">{{ 'Preferred' | localize }}</span>
@@ -347,10 +357,10 @@
                                     <input class="form-check-input" type="checkbox" [(ngModel)]="mappingForm.isActive" />
                                     <span class="form-check-label">{{ 'Active' | localize }}</span>
                                 </label>
-                                <button class="btn btn-sm btn-light ms-auto" (click)="resetMappingForm()">
+                                <button class="btn btn-sm btn-light ms-sm-auto w-100 w-sm-auto" (click)="resetMappingForm()">
                                     {{ 'Clear' | localize }}
                                 </button>
-                                <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="saveMapping()">
+                                <button class="btn btn-sm btn-primary w-100 w-sm-auto" [buttonBusy]="saving" (click)="saveMapping()">
                                     <i class="fa fa-save"></i>
                                     {{ 'Save' | localize }}
                                 </button>
@@ -358,51 +368,51 @@
                         </div>
                     </div>
 
-                    <div class="card card-custom gutter-b restaurant-card">
-                        <div class="card-header">
-                            <div class="card-title">{{ 'Supplier Item Mappings' | localize }}</div>
+                    <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                        <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-stretch align-items-sm-center d-flex flex-column flex-sm-row justify-content-between">
+                            <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Supplier Item Mappings' | localize }}</div>
                         </div>
-                        <div class="card-body p-0 restaurant-table-wrap">
-                            <table class="restaurant-table" *ngIf="mappings.length; else noMappings">
-                                <thead>
+                        <div class="card-body p-0 restaurant-table-wrap table-responsive">
+                            <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="mappings.length; else noMappings">
+                                <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
                                     <tr>
-                                        <th>{{ 'Raw Material' | localize }}</th>
-                                        <th>{{ 'Supplier' | localize }}</th>
-                                        <th>{{ 'Unit' | localize }}</th>
-                                        <th class="text-end">{{ 'Rate' | localize }}</th>
-                                        <th>{{ 'Status' | localize }}</th>
-                                        <th></th>
+                                        <th class="align-middle text-uppercase">{{ 'Raw Material' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Supplier' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Unit' | localize }}</th>
+                                        <th class="text-end align-middle text-uppercase">{{ 'Rate' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Status' | localize }}</th>
+                                        <th class="align-middle text-uppercase"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr *ngFor="let mapping of mappings">
-                                        <td>
+                                        <td class="align-middle">
                                             <div class="fw-bold">{{ mapping.productName }}</div>
-                                            <div class="restaurant-muted">{{ mapping.supplierSku || '-' }}</div>
+                                            <div class="restaurant-muted text-gray-600">{{ mapping.supplierSku || '-' }}</div>
                                         </td>
-                                        <td>{{ mapping.supplierName }}</td>
-                                        <td>{{ mapping.unitName }}</td>
-                                        <td class="text-end">{{ mapping.rate | number: '1.2-2' }}</td>
-                                        <td>
+                                        <td class="align-middle">{{ mapping.supplierName }}</td>
+                                        <td class="align-middle">{{ mapping.unitName }}</td>
+                                        <td class="text-end align-middle">{{ mapping.rate | number: '1.2-2' }}</td>
+                                        <td class="align-middle">
                                             <span
-                                                class="restaurant-status restaurant-status-success me-1"
+                                                class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-success text-success me-1 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
                                                 *ngIf="mapping.isPreferred"
                                             >
                                                 {{ 'Preferred' | localize }}
                                             </span>
                                             <span
-                                                class="restaurant-status"
-                                                [class.restaurant-status-primary]="mapping.isActive"
-                                                [class.restaurant-status-neutral]="!mapping.isActive"
+                                                class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
+                                                [class.bg-light-primary]="mapping.isActive" [class.text-primary]="mapping.isActive"
+                                                [class.bg-light]="!mapping.isActive" [class.text-gray-600]="!mapping.isActive"
                                             >
                                                 {{ mapping.isActive ? ('Active' | localize) : ('Inactive' | localize) }}
                                             </span>
                                         </td>
-                                        <td class="text-end">
-                                            <button class="btn btn-xs btn-light-primary me-1" (click)="editMapping(mapping)">
+                                        <td class="text-end align-middle">
+                                            <button class="btn btn-xs btn-light-primary me-1 align-items-center d-inline-flex fs-9 justify-content-center" (click)="editMapping(mapping)">
                                                 <i class="fa fa-pencil"></i>
                                             </button>
-                                            <button class="btn btn-xs btn-light-danger" (click)="deleteMapping(mapping)">
+                                            <button class="btn btn-xs btn-light-danger align-items-center d-inline-flex fs-9 justify-content-center" (click)="deleteMapping(mapping)">
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </td>
@@ -410,7 +420,7 @@
                                 </tbody>
                             </table>
                             <ng-template #noMappings>
-                                <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                                <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'NoData' | localize }}</div>
                             </ng-template>
                         </div>
                     </div>
@@ -418,48 +428,48 @@
             </ng-container>
 
             <ng-container *ngIf="activeTab === 'adjustment'">
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Manual Stock Adjustment' | localize }}</div>
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-stretch align-items-sm-center d-flex flex-column flex-sm-row justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Manual Stock Adjustment' | localize }}</div>
                     </div>
-                    <div class="card-body">
-                        <div class="restaurant-filterbar mb-4">
-                            <div>
+                    <div class="card-body p-2 p-sm-4">
+                        <div class="restaurant-filterbar align-items-end d-flex flex-wrap gap-3 mb-4">
+                            <div class="w-100 w-sm-auto">
                                 <label class="form-label">{{ 'Type' | localize }}</label>
-                                <select class="form-select w-175px" [(ngModel)]="adjustmentForm.adjustmentType">
+                                <select class="form-select w-100 w-sm-175px" [(ngModel)]="adjustmentForm.adjustmentType">
                                     <option [ngValue]="0">{{ 'Increase' | localize }}</option>
                                     <option [ngValue]="1">{{ 'Decrease' | localize }}</option>
                                     <option [ngValue]="2">{{ 'Physical Count' | localize }}</option>
                                 </select>
                             </div>
-                            <div>
+                            <div class="w-100 w-sm-auto">
                                 <label class="form-label">{{ 'Date Miti' | localize }}</label>
-                                <input class="form-control w-175px" [(ngModel)]="adjustmentForm.dateMiti" />
+                                <input class="form-control w-100 w-sm-175px" [(ngModel)]="adjustmentForm.dateMiti" />
                             </div>
-                            <div>
+                            <div class="flex-grow-1 w-100 w-sm-auto">
                                 <label class="form-label">{{ 'Description' | localize }}</label>
-                                <input class="form-control w-300px" [(ngModel)]="adjustmentForm.description" />
+                                <input class="form-control w-100 w-sm-300px" [(ngModel)]="adjustmentForm.description" />
                             </div>
                         </div>
 
-                        <div class="restaurant-table-wrap">
-                            <table class="restaurant-table">
-                                <thead>
+                        <div class="restaurant-table-wrap table-responsive">
+                            <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100">
+                                <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
                                     <tr>
-                                        <th>{{ 'Raw Material' | localize }}</th>
-                                        <th>{{ 'Unit' | localize }}</th>
-                                        <th>{{ 'Qty' | localize }}</th>
-                                        <th *ngIf="adjustmentForm.adjustmentType === 2">
+                                        <th class="align-middle text-uppercase">{{ 'Raw Material' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Unit' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Qty' | localize }}</th>
+                                        <th *ngIf="adjustmentForm.adjustmentType === 2" class="align-middle text-uppercase">
                                             {{ 'Counted Qty' | localize }}
                                         </th>
-                                        <th>{{ 'Rate' | localize }}</th>
-                                        <th>{{ 'Reason' | localize }}</th>
-                                        <th></th>
+                                        <th class="align-middle text-uppercase">{{ 'Rate' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Reason' | localize }}</th>
+                                        <th class="align-middle text-uppercase"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr *ngFor="let line of adjustmentForm.lines; let i = index">
-                                        <td>
+                                        <td class="align-middle">
                                             <ng-select
                                                 [items]="rawMaterials"
                                                 bindLabel="displayName"
@@ -468,7 +478,7 @@
                                                 appendTo="body"
                                             ></ng-select>
                                         </td>
-                                        <td>
+                                        <td class="align-middle">
                                             <ng-select
                                                 [items]="units"
                                                 bindLabel="displayName"
@@ -477,24 +487,24 @@
                                                 appendTo="body"
                                             ></ng-select>
                                         </td>
-                                        <td>
+                                        <td class="align-middle">
                                             <input class="form-control w-100px" type="number" [(ngModel)]="line.qty" />
                                         </td>
-                                        <td *ngIf="adjustmentForm.adjustmentType === 2">
+                                        <td *ngIf="adjustmentForm.adjustmentType === 2" class="align-middle">
                                             <input
                                                 class="form-control w-125px"
                                                 type="number"
                                                 [(ngModel)]="line.countedQty"
                                             />
                                         </td>
-                                        <td>
+                                        <td class="align-middle">
                                             <input class="form-control w-100px" type="number" [(ngModel)]="line.rate" />
                                         </td>
-                                        <td>
+                                        <td class="align-middle">
                                             <input class="form-control" [(ngModel)]="line.reason" />
                                         </td>
-                                        <td class="text-end">
-                                            <button class="btn btn-xs btn-light-danger" (click)="removeAdjustmentLine(adjustmentForm, i)">
+                                        <td class="text-end align-middle">
+                                            <button class="btn btn-xs btn-light-danger align-items-center d-inline-flex fs-9 justify-content-center" (click)="removeAdjustmentLine(adjustmentForm, i)">
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </td>
@@ -503,12 +513,12 @@
                             </table>
                         </div>
 
-                        <div class="restaurant-actionbar restaurant-actionbar-end mt-4">
-                            <button class="btn btn-sm btn-light-primary" (click)="addAdjustmentLine(adjustmentForm)">
+                        <div class="restaurant-actionbar gap-2 restaurant-actionbar-end mt-4 align-items-center d-flex flex-wrap justify-content-start justify-content-sm-end min-w-0">
+                            <button class="btn btn-sm btn-light-primary w-100 w-sm-auto" (click)="addAdjustmentLine(adjustmentForm)">
                                 <i class="fa fa-plus"></i>
                                 {{ 'Add' | localize }}
                             </button>
-                            <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="saveAdjustment(adjustmentForm)">
+                            <button class="btn btn-sm btn-primary w-100 w-sm-auto" [buttonBusy]="saving" (click)="saveAdjustment(adjustmentForm)">
                                 <i class="fa fa-save"></i>
                                 {{ 'Post Adjustment' | localize }}
                             </button>
@@ -518,37 +528,37 @@
             </ng-container>
 
             <ng-container *ngIf="activeTab === 'wastage'">
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Wastage Entry' | localize }}</div>
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-stretch align-items-sm-center d-flex flex-column flex-sm-row justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Wastage Entry' | localize }}</div>
                     </div>
-                    <div class="card-body">
-                        <div class="restaurant-filterbar mb-4">
-                            <div>
+                    <div class="card-body p-2 p-sm-4">
+                        <div class="restaurant-filterbar align-items-end d-flex flex-wrap gap-3 mb-4">
+                            <div class="w-100 w-sm-auto">
                                 <label class="form-label">{{ 'Date Miti' | localize }}</label>
-                                <input class="form-control w-175px" [(ngModel)]="wastageForm.dateMiti" />
+                                <input class="form-control w-100 w-sm-175px" [(ngModel)]="wastageForm.dateMiti" />
                             </div>
-                            <div>
+                            <div class="flex-grow-1 w-100 w-sm-auto">
                                 <label class="form-label">{{ 'Description' | localize }}</label>
-                                <input class="form-control w-300px" [(ngModel)]="wastageForm.description" />
+                                <input class="form-control w-100 w-sm-300px" [(ngModel)]="wastageForm.description" />
                             </div>
                         </div>
 
-                        <div class="restaurant-table-wrap">
-                            <table class="restaurant-table">
-                                <thead>
+                        <div class="restaurant-table-wrap table-responsive">
+                            <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100">
+                                <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
                                     <tr>
-                                        <th>{{ 'Raw Material' | localize }}</th>
-                                        <th>{{ 'Unit' | localize }}</th>
-                                        <th>{{ 'Qty' | localize }}</th>
-                                        <th>{{ 'Rate' | localize }}</th>
-                                        <th>{{ 'Reason' | localize }}</th>
-                                        <th></th>
+                                        <th class="align-middle text-uppercase">{{ 'Raw Material' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Unit' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Qty' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Rate' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Reason' | localize }}</th>
+                                        <th class="align-middle text-uppercase"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr *ngFor="let line of wastageForm.lines; let i = index">
-                                        <td>
+                                        <td class="align-middle">
                                             <ng-select
                                                 [items]="rawMaterials"
                                                 bindLabel="displayName"
@@ -557,7 +567,7 @@
                                                 appendTo="body"
                                             ></ng-select>
                                         </td>
-                                        <td>
+                                        <td class="align-middle">
                                             <ng-select
                                                 [items]="units"
                                                 bindLabel="displayName"
@@ -566,17 +576,17 @@
                                                 appendTo="body"
                                             ></ng-select>
                                         </td>
-                                        <td>
+                                        <td class="align-middle">
                                             <input class="form-control w-100px" type="number" [(ngModel)]="line.qty" />
                                         </td>
-                                        <td>
+                                        <td class="align-middle">
                                             <input class="form-control w-100px" type="number" [(ngModel)]="line.rate" />
                                         </td>
-                                        <td>
+                                        <td class="align-middle">
                                             <input class="form-control" [(ngModel)]="line.reason" />
                                         </td>
-                                        <td class="text-end">
-                                            <button class="btn btn-xs btn-light-danger" (click)="removeAdjustmentLine(wastageForm, i)">
+                                        <td class="text-end align-middle">
+                                            <button class="btn btn-xs btn-light-danger align-items-center d-inline-flex fs-9 justify-content-center" (click)="removeAdjustmentLine(wastageForm, i)">
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </td>
@@ -585,12 +595,12 @@
                             </table>
                         </div>
 
-                        <div class="restaurant-actionbar restaurant-actionbar-end mt-4">
-                            <button class="btn btn-sm btn-light-primary" (click)="addAdjustmentLine(wastageForm)">
+                        <div class="restaurant-actionbar gap-2 restaurant-actionbar-end mt-4 align-items-center d-flex flex-wrap justify-content-start justify-content-sm-end min-w-0">
+                            <button class="btn btn-sm btn-light-primary w-100 w-sm-auto" (click)="addAdjustmentLine(wastageForm)">
                                 <i class="fa fa-plus"></i>
                                 {{ 'Add' | localize }}
                             </button>
-                            <button class="btn btn-sm btn-danger" [buttonBusy]="saving" (click)="saveAdjustment(wastageForm)">
+                            <button class="btn btn-sm btn-danger w-100 w-sm-auto" [buttonBusy]="saving" (click)="saveAdjustment(wastageForm)">
                                 <i class="fa fa-trash-can"></i>
                                 {{ 'Post Wastage' | localize }}
                             </button>
@@ -599,42 +609,42 @@
                 </div>
             </ng-container>
 
-            <div class="card card-custom gutter-b restaurant-card">
-                <div class="card-header">
-                    <div class="card-title">{{ 'Recent Stock Adjustments' | localize }}</div>
-                    <div class="card-toolbar restaurant-actionbar">
-                        <input class="form-control w-150px" type="date" [(ngModel)]="adjustmentFilter.fromDate" />
-                        <input class="form-control w-150px" type="date" [(ngModel)]="adjustmentFilter.toDate" />
-                        <button class="btn btn-sm btn-light-primary" [buttonBusy]="loading" (click)="refresh()">
+            <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-stretch align-items-sm-center d-flex flex-column flex-sm-row justify-content-between">
+                    <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Recent Stock Adjustments' | localize }}</div>
+                    <div class="card-toolbar restaurant-actionbar gap-2 align-items-center d-flex flex-wrap min-w-0 w-100 w-sm-auto">
+                        <input class="form-control w-100 w-sm-150px" type="date" [(ngModel)]="adjustmentFilter.fromDate" />
+                        <input class="form-control w-100 w-sm-150px" type="date" [(ngModel)]="adjustmentFilter.toDate" />
+                        <button class="btn btn-sm btn-light-primary w-100 w-sm-auto" [buttonBusy]="loading" (click)="refresh()">
                             <i class="fa fa-filter"></i>
                         </button>
                     </div>
                 </div>
-                <div class="card-body p-0 restaurant-table-wrap">
-                    <table class="restaurant-table" *ngIf="adjustments.length; else noAdjustments">
-                        <thead>
+                <div class="card-body p-0 restaurant-table-wrap table-responsive">
+                    <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="adjustments.length; else noAdjustments">
+                        <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
                             <tr>
-                                <th>{{ 'Voucher' | localize }}</th>
-                                <th>{{ 'Date' | localize }}</th>
-                                <th>{{ 'Type' | localize }}</th>
-                                <th>{{ 'User' | localize }}</th>
-                                <th>{{ 'Lines' | localize }}</th>
-                                <th class="text-end">{{ 'Amount' | localize }}</th>
+                                <th class="align-middle text-uppercase">{{ 'Voucher' | localize }}</th>
+                                <th class="align-middle text-uppercase">{{ 'Date' | localize }}</th>
+                                <th class="align-middle text-uppercase">{{ 'Type' | localize }}</th>
+                                <th class="align-middle text-uppercase">{{ 'User' | localize }}</th>
+                                <th class="align-middle text-uppercase">{{ 'Lines' | localize }}</th>
+                                <th class="text-end align-middle text-uppercase">{{ 'Amount' | localize }}</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr *ngFor="let adjustment of adjustments">
-                                <td class="fw-bold">{{ adjustment.voucherNo }}</td>
-                                <td>{{ adjustment.dateMiti || '-' }}</td>
-                                <td>{{ adjustmentTypeText(adjustment.adjustmentType) }}</td>
-                                <td>{{ adjustment.createUserName || '-' }}</td>
-                                <td>{{ adjustment.lines?.length || 0 }}</td>
-                                <td class="text-end">{{ adjustment.totalAmount | number: '1.2-2' }}</td>
+                                <td class="fw-bold align-middle">{{ adjustment.voucherNo }}</td>
+                                <td class="align-middle">{{ adjustment.dateMiti || '-' }}</td>
+                                <td class="align-middle">{{ adjustmentTypeText(adjustment.adjustmentType) }}</td>
+                                <td class="align-middle">{{ adjustment.createUserName || '-' }}</td>
+                                <td class="align-middle">{{ adjustment.lines?.length || 0 }}</td>
+                                <td class="text-end align-middle">{{ adjustment.totalAmount | number: '1.2-2' }}</td>
                             </tr>
                         </tbody>
                     </table>
                     <ng-template #noAdjustments>
-                        <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                        <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'NoData' | localize }}</div>
                     </ng-template>
                 </div>
             </div>

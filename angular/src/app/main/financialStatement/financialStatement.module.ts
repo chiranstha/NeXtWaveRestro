@@ -15,6 +15,7 @@ import { CashFlowReportComponent } from './cash-flow-report/cash-flow-report.com
 import { AgCharts } from 'ag-charts-angular';
 import { AgChartsSharedModule } from '@app/shared/common/ag-charts-shared/ag-charts-shared.module';
 import { NepaliDatepickerModule } from '@app/shared/common/nepalidatepicker/nepali-datepicker-angular.module';
+import { AgGridFeatureModule } from '@app/shared/common/ag-grid/ag-grid-feature.module';
 @NgModule({
     imports: [
         NgSelectModule,
@@ -26,6 +27,7 @@ import { NepaliDatepickerModule } from '@app/shared/common/nepalidatepicker/nepa
         AppCommonModule,
         NgSelectModule,
         AgChartsSharedModule,
+        AgGridFeatureModule,
         FormsModule,
         AdminSharedModule,
         NepaliDatepickerModule,

@@ -69,7 +69,6 @@ interface RestaurantStockAdjustmentForm {
 @Component({
     selector: 'restaurant-inventory',
     templateUrl: './restaurant-inventory.component.html',
-    styleUrls: ['../restaurant-shared.css'],
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation],
     changeDetection: ChangeDetectionStrategy.Eager,

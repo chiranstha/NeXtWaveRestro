@@ -257,7 +257,12 @@ public class TenantSettingsAppService : SettingsAppServiceBase, ITenantSettingsA
                 AppSettings.UserManagement.IsQrLoginEnabled
             ),
 
-            IsQrLoginEnabledForApplication = await IsQrLoginEnabledForApplicationAsync()
+            IsQrLoginEnabledForApplication = await IsQrLoginEnabledForApplicationAsync(),
+
+            DefaultEmployeePassword = await SettingManager.GetSettingValueForTenantAsync(
+                AppSettings.UserManagement.EmployeeDefaultPassword,
+                AbpSession.GetTenantId()
+            )
         };
     }
 
@@ -890,6 +895,20 @@ public class TenantSettingsAppService : SettingsAppServiceBase, ITenantSettingsA
             tenantId,
             AppSettings.UserManagement.IsQrLoginEnabled,
             settings.IsQrLoginEnabled.ToString().ToLowerInvariant()
+        );
+
+        var defaultEmployeePassword = string.IsNullOrWhiteSpace(settings.DefaultEmployeePassword)
+            ? ErpConsts.DefaultRestaurantEmployeePassword
+            : settings.DefaultEmployeePassword.Trim();
+        if (defaultEmployeePassword.Length < 6)
+        {
+            throw new UserFriendlyException("Default employee password must contain at least 6 characters.");
+        }
+
+        await SettingManager.ChangeSettingForTenantAsync(
+            tenantId,
+            AppSettings.UserManagement.EmployeeDefaultPassword,
+            defaultEmployeePassword
         );
     }
 

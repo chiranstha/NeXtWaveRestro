@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ReportsRoutingModule } from './reports-routing.module';
 import { AccountGroupsReportComponent } from './accountGroupReport/accountGroupReport.component';
-import { AgGridModule } from 'ag-grid-angular';
+import { AgGridFeatureModule } from '@app/shared/common/ag-grid/ag-grid-feature.module';
 import { AppCommonModule } from '@app/shared/common/app-common.module';
 import { AppSharedModule } from '@app/shared/app-shared.module';
 import { AdminSharedModule } from '@app/admin/shared/admin-shared.module';
@@ -54,7 +54,7 @@ import { DaybookReportComponent } from './daybookReport/daybookReport.component'
         AppSharedModule,
         AdminSharedModule,
         SubHeaderComponent,
-        AgGridModule,
+        AgGridFeatureModule,
         ScrollingModule,
         NgScrollbarModule,
         NepaliDatepickerModule,

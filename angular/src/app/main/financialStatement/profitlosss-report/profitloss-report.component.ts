@@ -11,9 +11,10 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 import { FileDownloadService } from '@shared/utils/file-download.service';
 import { ColDef, GetDataPath, GridApi, GridReadyEvent } from 'ag-grid-enterprise';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { NgClass } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 import { NepaliDatepickerComponent } from '../../../shared/common/nepalidatepicker/nepali-datepicker-angular.component';
 import { AgGridAngular } from 'ag-grid-angular';
+import { AgGridFeatureModule } from '@app/shared/common/ag-grid/ag-grid-feature.module';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 @Component({
     selector: 'app-profit-loss-report',
@@ -21,11 +22,12 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
     styleUrls: ['./profitloss-report.component.css'],
     animations: [appModuleAnimation],
     imports: [
+        CommonModule,
         NgClass,
         FormsModule,
         ReactiveFormsModule,
         NepaliDatepickerComponent,
-        AgGridAngular,
+        AgGridFeatureModule,
         NgxExtendedPdfViewerModule,
     ],
     changeDetection: ChangeDetectionStrategy.Eager,

@@ -171,6 +171,13 @@ public class ErpDbContext : AbpZeroDbContext<Tenant, Role, User, ErpDbContext>, 
     public virtual DbSet<RestaurantPushToken> RestaurantPushTokens { get; set; }
     public virtual DbSet<RestaurantChangeLog> RestaurantChangeLogs { get; set; }
     public virtual DbSet<RestaurantSyncUploadBatch> RestaurantSyncUploadBatches { get; set; }
+    public virtual DbSet<RestaurantPayrollDepartment> RestaurantPayrollDepartments { get; set; }
+    public virtual DbSet<RestaurantPayrollJobRole> RestaurantPayrollJobRoles { get; set; }
+    public virtual DbSet<RestaurantPayrollEmployee> RestaurantPayrollEmployees { get; set; }
+    public virtual DbSet<RestaurantPayrollAllowanceHistory> RestaurantPayrollAllowanceHistories { get; set; }
+    public virtual DbSet<RestaurantPayrollAttendance> RestaurantPayrollAttendances { get; set; }
+    public virtual DbSet<RestaurantPayrollRun> RestaurantPayrollRuns { get; set; }
+    public virtual DbSet<RestaurantPayrollLine> RestaurantPayrollLines { get; set; }
     // Added Tables End
 
 
@@ -329,6 +336,60 @@ public class ErpDbContext : AbpZeroDbContext<Tenant, Role, User, ErpDbContext>, 
                 .HasDatabaseName("IX_tbl_RestaurantSyncUploadBatch_BatchGuid")
                 .IsUnique();
             b.HasIndex(e => new { e.TenantId, e.DeviceId, e.ReceivedAt });
+        });
+
+        modelBuilder.Entity<RestaurantPayrollDepartment>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.Name }).IsUnique();
+            b.HasIndex(e => new { e.TenantId, e.IsActive, e.SortOrder });
+        });
+
+        modelBuilder.Entity<RestaurantPayrollJobRole>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.DepartmentId, e.Name }).IsUnique();
+            b.HasIndex(e => new { e.TenantId, e.DepartmentId, e.IsActive, e.SortOrder });
+            b.HasOne(e => e.DepartmentFk).WithMany(e => e.JobRoles)
+                .HasForeignKey(e => e.DepartmentId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<RestaurantPayrollEmployee>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.StaffCode }).IsUnique();
+            b.HasIndex(e => new { e.TenantId, e.UserId })
+                .HasFilter("[UserId] IS NOT NULL")
+                .IsUnique();
+            b.HasIndex(e => new { e.TenantId, e.DepartmentId, e.IsActive });
+            b.HasIndex(e => new { e.TenantId, e.JobRoleId, e.IsActive });
+            b.HasOne(e => e.DepartmentFk).WithMany()
+                .HasForeignKey(e => e.DepartmentId).OnDelete(DeleteBehavior.Restrict);
+            b.HasOne(e => e.JobRoleFk).WithMany()
+                .HasForeignKey(e => e.JobRoleId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<RestaurantPayrollAllowanceHistory>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.EmployeeId, e.EffectiveFrom }).IsUnique();
+            b.HasOne(e => e.EmployeeFk).WithMany()
+                .HasForeignKey(e => e.EmployeeId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<RestaurantPayrollAttendance>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.EmployeeId, e.WorkDate }).IsUnique();
+            b.HasIndex(e => new { e.TenantId, e.WorkDate, e.Status });
+        });
+
+        modelBuilder.Entity<RestaurantPayrollRun>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.RunNumber }).IsUnique();
+            b.HasIndex(e => new { e.TenantId, e.PeriodStart, e.PeriodEnd }).IsUnique();
+            b.HasIndex(e => new { e.TenantId, e.Status, e.PeriodEnd });
+        });
+
+        modelBuilder.Entity<RestaurantPayrollLine>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.PayrollRunId, e.EmployeeId }).IsUnique();
+            b.HasIndex(e => new { e.TenantId, e.EmployeeId });
         });
 
         modelBuilder.Entity<Tenant>(b =>

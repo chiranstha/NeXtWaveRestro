@@ -1,4 +1,4 @@
-<div #nepaliDatePicker [ngClass]="{ dark: darkTheme }" class="nepali-date-picker">
+<div #nepaliDatePicker [ngClass]="{ dark: darkTheme }" class="nepali-date-picker d-inline-block fw-bold position-relative w-100">
     <input
         (blur)="validateManualInput()"
         (focus)="!dateReadonly && open()"
@@ -6,13 +6,13 @@
         [(ngModel)]="formattedDate"
         [disabled]="dateReadonly"
         [ngClass]="{
-            'np_datepicker_input--error': isError,
-            'np_datepicker_input--active': isOpen,
+            'is-invalid': isError,
+            'border-primary': isOpen,
         }"
         [placeholder]="placeholder"
         [readonly]="dateReadonly"
         aria-hidden="true"
-        class="np_datepicker_input"
+        class="np_datepicker_input form-control form-control-sm fw-bold h-35px"
         type="text"
     />
     <a
@@ -23,7 +23,7 @@
         }"
         [style.opacity]="dateReadonly ? '0.5' : '1'"
         [style.pointer-events]="dateReadonly ? 'none' : 'auto'"
-        class="form-icon"
+        class="form-icon d-none"
     >
         <svg viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -35,9 +35,9 @@
 </div>
 <!--.nepali-date-picker-->
 <ng-template #datePicker>
-    <div class="datepicker__container">
-        <div class="datepicker__options-container">
-            <a (click)="prevMonth()" class="prev-month">
+    <div class="datepicker__container bg-body border border-gray-300 overflow-hidden position-absolute rounded-3 shadow">
+        <div class="datepicker__options-container align-items-center border-bottom d-flex justify-content-around p-2 text-white">
+            <a (click)="prevMonth()" class="prev-month align-items-center bg-light btn btn-icon btn-sm d-flex flex-shrink-0 h-25px justify-content-center opacity-50 rounded-circle w-25px">
                 <svg viewBox="0 0 320 512" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M224 480c-8.188 0-16.38-3.125-22.62-9.375l-192-192c-12.5-12.5-12.5-32.75 0-45.25l192-192c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25L77.25 256l169.4 169.4c12.5 12.5 12.5 32.75 0 45.25C240.4 476.9 232.2 480 224 480z"
@@ -45,7 +45,7 @@
                 </svg>
             </a>
             <span class="datepicker__options-month-container">
-                <select (change)="selectMonth($event)" class="datepicker__container__select">
+                <select (change)="selectMonth($event)" class="datepicker__container__select bg-transparent border-0 form-select form-select-sm text-white">
                     <option
                         *ngFor="let month of monthsMapping[language][monthDisplayType]; index as i"
                         [selected]="i === selectedMonthIndex"
@@ -56,14 +56,14 @@
                 </select>
             </span>
             <span class="datepicker__options-year-container">
-                <select (change)="selectYear($event)" class="datepicker__container__select">
+                <select (change)="selectYear($event)" class="datepicker__container__select bg-transparent border-0 form-select form-select-sm text-white">
                     <option *ngFor="let year of years; index as i" [selected]="year === selectedYear" [value]="year">
                         {{ year | toNp: language : 'number' }}
                     </option>
                 </select>
             </span>
             <span *ngIf="hasMultipleCalendarView" class="datepicker__options-year-container">
-                <select (change)="selectCalendarView($event)" class="datepicker__container__select">
+                <select (change)="selectCalendarView($event)" class="datepicker__container__select bg-transparent border-0 form-select form-select-sm text-white">
                     <option
                         *ngFor="let type of calendarType"
                         [selected]="type.value === calendarView"
@@ -73,7 +73,7 @@
                     </option>
                 </select>
             </span>
-            <a (click)="nextMonth()" class="next-month">
+            <a (click)="nextMonth()" class="next-month align-items-center bg-light btn btn-icon btn-sm d-flex flex-shrink-0 h-25px justify-content-center opacity-50 rounded-circle w-25px">
                 <svg viewBox="0 0 320 512" xmlns="http://www.w3.org/2000/svg">
                     <path
                         d="M96 480c-8.188 0-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L242.8 256L73.38 86.63c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l192 192c12.5 12.5 12.5 32.75 0 45.25l-192 192C112.4 476.9 104.2 480 96 480z"
@@ -81,14 +81,14 @@
                 </svg>
             </a>
         </div>
-        <div class="datepicker__days-container">
-            <div *ngFor="let day of daysMapping[language][dayDisplayType]; index as i" class="datepicker__days">
-                <div class="datepicker__weekday">{{ day }}</div>
+        <div class="datepicker__days-container d-flex justify-content-center text-gray-600">
+            <div *ngFor="let day of daysMapping[language][dayDisplayType]; index as i" class="datepicker__days pb-3 text-center">
+                <div class="datepicker__weekday border-bottom border-gray-200 fw-bold mb-4 p-2">{{ day }}</div>
                 <ng-container
                     [ngTemplateOutlet]="calendarView === CalendarType.BS ? dateView : englishCalendar"
                 ></ng-container>
                 <ng-template #dateView>
-                    <div *ngFor="let date of currentMonthData[i]" class="datepicker__date-container">
+                    <div *ngFor="let date of currentMonthData[i]" class="datepicker__date-container h-30px lh-30px my-2 w-30px">
                         <div *ngIf="!maxDate && !minDate; else viewWithDisabledDate">
                             <div
                                 (click)="selectDate(date)"
@@ -104,7 +104,7 @@
                                     currentNepaliDate.month === nepaliDateToday.month &&
                                     currentNepaliDate.year === nepaliDateToday.year
                                 "
-                                class="datepicker__date"
+                                class="datepicker__date cursor-pointer rounded-circle"
                             >
                                 {{ date | toNp: language : 'number' }}
                             </div>
@@ -158,12 +158,12 @@
                                     currentNepaliDate.month === nepaliDateToday.month &&
                                     currentNepaliDate.year === nepaliDateToday.year
                                 "
-                                class="datepicker__date"
+                                class="datepicker__date cursor-pointer rounded-circle"
                             >
                                 {{ date | toNp: language : 'number' }}
                             </div>
                             <ng-template #disabledDates>
-                                <div *ngIf="date" class="datepicker__date datepicker__date--disabled">
+                                <div *ngIf="date" class="datepicker__date datepicker__date--disabled rounded-circle">
                                     {{ date | toNp: language : 'number' }}
                                 </div>
                                 <div *ngIf="!date">
@@ -174,7 +174,7 @@
                     </div>
                 </ng-template>
                 <ng-template #englishCalendar>
-                    <div *ngFor="let date of currentMonthData[i]" class="datepicker__date-container">
+                    <div *ngFor="let date of currentMonthData[i]" class="datepicker__date-container h-30px lh-30px my-2 w-30px">
                         <div *ngIf="!maxDate && !minDate; else viewWithDisabledDate">
                             <div
                                 (click)="selectDate(date)"
@@ -190,7 +190,7 @@
                                     englishCurrentDate.month === englishDateToday.month &&
                                     englishCurrentDate.year === englishDateToday.year
                                 "
-                                class="datepicker__date"
+                                class="datepicker__date cursor-pointer rounded-circle"
                             >
                                 {{ date | toNp: language : 'number' }}
                             </div>
@@ -244,12 +244,12 @@
                                     englishCurrentDate.month === englishDateToday.month &&
                                     englishCurrentDate.year === englishDateToday.year
                                 "
-                                class="datepicker__date"
+                                class="datepicker__date cursor-pointer rounded-circle"
                             >
                                 {{ date | toNp: language : 'number' }}
                             </div>
                             <ng-template #disabledDates>
-                                <div *ngIf="date" class="datepicker__date datepicker__date--disabled">
+                                <div *ngIf="date" class="datepicker__date datepicker__date--disabled rounded-circle">
                                     {{ date | toNp: language : 'number' }}
                                 </div>
                                 <div *ngIf="!date">

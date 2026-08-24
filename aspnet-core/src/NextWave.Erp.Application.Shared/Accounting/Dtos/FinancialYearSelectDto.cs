@@ -7,5 +7,7 @@ namespace NextWave.Erp.Accounting.Dtos
         public Guid FinancialYearId { get; set; }
 
         public string FinancialYear { get; set; }
+
+        public bool Active { get; set; }
     }
 }

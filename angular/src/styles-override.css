@@ -1,0 +1,822 @@
+/* Override CSS Variables for Dark Mode Optimization */
+html[data-bs-theme=dark] {
+  --dark-card-bg: #111827;
+  --dark-card-border: #374151;
+}
+
+/* Essential dark mode overrides to fix white backgrounds */
+html[data-bs-theme=dark] .card.shadow-sm.mb-4.fee-section,
+html[data-bs-theme=dark] .card.shadow-sm.mb-4.class-section,
+html[data-bs-theme=dark] .card.shadow-sm.installment-section,
+html[data-bs-theme=dark] .card.shadow-sm.summary-section {
+  background: var(--dark-card-bg) !important;
+  background-color: var(--dark-card-bg) !important;
+  border-color: var(--dark-card-border) !important;
+  color: white !important;
+}
+
+html[data-bs-theme=dark] .card.shadow-sm.mb-4.fee-section .card-body,
+html[data-bs-theme=dark] .card.shadow-sm.mb-4.class-section .card-body,
+html[data-bs-theme=dark] .card.shadow-sm.installment-section .card-body,
+html[data-bs-theme=dark] .card.shadow-sm.summary-section .card-body {
+  background: var(--dark-card-bg) !important;
+  background-color: var(--dark-card-bg) !important;
+  color: white !important;
+}
+
+/* Override any Bootstrap card styles */
+html[data-bs-theme=dark] .card {
+  --bs-card-bg: var(--dark-card-bg) !important;
+  --bs-card-border-color: var(--dark-card-border) !important;
+}
+
+html[data-bs-theme=dark] .bg-white,
+html[data-bs-theme=dark] .bg-body-tertiary {
+  --bs-bg-opacity: 1;
+  background-color: var(--dark-card-bg) !important;
+}
+
+/* Table header and sticky columns background for dark mode */
+html[data-bs-theme=dark],
+[data-theme="dark"],
+.dark-theme {
+  --table-header-bg: #23272e;
+}
+
+/* Global card hover effect */
+.card {
+  transition: box-shadow 0.2s ease, transform 0.2s ease !important;
+  will-change: transform, box-shadow;
+}
+
+/* Add an invisible pseudo-element to extend the hover hit area downward by 2px */
+.card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: -4px; /* Extends below the card to catch the mouse during upward transform */
+  left: 0;
+  z-index: -1;
+  background: transparent;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+  transform: translateY(-2px);
+  z-index: 5; /* Ensures elevated card stays on top to prevent adjacent overlap stealing */
+}
+
+.card.ag-grid-host-card,
+.card.ag-grid-host-card:hover,
+.card:has(ag-grid-angular),
+.card:has(ag-grid-angular):hover {
+  box-shadow: none !important;
+  transform: none !important;
+  transition: none !important;
+  will-change: auto;
+  z-index: auto;
+}
+
+.card.ag-grid-host-card::after,
+.card:has(ag-grid-angular)::after {
+  display: none;
+}
+
+html[data-bs-theme=dark] .card.ag-grid-host-card:hover,
+html[data-bs-theme=dark] .card:has(ag-grid-angular):hover {
+  box-shadow: none !important;
+}
+
+/* Keep high-frequency hover feedback immediate. These controls are crossed quickly
+   while navigating dense pages; animated hover states feel like they are chasing
+   the pointer. */
+.aside-menu .menu .menu-item .menu-link,
+.aside-menu .menu .menu-item .menu-link *,
+.menu-sub-dropdown .menu-item .menu-link,
+.menu-sub-dropdown .menu-item .menu-link *,
+.dropdown-menu .dropdown-item,
+.dropdown-menu .dropdown-item *,
+.pagination-controls button,
+.page-size-menu .page-size-option,
+.ng-dropdown-panel .ng-dropdown-panel-items .ng-option,
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item,
+.ui-contextmenu .ui-menuitem-link,
+.ag-menu .ag-menu-option,
+.ag-menu .ag-menu-option * {
+  animation: none !important;
+  transition: none !important;
+}
+
+html[data-bs-theme=dark] .card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+.app-no-data {
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+/* Customize SweetAlert2 toasts for NotifyService */
+.swal2-popup.swal2-toast {
+  max-width: 250px !important;
+  font-size: 0.875rem !important;
+}
+
+.swal2-toast .swal2-actions {
+  justify-content: flex-end !important;
+  margin-top: 0.5rem !important;
+}
+
+.swal2-toast .swal2-confirm {
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+}
+
+/* AG Grid Premium UI Enhancements - Ultra Compact Mode */
+
+
+/* Keep AG Grid scroll cheap: large hover shadows repaint while the grid moves rows. */
+.ag-theme-balham:hover {
+  box-shadow: none;
+}
+
+.ag-theme-balham {
+  --ag-row-hover-color: transparent;
+}
+
+.ag-theme-balham,
+.ag-theme-balham * {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition: none !important;
+}
+
+.ag-theme-balham .ag-root-wrapper.ag-layout-normal {
+  content-visibility: visible !important;
+}
+
+.ag-theme-balham .ag-header {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  font-family: 'AvenirNext', sans-serif;
+  font-size: 13px;
+  border-bottom: 1px solid var(--ag-border-color);
+}
+
+.ag-theme-balham .ag-header-cell,
+.ag-theme-balham .ag-header-group-cell {
+  padding: 1px 5px !important;
+}
+
+.ag-theme-balham .ag-row,
+.ag-theme-balham .ag-cell,
+.ag-theme-balham .ag-header-cell,
+.ag-theme-balham .ag-header-group-cell {
+  animation: none !important;
+  transition: none !important;
+}
+
+.ag-theme-balham .ag-body-viewport,
+.ag-theme-balham .ag-center-cols-viewport,
+.ag-theme-balham .ag-pinned-left-cols-viewport,
+.ag-theme-balham .ag-pinned-right-cols-viewport,
+.ag-theme-balham .ag-header-viewport,
+.ag-theme-balham .ag-body-horizontal-scroll-viewport {
+  overscroll-behavior: contain;
+  scroll-behavior: auto !important;
+  animation: none !important;
+  transition: none !important;
+  will-change: scroll-position;
+}
+
+.ag-theme-balham .ag-center-cols-container,
+.ag-theme-balham .ag-pinned-left-cols-container,
+.ag-theme-balham .ag-pinned-right-cols-container,
+.ag-theme-balham .ag-header-container,
+.ag-theme-balham .ag-header-row,
+.ag-theme-balham .ag-full-width-container,
+.ag-theme-balham .ag-body-horizontal-scroll-container {
+  animation: none !important;
+  transition: none !important;
+  contain: layout paint style;
+}
+
+.ag-theme-balham .ag-row:hover {
+  background-color: #ecf0f1 !important;
+  z-index: 10;
+}
+
+.ag-theme-balham .ag-row:hover::before {
+  background-color: #ecf0f1 !important;
+}
+
+.ag-theme-balham .ag-row-hover:not(:hover),
+.ag-theme-balham .ag-row-hover:not(:hover)::before {
+  background-color: transparent !important;
+}
+
+.ag-theme-balham .ag-image-cell,
+.ag-theme-balham .student-image-cell {
+  contain: layout paint style;
+}
+
+.ag-theme-balham .ag-image-cell img,
+.ag-theme-balham .student-grid-photo,
+.ag-theme-balham .student-grid-avatar {
+  backface-visibility: hidden;
+  display: block;
+  flex: 0 0 auto;
+}
+
+.ag-theme-balham .student-grid-avatar {
+  align-items: center;
+  background: rgba(0, 158, 247, 0.12);
+  border: 1px solid #e4e6ef;
+  border-radius: 50%;
+  color: #009ef7;
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 700;
+  height: 32px;
+  justify-content: center;
+  line-height: 1;
+  width: 32px;
+}
+
+/* Keep AG Grid popups/context menus above grid hover rows and sticky headers */
+.ag-theme-balham .ag-popup,
+.ag-theme-balham .ag-menu,
+.ag-theme-balham .ag-popup-child,
+.ag-theme-balham .ag-tooltip,
+body .ag-popup,
+body .ag-menu,
+body .ag-popup-child,
+body .ag-tooltip {
+  z-index: 1100 !important;
+}
+
+modal-container .student-left-modal .modal-content {
+  overflow: visible;
+}
+
+/* Modal create/edit hardening: keep page sub-headers and popup controls inside dialog bounds. */
+modal-container .modal-dialog sub-header {
+  display: block;
+  width: 100%;
+}
+
+modal-container .modal-dialog sub-header > .toolbar {
+  border-bottom: 1px solid var(--bs-border-color, #eff2f5);
+  border-radius: var(--bs-modal-border-radius, 0.475rem) var(--bs-modal-border-radius, 0.475rem) 0 0;
+  margin: 0 !important;
+  max-width: 100% !important;
+  min-width: 0;
+  position: static !important;
+  width: 100% !important;
+}
+
+modal-container .modal-dialog sub-header > .toolbar > .container,
+modal-container .modal-dialog sub-header > .toolbar > .container-fluid {
+  max-width: 100% !important;
+  padding: 1rem 1.25rem !important;
+  width: 100% !important;
+}
+
+modal-container .modal-dialog sub-header [role="actions"] {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+modal-container .modal-dialog:not(.modal-dialog-scrollable) .modal-content,
+modal-container .modal-dialog:not(.modal-dialog-scrollable) .modal-body,
+modal-container .modal-dialog:not(.modal-dialog-scrollable) .card,
+modal-container .modal-dialog:not(.modal-dialog-scrollable) .card-body {
+  overflow: visible;
+}
+
+modal-container .modal-dialog.host-usage-records-modal {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: min(1200px, calc(100vw - 2rem));
+  width: calc(100vw - 2rem);
+}
+
+modal-container .modal-dialog.host-usage-records-modal .modal-content {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 4rem);
+  max-height: calc(100vh - 4rem);
+}
+
+modal-container .modal-dialog.host-usage-records-modal .modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto !important;
+}
+
+@media (max-width: 575.98px) {
+  modal-container .modal-dialog.host-usage-records-modal {
+    max-width: calc(100vw - 0.75rem);
+    width: calc(100vw - 0.75rem);
+  }
+
+  modal-container .modal-dialog.host-usage-records-modal .modal-content {
+    height: calc(100vh - 0.75rem);
+    max-height: calc(100vh - 0.75rem);
+  }
+}
+
+body > .ng-dropdown-panel,
+body > ng-dropdown-panel,
+modal-container .modal-dialog .ng-dropdown-panel,
+modal-container .modal-dialog ng-dropdown-panel,
+modal-container .modal-dialog .datepicker__container {
+  z-index: 2000 !important;
+}
+
+html.bulk-bus-quick-add-open,
+body.bulk-bus-quick-add-open {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+.ag-theme-balham .ag-cell {
+  padding: 1px 5px !important;
+  line-height: 1.2;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'AvenirNext', sans-serif;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.ag-theme-balham .ag-serial-cell,
+.ag-theme-balham .ag-serial-header {
+  justify-content: center !important;
+  text-align: center;
+}
+
+.ag-theme-balham .ag-actions-cell,
+.ag-theme-balham .actions-cell {
+  align-items: center !important;
+  contain: layout paint style;
+  font-size: 0 !important;
+  overflow: hidden !important;
+}
+
+.ag-theme-balham .ag-action-buttons {
+  align-items: center;
+  contain: layout paint style;
+  display: inline-flex;
+  gap: 0;
+  height: 100%;
+  max-width: 100%;
+}
+
+.ag-theme-balham .ag-actions-cell .btnaction,
+.ag-theme-balham .actions-cell .btnaction {
+  align-items: center !important;
+  border: 0 !important;
+  border-radius: 0.45rem !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  display: inline-flex !important;
+  flex: 0 0 26px !important;
+  font-size: 13px !important;
+  height: 26px !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  margin: 0 4px 0 0 !important;
+  min-height: 26px !important;
+  min-width: 26px !important;
+  padding: 0 !important;
+  contain: layout paint style;
+  transition: none !important;
+  vertical-align: middle;
+  width: 26px !important;
+}
+
+.ag-theme-balham .ag-actions-cell .btnaction:last-child,
+.ag-theme-balham .actions-cell .btnaction:last-child {
+  margin-right: 0 !important;
+}
+
+.ag-theme-balham .ag-actions-cell .btnaction i,
+.ag-theme-balham .actions-cell .btnaction i,
+.ag-theme-balham .ag-actions-cell .btnaction::before,
+.ag-theme-balham .actions-cell .btnaction::before {
+  font-size: 18px !important;
+  line-height: 1 !important;
+}
+
+/*
+ * Older renderers place the Font Awesome classes on the action <button>
+ * itself. The shared grid layout then adds Bootstrap's .btn class, whose
+ * font-family wins over Font Awesome unless it is restored here.
+ */
+.ag-theme-balham .ag-actions-cell .btnaction[class*="fa-"],
+.ag-theme-balham .actions-cell .btnaction[class*="fa-"] {
+  font-family: var(--_fa-family) !important;
+  font-style: normal !important;
+  font-weight: var(--fa-style, 900) !important;
+}
+
+.ag-theme-balham .btnaction.btn-view,
+.ag-theme-balham .btnaction.btn-all-changes,
+.ag-theme-balham .btnaction.btn-view-change,
+.ag-theme-balham .btnaction.btn-provision-mobile,
+.ag-theme-balham .btnaction.btn-set-password {
+  background-color: rgba(0, 158, 247, 0.12) !important;
+  color: #009ef7 !important;
+}
+
+.ag-theme-balham .btnaction.btn-edit {
+  background-color: rgba(255, 199, 0, 0.16) !important;
+  color: #b88400 !important;
+}
+
+.ag-theme-balham .btnaction.btn-delete {
+  background-color: rgba(246, 78, 96, 0.14) !important;
+  color: #f64e60 !important;
+}
+
+.ag-theme-balham .btnaction.btn-print,
+.ag-theme-balham .btnaction.btn-download,
+.ag-theme-balham .btnaction.btn-reset-password {
+  background-color: rgba(80, 205, 137, 0.16) !important;
+  color: #1f9254 !important;
+}
+
+.ag-theme-balham .btnaction.btn-whatsapp {
+  background-color: rgba(37, 211, 102, 0.14) !important;
+  color: #128c4a !important;
+}
+
+.ag-theme-balham .btnaction.btn-pdf {
+  background-color: rgba(246, 78, 96, 0.14) !important;
+  color: #f64e60 !important;
+}
+
+.ag-theme-balham .btnaction.btn-lock {
+  background-color: rgba(255, 199, 0, 0.16) !important;
+  color: #b88400 !important;
+}
+
+.ag-theme-balham .btnaction:hover,
+.ag-theme-balham .btnaction:focus {
+  box-shadow: none !important;
+  filter: none;
+  transform: none;
+}
+
+.ag-theme-balham .btnaction.btn-view:hover,
+.ag-theme-balham .btnaction.btn-all-changes:hover,
+.ag-theme-balham .btnaction.btn-view-change:hover,
+.ag-theme-balham .btnaction.btn-provision-mobile:hover,
+.ag-theme-balham .btnaction.btn-set-password:hover {
+  background-color: #009ef7 !important;
+  color: #fff !important;
+}
+
+.ag-theme-balham .btnaction.btn-edit:hover {
+  background-color: #ffc700 !important;
+  color: #5e4a00 !important;
+}
+
+.ag-theme-balham .btnaction.btn-delete:hover,
+.ag-theme-balham .btnaction.btn-pdf:hover {
+  background-color: #f64e60 !important;
+  color: #fff !important;
+}
+
+.ag-theme-balham .btnaction.btn-print:hover,
+.ag-theme-balham .btnaction.btn-download:hover,
+.ag-theme-balham .btnaction.btn-reset-password:hover {
+  background-color: #50cd89 !important;
+  color: #fff !important;
+}
+
+.ag-theme-balham .btnaction.btn-whatsapp:hover {
+  background-color: #25d366 !important;
+  color: #fff !important;
+}
+
+/* Match the light AG Grid paint path from ERP while keeping Student hover immediate:
+   real :hover paints the row, delayed AG Grid hover overlays stay transparent. */
+
+.ag-theme-balham .ag-cell {
+  contain: none;
+  will-change: auto !important;
+}
+
+.ag-theme-balham .ag-body-viewport,
+.ag-theme-balham .ag-grid-viewport,
+.ag-theme-balham .ag-center-cols-viewport,
+.ag-theme-balham .ag-pinned-left-cols-viewport,
+.ag-theme-balham .ag-pinned-right-cols-viewport,
+.ag-theme-balham .ag-header-viewport,
+.ag-theme-balham .ag-body-horizontal-scroll-viewport,
+.ag-theme-balham .ag-center-cols-container,
+.ag-theme-balham .ag-grid-scrollable-area,
+.ag-theme-balham .ag-grid-scrolling-container,
+.ag-theme-balham .ag-pinned-left-cols-container,
+.ag-theme-balham .ag-pinned-right-cols-container,
+.ag-theme-balham .ag-header-container,
+.ag-theme-balham .ag-header-row,
+.ag-theme-balham .ag-full-width-container,
+.ag-theme-balham .ag-body-horizontal-scroll-container {
+  animation: initial !important;
+  scroll-behavior: auto;
+  transition: none !important;
+  will-change: auto !important;
+}
+
+.ag-theme-balham .ag-actions-cell,
+.ag-theme-balham .actions-cell,
+.ag-theme-balham .ag-actions-cell .btnaction,
+.ag-theme-balham .actions-cell .btnaction {
+  contain: none;
+}
+
+.ag-theme-balham .ag-actions-cell,
+.ag-theme-balham .actions-cell {
+  overflow: visible !important;
+}
+
+.ag-theme-balham .ag-actions-cell .btnaction i,
+.ag-theme-balham .actions-cell .btnaction i {
+  color: inherit !important;
+  margin: 0;
+  pointer-events: none;
+}
+
+.ag-theme-balham .btnaction[data-action]:hover,
+.ag-theme-balham .btnaction[data-action]:focus {
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+body .ag-menu-option-icon {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  min-width: 30px !important;
+}
+
+body .ag-menu-option-icon i,
+body .ag-menu-option-icon .ag-icon {
+  align-items: center;
+  border-radius: 0.45rem;
+  display: inline-flex !important;
+  font-size: 13px !important;
+  height: 26px;
+  justify-content: center;
+  line-height: 1;
+  width: 26px;
+}
+
+body .ag-menu-option-icon .fa-eye,
+body .ag-menu-option-icon .fa-list {
+  background-color: rgba(0, 158, 247, 0.12);
+  color: #009ef7 !important;
+}
+
+body .ag-menu-option-icon .fa-pen,
+body .ag-menu-option-icon .fa-pen-to-square {
+  background-color: rgba(255, 199, 0, 0.16);
+  color: #b88400 !important;
+}
+
+body .ag-menu-option-icon .fa-trash {
+  background-color: rgba(246, 78, 96, 0.14);
+  color: #f64e60 !important;
+}
+
+body .ag-menu-option-icon .fa-print,
+body .ag-menu-option-icon .fa-file-excel,
+body .ag-menu-option-icon .ag-icon-excel {
+  background-color: rgba(80, 205, 137, 0.16);
+  color: #1f9254 !important;
+}
+
+body .ag-menu-option-icon .fa-file-pdf {
+  background-color: rgba(246, 78, 96, 0.14);
+  color: #f64e60 !important;
+}
+
+/* Custom Scrollbar for AG Grid */
+.ag-theme-balham .ag-grid-scrolling-container::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.ag-theme-balham .ag-grid-scrolling-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ag-theme-balham .ag-grid-scrolling-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.ag-theme-balham .ag-grid-scrolling-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Dark Mode Overrides for AG Grid */
+html[data-bs-theme=dark] .ag-theme-balham {
+  --ag-header-background-color: #1f2937;
+  --ag-header-foreground-color: #94a3b8;
+  --ag-header-cell-hover-background-color: #374151;
+  --ag-row-hover-color: transparent;
+  --ag-selected-row-background-color: #1e3a8a;
+  --ag-odd-row-background-color: #111827;
+  --ag-background-color: #111827;
+  --ag-border-color: #374151;
+  --ag-foreground-color: #e2e8f0;
+
+  border-color: var(--ag-border-color);
+  background-color: var(--ag-background-color);
+}
+
+html[data-bs-theme=dark] .ag-theme-balham .ag-header {
+  background-color: var(--ag-header-background-color);
+}
+
+html[data-bs-theme=dark] .ag-theme-balham .ag-row:hover,
+html[data-bs-theme=dark] .ag-theme-balham .ag-row:hover::before {
+  background-color: #1e293b !important;
+}
+
+html[data-bs-theme=dark] .ag-theme-balham .ag-grid-scrolling-container::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+/* Global Dropdown Theme Support */
+/* Bootstrap dropdowns */
+html[data-bs-theme=dark] .dropdown-menu {
+  background-color: var(--bs-body-bg, #1f2937) !important;
+  border-color: var(--bs-border-color, #374151) !important;
+  color: var(--bs-body-color, #e5e7eb) !important;
+}
+
+/* Keep top/header menus above component ng-select dropdown panels. */
+body:not(.modal-open) #kt_app_header:has(.show.menu-dropdown, .menu-sub-dropdown.show),
+body:not(.modal-open) #kt_header:has(.show.menu-dropdown, .menu-sub-dropdown.show),
+body:not(.modal-open) .app-header:has(.show.menu-dropdown, .menu-sub-dropdown.show),
+body:not(.modal-open) .header:has(.show.menu-dropdown, .menu-sub-dropdown.show) {
+  z-index: 1110 !important;
+}
+
+body:not(.modal-open) #kt_app_header .menu-sub-dropdown,
+body:not(.modal-open) #kt_app_header .dropdown-menu,
+body:not(.modal-open) #kt_header .menu-sub-dropdown,
+body:not(.modal-open) #kt_header .dropdown-menu,
+body:not(.modal-open) #kt_header_menu .menu-sub-dropdown,
+body:not(.modal-open) #kt_header_menu .dropdown-menu,
+body:not(.modal-open) .app-navbar .menu-sub-dropdown,
+body:not(.modal-open) .app-navbar .dropdown-menu,
+body:not(.modal-open) .header-menu .menu-sub-dropdown,
+body:not(.modal-open) .header-menu .dropdown-menu {
+  z-index: var(--app-header-menu-z-index, 1120) !important;
+}
+
+html[data-bs-theme=dark] .dropdown-item {
+  color: var(--bs-body-color, #e5e7eb) !important;
+}
+
+html[data-bs-theme=dark] .dropdown-item:hover,
+html[data-bs-theme=dark] .dropdown-item:focus {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: var(--bs-body-color, #ffffff) !important;
+}
+
+html[data-bs-theme=dark] .dropdown-divider {
+  border-top-color: var(--bs-border-color, #374151) !important;
+}
+
+/* ── Dashboard stat-card chip & icon dark mode ──────────────────────────── */
+html[data-bs-theme=dark] .stat-card--primary {
+  --stat-card-icon: #93c5fd;
+  --stat-card-icon-bg: rgba(59, 130, 246, 0.2);
+  --stat-card-chip: #bfdbfe;
+  --stat-card-chip-bg: rgba(59, 130, 246, 0.3);
+}
+html[data-bs-theme=dark] .stat-card--success {
+  --stat-card-icon: #6ee7b7;
+  --stat-card-icon-bg: rgba(16, 185, 129, 0.2);
+  --stat-card-chip: #a7f3d0;
+  --stat-card-chip-bg: rgba(16, 185, 129, 0.3);
+}
+html[data-bs-theme=dark] .stat-card--info {
+  --stat-card-icon: #67e8f9;
+  --stat-card-icon-bg: rgba(6, 182, 212, 0.2);
+  --stat-card-chip: #a5f3fc;
+  --stat-card-chip-bg: rgba(6, 182, 212, 0.3);
+}
+html[data-bs-theme=dark] .stat-card--warning {
+  --stat-card-icon: #fcd34d;
+  --stat-card-icon-bg: rgba(245, 158, 11, 0.2);
+  --stat-card-chip: #fde68a;
+  --stat-card-chip-bg: rgba(245, 158, 11, 0.3);
+}
+html[data-bs-theme=dark] .stat-card--danger {
+  --stat-card-icon: #fca5a5;
+  --stat-card-icon-bg: rgba(239, 68, 68, 0.2);
+  --stat-card-chip: #fecaca;
+  --stat-card-chip-bg: rgba(239, 68, 68, 0.3);
+}
+
+/* ── ClassWiseSummary sticky table header dark mode ─────────────────────── */
+html[data-bs-theme=dark] .table-fixed-height thead th {
+  background: var(--bs-body-bg, #1e1e2d) !important;
+  color: var(--bs-body-color, #e5e7eb) !important;
+  border-bottom-color: var(--bs-border-color, #374151) !important;
+}
+
+html[data-bs-theme=dark] .p-dropdown-items .p-dropdown-item.p-highlight,
+html[data-bs-theme=dark] .p-multiselect-items .p-multiselect-item.p-highlight {
+  background: rgba(59, 130, 246, 0.5) !important;
+}
+
+/* ng-select dropdowns */
+html[data-bs-theme=dark] .ng-select .ng-select-container,
+html[data-bs-theme=dark] .ng-dropdown-panel {
+  background-color: var(--bs-body-bg, #1f2937) !important;
+  border-color: var(--bs-border-color, #374151) !important;
+  color: var(--bs-body-color, #e5e7eb) !important;
+}
+
+html[data-bs-theme=dark] .ng-select .ng-value,
+html[data-bs-theme=dark] .ng-select .ng-placeholder {
+  color: var(--bs-body-color, #e5e7eb) !important;
+}
+
+html[data-bs-theme=dark] .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+  background-color: var(--bs-body-bg, #1f2937) !important;
+  color: var(--bs-body-color, #e5e7eb) !important;
+}
+
+html[data-bs-theme=dark] .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:hover,
+html[data-bs-theme=dark] .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-bs-theme=dark] .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected {
+  background-color: rgba(59, 130, 246, 0.5) !important;
+}
+
+/* Native select elements */
+html[data-bs-theme=dark] select.form-select,
+html[data-bs-theme=dark] select.form-control {
+  background-color: var(--bs-body-bg, #1f2937) !important;
+  border-color: var(--bs-border-color, #374151) !important;
+  color: var(--bs-body-color, #e5e7eb) !important;
+}
+
+html[data-bs-theme=dark] select option {
+  background-color: var(--bs-body-bg, #1f2937) !important;
+  color: var(--bs-body-color, #e5e7eb) !important;
+}
+
+/* Restaurant compatibility: its optimized stylesheet hides these controls. */
+.ag-theme-balham .ag-header-cell-menu-button,
+.ag-theme-balham .ag-header-cell-filter-button {
+  display: block !important;
+}
+
+.academic-report-grid.ag-theme-balham .ag-column-drop-horizontal-rowgroup:not(.ag-hidden) {
+  display: flex !important;
+}
+
+/* AcademicUpgrade presentation for accounting report grids. */
+.academic-report-grid.ag-theme-balham .ag-root-wrapper {
+  border-radius: 2px;
+  box-shadow: none;
+}
+
+.academic-report-grid.ag-theme-balham .ag-header {
+  box-shadow: none;
+}
+
+.academic-report-grid.ag-theme-balham .ag-header-cell,
+.academic-report-grid.ag-theme-balham .ag-header-group-cell {
+  border-right: 0;
+  font-weight: 600;
+}
+
+.academic-report-grid.ag-theme-balham .ag-header-cell-text {
+  line-height: normal;
+  white-space: nowrap;
+}
+
+.academic-report-grid.ag-theme-balham .ag-cell {
+  border-right-color: transparent;
+}

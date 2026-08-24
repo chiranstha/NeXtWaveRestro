@@ -1,4 +1,5 @@
 <div [@routerTransition]>
+    <restaurant-styles></restaurant-styles>
     <sub-header [title]="'Restaurant Menu' | localize">
         <div role="actions">
             <button class="btn btn-sm btn-primary me-2" (click)="resetMenuItem()" tooltip="{{ 'New' | localize }}">
@@ -17,99 +18,103 @@
     </sub-header>
 
     <div [class]="containerClass">
-        <div class="restaurant-page">
-            <div class="restaurant-nav">
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/pos" routerLinkActive="active">
+        <div class="restaurant-page overflow-x-hidden gap-5 mw-100 d-grid min-w-0">
+            <div class="restaurant-nav align-items-center bg-white border border-gray-300 d-flex gap-2 overflow-x-auto p-2 rounded-3">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/pos" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-cash-register"></i>
                     {{ 'POS' | localize }}
                 </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/setup" routerLinkActive="active">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/setup" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-sliders"></i>
                     {{ 'Setup' | localize }}
                 </a>
-                <a class="restaurant-nav-link active" routerLink="/app/main/restaurant/menu">
+                <a class="restaurant-nav-link active bg-hover-light bg-light-primary flex-shrink-0 text-gray-600 text-hover-dark text-primary align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/menu">
                     <i class="fa fa-utensils"></i>
                     {{ 'Menu' | localize }}
                 </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/inventory" routerLinkActive="active">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/inventory" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-boxes-stacked"></i>
                     {{ 'Inventory' | localize }}
                 </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/channels" routerLinkActive="active">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/channels" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-store"></i>
                     {{ 'Channels' | localize }}
                 </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/kds" routerLinkActive="active">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/kds" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-tv"></i>
                     {{ 'KDS' | localize }}
                 </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/reports" routerLinkActive="active">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/reports" routerLinkActive="active bg-light-primary text-primary">
                     <i class="fa fa-chart-line"></i>
                     {{ 'Reports' | localize }}
                 </a>
+                <a *ngIf="isGranted('Pages.Restaurant.Payroll')" class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/payroll" routerLinkActive="active bg-light-primary text-primary">
+                    <i class="fa fa-money-check-dollar"></i>
+                    {{ 'Payroll' | localize }}
+                </a>
             </div>
 
-            <div class="restaurant-metric-row">
-                <div class="restaurant-metric">
-                    <span class="restaurant-metric-label">{{ 'Categories' | localize }}</span>
-                    <span class="restaurant-metric-value">{{ categories.length }}</span>
+            <div class="restaurant-metric-row d-grid gap-4">
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
+                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Categories' | localize }}</span>
+                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ categories.length }}</span>
                 </div>
-                <div class="restaurant-metric">
-                    <span class="restaurant-metric-label">{{ 'Menu Items' | localize }}</span>
-                    <span class="restaurant-metric-value">{{ menuItems.length }}</span>
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
+                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Menu Items' | localize }}</span>
+                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ menuItems.length }}</span>
                 </div>
-                <div class="restaurant-metric">
-                    <span class="restaurant-metric-label">{{ 'Kitchen Items' | localize }}</span>
-                    <span class="restaurant-metric-value">{{ kitchenItemCount }}</span>
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
+                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Kitchen Items' | localize }}</span>
+                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ kitchenItemCount }}</span>
                 </div>
-                <div class="restaurant-metric">
-                    <span class="restaurant-metric-label">{{ 'Stock Items' | localize }}</span>
-                    <span class="restaurant-metric-value">{{ stockItemCount }}</span>
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
+                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Stock Items' | localize }}</span>
+                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ stockItemCount }}</span>
                 </div>
-                <div class="restaurant-metric">
-                    <span class="restaurant-metric-label">{{ 'Visible' | localize }}</span>
-                    <span class="restaurant-metric-value">{{ visibleItemCount }}</span>
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
+                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Visible' | localize }}</span>
+                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ visibleItemCount }}</span>
                 </div>
-                <div class="restaurant-metric">
-                    <span class="restaurant-metric-label">{{ 'Needs Attention' | localize }}</span>
-                    <span class="restaurant-metric-value">{{ soldOutCount + inactiveItemCount }}</span>
-                    <span class="restaurant-muted small">
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
+                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Needs Attention' | localize }}</span>
+                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ soldOutCount + inactiveItemCount }}</span>
+                    <span class="restaurant-muted text-gray-600 small">
                         {{ soldOutCount }} {{ 'Sold Out' | localize }} / {{ inactiveItemCount }} {{ 'Inactive' | localize }}
                     </span>
                 </div>
             </div>
 
-            <div class="restaurant-command-panel">
-                <div class="restaurant-command-main">
-                    <div>
-                        <div class="restaurant-section-title">
+            <div class="restaurant-command-panel align-items-stretch align-items-lg-center bg-white border border-gray-300 d-flex flex-column flex-lg-row gap-3 justify-content-between min-w-0 p-3 rounded-3">
+                <div class="restaurant-command-main align-items-stretch align-items-lg-center d-grid d-lg-flex flex-grow-1 gap-4 justify-content-between min-w-0">
+                    <div class="min-w-0">
+                        <div class="restaurant-section-title fw-bolder text-gray-900 fs-7 lh-sm m-0">
                             {{ selectedMenuItem?.displayName || ('Select or create a menu item' | localize) }}
                         </div>
-                        <div class="restaurant-muted">
+                        <div class="restaurant-muted text-gray-600">
                             {{ activeItemCount }} {{ 'active items' | localize }} / {{ featuredCount }} {{ 'featured' | localize }}
                             <span *ngIf="selectedMenuItem">
                                 / {{ selectedMenuItem.categoryName }} / {{ itemRouteText(selectedMenuItem) | localize }}
                             </span>
                         </div>
                     </div>
-                    <div class="restaurant-actionbar">
+                    <div class="restaurant-actionbar gap-2 align-items-center d-flex flex-wrap min-w-0">
                         <span
-                            class="restaurant-status"
-                            [ngClass]="selectedMenuItem?.isAvailable === false ? 'restaurant-status-danger' : 'restaurant-status-success'"
+                            class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
+                            [ngClass]="selectedMenuItem?.isAvailable === false ? 'bg-light-danger text-danger' : 'bg-light-success text-success'"
                             *ngIf="selectedMenuItem"
                         >
                             {{ selectedMenuItem.isAvailable === false ? ('Sold Out' | localize) : ('Available' | localize) }}
                         </span>
                         <span
-                            class="restaurant-status"
-                            [ngClass]="selectedMenuItem?.isActive === false ? 'restaurant-status-neutral' : 'restaurant-status-primary'"
+                            class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
+                            [ngClass]="selectedMenuItem?.isActive === false ? 'bg-light text-gray-600' : 'bg-light-primary text-primary'"
                             *ngIf="selectedMenuItem"
                         >
                             {{ selectedMenuItem.isActive === false ? ('Inactive' | localize) : ('Active' | localize) }}
                         </span>
                     </div>
                 </div>
-                <div class="restaurant-actionbar restaurant-actionbar-end">
+                <div class="restaurant-actionbar gap-2 restaurant-actionbar-end align-items-center d-flex flex-wrap justify-content-start justify-content-sm-end min-w-0">
                     <button class="btn btn-sm btn-light" (click)="clearFilters()">
                         <i class="fa fa-filter-circle-xmark"></i>
                         {{ 'Clear Filters' | localize }}
@@ -121,12 +126,12 @@
                 </div>
             </div>
 
-            <div class="restaurant-grid-3">
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Categories' | localize }}</div>
+            <div class="restaurant-grid-3 d-grid gap-5">
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Categories' | localize }}</div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-2">
                         <div class="mb-4">
                             <label class="required form-label">{{ 'Category Name' | localize }}</label>
                             <input class="form-control mb-2" [(ngModel)]="categoryForm.name" />
@@ -135,7 +140,7 @@
                                 [(ngModel)]="categoryForm.description"
                                 placeholder="{{ 'Description' | localize }}"
                             />
-                            <div class="restaurant-actionbar">
+                            <div class="restaurant-actionbar gap-2 align-items-center d-flex flex-wrap min-w-0">
                                 <input
                                     class="form-control w-100px"
                                     type="number"
@@ -164,33 +169,36 @@
                             </div>
                         </div>
 
-                        <div class="restaurant-empty" *ngIf="!categories.length">{{ 'NoData' | localize }}</div>
+                        <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 text-center" *ngIf="!categories.length">{{ 'NoData' | localize }}</div>
                         <div class="d-grid gap-2" *ngIf="categories.length">
                             <div
-                                class="restaurant-touch-button restaurant-click-row"
+                                class="restaurant-touch-button align-items-start bg-hover-light bg-white border border-hover-primary cursor-pointer d-flex flex-column gap-1 justify-content-start min-h-65px min-w-0 px-2 py-2 restaurant-click-row rounded-3 text-gray-700 text-hover-dark text-start text-wrap"
                                 *ngFor="let category of categories"
                                 [class.active]="categoryFilterId === category.id"
+                                [class.bg-light-primary]="categoryFilterId === category.id"
+                                [class.border-primary]="categoryFilterId === category.id"
+                                [class.text-gray-900]="categoryFilterId === category.id"
                                 role="button"
                                 tabindex="0"
                                 (click)="selectCategory(category.id)"
                                 (keydown.enter)="selectCategory(category.id)"
                                 (keydown.space)="selectCategory(category.id); $event.preventDefault()"
                             >
-                                <span class="fw-bold">{{ category.name }}</span>
-                                <span class="restaurant-muted">
+                                <span class="fw-bold mw-100">{{ category.name }}</span>
+                                <span class="restaurant-muted text-gray-600 mw-100">
                                     {{ category.description || ('NoDescription' | localize) }}
                                 </span>
                                 <span
-                                    class="restaurant-status"
-                                    [class.restaurant-status-success]="category.isActive"
-                                    [class.restaurant-status-neutral]="!category.isActive"
+                                    class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
+                                    [class.bg-light-success]="category.isActive" [class.text-success]="category.isActive"
+                                    [class.bg-light]="!category.isActive" [class.text-gray-600]="!category.isActive"
                                 >
                                     {{ category.isActive ? ('Active' | localize) : ('Inactive' | localize) }}
                                 </span>
-                                <span class="text-end w-100">
+                                <span class="mw-100 text-end w-100">
                                     <button
                                         type="button"
-                                        class="btn btn-xs me-1"
+                                        class="btn btn-xs me-1 align-items-center d-inline-flex fs-9 justify-content-center"
                                         [class.btn-light-success]="!category.isActive"
                                         [class.btn-light-warning]="category.isActive"
                                         (click)="toggleCategoryActive(category, $event)"
@@ -200,7 +208,7 @@
                                     </button>
                                     <button
                                         type="button"
-                                        class="btn btn-xs btn-light-primary"
+                                        class="btn btn-xs btn-light-primary align-items-center d-inline-flex fs-9 justify-content-center"
                                         (click)="$event.stopPropagation(); editCategory(category)"
                                         tooltip="{{ 'Edit' | localize }}"
                                     >
@@ -212,19 +220,19 @@
                     </div>
                 </div>
 
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Menu Items' | localize }}</div>
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Menu Items' | localize }}</div>
                     </div>
-                    <div class="card-body">
-                        <div class="restaurant-filterbar mb-4">
+                    <div class="card-body p-2">
+                        <div class="restaurant-filterbar align-items-end d-flex flex-wrap gap-3 mb-4">
                             <input
-                                class="form-control"
+                                class="form-control flex-grow-1 min-w-200px"
                                 [(ngModel)]="menuSearch"
                                 placeholder="{{ 'Search' | localize }}"
                             />
                             <ng-select
-                                class="w-175px"
+                                class="w-100 w-sm-175px"
                                 [items]="categories"
                                 bindLabel="name"
                                 bindValue="id"
@@ -234,7 +242,7 @@
                                 appendTo="body"
                             ></ng-select>
                             <ng-select
-                                class="w-175px"
+                                class="w-100 w-sm-175px"
                                 [items]="stations"
                                 bindLabel="name"
                                 bindValue="id"
@@ -243,80 +251,80 @@
                                 placeholder="{{ 'Station' | localize }}"
                                 appendTo="body"
                             ></ng-select>
-                            <select class="form-select w-150px" [(ngModel)]="routeFilter">
+                            <select class="form-select w-100 w-sm-150px" [(ngModel)]="routeFilter">
                                 <option value="">{{ 'All Types' | localize }}</option>
                                 <option value="kitchen">{{ 'Kitchen Item' | localize }}</option>
                                 <option value="stock">{{ 'Stock Item' | localize }}</option>
                             </select>
                         </div>
 
-                        <div class="restaurant-scroll restaurant-table-wrap">
-                            <table class="restaurant-table" *ngIf="filteredMenuItems.length; else noMenuItems">
-                                <thead>
+                        <div class="restaurant-scroll mh-500px restaurant-table-wrap overflow-x-auto overflow-auto">
+                            <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="filteredMenuItems.length; else noMenuItems">
+                                <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
                                     <tr>
-                                        <th>{{ 'Item' | localize }}</th>
-                                        <th>{{ 'Station' | localize }}</th>
-                                        <th>{{ 'Route' | localize }}</th>
-                                        <th class="text-end">{{ 'Price' | localize }}</th>
-                                        <th></th>
+                                        <th class="align-middle text-uppercase">{{ 'Item' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Station' | localize }}</th>
+                                        <th class="align-middle text-uppercase">{{ 'Route' | localize }}</th>
+                                        <th class="text-end align-middle text-uppercase">{{ 'Price' | localize }}</th>
+                                        <th class="align-middle text-uppercase"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr
-                                        class="restaurant-click-row"
+                                        class="restaurant-click-row cursor-pointer"
                                         *ngFor="let item of filteredMenuItems"
                                         (click)="editMenuItem(item)"
                                     >
-                                        <td>
+                                        <td class="align-middle">
                                             <div class="fw-bold">{{ item.displayName }}</div>
-                                            <div class="restaurant-muted">
+                                            <div class="restaurant-muted text-gray-600">
                                                 {{ item.shortCode || '-' }} / {{ item.categoryName }} /
                                                 {{ productTypeText(item.productType) }}
                                             </div>
-                                            <div class="restaurant-actionbar mt-2">
+                                            <div class="restaurant-actionbar gap-2 mt-2 align-items-center d-flex flex-wrap min-w-0">
                                                 <span
-                                                    class="restaurant-status restaurant-status-danger"
+                                                    class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-danger text-danger align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
                                                     *ngIf="!item.isAvailable"
                                                 >
                                                     {{ 'Sold Out' | localize }}
                                                 </span>
                                                 <span
-                                                    class="restaurant-status restaurant-status-warning"
+                                                    class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-warning text-warning align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
                                                     *ngIf="item.hasVariants"
                                                 >
                                                     {{ 'Variants' | localize }}
                                                 </span>
                                                 <span
-                                                    class="restaurant-status restaurant-status-primary"
+                                                    class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-primary text-primary align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
                                                     *ngIf="item.hasModifiers"
                                                 >
                                                     {{ 'Modifiers' | localize }}
                                                 </span>
                                                 <span
-                                                    class="restaurant-status"
+                                                    class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
                                                     *ngFor="let tag of item.tags"
                                                     [style.background]="tag.colorHex || '#f5f8fa'"
                                                 >
                                                     {{ tag.name }}
                                                 </span>
                                             </div>
-                                            <div class="restaurant-muted small mt-1" *ngIf="!item.stationId">
+                                            <div class="restaurant-muted text-gray-600 small mt-1" *ngIf="!item.stationId">
                                                 {{ 'Direct stock sale' | localize }}
                                             </div>
                                         </td>
-                                        <td>{{ item.stationName || ('No KOT/BOT' | localize) }}</td>
-                                        <td>
-                                            <span class="restaurant-status" [ngClass]="itemRouteClass(item)">
+                                        <td class="align-middle">{{ item.stationName || ('No KOT/BOT' | localize) }}</td>
+                                        <td class="align-middle">
+                                            <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap" [ngClass]="itemRouteClass(item)">
                                                 {{ itemRouteText(item) | localize }}
                                             </span>
-                                            <span class="restaurant-status d-inline-flex mt-1" [ngClass]="menuBehaviorClass(item)">
+                                            <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 d-inline-flex mt-1 align-items-center lh-1 mw-100 text-nowrap" [ngClass]="menuBehaviorClass(item)">
                                                 {{ menuBehaviorText(item) }}
                                             </span>
                                         </td>
-                                        <td class="text-end fw-bold">{{ item.price | number: '1.2-2' }}</td>
-                                        <td class="text-end">
+                                        <td class="text-end fw-bold align-middle">{{ item.price | number: '1.2-2' }}</td>
+                                        <td class="text-end align-middle">
                                             <button
-                                                class="btn btn-xs me-1"
+                                                class="btn btn-xs me-1 align-items-center d-inline-flex fs-9 justify-content-center"
                                                 [class.btn-light-success]="!item.isAvailable"
                                                 [class.btn-light-danger]="item.isAvailable"
                                                 (click)="$event.stopPropagation(); setAvailability(item, !item.isAvailable)"
@@ -325,7 +333,7 @@
                                                 <i class="fa" [ngClass]="item.isAvailable ? 'fa-ban' : 'fa-check'"></i>
                                             </button>
                                             <button
-                                                class="btn btn-xs me-1"
+                                                class="btn btn-xs me-1 align-items-center d-inline-flex fs-9 justify-content-center"
                                                 [class.btn-light-warning]="item.isFeatured"
                                                 [class.btn-light]="!item.isFeatured"
                                                 (click)="toggleFeatured(item, $event)"
@@ -334,7 +342,7 @@
                                                 <i class="fa fa-star"></i>
                                             </button>
                                             <button
-                                                class="btn btn-xs me-1"
+                                                class="btn btn-xs me-1 align-items-center d-inline-flex fs-9 justify-content-center"
                                                 [class.btn-light-success]="item.isActive === false"
                                                 [class.btn-light-warning]="item.isActive !== false"
                                                 (click)="toggleMenuItemActive(item, $event)"
@@ -343,21 +351,21 @@
                                                 <i class="fa" [ngClass]="item.isActive === false ? 'fa-check' : 'fa-pause'"></i>
                                             </button>
                                             <button
-                                                class="btn btn-xs btn-light me-1"
+                                                class="btn btn-xs btn-light me-1 align-items-center d-inline-flex fs-9 justify-content-center"
                                                 (click)="duplicateMenuItem(item, $event)"
                                                 tooltip="{{ 'Duplicate' | localize }}"
                                             >
                                                 <i class="fa fa-copy"></i>
                                             </button>
                                             <button
-                                                class="btn btn-xs btn-light-primary me-1"
+                                                class="btn btn-xs btn-light-primary me-1 align-items-center d-inline-flex fs-9 justify-content-center"
                                                 (click)="$event.stopPropagation(); editMenuItem(item)"
                                                 tooltip="{{ 'Edit' | localize }}"
                                             >
                                                 <i class="fa fa-pencil"></i>
                                             </button>
                                             <button
-                                                class="btn btn-xs btn-light-success"
+                                                class="btn btn-xs btn-light-success align-items-center d-inline-flex fs-9 justify-content-center"
                                                 (click)="$event.stopPropagation(); loadRecipe(item)"
                                                 tooltip="{{ 'Recipe' | localize }}"
                                             >
@@ -368,32 +376,32 @@
                                 </tbody>
                             </table>
                             <ng-template #noMenuItems>
-                                <div class="restaurant-empty">{{ 'NoData' | localize }}</div>
+                                <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 text-center">{{ 'NoData' | localize }}</div>
                             </ng-template>
                         </div>
                     </div>
                 </div>
 
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">
                             {{ itemForm.id ? ('Edit Menu Item' | localize) : ('New Menu Item' | localize) }}
                         </div>
-                        <div class="card-toolbar restaurant-actionbar" *ngIf="selectedMenuItem">
+                        <div class="card-toolbar restaurant-actionbar gap-2 align-items-center d-flex flex-wrap min-w-0" *ngIf="selectedMenuItem">
                             <button
-                                class="btn btn-xs"
+                                class="btn btn-xs align-items-center d-inline-flex fs-9 justify-content-center"
                                 [class.btn-light-success]="selectedMenuItem.isAvailable === false"
                                 [class.btn-light-danger]="selectedMenuItem.isAvailable !== false"
                                 (click)="setAvailability(selectedMenuItem, selectedMenuItem.isAvailable === false)"
                             >
                                 <i class="fa" [ngClass]="selectedMenuItem.isAvailable === false ? 'fa-check' : 'fa-ban'"></i>
                             </button>
-                            <button class="btn btn-xs btn-light" (click)="duplicateMenuItem(selectedMenuItem)">
+                            <button class="btn btn-xs btn-light align-items-center d-inline-flex fs-9 justify-content-center" (click)="duplicateMenuItem(selectedMenuItem)">
                                 <i class="fa fa-copy"></i>
                             </button>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-2">
                         <div class="mb-3">
                             <label class="required form-label">{{ 'Category' | localize }}</label>
                             <ng-select
@@ -417,29 +425,43 @@
                         </div>
                         <div class="mb-3">
                             <label class="required form-label">{{ 'Item Type' | localize }}</label>
-                            <div class="restaurant-route-toggle">
+                            <div class="restaurant-route-toggle d-flex gap-2">
                                 <button
                                     type="button"
-                                    class="restaurant-route-option"
+                                    class="restaurant-route-option align-items-center border border-gray-300 btn btn-light d-flex flex-fill gap-3 min-h-60px min-w-0 px-3 py-2 rounded-3 text-gray-700 text-start"
                                     [class.active]="itemForm.itemRoute === 'kitchen'"
+                                    [class.btn-light-primary]="itemForm.itemRoute === 'kitchen'"
+                                    [class.border-primary]="itemForm.itemRoute === 'kitchen'"
+                                    [class.text-gray-900]="itemForm.itemRoute === 'kitchen'"
                                     (click)="onItemRouteChanged('kitchen')"
                                 >
-                                    <i class="fa fa-fire-burner"></i>
-                                    <span>
-                                        <strong>{{ 'Kitchen Item' | localize }}</strong>
-                                        <small>{{ 'KOT/BOT' | localize }}</small>
+                                    <i
+                                        class="fa fa-fire-burner flex-grow-0 flex-shrink-0 fs-base"
+                                        [class.text-gray-500]="itemForm.itemRoute !== 'kitchen'"
+                                        [class.text-primary]="itemForm.itemRoute === 'kitchen'"
+                                    ></i>
+                                    <span class="d-grid gap-1 min-w-0">
+                                        <strong class="text-truncate">{{ 'Kitchen Item' | localize }}</strong>
+                                        <small class="fs-9 fw-bolder text-gray-600 text-truncate">{{ 'KOT/BOT' | localize }}</small>
                                     </span>
                                 </button>
                                 <button
                                     type="button"
-                                    class="restaurant-route-option"
+                                    class="restaurant-route-option align-items-center border border-gray-300 btn btn-light d-flex flex-fill gap-3 min-h-60px min-w-0 px-3 py-2 rounded-3 text-gray-700 text-start"
                                     [class.active]="itemForm.itemRoute === 'stock'"
+                                    [class.btn-light-primary]="itemForm.itemRoute === 'stock'"
+                                    [class.border-primary]="itemForm.itemRoute === 'stock'"
+                                    [class.text-gray-900]="itemForm.itemRoute === 'stock'"
                                     (click)="onItemRouteChanged('stock')"
                                 >
-                                    <i class="fa fa-box"></i>
-                                    <span>
-                                        <strong>{{ 'Stock Item' | localize }}</strong>
-                                        <small>{{ 'Direct Sale' | localize }}</small>
+                                    <i
+                                        class="fa fa-box flex-grow-0 flex-shrink-0 fs-base"
+                                        [class.text-gray-500]="itemForm.itemRoute !== 'stock'"
+                                        [class.text-primary]="itemForm.itemRoute === 'stock'"
+                                    ></i>
+                                    <span class="d-grid gap-1 min-w-0">
+                                        <strong class="text-truncate">{{ 'Stock Item' | localize }}</strong>
+                                        <small class="fs-9 fw-bolder text-gray-600 text-truncate">{{ 'Direct Sale' | localize }}</small>
                                     </span>
                                 </button>
                             </div>
@@ -512,7 +534,7 @@
                                 />
                             </div>
                         </div>
-                        <div class="restaurant-actionbar mb-3">
+                        <div class="restaurant-actionbar gap-2 mb-3 align-items-center d-flex flex-wrap min-w-0">
                             <label class="form-check form-check-sm">
                                 <input class="form-check-input" type="checkbox" [(ngModel)]="itemForm.isActive" />
                                 <span class="form-check-label">{{ 'Active' | localize }}</span>
@@ -530,7 +552,7 @@
                                 <span class="form-check-label">{{ 'Veg' | localize }}</span>
                             </label>
                         </div>
-                        <div class="restaurant-actionbar restaurant-actionbar-end">
+                        <div class="restaurant-actionbar gap-2 restaurant-actionbar-end align-items-center d-flex flex-wrap justify-content-start justify-content-sm-end min-w-0">
                             <button class="btn btn-sm btn-light" (click)="resetMenuItem()">
                                 {{ 'Clear' | localize }}
                             </button>
@@ -543,24 +565,24 @@
                 </div>
             </div>
 
-            <div class="restaurant-grid-3" *ngIf="selectedMenuItem">
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Variants' | localize }}</div>
+            <div class="restaurant-grid-3 d-grid gap-5" *ngIf="selectedMenuItem">
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Variants' | localize }}</div>
                         <div class="card-toolbar">
-                            <span class="restaurant-status restaurant-status-neutral">
+                            <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light text-gray-600 align-items-center d-inline-flex lh-1 mw-100 text-nowrap">
                                 {{ selectedMenuItem.variants?.length || 0 }}
                             </span>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="restaurant-table-wrap mb-4" *ngIf="selectedMenuItem.variants?.length; else noVariants">
-                            <table class="restaurant-table restaurant-compact-table">
+                    <div class="card-body p-2">
+                        <div class="restaurant-table-wrap mb-4 overflow-x-auto" *ngIf="selectedMenuItem.variants?.length; else noVariants">
+                            <table class="restaurant-table restaurant-compact-table table table-sm table-row-bordered align-middle mb-0 w-100">
                                 <tbody>
                                     <tr *ngFor="let variant of selectedMenuItem.variants">
-                                        <td>
+                                        <td class="align-middle">
                                             <div class="fw-bold">{{ variant.name }}</div>
-                                            <div class="restaurant-muted">
+                                            <div class="restaurant-muted text-gray-600">
                                                 {{
                                                     variant.isAbsolutePrice
                                                         ? ('Fixed Price' | localize)
@@ -568,19 +590,19 @@
                                                 }}
                                             </div>
                                         </td>
-                                        <td class="text-end fw-bold">
+                                        <td class="text-end fw-bold align-middle">
                                             {{ variantDisplayPrice(selectedMenuItem, variant) | number: '1.2-2' }}
                                         </td>
-                                        <td class="text-end">
-                                            <span class="restaurant-status restaurant-status-success" *ngIf="variant.isDefault">
+                                        <td class="text-end align-middle">
+                                            <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-success text-success align-items-center d-inline-flex lh-1 mw-100 text-nowrap" *ngIf="variant.isDefault">
                                                 {{ 'Default' | localize }}
                                             </span>
                                         </td>
-                                        <td class="text-end">
-                                            <button class="btn btn-xs btn-light-primary me-1" (click)="editVariant(variant)">
+                                        <td class="text-end align-middle">
+                                            <button class="btn btn-xs btn-light-primary me-1 align-items-center d-inline-flex fs-9 justify-content-center" (click)="editVariant(variant)">
                                                 <i class="fa fa-pencil"></i>
                                             </button>
-                                            <button class="btn btn-xs btn-light-danger" (click)="deleteVariant(variant)">
+                                            <button class="btn btn-xs btn-light-danger align-items-center d-inline-flex fs-9 justify-content-center" (click)="deleteVariant(variant)">
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </td>
@@ -589,7 +611,7 @@
                             </table>
                         </div>
                         <ng-template #noVariants>
-                            <div class="restaurant-empty mb-4">{{ 'NoData' | localize }}</div>
+                            <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 mb-4 text-center">{{ 'NoData' | localize }}</div>
                         </ng-template>
 
                         <div class="row">
@@ -605,7 +627,7 @@
                                 <label class="form-label">{{ 'Sort' | localize }}</label>
                                 <input class="form-control" type="number" [(ngModel)]="variantForm.sortOrder" />
                             </div>
-                            <div class="col-md-6 mb-3 restaurant-actionbar align-items-end">
+                            <div class="col-md-6 mb-3 restaurant-actionbar gap-2 align-items-center d-flex flex-wrap min-w-0">
                                 <label class="form-check form-check-sm">
                                     <input
                                         class="form-check-input"
@@ -624,7 +646,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="restaurant-actionbar restaurant-actionbar-end">
+                        <div class="restaurant-actionbar gap-2 restaurant-actionbar-end align-items-center d-flex flex-wrap justify-content-start justify-content-sm-end min-w-0">
                             <button class="btn btn-sm btn-light" (click)="resetVariantForm()">
                                 {{ 'Clear' | localize }}
                             </button>
@@ -636,11 +658,11 @@
                     </div>
                 </div>
 
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Modifier Groups' | localize }}</div>
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Modifier Groups' | localize }}</div>
                         <div class="card-toolbar">
-                            <span class="restaurant-status restaurant-status-neutral me-2">
+                            <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light text-gray-600 me-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap">
                                 {{ assignedModifierGroupCount }} {{ 'Assigned' | localize }}
                             </span>
                             <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="saveMenuItemModifierGroups()">
@@ -649,19 +671,20 @@
                             </button>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="restaurant-scroll-sm mb-4" *ngIf="modifierGroups.length; else noModifierGroups">
-                            <div class="restaurant-modifier-manager" *ngFor="let group of modifierGroups">
-                                <div class="restaurant-modifier-manager-head">
-                                    <label class="restaurant-modifier-option mb-0">
+                    <div class="card-body p-2">
+                        <div class="restaurant-scroll-sm mh-400px mb-4 overflow-auto" *ngIf="modifierGroups.length; else noModifierGroups">
+                            <div class="restaurant-modifier-manager border border-gray-200 d-grid gap-2 mb-2 p-2 rounded-3" *ngFor="let group of modifierGroups">
+                                <div class="restaurant-modifier-manager-head align-items-start d-flex gap-2 justify-content-between">
+                                    <label class="restaurant-modifier-option align-items-start border-0 cursor-pointer d-flex flex-grow-1 gap-3 mb-0 min-w-0 p-0">
                                         <input
+                                            class="mt-1"
                                             type="checkbox"
                                             [checked]="selectedModifierGroupIds.includes(group.id)"
                                             (change)="onModifierGroupChanged(group.id, $event)"
                                         />
                                         <span>
                                             <strong>{{ group.name }}</strong>
-                                            <small class="restaurant-muted d-block">
+                                            <small class="restaurant-muted text-gray-600 d-block">
                                                 {{ group.isRequired ? ('Required' | localize) : ('Optional' | localize) }}
                                                 / {{ group.minSelect }}-{{ group.maxSelect }}
                                                 / {{ group.modifiers?.length || 0 }} {{ 'modifiers' | localize }}
@@ -669,19 +692,21 @@
                                         </span>
                                     </label>
                                     <button
-                                        class="btn btn-xs btn-light-primary"
+                                        class="btn btn-xs btn-light-primary align-items-center d-inline-flex fs-9 justify-content-center"
                                         (click)="editModifierGroup(group); modifierForm.modifierGroupId = group.id"
                                         tooltip="{{ 'Edit' | localize }}"
                                     >
                                         <i class="fa fa-pencil"></i>
                                     </button>
                                 </div>
-                                <div class="restaurant-modifier-pill-row" *ngIf="group.modifiers?.length">
+                                <div class="restaurant-modifier-pill-row d-flex flex-wrap gap-2" *ngIf="group.modifiers?.length">
                                     <button
                                         type="button"
-                                        class="restaurant-modifier-pill"
+                                        class="restaurant-modifier-pill align-items-center bg-hover-light-primary border border-gray-300 border-hover-primary btn btn-sm btn-light d-inline-flex fs-9 fw-bolder gap-2 min-h-30px px-2 py-1 rounded-2 text-gray-700 text-hover-dark"
                                         *ngFor="let modifier of group.modifiers"
                                         [class.inactive]="modifier.isActive === false"
+                                        [class.text-gray-400]="modifier.isActive === false"
+                                        [class.text-decoration-line-through]="modifier.isActive === false"
                                         (click)="editModifier(group, modifier)"
                                     >
                                         <span>{{ modifier.name }}</span>
@@ -691,7 +716,7 @@
                             </div>
                         </div>
                         <ng-template #noModifierGroups>
-                            <div class="restaurant-empty mb-4">{{ 'NoData' | localize }}</div>
+                            <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 mb-4 text-center">{{ 'NoData' | localize }}</div>
                         </ng-template>
 
                         <div class="separator separator-dashed my-4"></div>
@@ -708,7 +733,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="restaurant-actionbar mb-3">
+                        <div class="restaurant-actionbar gap-2 mb-3 align-items-center d-flex flex-wrap min-w-0">
                             <label class="form-check form-check-sm">
                                 <input class="form-check-input" type="checkbox" [(ngModel)]="modifierGroupForm.isRequired" />
                                 <span class="form-check-label">{{ 'Required' | localize }}</span>
@@ -752,7 +777,7 @@
                                 <input class="form-control" type="number" [(ngModel)]="modifierForm.priceDelta" />
                             </div>
                         </div>
-                        <div class="restaurant-actionbar restaurant-actionbar-end">
+                        <div class="restaurant-actionbar gap-2 restaurant-actionbar-end align-items-center d-flex flex-wrap justify-content-start justify-content-sm-end min-w-0">
                             <button class="btn btn-sm btn-light" (click)="resetModifierForm()">
                                 {{ 'Clear' | localize }}
                             </button>
@@ -764,17 +789,17 @@
                     </div>
                 </div>
 
-                <div class="card card-custom gutter-b restaurant-card">
-                    <div class="card-header">
-                        <div class="card-title">{{ 'Tags & Availability' | localize }}</div>
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Tags & Availability' | localize }}</div>
                         <div class="card-toolbar">
                             <button class="btn btn-sm btn-light-primary" (click)="addTag()">
                                 <i class="fa fa-plus"></i>
                             </button>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="restaurant-actionbar mb-4">
+                    <div class="card-body p-2">
+                        <div class="restaurant-actionbar gap-2 mb-4 align-items-center d-flex flex-wrap min-w-0">
                             <button
                                 class="btn btn-sm"
                                 [class.btn-success]="selectedMenuItem.isAvailable"
@@ -795,17 +820,17 @@
                             </button>
                         </div>
 
-                        <div class="restaurant-empty mb-3" *ngIf="!tagRows.length">{{ 'NoData' | localize }}</div>
-                        <div class="restaurant-tag-editor-row" *ngFor="let tag of tagRows; let i = index">
-                            <input class="form-control" [(ngModel)]="tag.name" placeholder="{{ 'Tag' | localize }}" />
-                            <input class="form-control restaurant-color-input" type="color" [(ngModel)]="tag.colorHex" />
-                            <input class="form-control w-80px" type="number" [(ngModel)]="tag.sortOrder" />
-                            <button class="btn btn-xs btn-light-danger" (click)="removeTag(i)">
+                        <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 mb-3 text-center" *ngIf="!tagRows.length">{{ 'NoData' | localize }}</div>
+                        <div class="restaurant-tag-editor-row align-items-center d-flex flex-wrap gap-2 mb-2" *ngFor="let tag of tagRows; let i = index">
+                            <input class="form-control flex-grow-1 min-w-200px" [(ngModel)]="tag.name" placeholder="{{ 'Tag' | localize }}" />
+                            <input class="form-control flex-shrink-0 min-h-40px p-1 w-55px" type="color" [(ngModel)]="tag.colorHex" />
+                            <input class="form-control flex-shrink-0 w-80px" type="number" [(ngModel)]="tag.sortOrder" />
+                            <button class="btn btn-xs btn-light-danger align-items-center d-inline-flex fs-9 justify-content-center" (click)="removeTag(i)">
                                 <i class="fa fa-trash"></i>
                             </button>
                         </div>
 
-                        <div class="restaurant-actionbar restaurant-actionbar-end mt-4">
+                        <div class="restaurant-actionbar gap-2 restaurant-actionbar-end mt-4 align-items-center d-flex flex-wrap justify-content-start justify-content-sm-end min-w-0">
                             <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="saveTags()">
                                 <i class="fa fa-save"></i>
                                 {{ 'Save Tags' | localize }}
@@ -815,28 +840,28 @@
                 </div>
             </div>
 
-            <div class="card card-custom gutter-b restaurant-card" *ngIf="selectedMenuItem">
-                <div class="card-header">
-                    <div class="card-title">
+            <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0" *ngIf="selectedMenuItem">
+                <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                    <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">
                         {{ selectedMenuItem.displayName }} {{ 'Recipe' | localize }}
                         <span
-                            class="restaurant-status restaurant-status-success ms-3"
+                            class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-success text-success ms-3 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
                             *ngIf="selectedMenuItem.hasRecipe"
                         >
                             Recipe/BOM
                         </span>
                         <span
-                            class="restaurant-status restaurant-status-primary ms-3"
+                            class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-primary text-primary ms-3 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
                             *ngIf="!selectedMenuItem.hasRecipe"
                         >
                             Direct
                         </span>
                     </div>
                     <div class="card-toolbar">
-                        <span class="restaurant-status restaurant-status-neutral me-2" *ngIf="recipeCost">
+                        <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light text-gray-600 me-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap" *ngIf="recipeCost">
                             {{ 'Cost' | localize }} {{ recipeCost.totalCost | number: '1.2-2' }}
                         </span>
-                        <span class="restaurant-status restaurant-status-success me-2" *ngIf="recipeMarginPercentage !== null">
+                        <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-success text-success me-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap" *ngIf="recipeMarginPercentage !== null">
                             {{ 'Margin' | localize }} {{ recipeMarginPercentage | number: '1.0-0' }}%
                         </span>
                         <button
@@ -848,39 +873,39 @@
                         </button>
                     </div>
                 </div>
-                <div class="restaurant-cost-strip" *ngIf="recipeCost">
-                    <div>
-                        <span class="restaurant-label">{{ 'Selling Price' | localize }}</span>
-                        <strong>{{ selectedMenuItem.price | number: '1.2-2' }}</strong>
+                <div class="restaurant-cost-strip bg-light border-bottom border-gray-200 d-flex flex-wrap gap-2 p-3" *ngIf="recipeCost">
+                    <div class="bg-white border border-gray-200 d-grid flex-fill gap-1 min-w-125px px-3 py-2 rounded-3">
+                        <span class="restaurant-label fs-9 fw-bold text-gray-600 text-uppercase">{{ 'Selling Price' | localize }}</span>
+                        <strong class="fs-base fw-bolder text-gray-900">{{ selectedMenuItem.price | number: '1.2-2' }}</strong>
                     </div>
-                    <div>
-                        <span class="restaurant-label">{{ 'Recipe Cost' | localize }}</span>
-                        <strong>{{ recipeCost.totalCost | number: '1.2-2' }}</strong>
+                    <div class="bg-white border border-gray-200 d-grid flex-fill gap-1 min-w-125px px-3 py-2 rounded-3">
+                        <span class="restaurant-label fs-9 fw-bold text-gray-600 text-uppercase">{{ 'Recipe Cost' | localize }}</span>
+                        <strong class="fs-base fw-bolder text-gray-900">{{ recipeCost.totalCost | number: '1.2-2' }}</strong>
                     </div>
-                    <div>
-                        <span class="restaurant-label">{{ 'Gross Profit' | localize }}</span>
-                        <strong>{{ selectedMenuItem.price - recipeCost.totalCost | number: '1.2-2' }}</strong>
+                    <div class="bg-white border border-gray-200 d-grid flex-fill gap-1 min-w-125px px-3 py-2 rounded-3">
+                        <span class="restaurant-label fs-9 fw-bold text-gray-600 text-uppercase">{{ 'Gross Profit' | localize }}</span>
+                        <strong class="fs-base fw-bolder text-gray-900">{{ selectedMenuItem.price - recipeCost.totalCost | number: '1.2-2' }}</strong>
                     </div>
-                    <div>
-                        <span class="restaurant-label">{{ 'Margin' | localize }}</span>
-                        <strong>{{ recipeMarginPercentage === null ? '-' : (recipeMarginPercentage | number: '1.0-0') + '%' }}</strong>
+                    <div class="bg-white border border-gray-200 d-grid flex-fill gap-1 min-w-125px px-3 py-2 rounded-3">
+                        <span class="restaurant-label fs-9 fw-bold text-gray-600 text-uppercase">{{ 'Margin' | localize }}</span>
+                        <strong class="fs-base fw-bolder text-gray-900">{{ recipeMarginPercentage === null ? '-' : (recipeMarginPercentage | number: '1.0-0') + '%' }}</strong>
                     </div>
                 </div>
-                <div class="card-body p-0 restaurant-table-wrap">
-                    <table class="restaurant-table" *ngIf="recipeLines.length; else noRecipeLines">
-                        <thead>
+                <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                    <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="recipeLines.length; else noRecipeLines">
+                        <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
                             <tr>
-                                <th>{{ 'Raw Material' | localize }}</th>
-                                <th>{{ 'Qty' | localize }}</th>
-                                <th>{{ 'Unit' | localize }}</th>
-                                <th>{{ 'Wastage %' | localize }}</th>
-                                <th>{{ 'Cost' | localize }}</th>
-                                <th></th>
+                                <th class="align-middle text-uppercase">{{ 'Raw Material' | localize }}</th>
+                                <th class="align-middle text-uppercase">{{ 'Qty' | localize }}</th>
+                                <th class="align-middle text-uppercase">{{ 'Unit' | localize }}</th>
+                                <th class="align-middle text-uppercase">{{ 'Wastage %' | localize }}</th>
+                                <th class="align-middle text-uppercase">{{ 'Cost' | localize }}</th>
+                                <th class="align-middle text-uppercase"></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr *ngFor="let line of recipeLines; let i = index">
-                                <td>
+                                <td class="align-middle">
                                     <ng-select
                                         [items]="rawMaterials"
                                         bindLabel="displayName"
@@ -889,10 +914,10 @@
                                         appendTo="body"
                                     ></ng-select>
                                 </td>
-                                <td>
+                                <td class="align-middle">
                                     <input class="form-control w-100px" type="number" [(ngModel)]="line.quantity" />
                                 </td>
-                                <td>
+                                <td class="align-middle">
                                     <ng-select
                                         [items]="units"
                                         bindLabel="displayName"
@@ -901,19 +926,19 @@
                                         appendTo="body"
                                     ></ng-select>
                                 </td>
-                                <td>
+                                <td class="align-middle">
                                     <input
                                         class="form-control w-100px"
                                         type="number"
                                         [(ngModel)]="line.wastagePercentage"
                                     />
                                 </td>
-                                <td>
+                                <td class="align-middle">
                                     <input class="form-control w-125px" type="number" [(ngModel)]="line.costRate" />
                                 </td>
-                                <td class="text-end">
+                                <td class="text-end align-middle">
                                     <button
-                                        class="btn btn-xs btn-light-danger"
+                                        class="btn btn-xs btn-light-danger align-items-center d-inline-flex fs-9 justify-content-center"
                                         (click)="removeRecipeLine(i)"
                                         tooltip="{{ 'Delete' | localize }}"
                                     >
@@ -924,10 +949,10 @@
                         </tbody>
                     </table>
                     <ng-template #noRecipeLines>
-                        <div class="restaurant-empty m-5">{{ 'NoData' | localize }}</div>
+                        <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'NoData' | localize }}</div>
                     </ng-template>
                 </div>
-                <div class="card-footer restaurant-actionbar restaurant-actionbar-end">
+                <div class="card-footer border-gray-200 gap-2 px-3 py-2 restaurant-actionbar gap-2 restaurant-actionbar-end align-items-center d-flex flex-wrap justify-content-start justify-content-sm-end min-w-0">
                     <button class="btn btn-sm btn-light-primary" (click)="addRecipeLine()">
                         <i class="fa fa-plus"></i>
                         {{ 'Add' | localize }}

@@ -1,7 +1,9 @@
 <!--begin::Signin-->
 <div [@routerTransition] class="login-form">
-    <div class="pb-13 pt-lg-0 pt-5">
-        <h3 class="fw-bolder text-dark fs-h4 fs-h1-lg">{{ 'LogIn' | localize }}</h3>
+    <div class="pb-10 pt-lg-0 pt-5 login-heading">
+        <span class="login-kicker">Restaurant workspace</span>
+        <h3 class="fw-bolder text-dark fs-h4 fs-h1-lg mb-3">{{ 'LogIn' | localize }}</h3>
+        <p class="mb-0 text-muted fw-bold">Welcome back. Your next service starts here.</p>
     </div>
     <!--begin::Form-->
     <form #loginForm="ngForm" (ngSubmit)="login()" class="login-form form" method="post">
@@ -9,6 +11,7 @@
             <input
                 #userNameOrEmailAddressInput="ngModel"
                 [(ngModel)]="loginService.authenticateModel.userNameOrEmailAddress"
+                [attr.aria-label]="'UserNameOrEmail' | localize"
                 autoFocus
                 autocomplete="new-password"
                 class="form-control form-control-solid h-auto py-4 px-6 rounded-lg fs-h6"
@@ -24,28 +27,41 @@
         <div class="mb-5" data-kt-password-meter="true">
             <div class="position-relative mb-3">
                 <input
+                    id="loginPassword"
                     #passwordInput="ngModel"
                     [(ngModel)]="loginService.authenticateModel.password"
-                    [type]="showPassword || passwordAnimation ? 'text' : 'password'"
+                    [attr.aria-label]="'Password' | localize"
+                    [class.password-field-scrambling]="passwordAnimation"
+                    [type]="showPassword ? 'text' : 'password'"
                     autocomplete="new-password"
-                    class="form-control form-control-solid h-auto px-6 py-4 rounded-lg fs-h6"
+                    class="form-control form-control-solid h-auto px-6 py-4 rounded-lg fs-h6 password-input"
                     maxlength="32"
                     name="password"
                     placeholder="{{ 'Password' | localize }} *"
                     required
                 />
+                @if (passwordAnimation) {
+                    <span class="password-shuffle-layer position-absolute top-50 translate-middle-y" aria-hidden="true">
+                        {{ passwordShuffleText }}
+                    </span>
+                }
                 <!--begin::Visibility toggle-->
-                <span
+                <button
+                    #passwordToggle
                     (click)="togglePasswordVisibility()"
+                    (mousemove)="trackMousePosition($event)"
+                    [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+                    [attr.aria-pressed]="showPassword"
+                    [disabled]="!hasPasswordValue"
                     [ngClass]="{
                         'password-animating': passwordAnimation,
                         'eye-open': showPassword,
                         'eye-closed': !showPassword,
-                        'hidden-toggle':
-                            !loginService.authenticateModel.password ||
-                            loginService.authenticateModel.password.length === 0,
+                        'hidden-toggle': !hasPasswordValue,
                     }"
-                    class="position-absolute translate-middle top-50 end-0 me-n2 password-toggle"
+                    aria-controls="loginPassword"
+                    class="position-absolute translate-middle-y top-50 end-0 d-flex align-items-center justify-content-center p-0 border rounded bg-white password-toggle"
+                    type="button"
                 >
                     <div class="simple-eye">
                         <!-- Open Eye (visible when password is shown) -->
@@ -62,7 +78,7 @@
                             <path class="eye-outline" d="M10,15 Q50,-5 90,15" />
                         </svg>
                     </div>
-                </span>
+                </button>
                 <!--end::Visibility toggle-->
             </div>
             @if (!passwordInput.touched) {
@@ -70,10 +86,11 @@
             }
         </div>
         <div class="mb-5 d-flex justify-content-between mt-4">
-            <label class="form-check form-check-custom form-check-solid">
+            <label class="form-check form-check-custom form-check-solid" for="rememberMe">
                 <input
                     [(ngModel)]="loginService.rememberMe"
                     class="form-check-input"
+                    id="rememberMe"
                     name="rememberMe"
                     type="checkbox"
                     value="true"
@@ -93,7 +110,7 @@
         <!--begin::Action-->
         <div class="pb-lg-0 pb-5">
             <button
-                [disabled]="isLoginButtonDisabled"
+                [disabled]="loginForm.invalid"
                 class="btn w-100 btn-primary fw-bolder fs-h6 px-8 py-3 my-3 me-3"
                 type="submit"
             >
@@ -127,7 +144,7 @@
     }
     <!--end::Options-->
 </div>
-<div class="mt-5">
+<div class="mt-6 login-support-links">
     @if (isPasswordlessLoginEnabled) {
         <span>
             <span>{{ 'PasswordlessLogin_Description' | localize }}</span>

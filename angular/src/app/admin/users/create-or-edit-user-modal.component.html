@@ -10,11 +10,11 @@
     tabindex="-1"
 >
     <div class="modal-dialog modal-lg modal-fullscreen-sm-down">
-        <div class="modal-content">
+            <div class="modal-content mw-100">
             @if (active) {
                 <form #userForm="ngForm" (ngSubmit)="save()" novalidate>
                     <div class="modal-header">
-                        <h4 class="modal-title">
+                        <h4 class="modal-title fs-5 text-break">
                             @if (user.id) {
                                 <span>{{ 'EditUser' | localize }}: {{ user.userName }}</span>
                             }
@@ -30,13 +30,13 @@
                             type="button"
                         ></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body overflow-x-hidden">
                         <tabset>
                             <tab class="pt-5" heading="{{ 'UserInformations' | localize }}">
                                 <div class="row">
                                     <div class="col-12 col-sm-3 text-center mb-5 mt-sm-5">
                                         <img
-                                            class="img-thumbnail img-rounded"
+                                            class="img-thumbnail img-rounded h-auto"
                                             height="128"
                                             src="{{ profilePicture }}"
                                             width="128"
@@ -391,7 +391,7 @@
                                     </label>
                                 }
                             </tab>
-                            <tab class="pt-5" heading="{{ 'Roles' | localize }}">
+                            <tab class="pt-5 d-block" heading="{{ 'Roles' | localize }}">
                                 <ng-template tabHeading>
                                     <span class="badge badge-success assigned-role-count ms-2">
                                         {{ assignedRoleCount }}
@@ -423,7 +423,7 @@
                                     }
                                 </div>
                             </tab>
-                            <tab class="pt-5" heading="{{ 'OrganizationUnits' | localize }}">
+                            <tab class="pt-5 d-block" heading="{{ 'OrganizationUnits' | localize }}">
                                 <ng-template tabHeading>
                                     <span class="badge badge-success assigned-role-count ms-2">
                                         {{ assignedMemberedOrganizationUnitCount }}
@@ -438,11 +438,11 @@
                             </tab>
                         </tabset>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer flex-wrap gap-2">
                         <button
                             (click)="close()"
                             [disabled]="saving"
-                            class="btn btn-sm btn-light-primary fw-bold"
+                            class="btn btn-sm btn-light-primary fw-bold m-0 w-100 w-sm-auto flex-sm-grow-0"
                             type="button"
                         >
                             {{ 'Cancel' | localize }}
@@ -451,7 +451,7 @@
                             [busyText]="l('SavingWithThreeDot')"
                             [buttonBusy]="saving"
                             [disabled]="saving || userForm.invalid"
-                            class="btn btn-sm btn-primary fw-bold"
+                            class="btn btn-sm btn-primary fw-bold m-0 w-100 w-sm-auto flex-sm-grow-0"
                             type="submit"
                         >
                             <i class="fa fa-save"></i>

@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable, Optional } from '@angular/core';
 import { API_BASE_URL } from '@shared/service-proxies/service-proxies';
 import { DateTime } from 'luxon';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 export interface RestaurantDailySalesSummaryReportDto {
     date: string | Date;
@@ -116,10 +116,10 @@ export interface RestaurantRecipeCostingLineDto {
     rawMaterialId: string;
     rawMaterialName: string;
     unitName: string;
-    qty: number;
+    quantity: number;
     wastagePercentage: number;
-    unitCost: number;
-    totalCost: number;
+    costRate: number;
+    costAmount: number;
 }
 
 export interface RestaurantRecipeCostingReportDto {
@@ -127,7 +127,7 @@ export interface RestaurantRecipeCostingReportDto {
     productName: string;
     categoryName: string;
     menuPrice: number;
-    totalRecipeCost: number;
+    recipeCost: number;
     foodCostPercent: number;
     marginAmount: number;
     lines: RestaurantRecipeCostingLineDto[];
@@ -139,10 +139,10 @@ export interface RestaurantFoodCostingReportDto {
     categoryName: string;
     soldQty: number;
     salesAmount: number;
-    theoreticalRecipeCost: number;
-    actualStockIssueCost: number;
-    wastageCost: number;
-    grossMargin: number;
+    theoreticalCostAmount: number;
+    actualCostAmount: number;
+    wastageCostAmount: number;
+    marginAmount: number;
     foodCostPercent: number;
 }
 
@@ -169,6 +169,60 @@ export interface RestaurantLowStockReportDto {
     supplierName: string;
     suggestedQty: number;
     missingSupplierMapping: boolean;
+}
+
+export interface RestaurantPayrollReportSummaryDto {
+    activeEmployeeCount: number;
+    payrollRunCount: number;
+    attendanceRecordCount: number;
+    totalGross: number;
+    totalDeduction: number;
+    totalNet: number;
+    totalOvertimeHours: number;
+}
+
+export interface RestaurantPayrollRunReportDto {
+    id: string;
+    runNumber: string;
+    periodStart: string | Date;
+    periodEnd: string | Date;
+    status: number;
+    tipsPool: number;
+    serviceChargePool: number;
+    totalGross: number;
+    totalDeduction: number;
+    totalNet: number;
+    employeeCount: number;
+}
+
+export interface RestaurantPayrollEmployeeCostReportDto {
+    employeeId: string;
+    employeeName: string;
+    staffCode: string;
+    jobRole: string;
+    workedHours: number;
+    overtimeHours: number;
+    basicPay: number;
+    allowance: number;
+    tipsAndServiceCharge: number;
+    grossPay: number;
+    totalDeduction: number;
+    netPay: number;
+}
+
+export interface RestaurantPayrollAttendanceStatusReportDto {
+    status: number;
+    statusName: string;
+    recordCount: number;
+    regularHours: number;
+    overtimeHours: number;
+}
+
+export interface RestaurantPayrollReportBundleDto {
+    summary: RestaurantPayrollReportSummaryDto;
+    runs: RestaurantPayrollRunReportDto[];
+    employeeCosts: RestaurantPayrollEmployeeCostReportDto[];
+    attendance: RestaurantPayrollAttendanceStatusReportDto[];
 }
 
 @Injectable()
@@ -299,6 +353,16 @@ export class RestaurantReportsApiService {
         return this.get<RestaurantLowStockReportDto[]>('GetLowStockReport', fromDate, toDate, tableId, waiterUserId, categoryId);
     }
 
+    getPayrollReport(
+        fromDate: DateTime | null,
+        toDate: DateTime | null,
+        tableId: string | null,
+        waiterUserId: number | null,
+        categoryId: string | null
+    ): Observable<RestaurantPayrollReportBundleDto> {
+        return this.get<RestaurantPayrollReportBundleDto>('GetPayrollReport', fromDate, toDate, tableId, waiterUserId, categoryId);
+    }
+
     private get<T>(
         action: string,
         fromDate: DateTime | null,
@@ -307,9 +371,17 @@ export class RestaurantReportsApiService {
         waiterUserId: number | null,
         categoryId: string | null
     ): Observable<T> {
-        return this.http.get<T>(`${this.baseUrl}/api/services/app/RestaurantReports/${action}`, {
-            params: this.buildParams(fromDate, toDate, tableId, waiterUserId, categoryId),
-        });
+        return this.http
+            .get<T | { result: T }>(`${this.baseUrl}/api/services/app/RestaurantReports/${action}`, {
+                params: this.buildParams(fromDate, toDate, tableId, waiterUserId, categoryId),
+            })
+            .pipe(
+                map((response) =>
+                    response && typeof response === 'object' && 'result' in response
+                        ? (response as { result: T }).result
+                        : (response as T),
+                ),
+            );
     }
 
     private buildParams(

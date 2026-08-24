@@ -23,7 +23,7 @@ Color statusColor(TicketStatus status) {
 
 String ticketStatusLabel(TicketStatus status) {
   return switch (status) {
-    TicketStatus.queued => 'Queued',
+    TicketStatus.queued => 'Pending',
     TicketStatus.acknowledged => 'Acknowledged',
     TicketStatus.preparing => 'Preparing',
     TicketStatus.ready => 'Ready',
@@ -33,7 +33,7 @@ String ticketStatusLabel(TicketStatus status) {
 
 String nextStatusAction(TicketStatus status) {
   return switch (status) {
-    TicketStatus.queued => 'Acknowledge',
+    TicketStatus.queued => 'Start Prep',
     TicketStatus.acknowledged => 'Start Prep',
     TicketStatus.preparing => 'Mark Ready',
     TicketStatus.ready => 'Bump Ticket',

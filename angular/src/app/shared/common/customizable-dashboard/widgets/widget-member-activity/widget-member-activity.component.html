@@ -2,10 +2,10 @@
 <div [@routerTransition]>
     <div [class]="containerClass">
         <div class="kt-content">
-            <div class="dashboard-portlet">
-                <header class="dashboard-header d-flex align-items-center justify-content-between">
+            <div class="dashboard-portlet p-3">
+                <header class="dashboard-header d-flex align-items-center justify-content-between py-2 px-3">
                     <div class="dashboard-title">
-                        <h2 class="mb-0">{{ l('AttendanceDashboard') }}</h2>
+                        <h2 class="mb-0 fs-5">{{ l('AttendanceDashboard') }}</h2>
                         <p class="text-muted mb-0 small">{{ l('AttendanceDashboardSubtitle') }}</p>
                     </div>
                     <div class="dashboard-controls d-flex align-items-center gap-2">
@@ -57,99 +57,99 @@
                 </header>
                 <div class="dashboard-body">
                     <!-- Stats cards -->
-                    <section aria-live="polite" class="stats-grid mb-3">
+                    <section aria-live="polite" class="stats-grid mb-3 d-grid gap-3">
                         @if (!loading) {
                             @if (dashboardData) {
-                                <div class="stat-card">
-                                    <div class="stat-icon bg-soft-blue"><i class="fa fa-users"></i></div>
+                                <div class="stat-card d-flex align-items-center bg-white gap-3 p-3 rounded-3">
+                                    <div class="stat-icon bg-soft-blue d-flex align-items-center justify-content-center rounded-3 fs-5"><i class="fa fa-users"></i></div>
                                     <div class="stat-body">
-                                        <div class="stat-number">
+                                        <div class="stat-number fs-5 fw-semibold text-dark">
                                             {{ dashboardData.statistics?.totalStudents || 0 }}
                                         </div>
-                                        <div class="stat-label">{{ l('TotalStudents') }}</div>
+                                        <div class="stat-label small text-muted">{{ l('TotalStudents') }}</div>
                                     </div>
                                 </div>
                             }
                             @if (dashboardData) {
-                                <div class="stat-card">
-                                    <div class="stat-icon bg-soft-green"><i class="fa fa-check"></i></div>
+                                <div class="stat-card d-flex align-items-center bg-white gap-3 p-3 rounded-3">
+                                    <div class="stat-icon bg-soft-green d-flex align-items-center justify-content-center rounded-3 fs-5"><i class="fa fa-check"></i></div>
                                     <div class="stat-body">
-                                        <div class="stat-number">{{ dashboardData.statistics?.presentToday || 0 }}</div>
-                                        <div class="stat-label">{{ l('PresentToday') }}</div>
+                                        <div class="stat-number fs-5 fw-semibold text-dark">{{ dashboardData.statistics?.presentToday || 0 }}</div>
+                                        <div class="stat-label small text-muted">{{ l('PresentToday') }}</div>
                                     </div>
                                 </div>
                             }
                             @if (dashboardData) {
-                                <div class="stat-card">
-                                    <div class="stat-icon bg-soft-red"><i class="fa fa-times"></i></div>
+                                <div class="stat-card d-flex align-items-center bg-white gap-3 p-3 rounded-3">
+                                    <div class="stat-icon bg-soft-red d-flex align-items-center justify-content-center rounded-3 fs-5"><i class="fa fa-times"></i></div>
                                     <div class="stat-body">
-                                        <div class="stat-number">{{ dashboardData.statistics?.absentToday || 0 }}</div>
-                                        <div class="stat-label">{{ l('AbsentToday') }}</div>
+                                        <div class="stat-number fs-5 fw-semibold text-dark">{{ dashboardData.statistics?.absentToday || 0 }}</div>
+                                        <div class="stat-label small text-muted">{{ l('AbsentToday') }}</div>
                                     </div>
                                 </div>
                             }
                             @if (dashboardData) {
-                                <div class="stat-card">
-                                    <div class="stat-icon bg-soft-indigo"><i class="fa fa-chart-line"></i></div>
+                                <div class="stat-card d-flex align-items-center bg-white gap-3 p-3 rounded-3">
+                                    <div class="stat-icon bg-soft-indigo d-flex align-items-center justify-content-center rounded-3 fs-5"><i class="fa fa-chart-line"></i></div>
                                     <div class="stat-body">
-                                        <div class="stat-number">
+                                        <div class="stat-number fs-5 fw-semibold text-dark">
                                             {{
                                                 $safeNavigationMigration(
                                                     dashboardData.statistics?.attendancePercentageToday
                                                 ) | number: '1.1-1'
                                             }}%
                                         </div>
-                                        <div class="stat-label">{{ l('AttendancePercentageToday') }}</div>
+                                        <div class="stat-label small text-muted">{{ l('AttendancePercentageToday') }}</div>
                                     </div>
                                 </div>
                             }
                         } @else {
                             @for (i of [1, 2, 3, 4]; track i) {
-                                <div class="stat-skel"></div>
+                                <div class="stat-skel rounded-3"></div>
                             }
                         }
                     </section>
                     <!-- Charts -->
-                    <section class="charts-row mb-3">
+                    <section class="charts-row mb-3 d-flex gap-3">
                         <div class="chart-main">
-                            <div class="chart-card">
-                                <div class="chart-header">
+                            <div class="chart-card bg-white p-2 rounded-3">
+                                <div class="chart-header pt-2 px-2">
                                     <strong>{{ l('MonthlyAttendanceTrend') }}</strong>
                                 </div>
-                                <div [attr.aria-hidden]="loading" class="chart-body">
+                                <div [attr.aria-hidden]="loading" class="chart-body p-2">
                                     @if (!loading) {
                                         <canvas #attendanceTrendChart></canvas>
                                     } @else {
-                                        <div class="chart-skel"></div>
+                                        <div class="chart-skel rounded-3"></div>
                                     }
                                 </div>
                             </div>
                         </div>
                         <aside class="chart-side">
-                            <div class="chart-card">
-                                <div class="chart-header">
+                            <div class="chart-card bg-white p-2 rounded-3">
+                                <div class="chart-header pt-2 px-2">
                                     <strong>{{ l('CourseWiseAttendance') }}</strong>
                                 </div>
-                                <div [attr.aria-hidden]="loading" class="chart-body">
+                                <div [attr.aria-hidden]="loading" class="chart-body p-2">
                                     @if (!loading) {
                                         <canvas #classWiseChart></canvas>
                                     } @else {
-                                        <div class="chart-skel"></div>
+                                        <div class="chart-skel rounded-3"></div>
                                     }
                                 </div>
                             </div>
                         </aside>
                     </section>
                     <section class="chart-full mb-3">
-                        <div class="chart-card">
-                            <div class="chart-header">
+                        <div class="chart-card bg-white p-2 rounded-3 w-100">
+                            <div class="chart-header pt-2 px-2">
                                 <strong>{{ l('DailyAttendanceCount') }}</strong>
                             </div>
-                            <div [attr.aria-hidden]="loading" class="chart-body">
+                            <div [attr.aria-hidden]="loading" class="chart-body p-2">
                                 @if (!loading) {
                                     <canvas #dailyAttendanceChart></canvas>
                                 } @else {
-                                    <div class="chart-skel"></div>
+                                    <div class="chart-skel rounded-3"></div>
                                 }
                             </div>
                         </div>
@@ -157,11 +157,11 @@
                     <!-- Tables -->
                     @if (dashboardData?.classSummaries?.length) {
                         <section class="mb-3">
-                            <div class="table-card">
-                                <div class="table-header">
+                            <div class="table-card bg-white rounded-3">
+                                <div class="table-header p-2">
                                     <strong>{{ l('CourseWiseSummary') }}</strong>
                                 </div>
-                                <div class="table-body table-fixed-height">
+                                <div class="table-body table-fixed-height p-2 overflow-y-auto overflow-x-auto">
                                     <ag-grid-angular
                                         class="ag-theme-balham"
                                         style="width: 100%; height: 100%; min-height: 320px"
@@ -175,11 +175,11 @@
                     }
                     @if (dashboardData?.criticalAlerts?.length) {
                         <section class="mb-3">
-                            <div class="table-card">
-                                <div class="table-header">
+                            <div class="table-card bg-white rounded-3">
+                                <div class="table-header p-2">
                                     <strong>{{ l('CriticalAlerts') }}</strong>
                                 </div>
-                                <div class="table-body table-fixed-height">
+                                <div class="table-body table-fixed-height p-2 overflow-y-auto overflow-x-auto">
                                     <ag-grid-angular
                                         class="ag-theme-balham"
                                         style="width: 100%; height: 100%; min-height: 320px"

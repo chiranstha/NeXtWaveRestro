@@ -6,7 +6,9 @@ import { SubHeaderComponent } from '@app/shared/common/sub-header/sub-header.com
 import { AdminSharedModule } from '@app/admin/shared/admin-shared.module';
 import { UtilsModule } from '@shared/utils/utils.module';
 import { AgGridModule } from 'ag-grid-angular';
+import { AgChartsSharedModule } from '@app/shared/common/ag-charts-shared/ag-charts-shared.module';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { KeyboardShortcutsModule } from 'ng-keyboard-shortcuts';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
@@ -15,10 +17,14 @@ import { RestaurantChannelsComponent } from './restaurant-channels/restaurant-ch
 import { RestaurantKdsComponent } from './restaurant-kds/restaurant-kds.component';
 import { RestaurantInventoryComponent } from './restaurant-inventory/restaurant-inventory.component';
 import { RestaurantMenuComponent } from './restaurant-menu/restaurant-menu.component';
+import { RestaurantNavigationComponent } from './restaurant-navigation.component';
+import { RestaurantPayrollApiService } from './restaurant-payroll/restaurant-payroll-api.service';
+import { RestaurantPayrollComponent } from './restaurant-payroll/restaurant-payroll.component';
 import { RestaurantPosComponent } from './restaurant-pos/restaurant-pos.component';
 import { RestaurantReportsComponent } from './restaurant-reports/restaurant-reports.component';
 import { RestaurantRoutingModule } from './restaurant-routing.module';
 import { RestaurantSetupComponent } from './restaurant-setup/restaurant-setup.component';
+import { RestaurantStylesComponent } from './restaurant-styles.component';
 
 @NgModule({
     imports: [
@@ -30,22 +36,28 @@ import { RestaurantSetupComponent } from './restaurant-setup/restaurant-setup.co
         AdminSharedModule,
         SubHeaderComponent,
         NgSelectModule,
+        KeyboardShortcutsModule,
         ModalModule,
         BsDropdownModule,
         TooltipModule,
         NepaliDatepickerModule,
         AgGridModule,
+        AgChartsSharedModule,
+        RestaurantStylesComponent,
         RestaurantRoutingModule,
     ],
     declarations: [
         RestaurantSetupComponent,
         RestaurantMenuComponent,
+        RestaurantNavigationComponent,
         RestaurantInventoryComponent,
         RestaurantChannelsComponent,
         RestaurantPosComponent,
         RestaurantKdsComponent,
         RestaurantReportsComponent,
+        RestaurantPayrollComponent,
     ],
+    providers: [RestaurantPayrollApiService],
     schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
 })
 export class RestaurantModule {}

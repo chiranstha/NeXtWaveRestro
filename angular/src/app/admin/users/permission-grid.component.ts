@@ -21,7 +21,6 @@ interface PermissionRowData {
 @Component({
     selector: 'permission-grid',
     templateUrl: './permission-grid.component.html',
-    styleUrls: ['./permission-grid.component.css'],
     imports: [AgGridAngular, LocalizePipe],
     changeDetection: ChangeDetectionStrategy.Eager,
     schemas: [NO_ERRORS_SCHEMA],

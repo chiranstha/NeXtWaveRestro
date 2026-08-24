@@ -2,94 +2,261 @@ part of '../../main.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({
+    required this.controller,
     required this.modules,
-    required this.tickets,
-    required this.cart,
     required this.onOpen,
     super.key,
   });
 
+  final RestaurantAppController controller;
   final List<ErpModule> modules;
-  final List<KdsTicket> tickets;
-  final List<CartLine> cart;
   final ValueChanged<ModuleKind> onOpen;
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.sizeOf(context).width;
-    final compact = width < 900;
+    final activeTickets = controller.tickets
+        .where((ticket) => ticket.status != TicketStatus.bumped)
+        .toList();
+    final occupied = controller.tables.where((table) => table.occupied).length;
+    final canViewSales = controller.canViewReportCategory(
+      'Pages.Restaurant.Reports.Sales',
+    );
+    final canViewOperations = controller.canViewReportCategory(
+      'Pages.Restaurant.Reports.Operations',
+    );
+    final canViewInventory = controller.canViewReportCategory(
+      'Pages.Restaurant.Reports.Inventory',
+    );
+    final canViewPayroll = controller.canViewReportCategory(
+      'Pages.Restaurant.Reports.Payroll',
+    );
+    final canViewAudit = controller.canViewReportCategory(
+      'Pages.Restaurant.Reports.AuditFinance',
+    );
+    final reportTickets = controller.reportBundle.kotBotStatus;
+    final pendingReportTickets = reportTickets.where((row) {
+      return _string(row['status']).toLowerCase() == 'pending';
+    }).length;
+    final lowStock = canViewInventory
+        ? controller.reportBundle.lowStock.length
+        : controller.inventory.where((item) => item.low).length;
+    final wastageAmount = controller.reportBundle.wastage.fold<double>(
+      0,
+      (total, row) => total + _number(row['amount']),
+    );
+    final discountAmount = controller.reportBundle.discounts.fold<double>(
+      0,
+      (total, row) => total + _number(row['totalDiscountAmount']),
+    );
+    final settledSales = controller.reportBundle.settlements.fold<double>(
+      0,
+      (total, row) => total + _number(row['grandTotal']),
+    );
+    final settledOrders = controller.reportBundle.settlements.fold<int>(
+      0,
+      (total, row) => total + _integer(row['orderCount']),
+    );
+    final payroll = controller.reportBundle.payrollSummary;
+    final managementCards = <Widget>[
+      if (canViewSales) ...[
+        _KpiCard(
+          title: 'Sales today',
+          value: money(controller.report.grandTotal),
+          helper: '${controller.report.orderCount} billed orders',
+          icon: Icons.payments_rounded,
+          color: AppColors.green,
+        ),
+        _KpiCard(
+          title: 'Average bill',
+          value: money(controller.report.averageBill),
+          helper: 'Discount ${money(controller.report.discountAmount)}',
+          icon: Icons.receipt_long_rounded,
+          color: AppColors.primary,
+        ),
+      ],
+      if (canViewOperations)
+        _KpiCard(
+          title: 'Pending KOT / BOT',
+          value: '$pendingReportTickets',
+          helper: '${reportTickets.length} tracked tickets',
+          icon: Icons.soup_kitchen_rounded,
+          color: AppColors.amber,
+        ),
+      if (canViewInventory) ...[
+        _KpiCard(
+          title: 'Low stock',
+          value: '$lowStock',
+          helper: 'Items needing attention',
+          icon: Icons.warning_amber_rounded,
+          color: AppColors.red,
+        ),
+        _KpiCard(
+          title: 'Wastage',
+          value: money(wastageAmount),
+          helper: '${controller.reportBundle.wastage.length} entries',
+          icon: Icons.delete_outline_rounded,
+          color: AppColors.red,
+        ),
+      ],
+      if (canViewPayroll) ...[
+        _KpiCard(
+          title: 'Active employees',
+          value: '${_integer(payroll['activeEmployeeCount'])}',
+          helper:
+              '${_integer(payroll['attendanceRecordCount'])} attendance records',
+          icon: Icons.groups_rounded,
+          color: AppColors.violet,
+        ),
+        _KpiCard(
+          title: 'Net payroll',
+          value: money(_number(payroll['totalNet'])),
+          helper: '${_integer(payroll['payrollRunCount'])} pay runs',
+          icon: Icons.account_balance_wallet_rounded,
+          color: AppColors.green,
+        ),
+      ],
+      if (canViewAudit) ...[
+        _KpiCard(
+          title: 'Settled sales',
+          value: money(settledSales),
+          helper: '$settledOrders settled orders',
+          icon: Icons.account_balance_rounded,
+          color: AppColors.green,
+        ),
+        _KpiCard(
+          title: 'Discount exposure',
+          value: money(discountAmount),
+          helper:
+              '${controller.reportBundle.voidAudit.length} void / cancelled records',
+          icon: Icons.policy_outlined,
+          color: AppColors.amber,
+        ),
+      ],
+    ];
+    final operationalCards = <Widget>[
+      _KpiCard(
+        title: 'Occupied tables',
+        value: '$occupied / ${controller.tables.length}',
+        helper: '${controller.openOrders.length} open orders',
+        icon: Icons.table_bar_rounded,
+        color: AppColors.primary,
+      ),
+      _KpiCard(
+        title: 'Kitchen tickets',
+        value: '${activeTickets.length}',
+        helper:
+            '${activeTickets.where((item) => item.minutes >= 15).length} over 15 minutes',
+        icon: Icons.soup_kitchen_rounded,
+        color: AppColors.amber,
+      ),
+      _KpiCard(
+        title: 'Low stock',
+        value: '$lowStock',
+        helper: '${controller.inventory.length} suggestions loaded',
+        icon: Icons.warning_amber_rounded,
+        color: AppColors.red,
+      ),
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _CommandPanel(onOpen: onOpen),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: AppColors.primaryDark,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Wrap(
+            spacing: 24,
+            runSpacing: 14,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              const Icon(
+                Icons.restaurant_rounded,
+                color: Colors.white,
+                size: 42,
+              ),
+              SizedBox(
+                width: 430,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Welcome, ${controller.profile?.name ?? controller.profile?.userName ?? 'team'}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      controller.hasPermission('Pages.Restaurant.Reports')
+                          ? 'Decision-ready restaurant, inventory, payroll, and audit insights for ${controller.brand.displayName}.'
+                          : 'Live restaurant operations for ${controller.brand.displayName}.',
+                      style: const TextStyle(
+                        color: Color(0xFFD9E7FB),
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (controller.hasPermission('Pages.Restaurant.Pos'))
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    if (controller.tables.isNotEmpty)
+                      _orderModeButton(
+                        'Dine in',
+                        Icons.table_restaurant_rounded,
+                        controller.tables.first.id,
+                      ),
+                    _orderModeButton(
+                      'Takeaway',
+                      Icons.shopping_bag_rounded,
+                      'mode:takeaway',
+                    ),
+                    _orderModeButton(
+                      'Delivery',
+                      Icons.delivery_dining_rounded,
+                      'mode:delivery',
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ),
         const SizedBox(height: 16),
         _ResponsiveGrid(
           minTileWidth: 210,
           tileHeight: 148,
-          children: [
-            _KpiCard(
-              title: 'Net Sales',
-              value: 'Rs 1,42,850',
-              helper: '+18.6% vs yesterday',
-              icon: Icons.trending_up_rounded,
-              color: AppColors.green,
-            ),
-            _KpiCard(
-              title: 'Open Tables',
-              value: '12 / 32',
-              helper: '4 tables need service',
-              icon: Icons.table_bar_rounded,
-              color: AppColors.primary,
-            ),
-            _KpiCard(
-              title: 'Kitchen Tickets',
-              value:
-                  '${tickets.where((t) => t.status != TicketStatus.bumped).length}',
-              helper: '3 over target prep time',
-              icon: Icons.soup_kitchen_rounded,
-              color: AppColors.amber,
-            ),
-            _KpiCard(
-              title: 'Low Stock',
-              value: '${inventoryItems.where((i) => i.low).length}',
-              helper: 'Auto PO suggestions ready',
-              icon: Icons.warning_amber_rounded,
-              color: AppColors.red,
-            ),
-          ],
+          children: managementCards.isNotEmpty
+              ? managementCards
+              : operationalCards,
         ),
         const SizedBox(height: 16),
-        if (compact)
-          Column(
-            children: [
-              _LiveServiceBoard(tickets: tickets),
-              const SizedBox(height: 16),
-              _PriorityWork(onOpen: onOpen),
-            ],
-          )
-        else
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(flex: 7, child: _LiveServiceBoard(tickets: tickets)),
-              const SizedBox(width: 16),
-              Expanded(flex: 4, child: _PriorityWork(onOpen: onOpen)),
-            ],
-          ),
-        const SizedBox(height: 16),
+        if (controller.hasPermission('Pages.Restaurant.Kds') &&
+            activeTickets.isNotEmpty) ...[
+          _LiveServiceBoard(tickets: activeTickets),
+          const SizedBox(height: 16),
+        ],
         _SectionHeader(
-          title: 'ERP Modules',
-          action: 'All ${modules.length} modules',
+          title: 'Available modules',
+          action:
+              '${math.max(0, modules.length - 1)} based on your permissions',
           icon: Icons.apps_rounded,
         ),
         const SizedBox(height: 10),
         _ResponsiveGrid(
-          minTileWidth: 260,
+          minTileWidth: 250,
           tileHeight: 132,
           children: [
             for (final module in modules.where(
-              (m) => m.kind != ModuleKind.dashboard,
+              (module) => module.kind != ModuleKind.dashboard,
             ))
               _ModuleCard(module: module, onTap: () => onOpen(module.kind)),
           ],
@@ -97,132 +264,15 @@ class DashboardScreen extends StatelessWidget {
       ],
     );
   }
-}
 
-class _CommandPanel extends StatelessWidget {
-  const _CommandPanel({required this.onOpen});
-
-  final ValueChanged<ModuleKind> onOpen;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.primaryDark,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final wide = constraints.maxWidth > 760;
-          return Flex(
-            direction: wide ? Axis.horizontal : Axis.vertical,
-            crossAxisAlignment: wide
-                ? CrossAxisAlignment.center
-                : CrossAxisAlignment.start,
-            children: [
-              Flexible(
-                flex: wide ? 3 : 0,
-                fit: wide ? FlexFit.tight : FlexFit.loose,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: const [
-                        _StatusPill(
-                          label: 'OPEN SHIFT',
-                          color: AppColors.green,
-                        ),
-                        _StatusPill(
-                          label: 'IRD QUEUE: 2',
-                          color: AppColors.amber,
-                        ),
-                        _StatusPill(
-                          label: 'SYNC ONLINE',
-                          color: AppColors.teal,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 18),
-                    const Text(
-                      'Restaurant command center',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Operate counter billing, KOT/BOT, purchases, stock, channels, and accounting from one mobile-first ERP workspace.',
-                      style: TextStyle(
-                        color: Color(0xFFC8D7EF),
-                        fontSize: 14.5,
-                        height: 1.45,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: [
-                        _ActionButton(
-                          label: 'New Bill',
-                          icon: Icons.point_of_sale_rounded,
-                          color: AppColors.green,
-                          onTap: () => onOpen(ModuleKind.pos),
-                        ),
-                        _ActionButton(
-                          label: 'KDS Board',
-                          icon: Icons.restaurant_menu_rounded,
-                          color: AppColors.amber,
-                          onTap: () => onOpen(ModuleKind.kds),
-                        ),
-                        _ActionButton(
-                          label: 'Stock Used',
-                          icon: Icons.soup_kitchen_rounded,
-                          color: AppColors.teal,
-                          onTap: () => onOpen(ModuleKind.restaurantStockUsed),
-                        ),
-                        _ActionButton(
-                          label: 'Reports',
-                          icon: Icons.insights_rounded,
-                          color: AppColors.violet,
-                          onTap: () => onOpen(ModuleKind.restaurantReports),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              if (wide) const SizedBox(width: 20),
-              SizedBox(
-                width: wide ? 360 : double.infinity,
-                height: 220,
-                child: CustomPaint(
-                  painter: _DashboardChartPainter(),
-                  child: const Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Text(
-                        'Peak: 7:45 PM  |  Avg ticket Rs 1,185',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
+  Widget _orderModeButton(String label, IconData icon, String contextValue) {
+    return FilledButton.icon(
+      onPressed: () {
+        controller.selectPosContext(contextValue);
+        onOpen(ModuleKind.pos);
+      },
+      icon: Icon(icon),
+      label: Text(label),
     );
   }
 }

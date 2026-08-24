@@ -127,6 +127,7 @@ namespace NextWave.Erp.Restaurant.Dtos
         public string OrderNo { get; set; }
         public Guid OrderItemId { get; set; }
         public Guid SalesMasterId { get; set; }
+        public string SalesVoucherNo { get; set; }
         public Guid? SalesDetailId { get; set; }
         public string VoucherNo { get; set; }
         public Guid MenuProductId { get; set; }

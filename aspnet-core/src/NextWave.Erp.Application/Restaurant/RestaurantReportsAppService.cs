@@ -35,11 +35,25 @@ namespace NextWave.Erp.Restaurant
         IRepository<Unit, Guid> unitRepository,
         IRepository<SalesMaster, Guid> salesMasterRepository,
         IRepository<User, long> userRepository,
+        IRepository<RestaurantPayrollEmployee, Guid> payrollEmployeeRepository,
+        IRepository<RestaurantPayrollRun, Guid> payrollRunRepository,
+        IRepository<RestaurantPayrollLine, Guid> payrollLineRepository,
+        IRepository<RestaurantPayrollAttendance, Guid> payrollAttendanceRepository,
         RestaurantReorderService reorderService)
         : ErpAppServiceBase, IRestaurantReportsAppService
     {
+        private static readonly string[] ReportCategoryPermissions =
+        {
+            AppPermissions.PagesRestaurantReportsSales,
+            AppPermissions.PagesRestaurantReportsOperations,
+            AppPermissions.PagesRestaurantReportsInventory,
+            AppPermissions.PagesRestaurantReportsPayroll,
+            AppPermissions.PagesRestaurantReportsAuditFinance
+        };
+
         public async Task<RestaurantPosSalesSummaryDto> GetPosSalesSummary(RestaurantReportFilterDto input)
         {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsSales);
             var sales = GetBilledSales(input);
             var orderCount = await sales.CountAsync();
             var grandTotal = await sales.Select(x => (decimal?)x.GrandTotal).SumAsync() ?? 0;
@@ -56,8 +70,102 @@ namespace NextWave.Erp.Restaurant
             };
         }
 
+        public async Task<RestaurantPayrollReportBundleDto> GetPayrollReport(RestaurantReportFilterDto input)
+        {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsPayroll);
+            var fromDate = input?.FromDate?.Date;
+            var toDateExclusive = input?.ToDate?.Date.AddDays(1);
+
+            var payrollRuns = payrollRunRepository.GetAll();
+            if (fromDate.HasValue)
+                payrollRuns = payrollRuns.Where(run => run.PeriodEnd >= fromDate.Value);
+            if (toDateExclusive.HasValue)
+                payrollRuns = payrollRuns.Where(run => run.PeriodStart < toDateExclusive.Value);
+
+            var runs = await payrollRuns
+                .OrderByDescending(run => run.PeriodEnd)
+                .Select(run => new RestaurantPayrollRunDto
+                {
+                    Id = run.Id,
+                    RunNumber = run.RunNumber,
+                    PeriodStart = run.PeriodStart,
+                    PeriodEnd = run.PeriodEnd,
+                    Status = run.Status,
+                    TipsPool = run.TipsPool,
+                    ServiceChargePool = run.ServiceChargePool,
+                    TotalGross = run.TotalGross,
+                    TotalDeduction = run.TotalDeduction,
+                    TotalNet = run.TotalNet,
+                    Notes = run.Notes,
+                    CreatedAt = run.CreatedAt,
+                    EmployeeCount = payrollLineRepository.GetAll().Count(line => line.PayrollRunId == run.Id)
+                })
+                .ToListAsync();
+
+            var runIds = runs.Select(run => run.Id).ToList();
+            var employeeCosts = runIds.Count == 0
+                ? new List<RestaurantPayrollEmployeeCostReportDto>()
+                : await payrollLineRepository.GetAll()
+                    .Where(line => runIds.Contains(line.PayrollRunId))
+                    .GroupBy(line => new { line.EmployeeId, line.EmployeeName, line.StaffCode, line.JobRole })
+                    .Select(group => new RestaurantPayrollEmployeeCostReportDto
+                    {
+                        EmployeeId = group.Key.EmployeeId,
+                        EmployeeName = group.Key.EmployeeName,
+                        StaffCode = group.Key.StaffCode,
+                        JobRole = group.Key.JobRole,
+                        WorkedHours = group.Sum(line => line.WorkedHours),
+                        OvertimeHours = group.Sum(line => line.OvertimeHours),
+                        BasicPay = group.Sum(line => line.BasicPay),
+                        Allowance = group.Sum(line => line.Allowance),
+                        TipsAndServiceCharge = group.Sum(line => line.TipsShare + line.ServiceChargeShare),
+                        GrossPay = group.Sum(line => line.GrossPay),
+                        TotalDeduction = group.Sum(line => line.TaxDeduction + line.OtherDeduction + line.AdvanceRecovery),
+                        NetPay = group.Sum(line => line.NetPay)
+                    })
+                    .OrderByDescending(row => row.GrossPay)
+                    .ToListAsync();
+
+            var attendanceQuery = payrollAttendanceRepository.GetAll();
+            if (fromDate.HasValue)
+                attendanceQuery = attendanceQuery.Where(row => row.WorkDate >= fromDate.Value);
+            if (toDateExclusive.HasValue)
+                attendanceQuery = attendanceQuery.Where(row => row.WorkDate < toDateExclusive.Value);
+
+            var attendance = await attendanceQuery
+                .GroupBy(row => row.Status)
+                .Select(group => new RestaurantPayrollAttendanceStatusReportDto
+                {
+                    Status = group.Key,
+                    StatusName = group.Key.ToString(),
+                    RecordCount = group.Count(),
+                    RegularHours = group.Sum(row => row.RegularHours),
+                    OvertimeHours = group.Sum(row => row.OvertimeHours)
+                })
+                .OrderBy(row => row.Status)
+                .ToListAsync();
+
+            return new RestaurantPayrollReportBundleDto
+            {
+                Summary = new RestaurantPayrollReportSummaryDto
+                {
+                    ActiveEmployeeCount = await payrollEmployeeRepository.GetAll().CountAsync(employee => employee.IsActive),
+                    PayrollRunCount = runs.Count,
+                    AttendanceRecordCount = attendance.Sum(row => row.RecordCount),
+                    TotalGross = runs.Sum(run => run.TotalGross),
+                    TotalDeduction = runs.Sum(run => run.TotalDeduction),
+                    TotalNet = runs.Sum(run => run.TotalNet),
+                    TotalOvertimeHours = employeeCosts.Sum(row => row.OvertimeHours)
+                },
+                Runs = runs,
+                EmployeeCosts = employeeCosts,
+                Attendance = attendance
+            };
+        }
+
         public async Task<List<RestaurantMaterialConsumptionReportDto>> GetMaterialConsumption(RestaurantReportFilterDto input)
         {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsInventory);
             var rows = await (
                     from sales in GetBilledSales(input)
                     join stockPosting in stockPostingRepository.GetAll() on (Guid?)sales.Id equals stockPosting.MasterId
@@ -95,6 +203,7 @@ namespace NextWave.Erp.Restaurant
 
         public async Task<List<RestaurantItemSalesReportDto>> GetItemSales(RestaurantReportFilterDto input)
         {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsSales);
             var rows = await (
                     from billLine in GetBilledBillLines(input)
                     join item in orderItemRepository.GetAll() on billLine.OrderItemId equals item.Id
@@ -144,6 +253,7 @@ namespace NextWave.Erp.Restaurant
 
         public async Task<List<RestaurantTableSalesReportDto>> GetTableSales(RestaurantReportFilterDto input)
         {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsOperations);
             var rows = await (
                     from sales in GetBilledSales(input)
                     join order in orderRepository.GetAll().Include(x => x.TableFk) on sales.SourceDocumentId equals (Guid?)order.Id
@@ -172,6 +282,7 @@ namespace NextWave.Erp.Restaurant
 
         public async Task<List<RestaurantWaiterSalesReportDto>> GetWaiterSales(RestaurantReportFilterDto input)
         {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsOperations);
             var rows = await (
                     from sales in GetBilledSales(input)
                     join order in orderRepository.GetAll() on sales.SourceDocumentId equals (Guid?)order.Id
@@ -202,6 +313,7 @@ namespace NextWave.Erp.Restaurant
 
         public async Task<List<RestaurantDailySalesSummaryReportDto>> GetDailySalesSummary(RestaurantReportFilterDto input)
         {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsSales);
             var rows = await (
                     from sales in GetBilledSales(input)
                     join order in orderRepository.GetAll()
@@ -259,6 +371,7 @@ namespace NextWave.Erp.Restaurant
 
         public async Task<List<RestaurantTicketStatusReportDto>> GetKotBotStatus(RestaurantReportFilterDto input)
         {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsOperations);
             input ??= new RestaurantReportFilterDto();
 
             var query =
@@ -362,6 +475,7 @@ namespace NextWave.Erp.Restaurant
 
         public async Task<List<RestaurantItemMarginReportDto>> GetItemSalesWithMargin(RestaurantReportFilterDto input)
         {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsSales);
             var salesRows = await (
                     from billLine in GetBilledBillLines(input)
                     join item in orderItemRepository.GetAll() on billLine.OrderItemId equals item.Id
@@ -451,6 +565,7 @@ namespace NextWave.Erp.Restaurant
 
         public async Task<List<RestaurantWaiterPerformanceReportDto>> GetWaiterPerformance(RestaurantReportFilterDto input)
         {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsOperations);
             var orders = await (
                     from sales in GetBilledSales(input)
                     join order in orderRepository.GetAll()
@@ -508,6 +623,7 @@ namespace NextWave.Erp.Restaurant
 
         public async Task<List<RestaurantTableTurnoverReportDto>> GetTableTurnover(RestaurantReportFilterDto input)
         {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsOperations);
             input ??= new RestaurantReportFilterDto();
 
             var sessionQuery = tableSessionRepository.GetAll()
@@ -596,6 +712,7 @@ namespace NextWave.Erp.Restaurant
 
         public async Task<List<RestaurantVoidAuditReportDto>> GetVoidCancelledAudit(RestaurantReportFilterDto input)
         {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsAuditFinance);
             input ??= new RestaurantReportFilterDto();
             var rows = new List<RestaurantVoidAuditReportDto>();
 
@@ -790,6 +907,7 @@ namespace NextWave.Erp.Restaurant
 
         public async Task<List<RestaurantDiscountReportDto>> GetDiscountReport(RestaurantReportFilterDto input)
         {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsAuditFinance);
             var orders = await (
                     from sales in GetBilledSales(input)
                     join order in orderRepository.GetAll().Include(x => x.TableFk) on sales.SourceDocumentId equals (Guid?)order.Id
@@ -850,6 +968,7 @@ namespace NextWave.Erp.Restaurant
 
         public async Task<List<RestaurantSettlementReportDto>> GetSettlementReport(RestaurantReportFilterDto input)
         {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsAuditFinance);
             var rows = await GetBilledSales(input)
                 .Select(sales => new
                     {
@@ -882,6 +1001,7 @@ namespace NextWave.Erp.Restaurant
 
         public async Task<List<RestaurantRecipeCostingReportDto>> GetRecipeCosting(RestaurantReportFilterDto input)
         {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsInventory);
             input ??= new RestaurantReportFilterDto();
 
             var menuItems = await menuItemRepository.GetAll()
@@ -952,6 +1072,7 @@ namespace NextWave.Erp.Restaurant
 
         public async Task<List<RestaurantFoodCostingReportDto>> GetFoodCosting(RestaurantReportFilterDto input)
         {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsInventory);
             input ??= new RestaurantReportFilterDto();
 
             var salesRows = await (
@@ -1066,6 +1187,7 @@ namespace NextWave.Erp.Restaurant
 
         public async Task<List<RestaurantWastageReportDto>> GetWastageReport(RestaurantReportFilterDto input)
         {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsInventory);
             input ??= new RestaurantReportFilterDto();
             var adjustmentQuery = stockAdjustmentRepository.GetAll()
                 .Where(x => x.TenantId == AbpSession.TenantId &&
@@ -1116,9 +1238,25 @@ namespace NextWave.Erp.Restaurant
                 .ToList();
         }
 
-        public Task<List<RestaurantLowStockSuggestionDto>> GetLowStockReport(RestaurantReportFilterDto input)
+        public async Task<List<RestaurantLowStockSuggestionDto>> GetLowStockReport(RestaurantReportFilterDto input)
         {
-            return reorderService.GetLowStockSuggestionsAsync();
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsInventory);
+            return await reorderService.GetLowStockSuggestionsAsync();
+        }
+
+        private async Task EnsureReportCategoryGrantedAsync(string permission)
+        {
+            if (await PermissionChecker.IsGrantedAsync(permission))
+                return;
+
+            foreach (var categoryPermission in ReportCategoryPermissions)
+            {
+                if (await PermissionChecker.IsGrantedAsync(categoryPermission))
+                    throw new AbpAuthorizationException(L("PermissionIsNotGranted", permission));
+            }
+
+            // A role with only the original Reports permission predates report
+            // categories, so it retains full report access until explicitly split.
         }
 
         private async Task<Dictionary<Guid, decimal>> GetWastageByRawMaterial(RestaurantReportFilterDto input)

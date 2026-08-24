@@ -1,6 +1,8 @@
 @import "@ng-select/ng-select/themes/default.theme.css";
 @import './assets/common/styles/nepali-datepicker-dark-mode.css';
 @import './assets/common/styles/ngx-extended-pdf-viewer-dark-theme.css';
+@import './app/shared/styles/financial-statement-grid.css';
+@import './app/shared/styles/responsive-entry-table.css';
 
 /* Compact ng-select controls globally */
 .ng-select .ng-select-container {

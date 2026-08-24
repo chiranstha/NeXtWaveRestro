@@ -70,6 +70,30 @@ export class AppRouteGuard implements CanActivate, CanActivateChild, CanLoad {
         if (this._permissionChecker.isGranted('Pages.Administration.Host.Dashboard')) {
             return '/app/admin/hostDashboard';
         }
+        if (this._permissionChecker.isGranted('Pages.Restaurant.Pos')) {
+            return '/app/main/restaurant/pos';
+        }
+        if (this._permissionChecker.isGranted('Pages.Restaurant.Reports')) {
+            return '/app/main/dashboard';
+        }
+        if (this._permissionChecker.isGranted('Pages.Restaurant.Kds')) {
+            return '/app/main/restaurant/kds';
+        }
+        if (this._permissionChecker.isGranted('Pages.Restaurant.Inventory')) {
+            return '/app/main/restaurant/inventory';
+        }
+        if (this._permissionChecker.isGranted('Pages.Restaurant.Menu')) {
+            return '/app/main/restaurant/menu';
+        }
+        if (this._permissionChecker.isGranted('Pages.Restaurant.Channels')) {
+            return '/app/main/restaurant/channels';
+        }
+        if (this._permissionChecker.isGranted('Pages.Restaurant.Setup')) {
+            return '/app/main/restaurant/setup';
+        }
+        if (this._permissionChecker.isGranted('Pages.Restaurant.Payroll')) {
+            return '/app/main/restaurant/payroll';
+        }
         if (this._permissionChecker.isGranted('Pages.Tenant.Dashboard')) {
             return '/app/main/dashboard';
         }

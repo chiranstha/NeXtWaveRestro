@@ -11,7 +11,6 @@ import { ProductProfitReportDto, ProductProfitReportServiceProxy } from '@shared
     standalone: false,
     selector: 'app-product-profit-new-report',
     templateUrl: './productProfitReport.component.html',
-    styleUrls: ['./productProfitReport.component.css'],
 })
 export class ProductProfitReportComponent extends AppComponentBase implements OnInit {
     private gridApi!: GridApi;

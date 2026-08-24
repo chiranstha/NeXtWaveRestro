@@ -15,18 +15,18 @@ import { ServiceWorkerService } from '../services/service-worker.service';
     imports: [],
     template: `
         @if (showNotification) {
-            <div class="update-notification" [@slideDown]>
-                <div class="notification-content">
-                    <div class="notification-message">
-                        <strong>New version available!</strong>
-                        <p>
+            <div class="update-notification position-fixed text-white rounded-3 shadow-lg" [@slideDown]>
+                <div class="notification-content p-3 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3">
+                    <div class="notification-message flex-grow-1">
+                        <strong class="d-block mb-1">New version available!</strong>
+                        <p class="m-0 small">
                             A new version of the application is ready. Reload to get the latest features and
                             improvements.
                         </p>
                     </div>
-                    <div class="notification-actions">
-                        <button type="button" class="btn-reload" (click)="onReload()">Reload Now</button>
-                        <button type="button" class="btn-dismiss" (click)="onDismiss()">Later</button>
+                    <div class="notification-actions d-flex gap-2 w-100 w-sm-auto">
+                        <button type="button" class="btn btn-reload border-0 rounded-1 px-3 py-2 small fw-medium flex-grow-1 flex-sm-grow-0" (click)="onReload()">Reload Now</button>
+                        <button type="button" class="btn btn-dismiss border-0 rounded-1 px-3 py-2 small fw-medium flex-grow-1 flex-sm-grow-0" (click)="onDismiss()">Later</button>
                     </div>
                 </div>
             </div>
@@ -35,16 +35,11 @@ import { ServiceWorkerService } from '../services/service-worker.service';
     styles: [
         `
             .update-notification {
-                position: fixed;
                 bottom: 20px;
                 right: 20px;
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                border-radius: 8px;
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
                 max-width: 400px;
                 z-index: 10000;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
                 @media (max-width: 640px) {
                     bottom: 10px;
@@ -54,67 +49,15 @@ import { ServiceWorkerService } from '../services/service-worker.service';
                 }
             }
 
-            .notification-content {
-                padding: 16px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 16px;
-
-                @media (max-width: 640px) {
-                    flex-direction: column;
-                    gap: 12px;
-                }
+            .notification-message p {
+                opacity: 0.95;
+                line-height: 1.4;
             }
-
-            .notification-message {
-                flex: 1;
-
-                strong {
-                    display: block;
-                    font-size: 16px;
-                    margin-bottom: 4px;
-                }
-
-                p {
-                    margin: 0;
-                    font-size: 14px;
-                    opacity: 0.95;
-                    line-height: 1.4;
-                }
-            }
-
-            .notification-actions {
-                display: flex;
-                gap: 8px;
-                white-space: nowrap;
-
-                @media (max-width: 640px) {
-                    width: 100%;
-                    gap: 8px;
-
-                    button {
-                        flex: 1;
-                        white-space: normal;
-                    }
-                }
-            }
-
-            button {
-                padding: 8px 16px;
-                border: none;
-                border-radius: 4px;
-                font-size: 14px;
-                font-weight: 500;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                font-family: inherit;
-            }
-
             .btn-reload {
                 background: rgba(255, 255, 255, 0.25);
                 color: white;
                 backdrop-filter: blur(10px);
+                transition: all 0.3s ease;
 
                 &:hover {
                     background: rgba(255, 255, 255, 0.35);
@@ -130,6 +73,7 @@ import { ServiceWorkerService } from '../services/service-worker.service';
                 background: rgba(255, 255, 255, 0.1);
                 color: white;
                 opacity: 0.8;
+                transition: all 0.3s ease;
 
                 &:hover {
                     opacity: 1;

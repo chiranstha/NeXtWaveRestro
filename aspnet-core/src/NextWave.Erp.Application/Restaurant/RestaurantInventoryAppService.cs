@@ -15,6 +15,7 @@ using NextWave.Erp.GeneralSetting;
 using NextWave.Erp.Inventory;
 using NextWave.Erp.Inventory.Dtos;
 using NextWave.Erp.Restaurant.Dtos;
+using NextWave.Erp.Sales;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +35,7 @@ namespace NextWave.Erp.Restaurant
         IRepository<RestaurantOrder, Guid> orderRepository,
         IRepository<RestaurantOrderItem, Guid> orderItemRepository,
         IRepository<RestaurantBillLine, Guid> billLineRepository,
+        IRepository<SalesMaster, Guid> salesMasterRepository,
         IRepository<RestaurantMenuItem, Guid> menuItemRepository,
         IRepository<Bom, Guid> bomRepository,
         IRepository<StockPosting, Guid> stockPostingRepository,
@@ -362,6 +364,7 @@ namespace NextWave.Erp.Restaurant
             var query =
                 from stockPosting in stockPostingRepository.GetAll()
                 join billLine in billLineRepository.GetAll() on stockPosting.SourceDetailId equals billLine.SalesDetailId
+                join salesMaster in salesMasterRepository.GetAll() on billLine.SalesMasterId equals salesMaster.Id
                 join order in orderRepository.GetAll() on billLine.OrderId equals order.Id
                 join orderItem in orderItemRepository.GetAll() on billLine.OrderItemId equals orderItem.Id
                 join rawMaterial in productRepository.GetAll() on stockPosting.ProductId equals rawMaterial.Id
@@ -395,6 +398,7 @@ namespace NextWave.Erp.Restaurant
                     order.WaiterUserId,
                     billLine.OrderItemId,
                     billLine.SalesMasterId,
+                    SalesVoucherNo = salesMaster.VoucherNo,
                     billLine.SalesDetailId,
                     MenuProductId = orderItem.ProductId,
                     MenuProductName = menuProduct.Name,
@@ -451,6 +455,7 @@ namespace NextWave.Erp.Restaurant
                 OrderNo = x.OrderNo,
                 OrderItemId = x.OrderItemId,
                 SalesMasterId = x.SalesMasterId,
+                SalesVoucherNo = x.SalesVoucherNo,
                 SalesDetailId = x.SalesDetailId ?? x.SourceDetailId,
                 VoucherNo = x.VoucherNo,
                 MenuProductId = x.MenuProductId,

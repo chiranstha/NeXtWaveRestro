@@ -1,3 +1,60 @@
+@if (canSelectUserFinancialYear) {
+    <div
+        (click)="$event.stopPropagation()"
+        class="d-flex align-items-center ms-1 ms-lg-3 position-relative"
+        title="Financial Year"
+    >
+        <button
+            (click)="toggleFinancialYearMenu()"
+            [attr.aria-expanded]="financialYearMenuOpen"
+            class="btn btn-custom btn-active-light btn-active-color-primary d-flex align-items-center gap-2 h-35px h-md-40px px-2 px-lg-3"
+            [disabled]="loadingFinancialYears || changingFinancialYear"
+            type="button"
+        >
+            @if (loadingFinancialYears || changingFinancialYear) {
+                <i class="fa fa-spinner fa-spin fs-5"></i>
+            } @else {
+                <i class="fa-duotone fa-calendar-days fs-5"></i>
+            }
+            <span class="d-none d-lg-inline fw-semibold text-nowrap">
+                {{ currentFinancialYearName || 'Financial Year' }}
+            </span>
+            <i class="fa fa-angle-down fs-7"></i>
+        </button>
+        @if (financialYearMenuOpen) {
+            <div
+                (click)="$event.stopPropagation()"
+                class="menu menu-sub-dropdown menu-column menu-rounded menu-gray-700 menu-state-bg-light-primary fw-semibold w-200px py-2 d-block position-absolute top-100 end-0 mt-2"
+                role="menu"
+                style="z-index: 107"
+            >
+                @if (financialYears.length === 0) {
+                    <div class="menu-item px-2">
+                        <span class="menu-link text-muted">No financial year available</span>
+                    </div>
+                }
+                @for (financialYear of financialYears; track financialYear.financialYearId) {
+                    <div class="menu-item px-2">
+                        <button
+                            (click)="financialYearMenuOpen = false; changeUserFinancialYear(financialYear.financialYearId)"
+                            [attr.aria-current]="financialYear.financialYearId === selectedFinancialYearId ? 'true' : null"
+                            [class.active]="financialYear.financialYearId === selectedFinancialYearId"
+                            class="menu-link w-100 border-0 bg-transparent d-flex justify-content-between"
+                            role="menuitem"
+                            type="button"
+                        >
+                            <span>{{ financialYear.financialYear }}</span>
+                            @if (financialYear.financialYearId === selectedFinancialYearId) {
+                                <i class="fa fa-check text-primary ms-3"></i>
+                            }
+                        </button>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+
 @if (languages.length > 1) {
     <div
         class="d-flex align-items-center ms-1 ms-lg-3 dropdown-language"

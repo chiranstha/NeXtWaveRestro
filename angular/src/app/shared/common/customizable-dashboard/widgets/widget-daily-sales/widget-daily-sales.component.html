@@ -1,35 +1,35 @@
-<div class="widget-card">
-    <div class="widget-header">
-        <div class="header-content">
-            <h3 class="widget-title">Student Distribution</h3>
-            <span class="widget-subtitle">By Gender & Class</span>
+<div class="widget-card bg-body border border-gray-200 d-flex flex-column h-100 min-h-400px overflow-hidden rounded-4 shadow-sm">
+    <div class="widget-header border-bottom border-gray-200 d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-4 gap-sm-0 p-5 p-sm-6">
+        <div class="header-content d-flex flex-column gap-1">
+            <h3 class="m-0 fs-5 fw-semibold text-gray-900">Student Distribution</h3>
+            <span class="fs-8 fw-medium text-gray-500">By Gender & Class</span>
         </div>
-        <div class="header-stats">
-            <div class="stat-item">
-                <span class="stat-label">Male</span>
-                <span class="stat-value text-male">{{ totalMale }}</span>
+        <div class="header-stats d-flex align-items-center gap-3 w-100 w-sm-auto justify-content-between justify-content-sm-start">
+            <div class="d-flex flex-column align-items-start align-items-sm-end min-w-40px">
+                <span class="fs-9 mb-1 text-gray-500 text-uppercase fw-semibold">Male</span>
+                <span class="fs-5 text-primary fw-bold lh-1">{{ totalMale }}</span>
             </div>
-            <div class="stat-separator"></div>
-            <div class="stat-item">
-                <span class="stat-label">Female</span>
-                <span class="stat-value text-female">{{ totalFemale }}</span>
+            <div class="vr h-25px opacity-25"></div>
+            <div class="d-flex flex-column align-items-start align-items-sm-end min-w-40px">
+                <span class="fs-9 mb-1 text-gray-500 text-uppercase fw-semibold">Female</span>
+                <span class="fs-5 text-danger fw-bold lh-1">{{ totalFemale }}</span>
             </div>
-            <div class="stat-separator"></div>
-            <div class="stat-item">
-                <span class="stat-label">Total</span>
-                <span class="stat-value">{{ totalStudents }}</span>
+            <div class="vr h-25px opacity-25"></div>
+            <div class="d-flex flex-column align-items-start align-items-sm-end min-w-40px">
+                <span class="fs-9 mb-1 text-gray-500 text-uppercase fw-semibold">Total</span>
+                <span class="fs-5 text-gray-900 fw-bold lh-1">{{ totalStudents }}</span>
             </div>
         </div>
     </div>
-    <div class="widget-body">
+    <div class="position-relative d-flex flex-column flex-grow-1 p-3">
         @if (loading) {
-            <div class="loading-container">
-                <div class="spinner"></div>
+            <div class="d-flex flex-column align-items-center justify-content-center h-100 min-h-300px gap-3 small text-gray-500">
+                <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading insights...</span></div>
                 <span>Loading insights...</span>
             </div>
         }
         @if (!loading) {
-            <div class="chart-wrapper">
+            <div class="w-100 min-h-300px overflow-hidden flex-grow-1 rounded-3">
                 <ag-charts [options]="chartOptions" style="width: 100%; height: 100%; display: block"></ag-charts>
             </div>
         }

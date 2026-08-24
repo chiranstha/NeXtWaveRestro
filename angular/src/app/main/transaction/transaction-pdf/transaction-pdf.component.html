@@ -12,17 +12,17 @@
         </div>
     </sub-header>
 
-    <div class="card card-custom transaction-voucher-card">
+    <div class="card card-custom transaction-voucher-card mx-auto">
         <div class="card-body">
-            <div *ngIf="loading" class="transaction-voucher-loading">
+            <div *ngIf="loading" class="transaction-voucher-loading align-items-center d-flex justify-content-center">
                 <span class="spinner-border spinner-border-sm me-2"></span>
                 {{ l('Loading') }}...
             </div>
 
             <ng-container *ngIf="!loading && voucher">
-                <div class="transaction-voucher-header">
+                <div class="transaction-voucher-header align-items-start d-flex gap-3 justify-content-between mb-4">
                     <div class="d-flex align-items-start gap-4">
-                        <img *ngIf="logoSrc()" [src]="logoSrc()" alt="" class="transaction-voucher-logo" />
+                        <img *ngIf="logoSrc()" [src]="logoSrc()" alt="" class="transaction-voucher-logo object-fit-contain" />
                         <div>
                             <h3 class="mb-1">{{ companyName() }}</h3>
                             <div *ngIf="companyAddress()" class="text-muted">{{ companyAddress() }}</div>
@@ -30,41 +30,41 @@
                         </div>
                     </div>
 
-                    <div class="transaction-voucher-title">
+                    <div class="transaction-voucher-title text-end">
                         <h4 class="mb-1">{{ title | localize }}</h4>
                         <div class="text-muted">{{ voucher.voucherNo }}</div>
                     </div>
                 </div>
 
-                <div class="transaction-voucher-meta">
+                <div class="transaction-voucher-meta d-grid gap-3">
                     <div>
-                        <span>{{ l('Date') }}</span>
+                        <span class="d-block mb-1 small text-muted">{{ l('Date') }}</span>
                         <strong>{{ voucher.dateMiti || formatDate(voucher.date) }}</strong>
                     </div>
                     <div *ngIf="voucher.ledgerName">
-                        <span>{{ l('Ledger') }}</span>
+                        <span class="d-block mb-1 small text-muted">{{ l('Ledger') }}</span>
                         <strong>{{ voucher.ledgerName }}</strong>
                     </div>
                     <div *ngIf="voucher.bank">
-                        <span>{{ l('Bank') }}</span>
+                        <span class="d-block mb-1 small text-muted">{{ l('Bank') }}</span>
                         <strong>{{ voucher.bank }}</strong>
                     </div>
                     <div *ngIf="voucher.chequeNo">
-                        <span>{{ l('Cheque No') }}</span>
+                        <span class="d-block mb-1 small text-muted">{{ l('Cheque No') }}</span>
                         <strong>{{ voucher.chequeNo }}</strong>
                     </div>
                     <div *ngIf="voucher.chequeMiti || voucher.chequeDate">
-                        <span>{{ l('Cheque Date') }}</span>
+                        <span class="d-block mb-1 small text-muted">{{ l('Cheque Date') }}</span>
                         <strong>{{ voucher.chequeMiti || formatDate(voucher.chequeDate) }}</strong>
                     </div>
                     <div *ngIf="voucher.againstBank">
-                        <span>{{ l('Against Bank') }}</span>
+                        <span class="d-block mb-1 small text-muted">{{ l('Against Bank') }}</span>
                         <strong>{{ voucher.againstBank }}</strong>
                     </div>
                 </div>
 
                 <div *ngIf="detailRows.length" class="table-responsive">
-                    <table class="table table-bordered transaction-voucher-table">
+                    <table class="table table-bordered transaction-voucher-table align-middle">
                         <thead>
                             <tr>
                                 <th *ngFor="let column of detailColumns">{{ column.label | localize }}</th>
@@ -80,19 +80,19 @@
                     </table>
                 </div>
 
-                <div class="transaction-voucher-total">
-                    <span>{{ l('Total Amount') }}</span>
+                <div class="transaction-voucher-total align-items-center d-flex justify-content-end mt-3 text-end">
+                    <span class="d-block mb-1 small text-muted">{{ l('Total Amount') }}</span>
                     <strong>{{ formatAmount(voucher.totalAmount) }}</strong>
                 </div>
 
-                <div *ngIf="voucher.totalAmountInWord" class="transaction-voucher-note">
-                    <span>{{ l('Amount In Words') }}</span>
+                <div *ngIf="voucher.totalAmountInWord" class="transaction-voucher-note mt-3 bg-light border rounded-2 py-3 px-3">
+                    <span class="d-block mb-1 small text-muted">{{ l('Amount In Words') }}</span>
                     <strong>{{ voucher.totalAmountInWord }}</strong>
                 </div>
 
-                <div *ngIf="voucher.narration" class="transaction-voucher-note">
-                    <span>{{ l('Narration') }}</span>
-                    <p>{{ voucher.narration }}</p>
+                <div *ngIf="voucher.narration" class="transaction-voucher-note mt-3 bg-light border rounded-2 py-3 px-3">
+                    <span class="d-block mb-1 small text-muted">{{ l('Narration') }}</span>
+                    <p class="mb-0">{{ voucher.narration }}</p>
                 </div>
             </ng-container>
         </div>

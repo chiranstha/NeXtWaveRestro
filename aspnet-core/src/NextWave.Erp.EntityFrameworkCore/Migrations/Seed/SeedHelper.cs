@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Transactions;
+using System.Linq;
 using Abp.Dependency;
 using Abp.Domain.Uow;
 using Abp.EntityFrameworkCore.Uow;
@@ -27,7 +28,11 @@ public static class SeedHelper
 
         //Default tenant seed (in host database).
         new DefaultTenantBuilder(context).Create();
-        new TenantRoleAndUserBuilder(context, 1).Create();
+        var tenantIds = context.Tenants.IgnoreQueryFilters()
+            .Select(tenant => tenant.Id)
+            .ToList();
+        foreach (var tenantId in tenantIds)
+            new TenantRoleAndUserBuilder(context, tenantId).Create();
     }
 
     private static void WithDbContext<TDbContext>(IIocResolver iocResolver, Action<TDbContext> contextAction)

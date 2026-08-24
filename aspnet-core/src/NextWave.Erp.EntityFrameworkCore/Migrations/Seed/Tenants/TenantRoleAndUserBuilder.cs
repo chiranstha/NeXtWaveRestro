@@ -99,20 +99,49 @@ public class TenantRoleAndUserBuilder
 
     private void GrantRestaurantPermissionsToAdminRole(Role adminRole)
     {
-        GrantPermissionsToRole(adminRole, GetRestaurantManagerPermissions());
+        GrantPermissionsToRole(adminRole, GetRestaurantAdminPermissions());
     }
 
     private void CreateRestaurantOperatingRoles()
     {
-        GrantPermissionsToRole(
-            EnsureTenantRole(StaticRoleNames.Tenants.RestaurantManager, "Restaurant Manager"),
+        CreateRestaurantOperatingRole(
+            StaticRoleNames.Tenants.RestaurantManager,
+            "Restaurant Manager",
             GetRestaurantManagerPermissions());
 
-        GrantPermissionsToRole(
-            EnsureTenantRole(StaticRoleNames.Tenants.RestaurantCashier, "Restaurant Cashier"),
+        CreateRestaurantReportManagerRole(
+            StaticRoleNames.Tenants.RestaurantSalesManager,
+            "Restaurant Sales Manager",
+            AppPermissions.PagesRestaurantReportsSales);
+
+        CreateRestaurantReportManagerRole(
+            StaticRoleNames.Tenants.RestaurantOperationsManager,
+            "Restaurant Operations Manager",
+            AppPermissions.PagesRestaurantReportsOperations);
+
+        CreateRestaurantReportManagerRole(
+            StaticRoleNames.Tenants.RestaurantInventoryManager,
+            "Restaurant Inventory & Cost Manager",
+            AppPermissions.PagesRestaurantReportsInventory);
+
+        CreateRestaurantReportManagerRole(
+            StaticRoleNames.Tenants.RestaurantFinanceManager,
+            "Restaurant Finance & Audit Manager",
+            AppPermissions.PagesRestaurantReportsAuditFinance,
+            GetRestaurantFinanceReportPermissions());
+
+        CreateRestaurantReportManagerRole(
+            StaticRoleNames.Tenants.RestaurantPayrollManager,
+            "Restaurant HR & Payroll Manager",
+            AppPermissions.PagesRestaurantReportsPayroll);
+
+        CreateRestaurantOperatingRole(
+            StaticRoleNames.Tenants.RestaurantCashier,
+            "Restaurant Cashier",
             new[]
             {
                 AppPermissions.PagesRestaurant,
+                AppPermissions.PagesRestaurantSetup,
                 AppPermissions.PagesRestaurantMenu,
                 AppPermissions.PagesRestaurantItemAvailability,
                 AppPermissions.PagesRestaurantPos,
@@ -124,55 +153,118 @@ public class TenantRoleAndUserBuilder
                 AppPermissions.PagesRestaurantKotBot,
                 AppPermissions.PagesRestaurantKotBotReprint,
                 AppPermissions.PagesRestaurantKds,
-                AppPermissions.PagesRestaurantReports
+                AppPermissions.PagesRestaurantReports,
+                AppPermissions.PagesRestaurantReportsSales,
+                AppPermissions.PagesRestaurantReportsOperations,
+                AppPermissions.PagesRestaurantReportsAuditFinance,
+                AppPermissions.PagesRestaurantPayroll,
+                AppPermissions.PagesRestaurantPayrollAttendance,
+                AppPermissions.PagesRestaurantPayrollOwnPayslip
             });
 
-        GrantPermissionsToRole(
-            EnsureTenantRole(StaticRoleNames.Tenants.RestaurantWaiter, "Restaurant Waiter"),
+        CreateRestaurantOperatingRole(
+            StaticRoleNames.Tenants.RestaurantWaiter,
+            "Restaurant Waiter",
             new[]
             {
                 AppPermissions.PagesRestaurant,
+                AppPermissions.PagesRestaurantSetup,
                 AppPermissions.PagesRestaurantMenu,
                 AppPermissions.PagesRestaurantPos,
                 AppPermissions.PagesRestaurantPosTableTransfer,
                 AppPermissions.PagesRestaurantKotBot,
-                AppPermissions.PagesRestaurantKds
+                AppPermissions.PagesRestaurantKds,
+                AppPermissions.PagesRestaurantPayroll,
+                AppPermissions.PagesRestaurantPayrollAttendance,
+                AppPermissions.PagesRestaurantPayrollOwnPayslip
             });
 
-        GrantPermissionsToRole(
-            EnsureTenantRole(StaticRoleNames.Tenants.RestaurantKitchen, "Restaurant Kitchen"),
+        CreateRestaurantOperatingRole(
+            StaticRoleNames.Tenants.RestaurantKitchen,
+            "Restaurant Kitchen",
             new[]
             {
                 AppPermissions.PagesRestaurant,
+                AppPermissions.PagesRestaurantSetup,
                 AppPermissions.PagesRestaurantKotBot,
-                AppPermissions.PagesRestaurantKds
+                AppPermissions.PagesRestaurantKds,
+                AppPermissions.PagesRestaurantPayroll,
+                AppPermissions.PagesRestaurantPayrollAttendance,
+                AppPermissions.PagesRestaurantPayrollOwnPayslip
             });
 
-        GrantPermissionsToRole(
-            EnsureTenantRole(StaticRoleNames.Tenants.RestaurantInventory, "Restaurant Inventory"),
+        CreateRestaurantOperatingRole(
+            StaticRoleNames.Tenants.RestaurantInventory,
+            "Restaurant Inventory",
             new[]
             {
                 AppPermissions.PagesRestaurant,
                 AppPermissions.PagesRestaurantMenu,
                 AppPermissions.PagesRestaurantRecipe,
                 AppPermissions.PagesRestaurantReports,
+                AppPermissions.PagesRestaurantReportsInventory,
                 AppPermissions.PagesRestaurantInventory,
                 AppPermissions.PagesRestaurantInventorySupplierMapping,
                 AppPermissions.PagesRestaurantInventoryStockAdjustment,
                 AppPermissions.PagesRestaurantInventoryWastage,
-                AppPermissions.PagesRestaurantInventoryReorder
+                AppPermissions.PagesRestaurantInventoryReorder,
+                AppPermissions.PagesRestaurantPayroll,
+                AppPermissions.PagesRestaurantPayrollAttendance,
+                AppPermissions.PagesRestaurantPayrollOwnPayslip
+            });
+
+        CreateRestaurantOperatingRole(
+            StaticRoleNames.Tenants.RestaurantPayroll,
+            "Restaurant Payroll",
+            new[]
+            {
+                AppPermissions.PagesRestaurant,
+                AppPermissions.PagesRestaurantPayroll,
+                AppPermissions.PagesRestaurantPayrollStaff,
+                AppPermissions.PagesRestaurantPayrollAttendance,
+                AppPermissions.PagesRestaurantPayrollAttendanceManage,
+                AppPermissions.PagesRestaurantPayrollProcess,
+                AppPermissions.PagesRestaurantPayrollReports,
+                AppPermissions.PagesRestaurantPayrollOwnPayslip
             });
     }
 
-    private Role EnsureTenantRole(string roleName, string displayName)
+    private void CreateRestaurantOperatingRole(string roleName, string displayName, string[] defaultPermissions)
+    {
+        var (role, wasCreated) = EnsureTenantRole(roleName, displayName);
+        if (wasCreated)
+        {
+            GrantPermissionsToRole(role, defaultPermissions);
+        }
+    }
+
+    private void CreateRestaurantReportManagerRole(
+        string roleName,
+        string displayName,
+        string reportPermission,
+        params string[] additionalPermissions)
+    {
+        CreateRestaurantOperatingRole(
+            roleName,
+            displayName,
+            new[]
+            {
+                AppPermissions.PagesRestaurant,
+                AppPermissions.PagesRestaurantReports,
+                AppPermissions.PagesFinancialYears,
+                reportPermission
+            }.Concat(additionalPermissions).ToArray());
+    }
+
+    private (Role Role, bool WasCreated) EnsureTenantRole(string roleName, string displayName)
     {
         var role = _context.Roles.IgnoreQueryFilters().FirstOrDefault(r => r.TenantId == _tenantId && r.Name == roleName);
         if (role != null)
-            return role;
+            return (role, false);
 
         role = _context.Roles.Add(new Role(_tenantId, roleName, displayName) { IsStatic = true }).Entity;
         _context.SaveChanges();
-        return role;
+        return (role, true);
     }
 
     private void GrantPermissionsToRole(Role role, string[] permissions)
@@ -203,6 +295,50 @@ public class TenantRoleAndUserBuilder
         return new[]
         {
             AppPermissions.PagesRestaurant,
+            AppPermissions.PagesRestaurantReports,
+            AppPermissions.PagesRestaurantReportsSales,
+            AppPermissions.PagesRestaurantReportsOperations,
+            AppPermissions.PagesRestaurantReportsInventory,
+            AppPermissions.PagesRestaurantReportsPayroll,
+            AppPermissions.PagesRestaurantReportsAuditFinance,
+            AppPermissions.PagesFinancialYears
+        }.Concat(GetRestaurantFinanceReportPermissions()).ToArray();
+    }
+
+    private static string[] GetRestaurantFinanceReportPermissions()
+    {
+        return new[]
+        {
+            AppPermissions.PagesReporting,
+            AppPermissions.PagesAccountingReporting,
+            AppPermissions.PagesAccountGroupReport,
+            AppPermissions.PagesAccountLedgerReport,
+            AppPermissions.PagesBookReport,
+            AppPermissions.PagesFinancialStatement,
+            AppPermissions.PagesTrialBalanceReport,
+            AppPermissions.PagesProfitAndLossReport,
+            AppPermissions.PagesBalanceSheetReport,
+            AppPermissions.PageFundFlowReport,
+            AppPermissions.PagesCashFlowReport,
+            AppPermissions.PagesTaxReporting,
+            AppPermissions.PagesTaxSalesRegisterReport,
+            AppPermissions.PagesTaxPurchaseRegisterReport,
+            AppPermissions.PagesTdsReport,
+            AppPermissions.PagesVatSummaryReport,
+            AppPermissions.PagesGetPayTaxReport,
+            AppPermissions.PagesTaxableCustomerReport,
+            AppPermissions.PagesSalesAboveLakhsReport,
+            AppPermissions.PagesPurchaseAboveLakhsReport,
+            AppPermissions.PagesSalesTaxReport,
+            AppPermissions.PagesPurchaseTaxReport
+        };
+    }
+
+    private static string[] GetRestaurantAdminPermissions()
+    {
+        return new[]
+        {
+            AppPermissions.PagesRestaurant,
             AppPermissions.PagesRestaurantSetup,
             AppPermissions.PagesRestaurantSetupCreate,
             AppPermissions.PagesRestaurantSetupEdit,
@@ -226,6 +362,11 @@ public class TenantRoleAndUserBuilder
             AppPermissions.PagesRestaurantKds,
             AppPermissions.PagesRestaurantSync,
             AppPermissions.PagesRestaurantReports,
+            AppPermissions.PagesRestaurantReportsSales,
+            AppPermissions.PagesRestaurantReportsOperations,
+            AppPermissions.PagesRestaurantReportsInventory,
+            AppPermissions.PagesRestaurantReportsPayroll,
+            AppPermissions.PagesRestaurantReportsAuditFinance,
             AppPermissions.PagesRestaurantInventory,
             AppPermissions.PagesRestaurantInventorySupplierMapping,
             AppPermissions.PagesRestaurantInventoryStockAdjustment,
@@ -235,7 +376,16 @@ public class TenantRoleAndUserBuilder
             AppPermissions.PagesRestaurantChannelsManage,
             AppPermissions.PagesRestaurantAggregators,
             AppPermissions.PagesRestaurantPayouts,
-            AppPermissions.PagesRestaurantCustomerOrdering
+            AppPermissions.PagesRestaurantCustomerOrdering,
+            AppPermissions.PagesRestaurantPayroll,
+            AppPermissions.PagesRestaurantPayrollStaff,
+            AppPermissions.PagesRestaurantPayrollStaffAccess,
+            AppPermissions.PagesRestaurantPayrollAttendance,
+            AppPermissions.PagesRestaurantPayrollAttendanceManage,
+            AppPermissions.PagesRestaurantPayrollProcess,
+            AppPermissions.PagesRestaurantPayrollApprove,
+            AppPermissions.PagesRestaurantPayrollReports,
+            AppPermissions.PagesRestaurantPayrollOwnPayslip
         };
     }
 

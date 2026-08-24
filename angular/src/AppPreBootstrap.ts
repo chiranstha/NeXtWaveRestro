@@ -103,6 +103,7 @@ export class AppPreBootstrap {
             AppConsts.localeMappings = result.localeMappings;
             AppConsts.appBaseUrlFormat = result.appBaseUrl;
             AppConsts.remoteServiceBaseUrlFormat = result.remoteServiceBaseUrl;
+            AppConsts.agChartsLicenseKey = result.agChartsLicenseKey || '';
             const tenancyName = AppPreBootstrap.resolveTenancyName(result.appBaseUrl);
             AppPreBootstrap.configureAppUrls(tenancyName, result.appBaseUrl, result.remoteServiceBaseUrl);
             if (AppConsts.PreventNotExistingTenantSubdomains) {

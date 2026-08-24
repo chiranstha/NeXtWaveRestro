@@ -292,15 +292,16 @@ class _Panel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
+    return Material(
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppColors.border),
+        side: const BorderSide(color: AppColors.border),
       ),
-      child: child,
+      child: SizedBox(
+        width: double.infinity,
+        child: Padding(padding: const EdgeInsets.all(10), child: child),
+      ),
     );
   }
 }
@@ -323,6 +324,7 @@ class _SectionHeader extends StatelessWidget {
         Icon(icon, size: 20, color: AppColors.primary),
         const SizedBox(width: 8),
         Expanded(
+          flex: 3,
           child: Text(
             title,
             maxLines: 1,
@@ -334,14 +336,19 @@ class _SectionHeader extends StatelessWidget {
             ),
           ),
         ),
-        Text(
-          action,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: AppColors.muted,
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
+        const SizedBox(width: 6),
+        Flexible(
+          flex: 2,
+          child: Text(
+            action,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              color: AppColors.muted,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ],
@@ -519,6 +526,8 @@ class _LiveServiceBoard extends StatelessWidget {
   }
 }
 
+// Kept for the seeded prototype workspace that can be re-enabled later.
+// ignore: unused_element
 class _PriorityWork extends StatelessWidget {
   const _PriorityWork({required this.onOpen});
 
@@ -636,10 +645,11 @@ class _MenuTile extends StatelessWidget {
 }
 
 class _CartLineTile extends StatelessWidget {
-  const _CartLineTile({required this.line, required this.onQty});
+  const _CartLineTile({required this.line, required this.onQty, this.onVoid});
 
   final CartLine line;
-  final void Function(MenuProduct product, int delta) onQty;
+  final void Function(CartLine line, int delta) onQty;
+  final VoidCallback? onVoid;
 
   @override
   Widget build(BuildContext context) {
@@ -661,15 +671,23 @@ class _CartLineTile extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.w900),
                 ),
                 Text(
-                  '${line.product.station} - ${money(line.product.price)}',
+                  '${line.product.station} · ${money(line.unitPrice + line.modifierUnitTotal)}'
+                  '${line.detailLabel.isEmpty ? '' : ' · ${line.detailLabel}'}',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(color: AppColors.muted, fontSize: 12),
                 ),
+                if (!line.editable)
+                  const Text(
+                    'Already sent to kitchen',
+                    style: TextStyle(color: AppColors.amber, fontSize: 11),
+                  ),
               ],
             ),
           ),
           IconButton(
             tooltip: 'Decrease',
-            onPressed: () => onQty(line.product, -1),
+            onPressed: line.editable ? () => onQty(line, -1) : null,
             icon: const Icon(Icons.remove_circle_outline_rounded),
           ),
           Text(
@@ -678,9 +696,20 @@ class _CartLineTile extends StatelessWidget {
           ),
           IconButton(
             tooltip: 'Increase',
-            onPressed: () => onQty(line.product, 1),
+            onPressed: line.editable ? () => onQty(line, 1) : null,
             icon: const Icon(Icons.add_circle_outline_rounded),
           ),
+          if (onVoid != null)
+            IconButton(
+              tooltip: line.orderItemId == null ? 'Remove' : 'Void item',
+              onPressed: onVoid,
+              icon: Icon(
+                line.orderItemId == null
+                    ? Icons.delete_outline_rounded
+                    : Icons.block_rounded,
+                color: AppColors.red,
+              ),
+            ),
           SizedBox(
             width: 82,
             child: Text(
@@ -696,10 +725,17 @@ class _CartLineTile extends StatelessWidget {
 }
 
 class _TicketCard extends StatelessWidget {
-  const _TicketCard({required this.ticket, required this.onAdvance});
+  const _TicketCard({
+    required this.ticket,
+    required this.onAdvance,
+    this.onItemStatus,
+    this.onCancel,
+  });
 
   final KdsTicket ticket;
   final VoidCallback onAdvance;
+  final void Function(CartLine line, int status)? onItemStatus;
+  final VoidCallback? onCancel;
 
   @override
   Widget build(BuildContext context) {
@@ -740,22 +776,72 @@ class _TicketCard extends StatelessWidget {
             style: const TextStyle(color: AppColors.muted, fontSize: 12),
           ),
           const Spacer(),
-          for (final line in ticket.items.take(3))
-            Text(
-              '${line.qty}x ${line.product.name}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+          for (final line in ticket.items.take(4))
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '${line.qty}x ${line.product.name}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (onItemStatus != null && line.ticketItemId != null)
+                  PopupMenuButton<int>(
+                    tooltip: 'Update item status',
+                    onSelected: (status) => onItemStatus!(line, status),
+                    itemBuilder: (context) => [
+                      if (line.status <= 1)
+                        const PopupMenuItem(
+                          value: 2,
+                          child: Text('Start preparing'),
+                        ),
+                      if (line.status == 2)
+                        const PopupMenuItem(
+                          value: 3,
+                          child: Text('Mark ready'),
+                        ),
+                      if (line.status == 3)
+                        const PopupMenuItem(
+                          value: 4,
+                          child: Text('Mark served'),
+                        ),
+                      if (line.status < 4)
+                        const PopupMenuItem(
+                          value: 5,
+                          child: Text('Cancel item'),
+                        ),
+                    ],
+                    child: _TinyTag(
+                      label: _ticketItemStatus(line.status),
+                      color: line.status >= 3
+                          ? AppColors.green
+                          : AppColors.amber,
+                    ),
+                  ),
+              ],
             ),
           const SizedBox(height: 10),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: ticket.status == TicketStatus.bumped
-                  ? null
-                  : onAdvance,
-              icon: const Icon(Icons.arrow_forward_rounded),
-              label: Text(nextStatusAction(ticket.status)),
-            ),
+          Row(
+            children: [
+              if (onCancel != null) ...[
+                IconButton.outlined(
+                  tooltip: 'Cancel ticket',
+                  onPressed: onCancel,
+                  icon: const Icon(Icons.cancel_outlined),
+                ),
+                const SizedBox(width: 7),
+              ],
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: ticket.status == TicketStatus.bumped
+                      ? null
+                      : onAdvance,
+                  icon: const Icon(Icons.arrow_forward_rounded),
+                  label: Text(nextStatusAction(ticket.status)),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -763,6 +849,17 @@ class _TicketCard extends StatelessWidget {
   }
 }
 
+String _ticketItemStatus(int status) => switch (status) {
+  0 => 'Draft',
+  1 => 'Sent',
+  2 => 'Preparing',
+  3 => 'Ready',
+  4 => 'Served',
+  5 => 'Cancelled',
+  _ => 'Item',
+};
+
+// ignore: unused_element
 class _RecipeCard extends StatelessWidget {
   const _RecipeCard({required this.product});
 
@@ -821,6 +918,7 @@ class _RecipeCard extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _ChannelCard extends StatelessWidget {
   const _ChannelCard({required this.channel});
 
@@ -867,61 +965,6 @@ class _ChannelCard extends StatelessWidget {
             'Commission ${money(channel.commission)} - ${channel.sync}',
             style: const TextStyle(color: AppColors.muted, fontSize: 12),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SetupCard extends StatelessWidget {
-  const _SetupCard({
-    required this.icon,
-    required this.title,
-    required this.value,
-    required this.lines,
-    required this.color,
-  });
-
-  final IconData icon;
-  final String title;
-  final String value;
-  final List<String> lines;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return _Panel(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, color: color),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.w900),
-                ),
-              ),
-              Text(
-                value,
-                style: TextStyle(
-                  color: color,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 18,
-                ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          for (final line in lines.take(3))
-            Text(
-              line,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: AppColors.muted, fontSize: 12.5),
-            ),
         ],
       ),
     );
@@ -1229,6 +1272,7 @@ class _TinyTag extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _StatusPill extends StatelessWidget {
   const _StatusPill({required this.label, required this.color});
 
@@ -1256,6 +1300,7 @@ class _StatusPill extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _ActionButton extends StatelessWidget {
   const _ActionButton({
     required this.label,
@@ -1319,6 +1364,7 @@ class _AmountRow extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _DropdownField extends StatelessWidget {
   const _DropdownField({
     required this.label,
@@ -1397,6 +1443,7 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _DashboardChartPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {

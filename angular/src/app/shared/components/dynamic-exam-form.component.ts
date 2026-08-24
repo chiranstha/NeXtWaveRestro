@@ -28,13 +28,13 @@ export interface DynamicFormConfig {
     standalone: true,
     imports: [ReactiveFormsModule, NgSelectModule],
     template: `
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="dynamic-form">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="dynamic-form w-100">
             @for (field of config.fields; track field) {
-                <div class="form-group">
-                    <label [for]="field.name" class="form-label">
+                <div class="mb-3">
+                    <label [for]="field.name" class="form-label d-block mb-2 fw-medium">
                         {{ field.label }}
                         @if (field.required) {
-                            <span class="required-asterisk">*</span>
+                            <span class="text-danger">*</span>
                         }
                     </label>
                     <!-- Text Input -->
@@ -92,7 +92,7 @@ export interface DynamicFormConfig {
                     }
                     <!-- Error Messages -->
                     @if (isFieldInvalid(field.name)) {
-                        <div [id]="field.name + '-error'" class="invalid-feedback" role="alert" aria-live="polite">
+                        <div [id]="field.name + '-error'" class="invalid-feedback d-block" role="alert" aria-live="polite">
                             @for (error of getFieldErrors(field.name); track error) {
                                 <div>
                                     {{ error }}
@@ -103,7 +103,7 @@ export interface DynamicFormConfig {
                 </div>
             }
             <!-- Form Actions -->
-            <div class="form-actions">
+            <div class="mt-5 pt-3 border-top">
                 <button type="submit" class="btn btn-primary" [disabled]="form.invalid || isSubmitting">
                     {{ config.submitButtonText || 'Submit' }}
                 </button>
@@ -117,109 +117,6 @@ export interface DynamicFormConfig {
         `
             .dynamic-form {
                 max-width: 600px;
-            }
-            .form-group {
-                margin-bottom: 1rem;
-            }
-            .form-label {
-                display: block;
-                margin-bottom: 0.5rem;
-                font-weight: 500;
-            }
-            .required-asterisk {
-                color: #dc3545;
-            }
-            .form-control {
-                width: 100%;
-                padding: 0.375rem 0.75rem;
-                border: 1px solid #ced4da;
-                border-radius: 0.375rem;
-                font-size: 1rem;
-                line-height: 1.5;
-            }
-            .form-control:focus {
-                outline: 0;
-                border-color: #80bdff;
-                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-            }
-            .form-control.is-invalid {
-                border-color: #dc3545;
-            }
-            .form-control.is-invalid:focus {
-                border-color: #dc3545;
-                box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
-            }
-            .invalid-feedback {
-                display: block;
-                color: #dc3545;
-                font-size: 0.875rem;
-                margin-top: 0.25rem;
-            }
-            .form-actions {
-                margin-top: 2rem;
-                padding-top: 1rem;
-                border-top: 1px solid #dee2e6;
-            }
-            .btn {
-                display: inline-block;
-                font-weight: 400;
-                text-align: center;
-                vertical-align: middle;
-                user-select: none;
-                border: 1px solid transparent;
-                padding: 0.375rem 0.75rem;
-                font-size: 1rem;
-                line-height: 1.5;
-                border-radius: 0.375rem;
-                transition:
-                    color 0.15s ease-in-out,
-                    background-color 0.15s ease-in-out,
-                    border-color 0.15s ease-in-out,
-                    box-shadow 0.15s ease-in-out;
-                cursor: pointer;
-            }
-            .btn:disabled {
-                opacity: 0.65;
-                cursor: not-allowed;
-            }
-            .btn-primary {
-                color: #fff;
-                background-color: #007bff;
-                border-color: #007bff;
-            }
-            .btn-primary:hover:not(:disabled) {
-                background-color: #0056b3;
-                border-color: #004085;
-            }
-            .btn-secondary {
-                color: #6c757d;
-                background-color: transparent;
-                border-color: #6c757d;
-            }
-            .btn-secondary:hover:not(:disabled) {
-                color: #fff;
-                background-color: #6c757d;
-                border-color: #545b62;
-            }
-            .ms-2 {
-                margin-left: 0.5rem;
-            }
-            /* NgSelect styles */
-            :host ::ng-deep ng-select .ng-select-container {
-                border: 1px solid #ced4da;
-                border-radius: 0.375rem;
-                min-height: 38px;
-            }
-            :host ::ng-deep ng-select.ng-select-focused .ng-select-container {
-                border-color: #80bdff;
-                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-            }
-            :host ::ng-deep ng-select.ng-select-invalid .ng-select-container {
-                border-color: #dc3545;
-            }
-            :host ::ng-deep ng-select.ng-select-invalid.ng-select-focused .ng-select-container {
-                border-color: #dc3545;
-                box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
             }
         `,
     ],

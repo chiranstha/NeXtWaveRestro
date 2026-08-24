@@ -21,6 +21,8 @@ public class ResetPasswordInput : IShouldNormalize
 
     public string SingleSignIn { get; set; }
 
+    public int? TenantId { get; set; }
+
     /// <summary>
     /// Encrypted values for {TenantId}, {UserId}, {ResetCode} and {ExpireDate}
     /// </summary>
@@ -48,6 +50,11 @@ public class ResetPasswordInput : IShouldNormalize
                 if (query["resetCode"] != null)
                 {
                     ResetCode = query["resetCode"];
+                }
+
+                if (query["tenantId"] != null)
+                {
+                    TenantId = Convert.ToInt32(query["tenantId"]);
                 }
 
                 if (query["expireDate"] == null)

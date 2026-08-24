@@ -30,7 +30,6 @@ type RestaurantSetupSection = 'areas' | 'tables' | 'stations' | 'devices' | 'set
 @Component({
     selector: 'restaurant-setup',
     templateUrl: './restaurant-setup.component.html',
-    styleUrls: ['../restaurant-shared.css'],
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation],
     changeDetection: ChangeDetectionStrategy.Eager,

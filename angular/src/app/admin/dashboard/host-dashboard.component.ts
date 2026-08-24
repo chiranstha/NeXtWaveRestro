@@ -5,7 +5,6 @@ import { DashboardCustomizationConst } from '@app/shared/common/customizable-das
 import { CustomizableDashboardComponent } from '../../shared/common/customizable-dashboard/customizable-dashboard.component';
 @Component({
     templateUrl: './host-dashboard.component.html',
-    styleUrls: ['./host-dashboard.component.less'],
     encapsulation: ViewEncapsulation.None,
     imports: [CustomizableDashboardComponent],
     changeDetection: ChangeDetectionStrategy.Eager,

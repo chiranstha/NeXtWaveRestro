@@ -31,30 +31,30 @@
     </sub-header>
 
     <div [class]="containerClass">
-        <div class="daybook-workspace">
-            <div class="daybook-hero">
+        <div class="d-flex flex-column gap-3">
+            <div class="align-items-stretch align-items-md-center bg-white border border-gray-300 d-flex flex-column flex-md-row gap-3 justify-content-between p-3 rounded-3">
                 <div>
-                    <span class="daybook-kicker">Accounting</span>
-                    <h3>Daybook Report</h3>
-                    <p>{{ myForm.get('fromMiti')?.value }} - {{ myForm.get('toMiti')?.value }}</p>
+                    <span class="d-block fs-9 fw-bolder lh-1 mb-2 text-success text-uppercase">Accounting</span>
+                    <h3 class="fs-3 fw-bold lh-sm m-0 text-gray-900">Daybook Report</h3>
+                    <p class="d-block fs-8 mb-0 mt-1 text-gray-600">{{ myForm.get('fromMiti')?.value }} - {{ myForm.get('toMiti')?.value }}</p>
                 </div>
-                <div class="daybook-hero-stats">
-                    <div>
-                        <span>Vouchers</span>
-                        <strong>{{ voucherCount | number: '1.0-0' }}</strong>
+                <div class="d-flex flex-wrap gap-2">
+                    <div class="bg-light border border-gray-300 flex-fill min-h-50px min-w-90px p-2 rounded-3">
+                        <span class="d-block fs-10 fw-bolder lh-1 text-gray-600 text-uppercase">Vouchers</span>
+                        <strong class="d-block fs-6 lh-sm mt-2 text-break text-gray-900">{{ voucherCount | number: '1.0-0' }}</strong>
                     </div>
-                    <div>
-                        <span>Lines</span>
-                        <strong>{{ summary.totalRows | number: '1.0-0' }}</strong>
+                    <div class="bg-light border border-gray-300 flex-fill min-h-50px min-w-90px p-2 rounded-3">
+                        <span class="d-block fs-10 fw-bolder lh-1 text-gray-600 text-uppercase">Lines</span>
+                        <strong class="d-block fs-6 lh-sm mt-2 text-break text-gray-900">{{ summary.totalRows | number: '1.0-0' }}</strong>
                     </div>
-                    <div>
-                        <span>Net Side</span>
-                        <strong>{{ netSide }}</strong>
+                    <div class="bg-light border border-gray-300 flex-fill min-h-50px min-w-90px p-2 rounded-3">
+                        <span class="d-block fs-10 fw-bolder lh-1 text-gray-600 text-uppercase">Net Side</span>
+                        <strong class="d-block fs-6 lh-sm mt-2 text-break text-gray-900">{{ netSide }}</strong>
                     </div>
                 </div>
             </div>
 
-            <form [formGroup]="myForm" [hidden]="!advancedFiltersAreShown" class="daybook-filter-panel">
+            <form [formGroup]="myForm" [hidden]="!advancedFiltersAreShown" class="bg-white border border-gray-300 p-3 rounded-3">
                 <div class="row g-3 align-items-end">
                     <div class="col-12 col-md-3 col-xl-2">
                         <label class="form-label" for="fromMiti">From Date(NP)</label>
@@ -113,39 +113,40 @@
 
             <div class="alert alert-danger py-3" *ngIf="errorMessage">{{ errorMessage }}</div>
 
-            <div class="daybook-summary-grid">
-                <div class="daybook-summary-tile">
-                    <span>Total Debit</span>
-                    <strong>{{ formatAmount(summary.totalDebit) }}</strong>
+            <div class="d-flex flex-wrap gap-3">
+                <div class="bg-white border border-gray-300 flex-fill min-h-75px min-w-150px p-3 rounded-3">
+                    <span class="d-block fs-10 fw-bolder lh-sm text-gray-600 text-uppercase">Total Debit</span>
+                    <strong class="d-block fs-6 lh-sm mt-2 text-break text-success">{{ formatAmount(summary.totalDebit) }}</strong>
                 </div>
-                <div class="daybook-summary-tile">
-                    <span>Total Credit</span>
-                    <strong>{{ formatAmount(summary.totalCredit) }}</strong>
+                <div class="bg-white border border-gray-300 flex-fill min-h-75px min-w-150px p-3 rounded-3">
+                    <span class="d-block fs-10 fw-bolder lh-sm text-gray-600 text-uppercase">Total Credit</span>
+                    <strong class="d-block fs-6 lh-sm mt-2 text-break text-danger">{{ formatAmount(summary.totalCredit) }}</strong>
                 </div>
-                <div class="daybook-summary-tile">
-                    <span>Receipt/In</span>
-                    <strong>{{ formatAmount(summary.totalIn) }}</strong>
+                <div class="bg-white border border-gray-300 flex-fill min-h-75px min-w-150px p-3 rounded-3">
+                    <span class="d-block fs-10 fw-bolder lh-sm text-gray-600 text-uppercase">Receipt/In</span>
+                    <strong class="d-block fs-6 lh-sm mt-2 text-break text-success">{{ formatAmount(summary.totalIn) }}</strong>
                 </div>
-                <div class="daybook-summary-tile">
-                    <span>Payment/Out</span>
-                    <strong>{{ formatAmount(summary.totalOut) }}</strong>
+                <div class="bg-white border border-gray-300 flex-fill min-h-75px min-w-150px p-3 rounded-3">
+                    <span class="d-block fs-10 fw-bolder lh-sm text-gray-600 text-uppercase">Payment/Out</span>
+                    <strong class="d-block fs-6 lh-sm mt-2 text-break text-danger">{{ formatAmount(summary.totalOut) }}</strong>
                 </div>
-                <div class="daybook-summary-tile">
-                    <span>Net</span>
-                    <strong>{{ formatAmount(summary.difference) }}</strong>
+                <div class="bg-white border border-gray-300 flex-fill min-h-75px min-w-150px p-3 rounded-3">
+                    <span class="d-block fs-10 fw-bolder lh-sm text-gray-600 text-uppercase">Net</span>
+                    <strong class="d-block fs-6 lh-sm mt-2 text-break text-gray-900">{{ formatAmount(summary.difference) }}</strong>
                 </div>
             </div>
 
-            <div class="daybook-layout">
-                <div class="daybook-grid-card">
-                    <div class="daybook-card-header">
+            <div class="row g-3 align-items-start">
+                <div class="col-12 col-xl-8">
+                <div class="bg-white border border-gray-300 overflow-hidden rounded-3">
+                    <div class="align-items-center border-bottom border-gray-300 d-flex justify-content-between min-h-60px p-3">
                         <div>
-                            <h4>Transaction Lines</h4>
-                            <span>{{ rowData.length | number: '1.0-0' }} lines</span>
+                            <h4 class="fs-6 fw-bold lh-sm m-0 text-gray-900">Transaction Lines</h4>
+                            <span class="d-block fs-8 mt-1 text-gray-600">{{ rowData.length | number: '1.0-0' }} lines</span>
                         </div>
                     </div>
                     <ag-grid-angular
-                        class="ag-theme-balham daybook-grid"
+                        class="ag-theme-balham min-h-400px w-100"
                         [gridOptions]="gridOptions"
                         [columnDefs]="columnDefs"
                         [defaultColDef]="defaultColDef"
@@ -155,27 +156,30 @@
                         [style.height.px]="screenHeight"
                     ></ag-grid-angular>
                 </div>
+                </div>
 
-                <div class="daybook-side-panel">
-                    <div class="daybook-card-header">
+                <div class="col-12 col-xl-4">
+                <div class="bg-white border border-gray-300 overflow-hidden rounded-3">
+                    <div class="align-items-center border-bottom border-gray-300 d-flex justify-content-between min-h-60px p-3">
                         <div>
-                            <h4>Daily Summary</h4>
-                            <span>{{ daySummaries.length | number: '1.0-0' }} days</span>
+                            <h4 class="fs-6 fw-bold lh-sm m-0 text-gray-900">Daily Summary</h4>
+                            <span class="d-block fs-8 mt-1 text-gray-600">{{ daySummaries.length | number: '1.0-0' }} days</span>
                         </div>
                     </div>
-                    <div class="day-summary-list">
-                        <div class="day-summary-row" *ngFor="let item of daySummaries">
+                    <div class="mh-600px overflow-auto">
+                        <div class="align-items-start border-bottom border-gray-300 d-flex gap-3 justify-content-between p-3" *ngFor="let item of daySummaries">
                             <div>
-                                <strong>{{ item.miti || item.date }}</strong>
-                                <span>{{ item.voucherCount }} vouchers, {{ item.lineCount }} lines</span>
+                                <strong class="d-block fs-8 text-gray-900">{{ item.miti || item.date }}</strong>
+                                <span class="d-block fs-8 mt-1 text-gray-600">{{ item.voucherCount }} vouchers, {{ item.lineCount }} lines</span>
                             </div>
-                            <div>
-                                <span>Dr {{ formatAmount(item.debit) }}</span>
-                                <span>Cr {{ formatAmount(item.credit) }}</span>
+                            <div class="text-end">
+                                <span class="d-block fs-8 text-gray-600 text-nowrap">Dr {{ formatAmount(item.debit) }}</span>
+                                <span class="d-block fs-8 mt-1 text-gray-600 text-nowrap">Cr {{ formatAmount(item.credit) }}</span>
                             </div>
                         </div>
-                        <div class="day-summary-empty" *ngIf="!daySummaries.length">No daybook rows found.</div>
+                        <div class="p-4 text-gray-600" *ngIf="!daySummaries.length">No daybook rows found.</div>
                     </div>
+                </div>
                 </div>
             </div>
         </div>

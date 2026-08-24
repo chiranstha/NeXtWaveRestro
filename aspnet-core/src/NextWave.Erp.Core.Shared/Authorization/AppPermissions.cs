@@ -232,6 +232,11 @@ public static class AppPermissions
     public const string PagesRestaurantKds = "Pages.Restaurant.Kds";
     public const string PagesRestaurantSync = "Pages.Restaurant.Sync";
     public const string PagesRestaurantReports = "Pages.Restaurant.Reports";
+    public const string PagesRestaurantReportsSales = "Pages.Restaurant.Reports.Sales";
+    public const string PagesRestaurantReportsOperations = "Pages.Restaurant.Reports.Operations";
+    public const string PagesRestaurantReportsInventory = "Pages.Restaurant.Reports.Inventory";
+    public const string PagesRestaurantReportsPayroll = "Pages.Restaurant.Reports.Payroll";
+    public const string PagesRestaurantReportsAuditFinance = "Pages.Restaurant.Reports.AuditFinance";
     public const string PagesRestaurantInventory = "Pages.Restaurant.Inventory";
     public const string PagesRestaurantInventorySupplierMapping = "Pages.Restaurant.Inventory.SupplierMapping";
     public const string PagesRestaurantInventoryStockAdjustment = "Pages.Restaurant.Inventory.StockAdjustment";
@@ -242,6 +247,15 @@ public static class AppPermissions
     public const string PagesRestaurantAggregators = "Pages.Restaurant.Aggregators";
     public const string PagesRestaurantPayouts = "Pages.Restaurant.Payouts";
     public const string PagesRestaurantCustomerOrdering = "Pages.Restaurant.CustomerOrdering";
+    public const string PagesRestaurantPayroll = "Pages.Restaurant.Payroll";
+    public const string PagesRestaurantPayrollStaff = "Pages.Restaurant.Payroll.Staff";
+    public const string PagesRestaurantPayrollStaffAccess = "Pages.Restaurant.Payroll.Staff.Access";
+    public const string PagesRestaurantPayrollAttendance = "Pages.Restaurant.Payroll.Attendance";
+    public const string PagesRestaurantPayrollAttendanceManage = "Pages.Restaurant.Payroll.Attendance.Manage";
+    public const string PagesRestaurantPayrollProcess = "Pages.Restaurant.Payroll.Process";
+    public const string PagesRestaurantPayrollApprove = "Pages.Restaurant.Payroll.Approve";
+    public const string PagesRestaurantPayrollReports = "Pages.Restaurant.Payroll.Reports";
+    public const string PagesRestaurantPayrollOwnPayslip = "Pages.Restaurant.Payroll.OwnPayslip";
 
     //Transaction
     public const string PagesTransaction = "Pages.Transaction";

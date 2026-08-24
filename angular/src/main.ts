@@ -16,15 +16,15 @@ import { AbpModule } from 'abp-ng2-module';
 import { RootComponent } from './root.component';
 import { AppModule } from './app/app.module'; // Keep for now to import all providers
 import { provideNepaliDatepicker } from '@app/shared/common/nepalidatepicker/nepali-datepicker-angular.module';
-import { ModuleRegistry as AgGridModuleRegistry, provideGlobalGridOptions } from 'ag-grid-community';
-import { ServerSideRowModelModule } from 'ag-grid-enterprise';
+import { provideGlobalGridOptions } from 'ag-grid-community';
+import { setupAgGridEnterprise } from '@app/shared/common/ag-grid/ag-grid-enterprise-setup';
 
 if (environment.production) {
     enableProdMode();
 }
 
 const bootstrap = () => {
-    AgGridModuleRegistry.registerModules([ServerSideRowModelModule]);
+    setupAgGridEnterprise();
     provideGlobalGridOptions(
         {
             theme: 'legacy',

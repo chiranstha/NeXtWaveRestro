@@ -1,4 +1,5 @@
 <div [@routerTransition]>
+    <restaurant-styles></restaurant-styles>
     <sub-header [title]="'Restaurant Reports' | localize">
         <div role="actions">
             <button
@@ -13,46 +14,17 @@
     </sub-header>
 
     <div [class]="containerClass">
-        <div class="restaurant-page">
-            <div class="restaurant-nav">
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/pos" routerLinkActive="active">
-                    <i class="fa fa-cash-register"></i>
-                    {{ 'POS' | localize }}
-                </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/setup" routerLinkActive="active">
-                    <i class="fa fa-sliders"></i>
-                    {{ 'Setup' | localize }}
-                </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/menu" routerLinkActive="active">
-                    <i class="fa fa-utensils"></i>
-                    {{ 'Menu' | localize }}
-                </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/inventory" routerLinkActive="active">
-                    <i class="fa fa-boxes-stacked"></i>
-                    {{ 'Inventory' | localize }}
-                </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/channels" routerLinkActive="active">
-                    <i class="fa fa-store"></i>
-                    {{ 'Channels' | localize }}
-                </a>
-                <a class="restaurant-nav-link" routerLink="/app/main/restaurant/kds" routerLinkActive="active">
-                    <i class="fa fa-tv"></i>
-                    {{ 'KDS' | localize }}
-                </a>
-                <a class="restaurant-nav-link active" routerLink="/app/main/restaurant/reports">
-                    <i class="fa fa-chart-line"></i>
-                    {{ 'Reports' | localize }}
-                </a>
-            </div>
+        <div class="restaurant-page overflow-x-hidden gap-5 mw-100 d-grid min-w-0">
+            <restaurant-navigation></restaurant-navigation>
 
-            <div class="card card-custom gutter-b restaurant-card">
-                <div class="card-body">
-                    <div class="restaurant-filterbar">
+            <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                <div class="card-body p-2">
+                    <div class="restaurant-filterbar align-items-end d-flex flex-wrap gap-3">
                         <div>
                             <label class="form-label">{{ 'From Date' | localize }} (BS)</label>
                             <ne-datepicker
                                 *ngIf="dateFiltersVisible"
-                                class="restaurant-date-filter w-175px"
+                                class="restaurant-date-filter d-block w-100 w-sm-175px"
                                 [date]="filter.fromDate"
                                 [dateFormat]="'yyyy/mm/dd'"
                                 dateIn="AD"
@@ -65,7 +37,7 @@
                             <label class="form-label">{{ 'To Date' | localize }} (BS)</label>
                             <ne-datepicker
                                 *ngIf="dateFiltersVisible"
-                                class="restaurant-date-filter w-175px"
+                                class="restaurant-date-filter d-block w-100 w-sm-175px"
                                 [date]="filter.toDate"
                                 [dateFormat]="'yyyy/mm/dd'"
                                 dateIn="AD"
@@ -74,10 +46,10 @@
                                 (dateInAD)="setFilterDate('toDate', $event)"
                             ></ne-datepicker>
                         </div>
-                        <div>
+                        <div *ngIf="canUseTableFilter">
                             <label class="form-label">{{ 'Table' | localize }}</label>
                             <ng-select
-                                class="w-200px"
+                                class="w-100 w-sm-200px"
                                 [items]="tables"
                                 bindLabel="name"
                                 bindValue="id"
@@ -89,7 +61,7 @@
                         <div>
                             <label class="form-label">{{ 'Waiter' | localize }}</label>
                             <ng-select
-                                class="w-200px"
+                                class="w-100 w-sm-200px"
                                 [items]="waiters"
                                 bindLabel="name"
                                 bindValue="id"
@@ -98,10 +70,10 @@
                                 appendTo="body"
                             ></ng-select>
                         </div>
-                        <div>
+                        <div *ngIf="canUseCategoryFilter">
                             <label class="form-label">{{ 'Category' | localize }}</label>
                             <ng-select
-                                class="w-200px"
+                                class="w-100 w-sm-200px"
                                 [items]="categories"
                                 bindLabel="name"
                                 bindValue="id"
@@ -110,44 +82,70 @@
                                 appendTo="body"
                             ></ng-select>
                         </div>
-                        <button class="btn btn-primary" [buttonBusy]="loading" (click)="refresh()">
+                        <button class="btn btn-primary w-100 w-sm-auto" [buttonBusy]="loading" (click)="refresh()">
                             <i class="fa fa-filter"></i>
                             {{ 'Filter' | localize }}
                         </button>
-                        <button class="btn btn-light" (click)="clearFilters()">{{ 'Clear' | localize }}</button>
+                        <button class="btn btn-light w-100 w-sm-auto" (click)="clearFilters()">{{ 'Clear' | localize }}</button>
                     </div>
                 </div>
             </div>
 
-            <div class="restaurant-grid mb-1">
-                <div class="card card-custom gutter-b restaurant-card restaurant-summary-card">
-                    <div class="card-body">
-                        <div class="restaurant-label">{{ 'Orders' | localize }}</div>
-                        <div class="restaurant-total">{{ summary?.orderCount || 0 }}</div>
-                    </div>
-                </div>
-                <div class="card card-custom gutter-b restaurant-card restaurant-summary-card">
-                    <div class="card-body">
-                        <div class="restaurant-label">{{ 'Sales' | localize }}</div>
-                        <div class="restaurant-total">{{ summary?.grandTotal || 0 | number: '1.2-2' }}</div>
-                    </div>
-                </div>
-                <div class="card card-custom gutter-b restaurant-card restaurant-summary-card">
-                    <div class="card-body">
-                        <div class="restaurant-label">{{ 'Average Bill' | localize }}</div>
-                        <div class="restaurant-total">{{ summary?.averageBill || 0 | number: '1.2-2' }}</div>
+            <div class="card card-custom restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                <div class="card-body p-2">
+                    <div class="d-flex flex-wrap gap-2" role="tablist" aria-label="Report categories">
+                        <button
+                            *ngFor="let type of visibleReportTypes"
+                            type="button"
+                            class="btn btn-sm"
+                            [class.btn-primary]="activeReportType === type.key"
+                            [class.btn-light]="activeReportType !== type.key"
+                            (click)="selectReportType(type.key)"
+                        >
+                            <i class="fa" [ngClass]="type.icon"></i>
+                            {{ type.label | localize }}
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <div class="restaurant-grid-2">
-                <div class="card card-custom gutter-b restaurant-card" *ngFor="let section of reportGridSections">
-                    <div class="card-header">
-                        <div class="card-title">{{ section.title }}</div>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 mb-1">
+                <div class="col" *ngFor="let metric of reportKpis; let index = index">
+                    <div
+                        class="card card-custom restaurant-card bg-white border border-gray-300 border-start border-4 rounded-3 shadow-sm restaurant-summary-card h-100 min-w-0"
+                        [ngClass]="index === 1 ? 'border-success' : index === 2 ? 'border-warning' : index === 3 ? 'border-danger' : 'border-primary'"
+                    >
+                        <div class="card-body p-3">
+                            <div class="restaurant-label fs-9 fw-bold text-gray-600 text-uppercase">{{ metric.label }}</div>
+                            <div class="restaurant-total fs-5 fw-bolder text-gray-900 text-break">{{ metric.value }}</div>
+                        </div>
                     </div>
-                    <div class="card-body p-0 restaurant-ag-grid-wrap">
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-12 col-xl-6">
+                    <div class="card card-custom restaurant-card h-100 min-w-0">
+                        <div class="card-header min-h-40px px-3 py-2"><div class="card-title fs-7 m-0">{{ primaryChartTitle }}</div></div>
+                        <div class="card-body p-2"><ag-charts [options]="primaryChartOptions" style="display: block; height: 320px; width: 100%"></ag-charts></div>
+                    </div>
+                </div>
+                <div class="col-12 col-xl-6">
+                    <div class="card card-custom restaurant-card h-100 min-w-0">
+                        <div class="card-header min-h-40px px-3 py-2"><div class="card-title fs-7 m-0">{{ secondaryChartTitle }}</div></div>
+                        <div class="card-body p-2"><ag-charts [options]="secondaryChartOptions" style="display: block; height: 320px; width: 100%"></ag-charts></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="restaurant-grid-2 d-grid gap-5">
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0" *ngFor="let section of visibleReportGridSections">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ section.title }}</div>
+                    </div>
+                    <div class="card-body p-0 restaurant-ag-grid-wrap overflow-hidden min-w-0">
                         <ag-grid-angular
-                            class="ag-theme-balham restaurant-report-grid"
+                            class="ag-theme-balham restaurant-report-grid rounded-bottom-3 w-100"
                             [style.height.px]="section.height"
                             [columnDefs]="section.columnDefs"
                             [defaultColDef]="defaultColDef"

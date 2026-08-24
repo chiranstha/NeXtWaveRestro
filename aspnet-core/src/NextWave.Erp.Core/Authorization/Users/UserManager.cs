@@ -376,5 +376,61 @@ public class UserManager : AbpUserManager<Role, User>
 
         return user;
     }
+
+    public async Task<(int? TenantId, string LoginIdentifier)> TryResolveTenantLoginAsync(string identifier)
+    {
+        var trimmed = identifier?.Trim();
+        if (string.IsNullOrWhiteSpace(trimmed))
+        {
+            return (null, trimmed);
+        }
+
+        return await _unitOfWorkManager.WithUnitOfWorkAsync(async () =>
+        {
+            using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.MayHaveTenant))
+            {
+                var matches = await Users
+                    .Where(user =>
+                        user.UserName == trimmed ||
+                        user.EmailAddress == trimmed ||
+                        user.PhoneNumber == trimmed)
+                    .Select(user => new
+                    {
+                        user.TenantId,
+                        user.UserName,
+                        user.EmailAddress,
+                        user.PhoneNumber
+                    })
+                    .ToListAsync();
+
+                var tenantIds = matches
+                    .Select(user => user.TenantId)
+                    .Distinct()
+                    .ToList();
+
+                if (tenantIds.Count != 1 || !tenantIds[0].HasValue)
+                {
+                    return (null, trimmed);
+                }
+
+                var phoneMatches = matches
+                    .Where(user => user.PhoneNumber == trimmed)
+                    .ToList();
+
+                if (phoneMatches.Count > 1)
+                {
+                    return (null, trimmed);
+                }
+
+                var loginIdentifier = phoneMatches.Count == 1
+                    ? string.IsNullOrWhiteSpace(phoneMatches[0].EmailAddress)
+                        ? phoneMatches[0].UserName
+                        : phoneMatches[0].EmailAddress
+                    : trimmed;
+
+                return (tenantIds[0], loginIdentifier);
+            }
+        });
+    }
 }
 

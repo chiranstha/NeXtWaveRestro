@@ -6,7 +6,6 @@ import {
     ElementRef,
     HostListener,
     inject,
-    signal,
     ChangeDetectionStrategy,
 } from '@angular/core';
 import { NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
@@ -19,13 +18,14 @@ import {
     TrailBalanceReportServiceProxy,
 } from '@shared/service-proxies/service-proxies';
 import { FileDownloadService } from '@shared/utils/file-download.service';
-import { Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 
 import { ColDef, GridApi, GridOptions, GridReadyEvent } from 'ag-grid-enterprise';
 import { AgGridAngular } from 'ag-grid-angular';
-import { NgClass, DecimalPipe } from '@angular/common';
+import { AgGridFeatureModule } from '@app/shared/common/ag-grid/ag-grid-feature.module';
+import { CommonModule, NgClass, DecimalPipe } from '@angular/common';
 import { NepaliDatepickerComponent } from '../../../shared/common/nepalidatepicker/nepali-datepicker-angular.component';
 import { LocalizePipe } from '@shared/common/pipes/localize.pipe';
 import { AddProductComponent } from '@app/main/inventory/products/addProduct/addProduct.component';
@@ -35,11 +35,12 @@ import { AddProductComponent } from '@app/main/inventory/products/addProduct/add
     styleUrls: ['./trial-balance-report.component.css'],
     animations: [appModuleAnimation],
     imports: [
+        CommonModule,
         NgClass,
         FormsModule,
         ReactiveFormsModule,
         NepaliDatepickerComponent,
-        AgGridAngular,
+        AgGridFeatureModule,
         DecimalPipe,
         LocalizePipe,
     ],
@@ -59,7 +60,7 @@ export class TrialBalanceReportComponent extends AppComponentBase implements OnI
     loadingReport: Subscription;
     getAllAccGroup: Subscription;
 
-    treeLength = signal<number>(0);
+    treeLength = new BehaviorSubject<number>(0);
 
     allAccountGroups: any[] = [];
     loading = true;
@@ -178,7 +179,7 @@ export class TrialBalanceReportComponent extends AppComponentBase implements OnI
             columnDefs: this.columnDefs,
             defaultColDef: this.defaultColDef,
             animateRows: true,
-            enableRangeSelection: true,
+            cellSelection: true,
             treeData: true,
             getDataPath: this.getDataPath,
             autoGroupColumnDef: this.autoGroupColumnDef,
@@ -259,7 +260,7 @@ export class TrialBalanceReportComponent extends AppComponentBase implements OnI
                 next: (data) => {
                     this.allData = data;
                     this.processDataForAgGrid(data);
-                    this.treeLength.set(this.rowData.length);
+                    this.treeLength.next(this.rowData.length);
                 },
                 error: (err) => {
                     this.loading = false;
@@ -277,7 +278,7 @@ export class TrialBalanceReportComponent extends AppComponentBase implements OnI
                 next: (data) => {
                     this.allData = data;
                     this.processDataForAgGrid(data);
-                    this.treeLength.set(this.rowData.length);
+                    this.treeLength.next(this.rowData.length);
                 },
                 error: (err) => {
                     this.notify.error(this.l('An error occurred while loading data'));

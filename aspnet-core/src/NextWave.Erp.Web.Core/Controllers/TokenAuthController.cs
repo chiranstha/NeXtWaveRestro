@@ -164,10 +164,23 @@ public class TokenAuthController : ErpControllerBase
             await ValidateReCaptcha(model.CaptchaResponse);
         }
 
+        var loginIdentifier = model.UserNameOrEmailAddress;
+        var tenancyName = GetTenancyNameOrNull();
+
+        if (tenancyName.IsNullOrWhiteSpace())
+        {
+            var resolvedLogin = await _userManager.TryResolveTenantLoginAsync(loginIdentifier);
+            if (resolvedLogin.TenantId.HasValue)
+            {
+                loginIdentifier = resolvedLogin.LoginIdentifier;
+                tenancyName = _tenantCache.GetOrNull(resolvedLogin.TenantId.Value)?.TenancyName;
+            }
+        }
+
         var loginResult = await GetLoginResultAsync(
-            model.UserNameOrEmailAddress,
+            loginIdentifier,
             model.Password,
-            GetTenancyNameOrNull()
+            tenancyName
         );
 
         var returnUrl = model.ReturnUrl;

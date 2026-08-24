@@ -93,7 +93,6 @@ interface RestaurantPayoutImportForm {
 @Component({
     selector: 'restaurant-channels',
     templateUrl: './restaurant-channels.component.html',
-    styleUrls: ['../restaurant-shared.css'],
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation],
     changeDetection: ChangeDetectionStrategy.Eager,
@@ -419,13 +418,13 @@ export class RestaurantChannelsComponent extends AppComponentBase implements OnI
 
     statusClass(value: number): string {
         if (value === 1) {
-            return 'restaurant-status-success';
+            return 'bg-light-success text-success';
         }
         if (value === 2 || value === 3) {
-            return 'restaurant-status-danger';
+            return 'bg-light-danger text-danger';
         }
 
-        return 'restaurant-status-primary';
+        return 'bg-light-primary text-primary';
     }
 
     private resetQuickAcceptForms(): void {

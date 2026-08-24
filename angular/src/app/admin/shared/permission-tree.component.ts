@@ -4,7 +4,7 @@ import { PermissionTreeEditModel } from '@app/admin/shared/permission-tree-edit.
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { FlatPermissionDto } from '@shared/service-proxies/service-proxies';
 import { FormsModule } from '@angular/forms';
-import { NgTemplateOutlet } from '@angular/common';
+import { NgClass, NgTemplateOutlet } from '@angular/common';
 import { LocalizePipe } from '@shared/common/pipes/localize.pipe';
 export interface PermissionNode {
     name: string;
@@ -20,7 +20,7 @@ export interface PermissionNode {
     selector: 'permission-tree',
     templateUrl: './permission-tree.component.html',
     styleUrls: ['./permission-tree.component.css'],
-    imports: [FormsModule, NgTemplateOutlet, LocalizePipe],
+    imports: [FormsModule, NgClass, NgTemplateOutlet, LocalizePipe],
     changeDetection: ChangeDetectionStrategy.Eager,
     schemas: [NO_ERRORS_SCHEMA],
 })

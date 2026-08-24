@@ -32,37 +32,37 @@
     </sub-header>
 
     <div [class]="containerClass">
-        <div class="book-report-toolbar print-hidden">
-            <div class="book-report-toolbar-head">
-                <div class="active-report-mark">
-                    <span class="active-report-icon"><i [class]="selectedReport.icon"></i></span>
+        <div class="bg-white border border-gray-300 mb-4 p-3 rounded-3 print-hidden">
+            <div class="align-items-stretch align-items-md-center border-bottom border-gray-300 d-flex flex-column flex-md-row gap-3 justify-content-between mb-4 pb-4">
+                <div class="align-items-center d-flex gap-3 min-w-0">
+                    <span class="align-items-center bg-light-success border border-success border-opacity-25 d-inline-flex flex-shrink-0 h-45px justify-content-center rounded-3 text-success w-45px"><i [class]="selectedReport.icon"></i></span>
                     <div>
-                        <h4>{{ reportTitle }}</h4>
-                        <span>{{ myForm.get('fromMiti')?.value }} - {{ myForm.get('toMiti')?.value }}</span>
+                        <h4 class="fs-5 fw-bold lh-sm m-0 text-gray-900">{{ reportTitle }}</h4>
+                        <span class="d-block fs-8 mt-1 text-gray-600">{{ myForm.get('fromMiti')?.value }} - {{ myForm.get('toMiti')?.value }}</span>
                     </div>
                 </div>
-                <div class="active-report-facts">
-                    <div>
-                        <span>Net</span>
-                        <strong>{{ formatAmount(summary.difference) }}</strong>
+                <div class="d-flex flex-wrap gap-2">
+                    <div class="bg-light border border-gray-300 flex-fill min-h-45px min-w-90px p-2 rounded-3">
+                        <span class="d-block fs-10 fw-bold lh-1 text-gray-600 text-uppercase">Net</span>
+                        <strong class="d-block fs-8 lh-sm mt-2 text-gray-900 text-break">{{ formatAmount(summary.difference) }}</strong>
                     </div>
-                    <div>
-                        <span>Side</span>
-                        <strong>{{ netMovementLabel }}</strong>
+                    <div class="bg-light border border-gray-300 flex-fill min-h-45px min-w-90px p-2 rounded-3">
+                        <span class="d-block fs-10 fw-bold lh-1 text-gray-600 text-uppercase">Side</span>
+                        <strong class="d-block fs-8 lh-sm mt-2 text-gray-900 text-break">{{ netMovementLabel }}</strong>
                     </div>
-                    <div>
-                        <span>Filters</span>
-                        <strong>{{ activeFilterCount }}</strong>
+                    <div class="bg-light border border-gray-300 flex-fill min-h-45px min-w-90px p-2 rounded-3">
+                        <span class="d-block fs-10 fw-bold lh-1 text-gray-600 text-uppercase">Filters</span>
+                        <strong class="d-block fs-8 lh-sm mt-2 text-gray-900 text-break">{{ activeFilterCount }}</strong>
                     </div>
                 </div>
             </div>
 
-            <div class="report-chip-grid">
+            <div class="d-flex flex-wrap gap-2 mb-4">
                 <button
                     *ngFor="let report of bookReports"
                     type="button"
-                    class="report-chip"
-                    [class.active]="selectedReport.id === report.id"
+                    class="btn align-items-center border d-flex flex-fill fs-8 fw-semibold gap-2 min-h-40px min-w-150px rounded-3 text-start"
+                    [ngClass]="selectedReport.id === report.id ? 'btn-light-success border-success text-success' : 'btn-light border-gray-300 text-gray-800'"
                     (click)="selectReport(report.id)"
                 >
                     <i [class]="report.icon"></i>
@@ -70,7 +70,7 @@
                 </button>
             </div>
 
-            <form [formGroup]="myForm" [hidden]="!advancedFiltersAreShown" class="filter-panel">
+            <form [formGroup]="myForm" [hidden]="!advancedFiltersAreShown" class="border-top border-gray-300 pt-4">
                 <div class="row g-3 align-items-end">
                     <div class="col-12 col-md-3 col-xl-2">
                         <label class="form-label" for="fromMiti">From Date(NP)</label>
@@ -137,52 +137,52 @@
             {{ inlineMessage }}
         </div>
 
-        <div class="summary-grid">
-            <div class="summary-tile">
-                <span>Rows</span>
-                <strong>{{ summary.totalRows | number: '1.0-0' }}</strong>
+        <div class="d-flex flex-wrap gap-3 mb-4 summary-grid">
+            <div class="bg-white border border-gray-300 flex-fill min-h-75px min-w-150px p-3 rounded-3 summary-tile">
+                <span class="d-block fs-8 fw-semibold lh-sm mb-2 text-gray-600 text-uppercase">Rows</span>
+                <strong class="d-block fs-5 fw-bold lh-sm text-break text-gray-900">{{ summary.totalRows | number: '1.0-0' }}</strong>
             </div>
-            <div class="summary-tile">
-                <span>In</span>
-                <strong>{{ formatAmount(summary.totalIn) }}</strong>
+            <div class="bg-white border border-gray-300 flex-fill min-h-75px min-w-150px p-3 rounded-3 summary-tile">
+                <span class="d-block fs-8 fw-semibold lh-sm mb-2 text-gray-600 text-uppercase">In</span>
+                <strong class="d-block fs-5 fw-bold lh-sm text-break text-gray-900">{{ formatAmount(summary.totalIn) }}</strong>
             </div>
-            <div class="summary-tile">
-                <span>Out</span>
-                <strong>{{ formatAmount(summary.totalOut) }}</strong>
+            <div class="bg-white border border-gray-300 flex-fill min-h-75px min-w-150px p-3 rounded-3 summary-tile">
+                <span class="d-block fs-8 fw-semibold lh-sm mb-2 text-gray-600 text-uppercase">Out</span>
+                <strong class="d-block fs-5 fw-bold lh-sm text-break text-gray-900">{{ formatAmount(summary.totalOut) }}</strong>
             </div>
-            <div class="summary-tile">
-                <span>Opening</span>
-                <strong>{{ formatAmount(summary.openingBalance) }}</strong>
+            <div class="bg-white border border-gray-300 flex-fill min-h-75px min-w-150px p-3 rounded-3 summary-tile">
+                <span class="d-block fs-8 fw-semibold lh-sm mb-2 text-gray-600 text-uppercase">Opening</span>
+                <strong class="d-block fs-5 fw-bold lh-sm text-break text-gray-900">{{ formatAmount(summary.openingBalance) }}</strong>
             </div>
-            <div class="summary-tile">
-                <span>Debit</span>
-                <strong>{{ formatAmount(summary.totalDebit) }}</strong>
+            <div class="bg-white border border-gray-300 flex-fill min-h-75px min-w-150px p-3 rounded-3 summary-tile">
+                <span class="d-block fs-8 fw-semibold lh-sm mb-2 text-gray-600 text-uppercase">Debit</span>
+                <strong class="d-block fs-5 fw-bold lh-sm text-break text-gray-900">{{ formatAmount(summary.totalDebit) }}</strong>
             </div>
-            <div class="summary-tile">
-                <span>Credit</span>
-                <strong>{{ formatAmount(summary.totalCredit) }}</strong>
+            <div class="bg-white border border-gray-300 flex-fill min-h-75px min-w-150px p-3 rounded-3 summary-tile">
+                <span class="d-block fs-8 fw-semibold lh-sm mb-2 text-gray-600 text-uppercase">Credit</span>
+                <strong class="d-block fs-5 fw-bold lh-sm text-break text-gray-900">{{ formatAmount(summary.totalCredit) }}</strong>
             </div>
-            <div class="summary-tile">
-                <span>Difference</span>
-                <strong>{{ formatAmount(summary.difference) }}</strong>
+            <div class="bg-white border border-gray-300 flex-fill min-h-75px min-w-150px p-3 rounded-3 summary-tile">
+                <span class="d-block fs-8 fw-semibold lh-sm mb-2 text-gray-600 text-uppercase">Difference</span>
+                <strong class="d-block fs-5 fw-bold lh-sm text-break text-gray-900">{{ formatAmount(summary.difference) }}</strong>
             </div>
-            <div class="summary-tile">
-                <span>Closing</span>
-                <strong>{{ formatAmount(summary.closingBalance) }}</strong>
+            <div class="bg-white border border-gray-300 flex-fill min-h-75px min-w-150px p-3 rounded-3 summary-tile">
+                <span class="d-block fs-8 fw-semibold lh-sm mb-2 text-gray-600 text-uppercase">Closing</span>
+                <strong class="d-block fs-5 fw-bold lh-sm text-break text-gray-900">{{ formatAmount(summary.closingBalance) }}</strong>
             </div>
         </div>
 
-        <div class="card report-grid-card">
-            <div class="card-header align-items-center">
+        <div class="card border border-gray-300 rounded-3">
+            <div class="card-header align-items-center min-h-60px">
                 <div>
-                    <h3 class="card-title mb-0">{{ reportTitle }}</h3>
+                    <h3 class="card-title fs-5 fw-bold mb-0 text-gray-900">{{ reportTitle }}</h3>
                     <span class="text-muted">{{ myForm.get('fromMiti')?.value }} - {{ myForm.get('toMiti')?.value }}</span>
                 </div>
                 <span class="badge badge-light-primary">{{ rowData.length | number: '1.0-0' }}</span>
             </div>
-            <div class="card-body">
+            <div class="card-body p-3 p-md-5">
                 <ag-grid-angular
-                    class="ag-theme-balham book-report-grid"
+                    class="ag-theme-balham book-report-grid w-100"
                     [gridOptions]="gridOptions"
                     [columnDefs]="columnDefs"
                     [defaultColDef]="defaultColDef"

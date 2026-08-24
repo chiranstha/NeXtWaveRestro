@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ColDef, ColGroupDef, GridApi, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import { AppComponentBase } from '@shared/common/app-component-base';
+import { appModuleAnimation } from '@shared/animations/routerTransition';
 import {
     AccountLedgerReportList,
     AccountLedgerReportServiceProxy,
@@ -12,52 +13,43 @@ import {
 // import { FileDownloadService } from '@shared/utils/file-download.service';
 
 @Component({
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
     selector: 'appaccountledgerreport',
     templateUrl: './accountLedgerReport.component.html',
     styleUrls: ['./accountLedgerReport.component.css'],
+    animations: [appModuleAnimation],
 })
 export class AccountLedgerReportComponent extends AppComponentBase implements OnInit {
     private gridApi!: GridApi;
     myForm: FormGroup;
     filterText = '';
-    advancedFiltersAreShown = false; rowData: AccountLedgerReportList[] = [];
+    advancedFiltersAreShown = false;
+    rowData: AccountLedgerReportList[] = [];
     totalRecords = 0;
 
     public gridOptions: GridOptions = {
         defaultColDef: {
             resizable: true,
             minWidth: 100,
-            maxWidth: 300
+            maxWidth: 300,
+            // Restaurant startup hides these globally; this report follows AcademicUpgrade.
+            suppressHeaderFilterButton: false,
+            suppressHeaderMenuButton: false,
         },
-        headerHeight: 25,
+        headerHeight: 32,
+        groupHeaderHeight: 32,
         rowHeight: 24,
         animateRows: true,
-        rowSelection: { mode: 'multiRow', enableClickSelection: false },
-        groupSelectsChildren: true,
+        rowSelection: {
+            mode: 'multiRow',
+            groupSelects: 'descendants',
+            enableClickSelection: false,
+        },
         pagination: false,
         pinnedBottomRowData: [],
-        onGridReady: this.onGridReady.bind(this), suppressHorizontalScroll: false, autoGroupColumnDef: {
-            headerName: 'AccountGroup',
-            field: 'groupName',
-            cellRenderer: 'agGroupCellRenderer',
-            cellRendererParams: {
-                suppressCount: true,
-                innerRenderer: (params) => {
-                    if (params.node.group) {
-                        return `<strong style="color: #1f4e79;">${params.node.key}</strong>`;
-                    }
-                    return params.value;
-                }
-            },
-            minWidth: 200,
-            flex: 1,
-            cellClass: 'group-cell'
-        },
-        groupDefaultExpanded: 1,
-        enableRangeSelection: true,
-        suppressAggFuncInHeader: true,
+        onGridReady: this.onGridReady.bind(this),
+        suppressHorizontalScroll: false,
     };
 
     public columnDefs: (ColDef | ColGroupDef)[] = [
@@ -75,16 +67,18 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
             sortable: true,
             filter: true,
             enableRowGroup: true,
-            flex: 3,
+            flex: 5,
+            minWidth: 160,
             headerClass: 'light-blue-header'
         },
         {
             field: 'ledgerName',
-            headerName: this.l('Account Ledger Name'),
+            headerName: this.l('Ledger Name'),
             sortable: true,
             filter: true,
             enableRowGroup: true,
             flex: 5,
+            minWidth: 160,
             headerClass: 'light-blue-header'
         },
         {
@@ -97,7 +91,6 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
                 enableRowGroup: true,
                 flex: 3,
                 valueFormatter: AccountLedgerReportComponent.numberFormatter,
-                aggFunc: 'sum'
             },
             {
                 field: 'openingCr',
@@ -107,7 +100,6 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
                 enableRowGroup: true,
                 flex: 3,
                 valueFormatter: AccountLedgerReportComponent.numberFormatter,
-                aggFunc: 'sum'
             }
             ]
         },
@@ -121,7 +113,6 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
                 enableRowGroup: true,
                 flex: 3,
                 valueFormatter: AccountLedgerReportComponent.numberFormatter,
-                aggFunc: 'sum'
             },
             {
                 field: 'credit',
@@ -131,7 +122,6 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
                 enableRowGroup: true,
                 flex: 3,
                 valueFormatter: AccountLedgerReportComponent.numberFormatter,
-                aggFunc: 'sum'
             }
             ]
         },
@@ -145,7 +135,6 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
                 enableRowGroup: true,
                 flex: 3,
                 valueFormatter: AccountLedgerReportComponent.numberFormatter,
-                aggFunc: 'sum'
             },
             {
                 field: 'balanceCr',
@@ -155,7 +144,6 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
                 enableRowGroup: true,
                 flex: 3,
                 valueFormatter: AccountLedgerReportComponent.numberFormatter,
-                aggFunc: 'sum'
             }
             ]
         }
@@ -171,24 +159,20 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
         private _route: ActivatedRoute
     ) {
         super(injector);
-        this.getSetting();
     }
 
     ngOnInit(): void {
         this.createForm();
         this.getAllAccountGroup();
         this.setFinancialYear();
-        setTimeout(() => {
-            this.loadreport();
-        }, 1000);
     }
 
     createForm() {
         this.myForm = this._fb.group({
             groupId: [this.emptyGuId],
             isZeroBalance: [true],
-            fromMiti: [this.fromMiti],
-            toMiti: [this.toMiti],
+            fromMiti: [''],
+            toMiti: [''],
         });
     }
 
@@ -207,12 +191,17 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
     getAllAccountGroup() {
         const groupId = this._route.snapshot.queryParamMap.get('id');
         this._proxy.getAllAccountGroupForTableDropdown().subscribe(data => {
-            this.allAccountGroups = data;
+            const allGroupOption = {
+                id: this.emptyGuId,
+                displayName: '- Select All -',
+            } as any;
+            this.allAccountGroups = [allGroupOption, ...(data ?? [])];
             if (groupId && groupId != null) {
                 this.myForm.get('groupId').setValue(groupId);
+                this.loadreport();
             }
             else {
-                this.myForm.get('groupId').setValue(data[0].id);
+                this.myForm.get('groupId').setValue(this.emptyGuId);
             }
         });
     }
@@ -222,7 +211,8 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
             this.myForm.patchValue({
                 fromMiti: result.fromMiti,
                 toMiti: result.toMiti
-            });
+            }, { emitEvent: false });
+            this.loadreport();
         })
     }
 
@@ -234,17 +224,6 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
         this.gridApi.addEventListener('filterChanged', () => {
             this.calculateTotals();
         });
-
-        this.gridApi.addEventListener('rowGroupOpened', () => {
-            this.onRowGroupChanged();
-        });
-
-        this.gridApi.addEventListener('columnRowGroupChanged', () => {
-            this.onRowGroupChanged();
-        });
-
-        // Enable grouping by default
-        this.enableGrouping();
 
         if (this.rowData?.length > 0) {
             this.calculateTotals();
@@ -302,12 +281,13 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
 
         if (!displayedRows.length) {
             this.gridOptions.pinnedBottomRowData = [];
+            this.gridApi.setGridOption('pinnedBottomRowData', []);
             return;
         }
 
         const totals = {
             groupName: '',
-            ledgerName: 'Grand Total',
+            ledgerName: 'Total',
             openingDr: this.sumFilteredField('openingDr', displayedRows),
             openingCr: this.sumFilteredField('openingCr', displayedRows),
             debit: this.sumFilteredField('debit', displayedRows),
@@ -317,9 +297,7 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
         };
 
         this.gridOptions.pinnedBottomRowData = [totals];
-        if (this.gridApi) {
-            this.gridApi.refreshCells();
-        }
+        this.gridApi.setGridOption('pinnedBottomRowData', [totals]);
     }
 
     sumFilteredField(fieldName: string, rows: any[]): number {
@@ -330,6 +308,9 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
     }
 
     onCellDoubleClicked(params) {
+        if (!params?.data?.accountLedgerId || params.node?.rowPinned) {
+            return;
+        }
         localStorage.setItem('accountledgerwise', JSON.stringify(this.myForm.value));
         this._router.navigate(['/app/main/reports/account-wise', params.data.accountLedgerId]);
     }

@@ -25,7 +25,6 @@ import { finalize } from 'rxjs';
 @Component({
     selector: 'restaurant-kds',
     templateUrl: './restaurant-kds.component.html',
-    styleUrls: ['../restaurant-shared.css'],
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation],
     changeDetection: ChangeDetectionStrategy.Eager,
@@ -184,7 +183,7 @@ export class RestaurantKdsComponent extends AppComponentBase implements OnInit, 
     }
 
     ticketRouteClass(ticket: RestaurantTicketDto): string {
-        return ticket.ticketType === 1 ? 'restaurant-status-primary' : 'restaurant-status-warning';
+        return ticket.ticketType === 1 ? 'bg-light-primary text-primary' : 'bg-light-warning text-warning';
     }
 
     purposeText(ticket: RestaurantTicketDto): string {
@@ -201,28 +200,28 @@ export class RestaurantKdsComponent extends AppComponentBase implements OnInit, 
 
     ticketStatusClass(status: number): string {
         if (status === 1) {
-            return 'restaurant-status-warning';
+            return 'bg-light-warning text-warning';
         }
         if (status === 2 || status === 3) {
-            return 'restaurant-status-success';
+            return 'bg-light-success text-success';
         }
         if (status === 4) {
-            return 'restaurant-status-danger';
+            return 'bg-light-danger text-danger';
         }
-        return 'restaurant-status-neutral';
+        return 'bg-light text-gray-600';
     }
 
     itemStatusClass(status: number): string {
         if (status === 2) {
-            return 'restaurant-status-warning';
+            return 'bg-light-warning text-warning';
         }
         if (status === 3 || status === 4) {
-            return 'restaurant-status-success';
+            return 'bg-light-success text-success';
         }
         if (status === 5) {
-            return 'restaurant-status-danger';
+            return 'bg-light-danger text-danger';
         }
-        return status === 1 ? 'restaurant-status-primary' : 'restaurant-status-neutral';
+        return status === 1 ? 'bg-light-primary text-primary' : 'bg-light text-gray-600';
     }
 
     elapsed(ticket: RestaurantTicketDto): string {

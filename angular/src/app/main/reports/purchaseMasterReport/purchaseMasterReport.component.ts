@@ -17,7 +17,6 @@ import { ColDef } from 'ag-grid-community';
     animations: [appModuleAnimation],
     selector: 'appPurchaseMasterReport',
     templateUrl: './purchaseMasterReport.component.html',
-    styleUrls: ['./purchaseMasterReport.component.css']
 })
 export class PurchaseMasterReportComponent extends AppComponentBase implements OnInit, OnDestroy {
     public destroy$ = new Subject<void>();

@@ -122,6 +122,7 @@ public static class AppSettings
         public const string MaxProfilePictureSizeInMB = "App.UserManagement.MaxProfilePictureSizeInMB";
         public const string MaxProfilePictureWidth = "App.UserManagement.MaxProfilePictureWidth";
         public const string MaxProfilePictureHeight = "App.UserManagement.MaxProfilePictureHeight";
+        public const string EmployeeDefaultPassword = "App.UserManagement.EmployeeDefaultPassword";
 
         public static class Password
         {

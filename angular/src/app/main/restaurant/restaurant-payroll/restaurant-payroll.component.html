@@ -1,0 +1,616 @@
+<div [@routerTransition]>
+    <restaurant-styles></restaurant-styles>
+    <sub-header [title]="'Restaurant Payroll' | localize">
+        <div role="actions">
+            <button class="btn btn-sm btn-light-primary" [buttonBusy]="loading" (click)="refresh()" tooltip="Refresh payroll">
+                <i class="fa fa-rotate"></i>
+            </button>
+        </div>
+    </sub-header>
+
+    <div [class]="containerClass">
+        <div class="restaurant-page overflow-x-hidden gap-5 mw-100 d-grid min-w-0">
+            <div class="restaurant-nav align-items-center bg-white border border-gray-300 d-flex gap-2 overflow-x-auto p-2 rounded-3">
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/pos" routerLinkActive="active bg-light-primary text-primary">
+                    <i class="fa fa-cash-register"></i> {{ 'POS' | localize }}
+                </a>
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/setup" routerLinkActive="active bg-light-primary text-primary">
+                    <i class="fa fa-sliders"></i> {{ 'Setup' | localize }}
+                </a>
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/menu" routerLinkActive="active bg-light-primary text-primary">
+                    <i class="fa fa-utensils"></i> {{ 'Menu' | localize }}
+                </a>
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/inventory" routerLinkActive="active bg-light-primary text-primary">
+                    <i class="fa fa-boxes-stacked"></i> {{ 'Inventory' | localize }}
+                </a>
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/channels" routerLinkActive="active bg-light-primary text-primary">
+                    <i class="fa fa-store"></i> {{ 'Channels' | localize }}
+                </a>
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/kds" routerLinkActive="active bg-light-primary text-primary">
+                    <i class="fa fa-tv"></i> {{ 'KDS' | localize }}
+                </a>
+                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/reports" routerLinkActive="active bg-light-primary text-primary">
+                    <i class="fa fa-chart-line"></i> {{ 'Reports' | localize }}
+                </a>
+                <a class="restaurant-nav-link active bg-hover-light bg-light-primary flex-shrink-0 text-gray-600 text-hover-dark text-primary align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/payroll">
+                    <i class="fa fa-money-check-dollar"></i> {{ 'Payroll' | localize }}
+                </a>
+            </div>
+
+            <div class="restaurant-metric-row d-grid gap-4">
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
+                    <span class="fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">Active staff</span>
+                    <span class="fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ dashboard.activeEmployeeCount }}</span>
+                </div>
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
+                    <span class="fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">Present today</span>
+                    <span class="fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ dashboard.presentToday }}</span>
+                </div>
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
+                    <span class="fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">Open clock-ins</span>
+                    <span class="fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ dashboard.openClockIns }}</span>
+                </div>
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3" *ngIf="canViewRuns">
+                    <span class="fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">Month gross</span>
+                    <span class="fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">NPR {{ money(dashboard.currentMonthGross) }}</span>
+                </div>
+                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3" *ngIf="canViewRuns">
+                    <span class="fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">Month net</span>
+                    <span class="fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">NPR {{ money(dashboard.currentMonthNet) }}</span>
+                </div>
+            </div>
+
+            <ul class="nav restaurant-section-tabs align-items-center bg-white border border-gray-300 d-flex flex-wrap gap-2 p-2 rounded-3">
+                <li class="nav-item">
+                    <button type="button" class="nav-link bg-hover-light border-0 fw-bolder min-h-35px px-3 py-2 rounded-2 text-gray-600 text-hover-dark" [class.active]="activeSection === 'overview'" [class.bg-light-primary]="activeSection === 'overview'" [class.text-primary]="activeSection === 'overview'" (click)="changeSection('overview')">
+                        <i class="fa fa-gauge-high me-1"></i> Overview
+                    </button>
+                </li>
+                <li class="nav-item" *ngIf="canManageStaff">
+                    <button type="button" class="nav-link bg-hover-light border-0 fw-bolder min-h-35px px-3 py-2 rounded-2 text-gray-600 text-hover-dark" [class.active]="activeSection === 'staff'" [class.bg-light-primary]="activeSection === 'staff'" [class.text-primary]="activeSection === 'staff'" (click)="changeSection('staff')">
+                        <i class="fa fa-users me-1"></i> Staff
+                    </button>
+                </li>
+                <li class="nav-item" *ngIf="canUseAttendance">
+                    <button type="button" class="nav-link bg-hover-light border-0 fw-bolder min-h-35px px-3 py-2 rounded-2 text-gray-600 text-hover-dark" [class.active]="activeSection === 'attendance'" [class.bg-light-primary]="activeSection === 'attendance'" [class.text-primary]="activeSection === 'attendance'" (click)="changeSection('attendance')">
+                        <i class="fa fa-calendar-check me-1"></i> Attendance
+                    </button>
+                </li>
+                <li class="nav-item" *ngIf="canViewRuns">
+                    <button type="button" class="nav-link bg-hover-light border-0 fw-bolder min-h-35px px-3 py-2 rounded-2 text-gray-600 text-hover-dark" [class.active]="activeSection === 'runs'" [class.bg-light-primary]="activeSection === 'runs'" [class.text-primary]="activeSection === 'runs'" (click)="changeSection('runs')">
+                        <i class="fa fa-file-invoice-dollar me-1"></i> Pay runs
+                    </button>
+                </li>
+                <li class="nav-item" *ngIf="canViewOwnPayslip">
+                    <button type="button" class="nav-link bg-hover-light border-0 fw-bolder min-h-35px px-3 py-2 rounded-2 text-gray-600 text-hover-dark" [class.active]="activeSection === 'payslips'" [class.bg-light-primary]="activeSection === 'payslips'" [class.text-primary]="activeSection === 'payslips'" (click)="changeSection('payslips')">
+                        <i class="fa fa-receipt me-1"></i> My payslips
+                    </button>
+                </li>
+            </ul>
+
+            <div class="restaurant-grid-2 d-grid gap-5" *ngIf="activeSection === 'overview'">
+                <div class="card card-custom restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">My timecard</div>
+                    </div>
+                    <div class="card-body p-5" *ngIf="dashboard.myProfile; else noPayrollProfile">
+                        <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+                            <div>
+                                <div class="fw-bolder fs-5 text-gray-900">{{ dashboard.myProfile.name }}</div>
+                                <div class="text-gray-600 mt-1">{{ dashboard.myProfile.staffCode }} · {{ dashboard.myProfile.jobRole || 'Staff' }}</div>
+                                <div class="text-gray-600 mt-1" *ngIf="dashboard.myTodayAttendance">
+                                    In {{ dateTime(dashboard.myTodayAttendance.clockIn) }} · Out {{ dateTime(dashboard.myTodayAttendance.clockOut) }}
+                                </div>
+                            </div>
+                            <span class="badge" [class.bg-light-success]="dashboard.myProfile.isActive" [class.text-success]="dashboard.myProfile.isActive" [class.bg-light-danger]="!dashboard.myProfile.isActive" [class.text-danger]="!dashboard.myProfile.isActive">
+                                {{ dashboard.myProfile.isActive ? 'Active' : 'Inactive' }}
+                            </span>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap mt-5" *ngIf="canUseAttendance">
+                            <button type="button" class="btn btn-sm btn-success" [buttonBusy]="saving" [disabled]="!!dashboard.myTodayAttendance?.clockIn" (click)="clockIn()">
+                                <i class="fa fa-right-to-bracket"></i> Clock in
+                            </button>
+                            <button type="button" class="btn btn-sm btn-light-primary" [buttonBusy]="saving" [disabled]="!dashboard.myTodayAttendance?.clockIn || !!dashboard.myTodayAttendance?.clockOut" (click)="clockOut()">
+                                <i class="fa fa-right-from-bracket"></i> Clock out
+                            </button>
+                        </div>
+                    </div>
+                    <ng-template #noPayrollProfile>
+                        <div class="card-body p-5 text-gray-600">
+                            This login is not linked to a payroll employee yet. A payroll manager can link it from the Staff tab.
+                        </div>
+                    </ng-template>
+                </div>
+
+                <div class="card card-custom restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0" *ngIf="canViewRuns">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">Recent payroll runs</div>
+                        <button type="button" class="btn btn-xs btn-light-primary" (click)="changeSection('runs')">View all</button>
+                    </div>
+                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="dashboard.recentRuns.length; else noRecentRuns">
+                            <thead class="table-light text-gray-600 text-uppercase"><tr><th>Run</th><th>Period</th><th>Status</th><th class="text-end">Net</th></tr></thead>
+                            <tbody>
+                                <tr *ngFor="let run of dashboard.recentRuns; trackBy: trackById" role="button" (click)="loadPayrollRun(run.id)">
+                                    <td class="fw-bold">{{ run.runNumber }}</td>
+                                    <td>{{ dateBs(run.periodStart) }} – {{ dateBs(run.periodEnd) }} BS</td>
+                                    <td><span class="badge" [class.bg-light-warning]="run.status === 0" [class.text-warning]="run.status === 0" [class.bg-light-primary]="run.status === 1" [class.text-primary]="run.status === 1" [class.bg-light-success]="run.status === 2" [class.text-success]="run.status === 2">{{ runStatusText(run.status) }}</span></td>
+                                    <td class="text-end fw-bold">NPR {{ money(run.totalNet) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <ng-template #noRecentRuns><div class="p-5 text-center text-gray-600">No payroll runs yet.</div></ng-template>
+                    </div>
+                </div>
+
+                <div class="card card-custom restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0" *ngIf="canViewOwnPayslip">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">Latest payslips</div>
+                        <button type="button" class="btn btn-xs btn-light-primary" (click)="changeSection('payslips')">View all</button>
+                    </div>
+                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="dashboard.myRecentPayslips.length; else noLatestPayslips">
+                            <thead class="table-light text-gray-600 text-uppercase"><tr><th>Run</th><th>Period</th><th class="text-end">Gross</th><th class="text-end">Net</th></tr></thead>
+                            <tbody><tr *ngFor="let line of dashboard.myRecentPayslips; trackBy: trackById"><td class="fw-bold">{{ line.runNumber }}</td><td>{{ dateBs(line.periodStart) }} – {{ dateBs(line.periodEnd) }} BS</td><td class="text-end">NPR {{ money(line.grossPay) }}</td><td class="text-end fw-bold">NPR {{ money(line.netPay) }}</td></tr></tbody>
+                        </table>
+                        <ng-template #noLatestPayslips><div class="p-5 text-center text-gray-600">No approved payslips yet.</div></ng-template>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-custom restaurant-card payroll-staff-directory bg-white border border-gray-300 rounded-3 shadow-sm min-w-0" *ngIf="activeSection === 'staff' && canManageStaff">
+                <div class="card-header payroll-directory-header border-gray-200 min-h-55px px-4 py-3 align-items-center d-flex justify-content-between gap-3">
+                    <div class="min-w-0">
+                        <div class="card-title fw-bolder text-gray-900 fs-6 lh-sm m-0">Employees</div>
+                        <div class="text-gray-600 fs-8 mt-1">Personal details, employment, pay and login access</div>
+                    </div>
+                    <div class="payroll-directory-tools d-flex align-items-center gap-2">
+                        <div class="payroll-search position-relative">
+                            <i class="fa fa-magnifying-glass position-absolute text-gray-500"></i>
+                            <input class="form-control form-control-sm" type="search" [(ngModel)]="employeeSearch" placeholder="Search staff" aria-label="Search staff" />
+                        </div>
+                        <label class="form-check form-switch form-check-custom form-check-solid text-nowrap mb-0">
+                            <input class="form-check-input" type="checkbox" [(ngModel)]="includeInactive" (change)="loadEmployees()" />
+                            <span class="form-check-label fs-8">Inactive</span>
+                        </label>
+                        <button type="button" class="btn btn-sm btn-light-primary text-nowrap" (click)="openStaffSetup()">
+                            <i class="fa fa-sitemap"></i> Departments & roles
+                        </button>
+                        <button type="button" class="btn btn-sm btn-primary text-nowrap" (click)="addEmployee()">
+                            <i class="fa fa-plus"></i> Add employee
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body p-0" *ngIf="filteredEmployees.length; else noEmployees">
+                    <div class="payroll-staff-table d-none d-lg-block overflow-x-auto">
+                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100">
+                            <thead class="table-light text-gray-600 text-uppercase">
+                                <tr><th>Employee</th><th>Contact</th><th>Work</th><th>Employment</th><th class="text-end">Pay rate</th><th>Status</th><th></th></tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let employee of filteredEmployees; trackBy: trackById">
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="payroll-avatar flex-shrink-0">{{ initials(employee.name) }}</div>
+                                            <div class="min-w-0">
+                                                <button type="button" class="btn btn-link fw-bolder p-0 text-gray-900 text-start" (click)="viewEmployee(employee)">{{ employee.name }}</button>
+                                                <div class="text-gray-600 fs-8 text-truncate">{{ employee.staffCode }} · {{ employee.jobRole || 'Staff' }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="text-gray-800 text-truncate">{{ employee.phoneNumber || 'No phone' }}</div>
+                                        <div class="text-gray-600 fs-8 text-truncate">{{ employee.emailAddress || 'No email' }}</div>
+                                    </td>
+                                    <td>
+                                        <div class="text-gray-800">{{ employee.department || 'Unassigned' }}</div>
+                                        <div class="text-gray-600 fs-8">{{ employee.restaurantRoleName || 'No login role' }}</div>
+                                    </td>
+                                    <td>
+                                        <div>{{ employmentTypeText(employee.employmentType) }}</div>
+                                        <div class="text-gray-600 fs-8">Joined {{ dateBs(employee.joinedOn, employee.joinedOnMiti) }} BS</div>
+                                    </td>
+                                    <td class="text-end fw-bold text-nowrap">NPR {{ money(employee.employmentType === 0 ? employee.basicSalary : employee.hourlyRate) }}<span class="text-gray-600 fw-normal" *ngIf="employee.employmentType === 1">/hr</span></td>
+                                    <td><span class="badge" [class.bg-light-success]="employee.isActive" [class.text-success]="employee.isActive" [class.bg-light-danger]="!employee.isActive" [class.text-danger]="!employee.isActive">{{ employee.isActive ? 'Active' : 'Inactive' }}</span></td>
+                                    <td class="text-end"><button type="button" class="btn btn-sm btn-light-primary text-nowrap" (click)="viewEmployee(employee)">View <i class="fa fa-chevron-right ms-1"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="payroll-staff-cards d-grid d-lg-none gap-3 p-3">
+                        <button type="button" class="payroll-staff-card bg-white border border-gray-300 d-flex align-items-center gap-3 p-3 rounded-3 text-start" *ngFor="let employee of filteredEmployees; trackBy: trackById" (click)="viewEmployee(employee)">
+                            <span class="payroll-avatar flex-shrink-0">{{ initials(employee.name) }}</span>
+                            <span class="min-w-0 flex-grow-1">
+                                <span class="d-block fw-bolder text-gray-900 text-truncate">{{ employee.name }}</span>
+                                <span class="d-block text-gray-600 fs-8 text-truncate">{{ employee.staffCode }} · {{ employee.jobRole || employee.department || 'Staff' }}</span>
+                                <span class="d-block text-gray-600 fs-8 text-truncate mt-1"><i class="fa fa-phone me-1"></i>{{ employee.phoneNumber || 'Contact not added' }}</span>
+                            </span>
+                            <span class="text-end flex-shrink-0">
+                                <span class="badge" [class.bg-light-success]="employee.isActive" [class.text-success]="employee.isActive" [class.bg-light-danger]="!employee.isActive" [class.text-danger]="!employee.isActive">{{ employee.isActive ? 'Active' : 'Inactive' }}</span>
+                                <i class="fa fa-chevron-right d-block text-gray-500 mt-3"></i>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                <ng-template #noEmployees>
+                    <div class="card-body p-6 text-center text-gray-600">
+                        <i class="fa fa-user-group fs-2 text-gray-400 d-block mb-3"></i>
+                        {{ employeeSearch ? 'No employees match this search.' : 'No payroll staff found. Add the first employee to begin attendance and payroll.' }}
+                    </div>
+                </ng-template>
+            </div>
+
+            <div class="d-grid gap-5" *ngIf="activeSection === 'attendance' && canUseAttendance">
+                <div class="card card-custom restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-body p-4">
+                        <div class="row align-items-end">
+                            <div class="col-sm-6 col-lg-3 mb-3"><label class="form-label">From (BS)</label><ne-datepicker class="d-block" [(ngModel)]="attendanceFrom" valueIn="AD" dateIn="AD" [dateFormat]="'yyyy-mm-dd'" language="en" [todayBtn]="true"></ne-datepicker></div>
+                            <div class="col-sm-6 col-lg-3 mb-3"><label class="form-label">To (BS)</label><ne-datepicker class="d-block" [(ngModel)]="attendanceTo" valueIn="AD" dateIn="AD" [dateFormat]="'yyyy-mm-dd'" language="en" [todayBtn]="true"></ne-datepicker></div>
+                            <div class="col-lg-3 mb-3" *ngIf="canManageAttendance"><label class="form-label">Employee</label><select class="form-select" [(ngModel)]="attendanceEmployeeId"><option value="">All employees</option><option *ngFor="let employee of employees" [value]="employee.id">{{ employee.name }}</option></select></div>
+                            <div class="col-lg-3 mb-3"><button type="button" class="btn btn-primary w-100" [buttonBusy]="loading" (click)="loadAttendance()"><i class="fa fa-filter"></i> Apply filter</button></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="restaurant-grid-2 d-grid gap-5" *ngIf="canManageAttendance">
+                    <div class="card card-custom restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                        <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between"><div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ attendanceForm.value.id ? 'Edit attendance' : 'Add attendance' }}</div><button type="button" class="btn btn-xs btn-light" (click)="resetAttendance()">Clear</button></div>
+                        <form class="card-body p-5" [formGroup]="attendanceForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3"><label class="required form-label">Employee</label><select class="form-select" formControlName="employeeId"><option value="">Choose employee</option><option *ngFor="let employee of employees" [value]="employee.id">{{ employee.name }} ({{ employee.staffCode }})</option></select></div>
+                                <div class="col-md-3 mb-3"><label class="required form-label">Work date (BS)</label><ne-datepicker class="d-block" formControlName="workDate" valueIn="AD" dateIn="AD" [dateFormat]="'yyyy-mm-dd'" language="en" [todayBtn]="true"></ne-datepicker></div>
+                                <div class="col-md-3 mb-3"><label class="required form-label">Status</label><select class="form-select" formControlName="status"><option *ngFor="let item of attendanceStatuses" [ngValue]="item.value">{{ item.label }}</option></select></div>
+                                <div class="col-md-6 mb-3"><label class="form-label">Clock in</label><input type="datetime-local" class="form-control" formControlName="clockIn" /></div>
+                                <div class="col-md-6 mb-3"><label class="form-label">Clock out</label><input type="datetime-local" class="form-control" formControlName="clockOut" /></div>
+                                <div class="col-md-4 mb-3"><label class="form-label">Break (minutes)</label><input type="number" min="0" max="1440" class="form-control" formControlName="breakMinutes" /></div>
+                                <div class="col-md-4 mb-3"><label class="form-label">Regular hours override</label><input type="number" min="0" max="24" step="0.25" class="form-control" formControlName="regularHours" placeholder="Auto" /></div>
+                                <div class="col-md-4 mb-3"><label class="form-label">Overtime hours override</label><input type="number" min="0" max="24" step="0.25" class="form-control" formControlName="overtimeHours" placeholder="Auto" /></div>
+                                <div class="col-md-4 mb-3"><label class="form-label">Shift</label><input class="form-control" formControlName="shiftName" maxlength="80" placeholder="Morning, evening…" /></div>
+                                <div class="col-md-8 mb-3"><label class="form-label">Notes</label><input class="form-control" formControlName="notes" maxlength="500" /></div>
+                            </div>
+                            <div class="d-flex justify-content-end gap-2"><button type="button" class="btn btn-sm btn-light" (click)="resetAttendance()">Cancel</button><button type="button" class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="saveAttendance()"><i class="fa fa-save"></i> Save attendance</button></div>
+                        </form>
+                    </div>
+
+                    <div class="card card-custom restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                        <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between"><div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">Self clock</div></div>
+                        <div class="card-body p-5" *ngIf="dashboard.myProfile; else noSelfClockProfile">
+                            <div class="fw-bold">{{ dashboard.myProfile.name }}</div><div class="text-gray-600 mt-1">Today: {{ dashboard.myTodayAttendance ? attendanceStatusText(dashboard.myTodayAttendance.status) : 'Not clocked in' }}</div>
+                            <div class="d-flex gap-2 mt-4"><button type="button" class="btn btn-sm btn-success" [buttonBusy]="saving" [disabled]="!!dashboard.myTodayAttendance?.clockIn" (click)="clockIn()">Clock in</button><button type="button" class="btn btn-sm btn-light-primary" [buttonBusy]="saving" [disabled]="!dashboard.myTodayAttendance?.clockIn || !!dashboard.myTodayAttendance?.clockOut" (click)="clockOut()">Clock out</button></div>
+                        </div>
+                        <ng-template #noSelfClockProfile><div class="card-body p-5 text-gray-600">Your login is not linked to a payroll employee.</div></ng-template>
+                    </div>
+                </div>
+
+                <div class="card card-custom restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between"><div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">Attendance log</div><span class="text-gray-600 fs-8">{{ attendance.length }} entries</span></div>
+                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="attendance.length; else noAttendance">
+                            <thead class="table-light text-gray-600 text-uppercase"><tr><th>Date</th><th>Employee</th><th>In / out</th><th>Status</th><th class="text-end">Hours</th><th>Shift</th><th *ngIf="canManageAttendance"></th></tr></thead>
+                            <tbody><tr *ngFor="let row of attendance; trackBy: trackById"><td class="fw-bold">{{ dateBs(row.workDate) }} BS</td><td><div>{{ row.employeeName }}</div><div class="text-gray-600 fs-8">{{ row.staffCode }}</div></td><td><div>{{ dateTime(row.clockIn) }}</div><div class="text-gray-600">{{ dateTime(row.clockOut) }}</div></td><td><span class="badge bg-light-primary text-primary">{{ attendanceStatusText(row.status) }}</span></td><td class="text-end"><div>{{ row.regularHours }} regular</div><div class="text-gray-600">{{ row.overtimeHours }} overtime</div></td><td>{{ row.shiftName || '-' }}</td><td class="text-end" *ngIf="canManageAttendance"><button type="button" class="btn btn-xs btn-light-primary" (click)="editAttendance(row)"><i class="fa fa-pencil"></i></button></td></tr></tbody>
+                        </table>
+                        <ng-template #noAttendance><div class="p-5 text-center text-gray-600">No attendance records in this period.</div></ng-template>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-5" *ngIf="activeSection === 'runs' && canViewRuns">
+                <div class="card card-custom restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0" *ngIf="canProcessPayroll">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between"><div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">Generate payroll draft</div><span class="text-gray-600 fs-8">Generating the same draft period recalculates it</span></div>
+                    <form class="card-body p-5" [formGroup]="payrollRunForm">
+                        <div class="row">
+                            <div class="col-md-3 mb-3"><label class="required form-label">Period start (BS)</label><ne-datepicker class="d-block" formControlName="periodStart" valueIn="AD" dateIn="AD" [dateFormat]="'yyyy-mm-dd'" language="en" [todayBtn]="true"></ne-datepicker></div>
+                            <div class="col-md-3 mb-3"><label class="required form-label">Period end (BS)</label><ne-datepicker class="d-block" formControlName="periodEnd" valueIn="AD" dateIn="AD" [dateFormat]="'yyyy-mm-dd'" language="en" [todayBtn]="true"></ne-datepicker></div>
+                            <div class="col-md-3 mb-3"><label class="form-label">Tips pool</label><input type="number" min="0" class="form-control" formControlName="tipsPool" /></div>
+                            <div class="col-md-3 mb-3"><label class="form-label">Service charge pool</label><input type="number" min="0" class="form-control" formControlName="serviceChargePool" /></div>
+                            <div class="col-12 mb-3"><label class="form-label">Run notes</label><input class="form-control" formControlName="notes" maxlength="500" /></div>
+                        </div>
+
+                        <details class="border border-gray-300 rounded-3 p-3 mt-2" *ngIf="employees.length">
+                            <summary class="fw-bold text-gray-800" role="button">Employee allowances and deductions</summary>
+                            <div class="restaurant-table-wrap overflow-x-auto mt-4">
+                                <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100">
+                                    <thead class="table-light text-gray-600 text-uppercase"><tr><th>Employee</th><th>Extra allowance</th><th>Tax</th><th>Other deduction</th><th>Advance recovery</th><th>Notes</th></tr></thead>
+                                    <tbody><tr *ngFor="let employee of employees"><td class="fw-bold">{{ employee.name }}</td><td><input class="form-control form-control-sm" type="number" min="0" [(ngModel)]="runAdjustments[employee.id].additionalAllowance" [ngModelOptions]="{standalone: true}" /></td><td><input class="form-control form-control-sm" type="number" min="0" [(ngModel)]="runAdjustments[employee.id].taxDeduction" [ngModelOptions]="{standalone: true}" /></td><td><input class="form-control form-control-sm" type="number" min="0" [(ngModel)]="runAdjustments[employee.id].otherDeduction" [ngModelOptions]="{standalone: true}" /></td><td><input class="form-control form-control-sm" type="number" min="0" [(ngModel)]="runAdjustments[employee.id].advanceRecovery" [ngModelOptions]="{standalone: true}" /></td><td><input class="form-control form-control-sm" [(ngModel)]="runAdjustments[employee.id].notes" [ngModelOptions]="{standalone: true}" /></td></tr></tbody>
+                                </table>
+                            </div>
+                        </details>
+
+                        <div class="d-flex justify-content-end mt-5"><button type="button" class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="generatePayrollRun()"><i class="fa fa-calculator"></i> Generate draft</button></div>
+                    </form>
+                </div>
+
+                <div class="card card-custom restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between"><div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">Payroll runs</div><span class="text-gray-600 fs-8">{{ payrollRuns.length }} runs</span></div>
+                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="payrollRuns.length; else noPayrollRuns">
+                            <thead class="table-light text-gray-600 text-uppercase"><tr><th>Run</th><th>Period</th><th>Staff</th><th>Status</th><th class="text-end">Gross</th><th class="text-end">Deductions</th><th class="text-end">Net</th><th></th></tr></thead>
+                            <tbody><tr *ngFor="let run of payrollRuns; trackBy: trackById"><td><button type="button" class="btn btn-link p-0 fw-bold" (click)="loadPayrollRun(run.id)">{{ run.runNumber }}</button></td><td>{{ dateBs(run.periodStart) }} – {{ dateBs(run.periodEnd) }} BS</td><td>{{ run.employeeCount }}</td><td><span class="badge" [class.bg-light-warning]="run.status === 0" [class.text-warning]="run.status === 0" [class.bg-light-primary]="run.status === 1" [class.text-primary]="run.status === 1" [class.bg-light-success]="run.status === 2" [class.text-success]="run.status === 2">{{ runStatusText(run.status) }}</span></td><td class="text-end">NPR {{ money(run.totalGross) }}</td><td class="text-end">NPR {{ money(run.totalDeduction) }}</td><td class="text-end fw-bold">NPR {{ money(run.totalNet) }}</td><td class="text-end text-nowrap"><button type="button" class="btn btn-xs btn-light-primary me-1" (click)="loadPayrollRun(run.id)" tooltip="View"><i class="fa fa-eye"></i></button><button type="button" class="btn btn-xs btn-light-success me-1" *ngIf="run.status === 0 && canApprovePayroll" [buttonBusy]="saving" (click)="approveRun(run)" tooltip="Approve"><i class="fa fa-check"></i></button><button type="button" class="btn btn-xs btn-light-success me-1" *ngIf="run.status === 1 && canApprovePayroll" [buttonBusy]="saving" (click)="markRunPaid(run)" tooltip="Mark paid"><i class="fa fa-money-bill-transfer"></i></button><button type="button" class="btn btn-xs btn-light-danger" *ngIf="run.status === 0 && canProcessPayroll" [buttonBusy]="saving" (click)="deleteDraft(run)" tooltip="Delete draft"><i class="fa fa-trash"></i></button></td></tr></tbody>
+                        </table>
+                        <ng-template #noPayrollRuns><div class="p-5 text-center text-gray-600">No payroll runs generated yet.</div></ng-template>
+                    </div>
+                </div>
+
+                <div class="card card-custom restaurant-card bg-white border border-primary rounded-3 shadow-sm min-w-0" *ngIf="selectedRun">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between flex-wrap"><div><div class="fw-bolder text-gray-900">{{ selectedRun.runNumber }} · {{ runStatusText(selectedRun.status) }}</div><div class="text-gray-600 fs-8">{{ dateBs(selectedRun.periodStart) }} – {{ dateBs(selectedRun.periodEnd) }} BS</div></div><div class="d-flex gap-2"><button type="button" class="btn btn-xs btn-success" *ngIf="selectedRun.status === 0 && canApprovePayroll" (click)="approveRun(selectedRun)">Approve</button><button type="button" class="btn btn-xs btn-success" *ngIf="selectedRun.status === 1 && canApprovePayroll" (click)="markRunPaid(selectedRun)">Mark paid</button><button type="button" class="btn btn-xs btn-light" (click)="selectedRun = undefined"><i class="fa fa-xmark"></i></button></div></div>
+                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100"><thead class="table-light text-gray-600 text-uppercase"><tr><th>Employee</th><th class="text-end">Hours</th><th class="text-end">Base</th><th class="text-end">OT</th><th class="text-end">Allowance</th><th class="text-end">Tips + service</th><th class="text-end">Deductions</th><th class="text-end">Net</th></tr></thead><tbody><tr *ngFor="let line of selectedRun.lines; trackBy: trackById"><td><div class="fw-bold">{{ line.employeeName }}</div><div class="text-gray-600 fs-8">{{ line.staffCode }} · {{ line.jobRole || '-' }}</div></td><td class="text-end"><div>{{ line.workedHours }}</div><div class="text-gray-600">+{{ line.overtimeHours }} OT</div></td><td class="text-end">{{ money(line.basicPay) }}</td><td class="text-end">{{ money(line.overtimePay) }}</td><td class="text-end">{{ money(line.allowance) }}</td><td class="text-end">{{ money(line.tipsShare + line.serviceChargeShare) }}</td><td class="text-end">{{ money(line.taxDeduction + line.otherDeduction + line.advanceRecovery) }}</td><td class="text-end fw-bold">NPR {{ money(line.netPay) }}</td></tr></tbody><tfoot><tr class="fw-bolder"><td colspan="7" class="text-end">Total net</td><td class="text-end">NPR {{ money(selectedRun.totalNet) }}</td></tr></tfoot></table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-custom restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0" *ngIf="activeSection === 'payslips' && canViewOwnPayslip">
+                <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between"><div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">My payslips</div><span class="text-gray-600 fs-8">Approved and paid payroll only</span></div>
+                <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                    <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="payslips.length; else noPayslips"><thead class="table-light text-gray-600 text-uppercase"><tr><th>Run</th><th>Period</th><th>Status</th><th class="text-end">Base</th><th class="text-end">Overtime</th><th class="text-end">Allowances</th><th class="text-end">Tips + service</th><th class="text-end">Deductions</th><th class="text-end">Net pay</th></tr></thead><tbody><tr *ngFor="let line of payslips; trackBy: trackById"><td class="fw-bold">{{ line.runNumber }}</td><td>{{ dateBs(line.periodStart) }} – {{ dateBs(line.periodEnd) }} BS</td><td><span class="badge bg-light-success text-success">{{ runStatusText(line.runStatus) }}</span></td><td class="text-end">NPR {{ money(line.basicPay) }}</td><td class="text-end">NPR {{ money(line.overtimePay) }}</td><td class="text-end">NPR {{ money(line.allowance) }}</td><td class="text-end">NPR {{ money(line.tipsShare + line.serviceChargeShare) }}</td><td class="text-end">NPR {{ money(line.taxDeduction + line.otherDeduction + line.advanceRecovery) }}</td><td class="text-end fw-bolder">NPR {{ money(line.netPay) }}</td></tr></tbody></table>
+                    <ng-template #noPayslips><div class="p-5 text-center text-gray-600">No approved payslips are available for this employee account.</div></ng-template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="restaurant-modal-backdrop payroll-modal-backdrop align-items-center bg-dark bg-opacity-50 d-flex h-100 justify-content-center p-3 position-fixed start-0 top-0 w-100" *ngIf="profileEmployee">
+        <div class="card payroll-profile-dialog bg-white border-0 mw-100 shadow-lg w-800px" role="dialog" aria-modal="true" aria-label="Employee profile">
+            <div class="card-header payroll-modal-header align-items-center d-flex justify-content-between gap-3 min-h-55px px-5 py-3">
+                <div class="d-flex align-items-center gap-3 min-w-0">
+                    <div class="payroll-avatar payroll-avatar-lg flex-shrink-0">{{ initials(profileEmployee.name) }}</div>
+                    <div class="min-w-0">
+                        <div class="fw-bolder text-gray-900 fs-5 text-truncate">{{ profileEmployee.name }}</div>
+                        <div class="fs-8 text-gray-600 text-truncate">{{ profileEmployee.staffCode }} · {{ profileEmployee.jobRole || 'Staff' }}</div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-icon btn-light flex-shrink-0" (click)="closeEmployeeProfile()" aria-label="Close employee profile"><i class="fa fa-xmark"></i></button>
+            </div>
+            <div class="card-body payroll-modal-scroll p-5">
+                <div class="d-flex align-items-center justify-content-between gap-3 mb-5">
+                    <div>
+                        <span class="badge me-2" [class.bg-light-success]="profileEmployee.isActive" [class.text-success]="profileEmployee.isActive" [class.bg-light-danger]="!profileEmployee.isActive" [class.text-danger]="!profileEmployee.isActive">{{ profileEmployee.isActive ? 'Active employee' : 'Inactive employee' }}</span>
+                        <span class="badge bg-light-primary text-primary">{{ employmentTypeText(profileEmployee.employmentType) }}</span>
+                    </div>
+                    <div class="text-gray-600 fs-8">Joined {{ dateBs(profileEmployee.joinedOn, profileEmployee.joinedOnMiti) }} BS</div>
+                </div>
+
+                <div class="payroll-profile-grid d-grid gap-4">
+                    <section class="payroll-detail-section border border-gray-300 rounded-3 p-4">
+                        <h3 class="payroll-section-title"><i class="fa fa-address-card"></i> Personal & contact</h3>
+                        <div class="payroll-detail-grid d-grid gap-3 mt-4">
+                            <div><span>Phone</span><strong>{{ profileEmployee.phoneNumber || 'Not added' }}</strong></div>
+                            <div><span>Email</span><strong>{{ profileEmployee.emailAddress || 'Not added' }}</strong></div>
+                            <div><span>Date of birth (BS)</span><strong>{{ dateBs(profileEmployee.dateOfBirth, profileEmployee.dateOfBirthMiti) }}</strong></div>
+                            <div><span>Gender</span><strong>{{ profileEmployee.gender || 'Not added' }}</strong></div>
+                            <div><span>Blood group</span><strong>{{ profileEmployee.bloodGroup || 'Not added' }}</strong></div>
+                            <div><span>Marital status</span><strong>{{ profileEmployee.maritalStatus || 'Not added' }}</strong></div>
+                            <div><span>Citizenship / ID</span><strong>{{ profileEmployee.citizenshipNumber || 'Not added' }}</strong></div>
+                            <div class="payroll-detail-wide"><span>Address</span><strong>{{ profileEmployee.address || 'Not added' }}</strong></div>
+                            <div><span>Emergency contact</span><strong>{{ profileEmployee.emergencyContactName || 'Not added' }}</strong></div>
+                            <div><span>Emergency phone</span><strong>{{ profileEmployee.emergencyContactPhone || 'Not added' }}</strong></div>
+                        </div>
+                    </section>
+
+                    <section class="payroll-detail-section border border-gray-300 rounded-3 p-4">
+                        <h3 class="payroll-section-title"><i class="fa fa-briefcase"></i> Work & payroll</h3>
+                        <div class="payroll-detail-grid d-grid gap-3 mt-4">
+                            <div><span>Department</span><strong>{{ profileEmployee.department || 'Unassigned' }}</strong></div>
+                            <div><span>Job role</span><strong>{{ profileEmployee.jobRole || 'Staff' }}</strong></div>
+                            <div><span>Pay rate</span><strong>NPR {{ money(profileEmployee.employmentType === 0 ? profileEmployee.basicSalary : profileEmployee.hourlyRate) }}{{ profileEmployee.employmentType === 1 ? '/hr' : '' }}</strong></div>
+                            <div><span>Overtime rate</span><strong>NPR {{ money(profileEmployee.overtimeRate) }}</strong></div>
+                            <div><span>Current allowance</span><strong>NPR {{ money(profileEmployee.fixedAllowance) }}</strong><button type="button" class="btn btn-link btn-sm p-0 d-block" (click)="openAllowanceHistory(profileEmployee)">View history / revise</button></div>
+                            <div><span>Fixed deduction</span><strong>NPR {{ money(profileEmployee.fixedDeduction) }}</strong></div>
+                            <div><span>Bank</span><strong>{{ profileEmployee.bankName || 'Not added' }}</strong></div>
+                            <div><span>Bank account</span><strong>{{ profileEmployee.bankAccountNumber || 'Not added' }}</strong></div>
+                            <div><span>PAN</span><strong>{{ profileEmployee.panNumber || 'Not added' }}</strong></div>
+                            <div><span>SSF number</span><strong>{{ profileEmployee.ssfNumber || 'Not added' }}</strong></div>
+                        </div>
+                    </section>
+
+                    <section class="payroll-detail-section border border-gray-300 rounded-3 p-4">
+                        <h3 class="payroll-section-title"><i class="fa fa-shield-halved"></i> Employee access</h3>
+                        <div class="payroll-detail-grid d-grid gap-3 mt-4">
+                            <div><span>Username</span><strong>{{ profileEmployee.loginUserName || 'No login account' }}</strong></div>
+                            <div><span>Restaurant role</span><strong>{{ profileEmployee.restaurantRoleName || 'No login role' }}</strong></div>
+                            <div><span>Login email</span><strong>{{ profileEmployee.loginEmailAddress || 'Not added' }}</strong></div>
+                            <div><span>Login status</span><strong>{{ profileEmployee.loginIsActive === false ? 'Sign-in disabled' : (profileEmployee.userId ? 'Can sign in' : 'No login') }}</strong></div>
+                            <div class="payroll-detail-wide" *ngIf="profileEmployee.notes"><span>Internal notes</span><strong>{{ profileEmployee.notes }}</strong></div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            <div class="card-footer payroll-modal-footer d-flex justify-content-between align-items-center gap-2 px-5 py-3">
+                <div class="d-flex gap-2" *ngIf="canManageStaffAccess && profileEmployee.loginManagedByRestaurant && profileEmployee.userId">
+                    <button type="button" class="btn btn-sm btn-light-warning" [buttonBusy]="saving" (click)="resetDefaultPassword(profileEmployee)" title="Reset to tenant default password"><i class="fa fa-rotate-left"></i><span class="d-none d-sm-inline ms-1">Reset password</span></button>
+                    <button type="button" class="btn btn-sm btn-light-primary" (click)="openPasswordDialog(profileEmployee)" title="Set employee password"><i class="fa fa-key"></i><span class="d-none d-sm-inline ms-1">Set password</span></button>
+                </div>
+                <div class="ms-auto d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-light" (click)="closeEmployeeProfile()">Close</button>
+                    <button type="button" class="btn btn-sm btn-primary" (click)="editEmployee(profileEmployee)"><i class="fa fa-pencil"></i> Edit employee</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="restaurant-modal-backdrop payroll-modal-backdrop align-items-center bg-dark bg-opacity-50 d-flex h-100 justify-content-center p-3 position-fixed start-0 top-0 w-100" *ngIf="employeeEditorOpen">
+        <form class="card payroll-employee-dialog bg-white border-0 mw-100 shadow-lg w-1000px" [formGroup]="employeeForm" (ngSubmit)="saveEmployee()" autocomplete="off" role="dialog" aria-modal="true" aria-label="Employee editor">
+            <div class="card-header payroll-modal-header align-items-center d-flex justify-content-between gap-3 min-h-55px px-5 py-3">
+                <div>
+                    <div class="fw-bolder text-gray-900 fs-5">{{ employeeForm.value.id ? 'Edit employee' : 'Add employee' }}</div>
+                    <div class="fs-8 text-gray-600">Personal, employment, payroll and access details</div>
+                </div>
+                <button type="button" class="btn btn-sm btn-icon btn-light" (click)="closeEmployeeEditor()" aria-label="Close employee editor"><i class="fa fa-xmark"></i></button>
+            </div>
+
+            <div class="card-body payroll-modal-scroll p-5">
+                <section class="payroll-form-section">
+                    <h3 class="payroll-section-title"><i class="fa fa-user"></i> Personal details</h3>
+                    <div class="row mt-4">
+                        <div class="col-lg-3 col-sm-6 mb-3"><label class="required form-label">Staff code</label><input class="form-control" formControlName="staffCode" maxlength="30" /></div>
+                        <div class="col-lg-5 col-sm-6 mb-3"><label class="required form-label">Full name</label><input class="form-control" formControlName="name" maxlength="150" /></div>
+                        <div class="col-lg-4 col-sm-6 mb-3"><label class="form-label">Personal phone</label><input class="form-control" formControlName="phoneNumber" maxlength="32" inputmode="tel" /></div>
+                        <div class="col-lg-4 col-sm-6 mb-3"><label class="form-label">Personal email</label><input class="form-control" type="email" formControlName="emailAddress" maxlength="256" /></div>
+                        <div class="col-lg-3 col-sm-6 mb-3"><label class="form-label">Date of birth (BS)</label><ne-datepicker class="d-block" formControlName="dateOfBirth" valueIn="AD" dateIn="AD" [dateFormat]="'yyyy-mm-dd'" language="en" [todayBtn]="true" (dateInBS)="setMiti('dateOfBirthMiti', $event)"></ne-datepicker></div>
+                        <div class="col-lg-2 col-sm-6 mb-3"><label class="form-label">Gender</label><select class="form-select" formControlName="gender"><option value="">Not specified</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
+                        <div class="col-lg-3 col-sm-6 mb-3"><label class="form-label">Blood group</label><select class="form-select" formControlName="bloodGroup"><option value="">Not specified</option><option *ngFor="let group of ['A+','A-','B+','B-','AB+','AB-','O+','O-']" [value]="group">{{ group }}</option></select></div>
+                        <div class="col-lg-3 col-sm-6 mb-3"><label class="form-label">Marital status</label><select class="form-select" formControlName="maritalStatus"><option value="">Not specified</option><option value="Single">Single</option><option value="Married">Married</option><option value="Other">Other</option></select></div>
+                        <div class="col-lg-4 col-sm-6 mb-3"><label class="form-label">Citizenship / national ID</label><input class="form-control" formControlName="citizenshipNumber" maxlength="80" /></div>
+                        <div class="col-lg-8 mb-3"><label class="form-label">Address</label><input class="form-control" formControlName="address" maxlength="300" /></div>
+                        <div class="col-lg-6 col-sm-6 mb-3"><label class="form-label">Emergency contact person</label><input class="form-control" formControlName="emergencyContactName" maxlength="150" /></div>
+                        <div class="col-lg-6 col-sm-6 mb-3"><label class="form-label">Emergency contact phone</label><input class="form-control" formControlName="emergencyContactPhone" maxlength="32" inputmode="tel" /></div>
+                    </div>
+                </section>
+
+                <section class="payroll-form-section border-top border-gray-200 pt-5 mt-2">
+                    <h3 class="payroll-section-title"><i class="fa fa-briefcase"></i> Employment</h3>
+                    <div class="row mt-4">
+                        <div class="col-lg-4 col-sm-6 mb-3"><label class="required form-label">Department</label><select class="form-select" formControlName="departmentId" (change)="onEmployeeDepartmentChanged()"><option value="">Choose department</option><option *ngFor="let department of activeDepartments" [value]="department.id">{{ department.name }}</option></select></div>
+                        <div class="col-lg-4 col-sm-6 mb-3"><label class="required form-label">Job role</label><select class="form-select" formControlName="jobRoleId"><option value="">Choose job role</option><option *ngFor="let role of filteredJobRoles" [value]="role.id">{{ role.name }}</option></select></div>
+                        <div class="col-lg-2 col-sm-6 mb-3"><label class="required form-label">Employment</label><select class="form-select" formControlName="employmentType"><option *ngFor="let item of employmentTypes" [ngValue]="item.value">{{ item.label }}</option></select></div>
+                        <div class="col-lg-2 col-sm-6 mb-3"><label class="required form-label">Joined on (BS)</label><ne-datepicker class="d-block" formControlName="joinedOn" valueIn="AD" dateIn="AD" [dateFormat]="'yyyy-mm-dd'" language="en" [todayBtn]="true" (dateInBS)="setMiti('joinedOnMiti', $event)"></ne-datepicker></div>
+                        <div class="col-lg-4 mb-3"><label class="form-label d-block">Employee status</label><label class="form-check form-switch form-check-custom form-check-solid mt-2"><input class="form-check-input" type="checkbox" formControlName="isActive" /><span class="form-check-label">Active employee</span></label></div>
+                        <div class="col-lg-8 mb-3"><label class="form-label">Internal notes</label><textarea class="form-control" formControlName="notes" maxlength="500" rows="2" placeholder="Shift preferences, uniform size, or internal HR note"></textarea></div>
+                    </div>
+                </section>
+
+                <section class="payroll-form-section border-top border-gray-200 pt-5 mt-2">
+                    <h3 class="payroll-section-title"><i class="fa fa-money-check-dollar"></i> Compensation & statutory details</h3>
+                    <div class="row mt-4">
+                        <div class="col-lg-3 col-sm-6 mb-3" *ngIf="employeeForm.value.employmentType === 0"><label class="required form-label">Monthly salary</label><input class="form-control" type="number" min="0" formControlName="basicSalary" /></div>
+                        <div class="col-lg-3 col-sm-6 mb-3" *ngIf="employeeForm.value.employmentType === 1"><label class="required form-label">Hourly rate</label><input class="form-control" type="number" min="0" formControlName="hourlyRate" /></div>
+                        <div class="col-lg-3 col-sm-6 mb-3"><label class="form-label">Overtime rate</label><input class="form-control" type="number" min="0" formControlName="overtimeRate" /></div>
+                        <div class="col-lg-3 col-sm-6 mb-3" *ngIf="!employeeForm.value.id"><label class="form-label">Starting allowance</label><input class="form-control" type="number" min="0" formControlName="fixedAllowance" /><div class="form-text">Later changes are recorded in allowance history.</div></div>
+                        <div class="col-lg-3 col-sm-6 mb-3" *ngIf="employeeForm.value.id"><label class="form-label">Current allowance</label><div class="form-control bg-light">NPR {{ money(employeeForm.value.fixedAllowance) }}</div><div class="form-text">Use allowance history to revise this amount.</div></div>
+                        <div class="col-lg-3 col-sm-6 mb-3"><label class="form-label">Fixed deduction</label><input class="form-control" type="number" min="0" formControlName="fixedDeduction" /></div>
+                        <div class="col-lg-3 col-sm-6 mb-3"><label class="form-label">Tips/service weight</label><input class="form-control" type="number" min="0" step="0.1" formControlName="serviceChargeWeight" /></div>
+                        <div class="col-lg-3 col-sm-6 mb-3"><label class="form-label">Bank name</label><input class="form-control" formControlName="bankName" maxlength="100" /></div>
+                        <div class="col-lg-3 col-sm-6 mb-3"><label class="form-label">Bank account</label><input class="form-control" formControlName="bankAccountNumber" maxlength="80" /></div>
+                        <div class="col-lg-3 col-sm-6 mb-3"><label class="form-label">PAN</label><input class="form-control" formControlName="panNumber" maxlength="80" /></div>
+                        <div class="col-lg-3 col-sm-6 mb-3"><label class="form-label">SSF number</label><input class="form-control" formControlName="ssfNumber" maxlength="80" /></div>
+                    </div>
+                </section>
+
+                <section class="payroll-form-section border border-gray-300 rounded-3 p-4 mt-2" *ngIf="canManageStaffAccess">
+                    <label class="form-check form-switch form-check-custom form-check-solid">
+                        <input class="form-check-input" type="checkbox" formControlName="updateLoginAccess" />
+                        <span class="form-check-label fw-bold">Update employee app and web access</span>
+                    </label>
+                    <div class="text-gray-600 fs-8 mt-2">Link an employee account or create one with a restaurant role. Tenant Admin is protected and cannot be linked here.</div>
+                    <div class="row mt-4" *ngIf="employeeForm.value.updateLoginAccess">
+                        <div class="col-lg-4 mb-3"><label class="required form-label">Access action</label><select class="form-select" formControlName="loginMode"><option [ngValue]="0">No login / remove restaurant access</option><option [ngValue]="1">Link existing employee account</option><option [ngValue]="2">Create new employee account</option></select></div>
+                        <div class="col-lg-8 mb-3" *ngIf="employeeForm.value.loginMode === 1"><label class="required form-label">Employee account</label><select class="form-select" formControlName="userId" (change)="onExistingUserChanged()"><option [ngValue]="null">Choose account</option><option *ngFor="let user of linkedUsersForForm" [ngValue]="user.id">{{ user.name }} ({{ user.userName }})</option></select></div>
+                        <div class="col-lg-8 mb-3" *ngIf="employeeForm.value.loginMode === 2"><label class="required form-label">Login email or phone number</label><input class="form-control" formControlName="loginUserName" maxlength="256" autocomplete="off" placeholder="employee@example.com or 98XXXXXXXX" /><div class="form-text">This value becomes the employee username. Arbitrary usernames are not allowed.</div></div>
+                        <div class="col-lg-6 mb-3" *ngIf="employeeForm.value.loginMode !== 0"><label class="required form-label">Restaurant role</label><select class="form-select" formControlName="restaurantRoleName"><option value="">Choose role</option><option *ngFor="let role of accessOptions.roles" [value]="role.name">{{ role.displayName }}</option></select></div>
+                        <div class="col-lg-6 mb-3" *ngIf="employeeForm.value.loginMode !== 0"><label class="form-label d-block">Login status</label><label class="form-check form-switch form-check-custom form-check-solid mt-2"><input class="form-check-input" type="checkbox" formControlName="loginIsActive" /><span class="form-check-label">Can sign in</span></label></div>
+                    </div>
+                </section>
+
+                <div class="alert alert-light-danger mt-4 mb-0" *ngIf="employeeForm.invalid && employeeForm.touched">Complete the required fields and enter valid contact and payroll values.</div>
+            </div>
+
+            <div class="card-footer payroll-modal-footer d-flex justify-content-end gap-2 px-5 py-3">
+                <button type="button" class="btn btn-sm btn-light" (click)="closeEmployeeEditor()">Cancel</button>
+                <button type="submit" class="btn btn-sm btn-primary" [buttonBusy]="saving"><i class="fa fa-save"></i> Save employee</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="restaurant-modal-backdrop payroll-modal-backdrop align-items-center bg-dark bg-opacity-50 d-flex h-100 justify-content-center p-3 position-fixed start-0 top-0 w-100" *ngIf="staffSetupOpen">
+        <div class="card payroll-setup-dialog bg-white border-0 mw-100 shadow-lg" role="dialog" aria-modal="true" aria-label="Departments and job roles">
+            <div class="card-header payroll-modal-header align-items-center d-flex justify-content-between min-h-55px px-5 py-3">
+                <div><div class="fw-bolder text-gray-900 fs-5">Departments & job roles</div><div class="fs-8 text-gray-600">Tenant-specific employment structure</div></div>
+                <button type="button" class="btn btn-sm btn-icon btn-light" (click)="closeStaffSetup()"><i class="fa fa-xmark"></i></button>
+            </div>
+            <div class="card-body payroll-modal-scroll p-5">
+                <div class="payroll-master-grid d-grid gap-5">
+                    <section class="border border-gray-300 rounded-3 p-4">
+                        <h3 class="payroll-section-title"><i class="fa fa-building"></i> Departments</h3>
+                        <form class="row g-3 mt-1" [formGroup]="departmentForm" (ngSubmit)="saveDepartment()">
+                            <div class="col-8"><label class="required form-label">Name</label><input class="form-control" formControlName="name" maxlength="80" /></div>
+                            <div class="col-4"><label class="form-label">Order</label><input class="form-control" type="number" min="0" formControlName="sortOrder" /></div>
+                            <div class="col-12"><label class="form-label">Description</label><input class="form-control" formControlName="description" maxlength="300" /></div>
+                            <div class="col-12 d-flex align-items-center justify-content-between"><label class="form-check form-switch form-check-custom form-check-solid mb-0"><input class="form-check-input" type="checkbox" formControlName="isActive" /><span class="form-check-label">Active</span></label><button class="btn btn-sm btn-primary" type="submit" [buttonBusy]="saving">Save department</button></div>
+                        </form>
+                        <div class="payroll-master-list mt-4">
+                            <button type="button" class="btn btn-light d-flex justify-content-between text-start w-100 mb-2" *ngFor="let department of staffMasters.departments" (click)="editDepartment(department)"><span><strong>{{ department.name }}</strong><small class="d-block text-gray-600">{{ department.description || 'No description' }}</small></span><span class="badge" [class.bg-light-success]="department.isActive" [class.text-success]="department.isActive">{{ department.isActive ? 'Active' : 'Inactive' }}</span></button>
+                        </div>
+                    </section>
+
+                    <section class="border border-gray-300 rounded-3 p-4">
+                        <h3 class="payroll-section-title"><i class="fa fa-id-badge"></i> Job roles</h3>
+                        <form class="row g-3 mt-1" [formGroup]="jobRoleForm" (ngSubmit)="saveJobRole()">
+                            <div class="col-12"><label class="required form-label">Department</label><select class="form-select" formControlName="departmentId"><option value="">Choose department</option><option *ngFor="let department of activeDepartments" [value]="department.id">{{ department.name }}</option></select></div>
+                            <div class="col-8"><label class="required form-label">Role name</label><input class="form-control" formControlName="name" maxlength="80" /></div>
+                            <div class="col-4"><label class="form-label">Order</label><input class="form-control" type="number" min="0" formControlName="sortOrder" /></div>
+                            <div class="col-12"><label class="form-label">Description</label><input class="form-control" formControlName="description" maxlength="300" /></div>
+                            <div class="col-12 d-flex align-items-center justify-content-between"><label class="form-check form-switch form-check-custom form-check-solid mb-0"><input class="form-check-input" type="checkbox" formControlName="isActive" /><span class="form-check-label">Active</span></label><button class="btn btn-sm btn-primary" type="submit" [buttonBusy]="saving">Save job role</button></div>
+                        </form>
+                        <div class="payroll-master-list mt-4">
+                            <button type="button" class="btn btn-light d-flex justify-content-between text-start w-100 mb-2" *ngFor="let role of staffMasters.jobRoles" (click)="editJobRole(role)"><span><strong>{{ role.name }}</strong><small class="d-block text-gray-600">{{ departmentName(role.departmentId) }}</small></span><span class="badge" [class.bg-light-success]="role.isActive" [class.text-success]="role.isActive">{{ role.isActive ? 'Active' : 'Inactive' }}</span></button>
+                        </div>
+                    </section>
+                </div>
+            </div>
+            <div class="card-footer payroll-modal-footer d-flex justify-content-end px-5 py-3"><button type="button" class="btn btn-sm btn-light" (click)="closeStaffSetup()">Close</button></div>
+        </div>
+    </div>
+
+    <div class="restaurant-modal-backdrop payroll-modal-backdrop align-items-center bg-dark bg-opacity-50 d-flex h-100 justify-content-center p-3 position-fixed start-0 top-0 w-100" *ngIf="allowanceEmployee">
+        <div class="card payroll-allowance-dialog bg-white border-0 mw-100 shadow-lg" role="dialog" aria-modal="true" aria-label="Allowance history">
+            <div class="card-header payroll-modal-header align-items-center d-flex justify-content-between min-h-55px px-5 py-3">
+                <div><div class="fw-bolder text-gray-900 fs-5">Allowance history</div><div class="fs-8 text-gray-600">{{ allowanceEmployee.name }} · current NPR {{ money(allowanceEmployee.fixedAllowance) }}</div></div>
+                <button type="button" class="btn btn-sm btn-icon btn-light" (click)="closeAllowanceHistory()"><i class="fa fa-xmark"></i></button>
+            </div>
+            <div class="card-body payroll-modal-scroll p-5">
+                <form class="border border-gray-300 rounded-3 p-4" [formGroup]="allowanceForm" (ngSubmit)="saveAllowanceRevision()">
+                    <h3 class="payroll-section-title"><i class="fa fa-arrow-trend-up"></i> New revision</h3>
+                    <div class="row align-items-end mt-3">
+                        <div class="col-md-4 mb-3"><label class="required form-label">New allowance (NPR)</label><input class="form-control" type="number" min="0" formControlName="amount" /></div>
+                        <div class="col-md-4 mb-3"><label class="required form-label">Effective from (BS)</label><ne-datepicker class="d-block" formControlName="effectiveFrom" valueIn="AD" dateIn="AD" [dateFormat]="'yyyy-mm-dd'" language="en" [todayBtn]="true" (dateInBS)="setMiti('effectiveFromMiti', $event, allowanceForm)"></ne-datepicker></div>
+                        <div class="col-md-4 mb-3"><button class="btn btn-primary w-100" type="submit" [buttonBusy]="saving">Add revision</button></div>
+                        <div class="col-12"><label class="required form-label">Reason</label><input class="form-control" formControlName="reason" maxlength="300" placeholder="Annual review, promotion, policy change…" /></div>
+                    </div>
+                </form>
+                <div class="restaurant-table-wrap overflow-x-auto mt-5">
+                    <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="allowanceHistory.length; else noAllowanceHistory">
+                        <thead class="table-light text-gray-600 text-uppercase"><tr><th>Effective date (BS)</th><th class="text-end">Allowance</th><th>Reason</th><th>Recorded</th></tr></thead>
+                        <tbody><tr *ngFor="let item of allowanceHistory; trackBy: trackById"><td class="fw-bold">{{ dateBs(item.effectiveFrom, item.effectiveFromMiti) }}</td><td class="text-end fw-bold">NPR {{ money(item.amount) }}</td><td>{{ item.reason }}</td><td>{{ dateTime(item.createdAt) }}</td></tr></tbody>
+                    </table>
+                    <ng-template #noAllowanceHistory><div class="p-5 text-center text-gray-600">No allowance history recorded.</div></ng-template>
+                </div>
+            </div>
+            <div class="card-footer payroll-modal-footer d-flex justify-content-end px-5 py-3"><button type="button" class="btn btn-sm btn-light" (click)="closeAllowanceHistory()">Close</button></div>
+        </div>
+    </div>
+
+    <div class="restaurant-modal-backdrop payroll-modal-backdrop align-items-center bg-dark bg-opacity-50 d-flex h-100 justify-content-center p-3 position-fixed start-0 top-0 w-100" *ngIf="passwordEmployee">
+        <form class="card bg-white border-0 mw-100 shadow-lg w-500px" [formGroup]="passwordForm" (ngSubmit)="saveEmployeePassword()" autocomplete="off">
+            <div class="card-header align-items-center d-flex justify-content-between min-h-55px px-5">
+                <div>
+                    <div class="fw-bolder text-gray-900">Set employee password</div>
+                    <div class="fs-8 text-gray-600">{{ passwordEmployee.name }} · {{ passwordEmployee.loginUserName }}</div>
+                </div>
+                <button type="button" class="btn btn-sm btn-icon btn-light" (click)="closePasswordDialog()" aria-label="Close"><i class="fa fa-xmark"></i></button>
+            </div>
+            <div class="card-body p-5">
+                <div class="mb-4">
+                    <label class="required form-label">New password</label>
+                    <input class="form-control" type="password" formControlName="password" autocomplete="new-password" />
+                    <div class="text-danger mt-1" *ngIf="passwordForm.get('password')?.touched && passwordForm.get('password')?.invalid">Use at least 6 characters and satisfy the tenant password policy.</div>
+                </div>
+                <div class="mb-4">
+                    <label class="required form-label">Confirm password</label>
+                    <input class="form-control" type="password" formControlName="confirmPassword" autocomplete="new-password" />
+                    <div class="text-danger mt-1" *ngIf="passwordForm.hasError('passwordMismatch')">Passwords do not match.</div>
+                </div>
+                <label class="form-check form-check-custom form-check-solid">
+                    <input class="form-check-input" type="checkbox" formControlName="forceChangeOnNextLogin" />
+                    <span class="form-check-label">Force change on next sign in</span>
+                </label>
+                <div class="alert alert-light-primary mt-4 mb-0">Changing the password signs out the employee's existing sessions.</div>
+            </div>
+            <div class="card-footer d-flex justify-content-end gap-2 px-5 py-4">
+                <button type="button" class="btn btn-sm btn-light" (click)="closePasswordDialog()">Cancel</button>
+                <button type="submit" class="btn btn-sm btn-primary" [buttonBusy]="saving" [disabled]="passwordForm.invalid"><i class="fa fa-key"></i> Set password</button>
+            </div>
+        </form>
+    </div>
+</div>

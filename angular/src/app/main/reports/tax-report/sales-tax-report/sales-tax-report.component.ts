@@ -14,7 +14,6 @@ import { ColDef, GridOptions, GridApi } from 'ag-grid-community';
     animations: [appModuleAnimation],
     selector: 'app-sales-tax-report',
     templateUrl: './sales-tax-report.component.html',
-    styleUrls: ['./sales-tax-report.component.css']
 })
 export class SalesTaxReportComponent extends AppComponentBase implements OnInit {
     loading = false;

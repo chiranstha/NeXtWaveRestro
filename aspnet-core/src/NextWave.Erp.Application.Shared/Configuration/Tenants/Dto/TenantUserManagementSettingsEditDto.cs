@@ -31,4 +31,7 @@ public class TenantUserManagementSettingsEditDto
     public bool IsQrLoginEnabled { get; set; }
     
     public bool IsQrLoginEnabledForApplication { get; set; }
+
+    [Abp.Auditing.DisableAuditing]
+    public string DefaultEmployeePassword { get; set; }
 }

@@ -2,9 +2,11 @@ import {
     AfterViewInit,
     ChangeDetectorRef,
     Component,
+    ElementRef,
     Injector,
     OnDestroy,
     OnInit,
+    ViewChild,
     ViewEncapsulation,
     inject,
     ChangeDetectionStrategy,
@@ -52,6 +54,8 @@ import {
     VoidRestaurantOrderItemDto,
 } from '@shared/service-proxies/service-proxies';
 import { DateTime } from 'luxon';
+import { AllowIn, ShortcutInput } from 'ng-keyboard-shortcuts';
+import { ModalDirective } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs';
 
 type DateTimeInput = DateTime | string | number | null | undefined;
@@ -145,10 +149,16 @@ interface PosBillReceiptSnapshot {
     lines: PosBillReceiptLine[];
 }
 
+type RestaurantPosContext = 'tables' | 'menu' | 'orders' | 'tickets';
+
+type PendingOrderSwitch =
+    | { kind: 'table'; table: RestaurantTableDto }
+    | { kind: 'order'; order: RestaurantOrderDto }
+    | { kind: 'new'; orderType: RestaurantOrderType };
+
 @Component({
     selector: 'restaurant-pos',
     templateUrl: './restaurant-pos.component.html',
-    styleUrls: ['../restaurant-shared.css'],
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation],
     changeDetection: ChangeDetectionStrategy.Eager,
@@ -173,8 +183,14 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     selectedCategoryId = '';
     selectedRouteFilter = '';
     menuSearch = '';
+    tableSearch = '';
+    tableStatusFilter = '';
+    orderSearch = '';
+    orderTypeFilter = '';
+    orderStatusFilter = '';
     filteredTablesList: RestaurantTableDto[] = [];
     filteredMenuItemsList: RestaurantMenuItemDto[] = [];
+    filteredOrdersList: RestaurantOrderDto[] = [];
     operationTablesList: RestaurantTableDto[] = [];
     mergeCandidatesList: RestaurantOrderDto[] = [];
     splittableLinesList: PosCartLine[] = [];
@@ -201,13 +217,19 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     currentOrderTitleText = '';
     currentOrderSubtitleText = '';
     billMode: 'full' | 'split' = 'full';
-    activeContext: 'tables' | 'orders' | 'tickets' = 'tables';
+    activeContext: RestaurantPosContext = 'tables';
     orderType = RestaurantOrderType.DineIn;
     pendingMenuItem: RestaurantMenuItemDto | null = null;
     pendingVariantId = '';
     pendingModifierIds: Record<string, string[]> = {};
     splitBillQuantities: Record<string, number> = {};
     activeOperation: 'discount' | 'transfer' | 'split' | 'merge' | '' = '';
+    orderDirty = false;
+    checkoutVisible = false;
+    advancedCheckoutOpen = false;
+    mobileCartOpen = false;
+    pendingOrderSwitch: PendingOrderSwitch | null = null;
+    shortcuts: ShortcutInput[] = [];
     operationForm: PosOperationForm = {
         discountAmount: 0,
         transferTableId: '',
@@ -217,6 +239,24 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     };
     readonly orderTypeEnum = RestaurantOrderType;
     readonly ticketPurpose = RestaurantTicketPurpose;
+    readonly tableStatuses = [
+        { value: '0', label: 'Available' },
+        { value: '1', label: 'Occupied' },
+        { value: '2', label: 'Reserved' },
+        { value: '3', label: 'Maintenance' },
+    ];
+    readonly orderTypeFilters = [
+        { value: RestaurantOrderType.DineIn.toString(), label: 'Dine In' },
+        { value: RestaurantOrderType.TakeAway.toString(), label: 'Takeaway' },
+        { value: RestaurantOrderType.Delivery.toString(), label: 'Delivery' },
+    ];
+    readonly orderStatusFilters = [
+        { value: '0', label: 'Draft' },
+        { value: '1', label: 'Sent' },
+        { value: '2', label: 'In Progress' },
+        { value: '3', label: 'Ready' },
+        { value: '4', label: 'Served' },
+    ];
     readonly paymentMethods = [
         { value: PaymentMethod.Cash, label: 'Cash', icon: 'fa-money-bill' },
         { value: PaymentMethod.Card_Swipe, label: 'Card', icon: 'fa-credit-card' },
@@ -247,6 +287,12 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     private cdr = inject(ChangeDetectorRef);
     private timerHandle?: ReturnType<typeof setInterval>;
 
+    @ViewChild('menuSearchInput') menuSearchInput?: ElementRef<HTMLInputElement>;
+    @ViewChild('checkoutModal') checkoutModal?: ModalDirective;
+    @ViewChild('checkoutButton') checkoutButton?: ElementRef<HTMLButtonElement>;
+    @ViewChild('mobileOrderButton') mobileOrderButton?: ElementRef<HTMLButtonElement>;
+    @ViewChild('checkoutCustomerInput') checkoutCustomerInput?: ElementRef<HTMLInputElement>;
+
     constructor() {
         super(inject(Injector));
     }
@@ -254,6 +300,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     ngOnInit(): void {
         this.today = this.nepaliDateService.getCurrentNepaliDate();
         this.billForm.dateMiti = this.billForm.dateMiti || this.today;
+        this.initShortcuts();
         this.timerHandle = setInterval(() => {
             this.currentClock = DateTime.now();
             this.recalculateViewState();
@@ -273,6 +320,41 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
 
     ngAfterViewInit(): void {
         this.cdr.detectChanges();
+    }
+
+    private initShortcuts(): void {
+        const allowIn = [AllowIn.Textarea, AllowIn.Input, AllowIn.Select];
+        this.shortcuts = [
+            this.createShortcut('alt + t', 'Floor', () => this.switchContext('tables'), allowIn),
+            this.createShortcut('alt + p', 'Product search', () => this.switchContext('menu', true), allowIn),
+            this.createShortcut('alt + o', 'Open orders', () => this.switchContext('orders'), allowIn),
+            this.createShortcut('alt + s', 'Save order', () => this.saveOrder(false), allowIn),
+            this.createShortcut('alt + k', 'Send KOT/BOT', () => this.saveOrder(true), allowIn),
+            this.createShortcut('alt + b', 'Checkout', () => this.openCheckout(), allowIn),
+            this.createShortcut('esc', 'Close', () => this.closeActiveOverlay(), allowIn),
+        ];
+    }
+
+    private createShortcut(
+        key: string,
+        label: string,
+        command: () => void,
+        allowIn: AllowIn[],
+    ): ShortcutInput {
+        return {
+            key: [key],
+            label,
+            description: label,
+            allowIn,
+            preventDefault: true,
+            command: (output) => {
+                output.event?.preventDefault();
+                if (!this.saving) {
+                    command();
+                }
+                return false;
+            },
+        };
     }
 
     ngOnDestroy(): void {
@@ -303,11 +385,22 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     }
 
     selectTable(table: RestaurantTableDto): void {
+        if (this.shouldProtectCurrentOrder('table', table.id)) {
+            this.pendingOrderSwitch = { kind: 'table', table };
+            return;
+        }
+
+        this.performSelectTable(table);
+    }
+
+    private performSelectTable(table: RestaurantTableDto): void {
         this.orderType = RestaurantOrderType.DineIn;
-        this.activeContext = 'tables';
+        this.activeContext = 'menu';
         this.selectedTable = table;
         this.selectedOrder = this.openOrders.find((order) => order.tableId === table.id) || null;
         this.cart = this.selectedOrder ? this.hydrateCartLines(this.selectedOrder.items || []) : [];
+        this.syncCustomerFromOrder();
+        this.orderDirty = false;
         this.stockValidation = null;
         this.resetBillSelection();
         this.resetTenderFields();
@@ -315,15 +408,28 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         this.resetOperationForm(false);
         this.loadTickets();
         this.recalculateViewState();
+        this.focusMenuSearch();
     }
 
     selectOrder(order: RestaurantOrderDto): void {
+        if (this.shouldProtectCurrentOrder('order', order.id)) {
+            this.pendingOrderSwitch = { kind: 'order', order };
+            return;
+        }
+
+        this.performSelectOrder(order);
+    }
+
+    private performSelectOrder(order: RestaurantOrderDto): void {
         this.selectedOrder = order;
         this.selectedTable = this.tables.find((table) => table.id === order.tableId) || null;
         this.orderType = this.selectedTable
             ? RestaurantOrderType.DineIn
             : (order.orderType ?? RestaurantOrderType.TakeAway);
+        this.activeContext = 'menu';
         this.cart = this.hydrateCartLines(order.items || []);
+        this.syncCustomerFromOrder();
+        this.orderDirty = false;
         this.stockValidation = null;
         this.resetBillSelection();
         this.resetTenderFields();
@@ -331,6 +437,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         this.resetOperationForm(false);
         this.loadTickets();
         this.recalculateViewState();
+        this.focusMenuSearch();
     }
 
     startTakeaway(): void {
@@ -342,18 +449,113 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     }
 
     startNewOrder(orderType = RestaurantOrderType.TakeAway): void {
+        this.requestStartNewOrder(orderType);
+    }
+
+    requestStartNewOrder(orderType = RestaurantOrderType.TakeAway): void {
+        if (this.shouldProtectCurrentOrder('new', orderType.toString())) {
+            this.pendingOrderSwitch = { kind: 'new', orderType };
+            return;
+        }
+
+        this.performStartNewOrder(orderType);
+    }
+
+    private performStartNewOrder(orderType = RestaurantOrderType.TakeAway): void {
         this.orderType = orderType;
-        this.activeContext = orderType === RestaurantOrderType.DineIn ? 'tables' : 'orders';
+        this.activeContext = orderType === RestaurantOrderType.DineIn ? 'tables' : 'menu';
         this.selectedTable = null;
         this.selectedOrder = null;
         this.cart = [];
         this.tickets = [];
+        this.billForm.customerName = '';
+        this.billForm.customerPhoneNo = '';
+        this.billForm.customerAddress = '';
+        this.billForm.customerVatNo = '';
+        this.orderDirty = false;
+        this.mobileCartOpen = false;
         this.stockValidation = null;
         this.resetBillSelection();
         this.resetTenderFields();
         this.cancelConfigurator(false);
         this.resetOperationForm(false);
         this.recalculateViewState();
+        if (this.activeContext === 'menu') {
+            this.focusMenuSearch();
+        }
+    }
+
+    switchContext(context: RestaurantPosContext, focusSearch = false): void {
+        this.activeContext = context;
+        if (context === 'menu' || focusSearch) {
+            this.focusMenuSearch();
+        }
+        this.cdr.markForCheck();
+    }
+
+    saveAndSwitchOrder(): void {
+        if (!this.pendingOrderSwitch) {
+            return;
+        }
+
+        this.saveOrder(false, () => {
+            const pending = this.pendingOrderSwitch;
+            this.pendingOrderSwitch = null;
+            this.executePendingSwitch(pending);
+        });
+    }
+
+    discardAndSwitchOrder(): void {
+        const pending = this.pendingOrderSwitch;
+        this.pendingOrderSwitch = null;
+        this.executePendingSwitch(pending);
+    }
+
+    stayOnCurrentOrder(): void {
+        this.pendingOrderSwitch = null;
+        this.cdr.markForCheck();
+    }
+
+    private executePendingSwitch(pending: PendingOrderSwitch | null): void {
+        if (!pending) {
+            return;
+        }
+
+        if (pending.kind === 'table') {
+            this.performSelectTable(pending.table);
+        } else if (pending.kind === 'order') {
+            this.performSelectOrder(pending.order);
+        } else {
+            this.performStartNewOrder(pending.orderType);
+        }
+    }
+
+    private shouldProtectCurrentOrder(kind: PendingOrderSwitch['kind'], targetId: string): boolean {
+        if (!this.orderDirty || (!this.cart.length && !this.selectedOrder)) {
+            return false;
+        }
+
+        if (kind === 'table' && this.selectedTable?.id === targetId) {
+            return false;
+        }
+
+        if (kind === 'order' && this.selectedOrder?.id === targetId) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private focusMenuSearch(): void {
+        setTimeout(() => {
+            this.cdr.detectChanges();
+            this.menuSearchInput?.nativeElement.focus();
+        }, 50);
+    }
+
+    private syncCustomerFromOrder(): void {
+        this.billForm.customerName = this.selectedOrder?.customerName || '';
+        this.billForm.customerPhoneNo = this.selectedOrder?.customerPhoneNo || '';
     }
 
     addMenuItem(item: RestaurantMenuItemDto): void {
@@ -419,15 +621,25 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         this.recalculateViewState();
     }
 
+    onTableFilterChange(): void {
+        this.recalculateViewState();
+    }
+
+    onOrderFilterChange(): void {
+        this.recalculateViewState();
+    }
+
     onMenuFilterChange(): void {
         this.recalculateViewState();
     }
 
     onCartChanged(): void {
+        this.orderDirty = true;
         this.recalculateViewState();
     }
 
     onCustomerChanged(): void {
+        this.orderDirty = true;
         this.recalculateViewState();
     }
 
@@ -443,6 +655,102 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
 
     get payButtonAmount(): number {
         return this.billPayableAmount;
+    }
+
+    get canFinalizePayment(): boolean {
+        return (
+            !this.saving &&
+            !!this.selectedOrder?.id &&
+            !!this.billForm.ledgerId &&
+            !!this.billForm.salesAccountId &&
+            this.billPayableAmount > 0
+        );
+    }
+
+    get checkoutBlockReason(): string {
+        if (!this.selectedOrder?.id) {
+            return 'Save the order before payment.';
+        }
+        if (!this.billForm.ledgerId || !this.billForm.salesAccountId) {
+            return 'Choose the required ledger and sales account under Advanced.';
+        }
+        if (this.billPayableAmount <= 0) {
+            return 'There is no payable amount on this order.';
+        }
+        return '';
+    }
+
+    openCheckout(): void {
+        if (this.saving) {
+            return;
+        }
+        if (!this.cart.length) {
+            this.notify.warn('Add at least one menu item before checkout');
+            return;
+        }
+
+        if (!this.selectedOrder?.id || this.orderDirty) {
+            this.saveOrder(false, () => this.showCheckout());
+            return;
+        }
+
+        this.showCheckout();
+    }
+
+    private showCheckout(): void {
+        this.applyDefaultLedgerSelection();
+        this.advancedCheckoutOpen = !this.billForm.ledgerId || !this.billForm.salesAccountId;
+        this.checkoutVisible = true;
+        this.mobileCartOpen = false;
+        this.recalculateViewState();
+        setTimeout(() => this.checkoutModal?.show());
+    }
+
+    closeCheckout(force = false): void {
+        if (this.saving && !force) {
+            return;
+        }
+        this.checkoutModal?.hide();
+    }
+
+    onCheckoutShown(): void {
+        this.checkoutVisible = true;
+        setTimeout(() => this.checkoutCustomerInput?.nativeElement.focus());
+    }
+
+    onCheckoutHidden(): void {
+        this.checkoutVisible = false;
+        setTimeout(() => {
+            if (window.matchMedia('(max-width: 959px)').matches) {
+                this.mobileOrderButton?.nativeElement.focus();
+            } else {
+                this.checkoutButton?.nativeElement.focus();
+            }
+        });
+    }
+
+    openMobileCart(): void {
+        this.mobileCartOpen = true;
+        this.cdr.markForCheck();
+    }
+
+    closeMobileCart(): void {
+        this.mobileCartOpen = false;
+        this.cdr.markForCheck();
+    }
+
+    closeActiveOverlay(): void {
+        if (this.pendingOrderSwitch) {
+            this.stayOnCurrentOrder();
+        } else if (this.pendingMenuItem) {
+            this.cancelConfigurator();
+        } else if (this.checkoutVisible) {
+            this.closeCheckout();
+        } else if (this.mobileCartOpen) {
+            this.closeMobileCart();
+        } else if (this.activeOperation) {
+            this.resetOperationForm();
+        }
     }
 
     showOperation(operation: 'discount' | 'transfer' | 'split' | 'merge'): void {
@@ -569,6 +877,9 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         const before = this.cart.length;
         const hadDraftLines = this.draftLineCountValue;
         this.cart = this.cart.filter((line) => line.id || !this.canEditLine(line));
+        if (before !== this.cart.length) {
+            this.orderDirty = true;
+        }
         this.recalculateViewState();
         if (before !== this.cart.length) {
             this.notify.info('Unsaved draft lines cleared');
@@ -581,6 +892,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         const line = this.cart[index];
         if (!line?.id) {
             this.cart.splice(index, 1);
+            this.orderDirty = true;
             this.recalculateViewState();
             return;
         }
@@ -607,6 +919,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         }
 
         line.qty = (line.qty || 0) + 1;
+        this.orderDirty = true;
         this.recalculateViewState();
     }
 
@@ -616,10 +929,15 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         }
 
         line.qty = Math.max(1, (line.qty || 1) - 1);
+        this.orderDirty = true;
         this.recalculateViewState();
     }
 
-    saveOrder(sendToKitchen = false): void {
+    saveOrder(sendToKitchen = false, onSaved?: () => void): void {
+        if (this.saving) {
+            return;
+        }
+
         if (!this.cart.length) {
             this.notify.warn('Add at least one menu item');
             return;
@@ -678,15 +996,16 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
             .pipe(finalize(() => (this.saving = false)))
             .subscribe((orderId) => {
                 this.notify.success(this.l('SavedSuccessfully'));
+                this.orderDirty = false;
                 if (shouldSendToKitchen) {
-                    this.sendToKitchen(orderId);
+                    this.sendToKitchen(orderId, onSaved);
                 } else {
-                    this.afterOrderChange(orderId);
+                    this.afterOrderChange(orderId, onSaved);
                 }
             });
     }
 
-    sendToKitchen(orderId?: string): void {
+    sendToKitchen(orderId?: string, onSaved?: () => void): void {
         const id = orderId || this.selectedOrder?.id;
         if (!id) {
             return;
@@ -704,7 +1023,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
             if (stockDraftCount) {
                 this.notify.info(`${stockDraftCount} stock item(s) kept for direct billing`);
             }
-            this.afterOrderChange(id);
+            this.afterOrderChange(id, onSaved);
         });
     }
 
@@ -755,12 +1074,17 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     }
 
     finalizeBill(): void {
+        if (this.saving) {
+            return;
+        }
+
         if (!this.selectedOrder?.id) {
             this.notify.warn('Save the order before final billing');
             return;
         }
 
         if (!this.billForm.ledgerId || !this.billForm.salesAccountId) {
+            this.advancedCheckoutOpen = true;
             this.notify.warn('Customer ledger and sales account are required');
             return;
         }
@@ -838,15 +1162,12 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
                 if (this.billForm.isPrint) {
                     this.printOrDownloadPosBill(receiptSnapshot, result);
                 }
+                this.closeCheckout(true);
                 this.stockValidation = null;
                 this.resetBillSelection();
                 this.resetTenderFields();
                 if (result.isFullyBilled) {
-                    this.selectedOrder = null;
-                    this.selectedTable = null;
-                    this.cart = [];
-                    this.tickets = [];
-                    this.recalculateViewState();
+                    this.performStartNewOrder(this.orderType);
                     this.refresh();
                     return;
                 }
@@ -1032,36 +1353,36 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
 
     lineStatusClass(status: number): string {
         if (status === 2) {
-            return 'restaurant-status-warning';
+            return 'bg-light-warning text-warning';
         }
         if (status === 3 || status === 4) {
-            return 'restaurant-status-success';
+            return 'bg-light-success text-success';
         }
         if (status === 5) {
-            return 'restaurant-status-danger';
+            return 'bg-light-danger text-danger';
         }
-        return status === 1 ? 'restaurant-status-primary' : 'restaurant-status-neutral';
+        return status === 1 ? 'bg-light-primary text-primary' : 'bg-light text-gray-600';
     }
 
     ticketStatusClass(status: number): string {
         if (status === 1) {
-            return 'restaurant-status-warning';
+            return 'bg-light-warning text-warning';
         }
         if (status === 2 || status === 3) {
-            return 'restaurant-status-success';
+            return 'bg-light-success text-success';
         }
         if (status === 4) {
-            return 'restaurant-status-danger';
+            return 'bg-light-danger text-danger';
         }
-        return 'restaurant-status-neutral';
+        return 'bg-light text-gray-600';
     }
 
     tableStatusClass(status: number): string {
         return status === 1
-            ? 'restaurant-status-warning'
+            ? 'bg-light-warning text-warning'
             : status === 3
-              ? 'restaurant-status-danger'
-              : 'restaurant-status-success';
+              ? 'bg-light-danger text-danger'
+              : 'bg-light-success text-success';
     }
 
     tableStatusText(status: number): string {
@@ -1371,11 +1692,15 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     }
 
     sendButtonLabel(): string {
-        if (!this.hasKitchenSendableLines()) {
-            return 'No KOT/BOT';
-        }
+        return this.hasAddOnDraftLines() ? 'Send Add-on KOT/BOT' : 'Send KOT/BOT';
+    }
 
-        return this.hasAddOnDraftLines() ? 'Send Add-on KOT/BOT' : 'Send';
+    trackByEntityId(index: number, item: { id?: string } | null | undefined): string | number {
+        return item?.id || index;
+    }
+
+    trackByCartLine(index: number, line: PosCartLine): string | number {
+        return line.id || line.configKey || index;
     }
 
     isSoldOut(item: RestaurantMenuItemDto): boolean {
@@ -1391,7 +1716,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     }
 
     itemRouteClass(item: RestaurantMenuItemDto): string {
-        return this.isKitchenItem(item) ? 'restaurant-status-warning' : 'restaurant-status-success';
+        return this.isKitchenItem(item) ? 'bg-light-warning text-warning' : 'bg-light-success text-success';
     }
 
     isKitchenLine(line: PosCartLine): boolean {
@@ -1403,7 +1728,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     }
 
     lineRouteClass(line: PosCartLine): string {
-        return this.isKitchenLine(line) ? 'restaurant-status-warning' : 'restaurant-status-success';
+        return this.isKitchenLine(line) ? 'bg-light-warning text-warning' : 'bg-light-success text-success';
     }
 
     hasKitchenSendableLines(): boolean {
@@ -1427,9 +1752,33 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     }
 
     private recalculateViewState(): void {
-        this.filteredTablesList = this.tables.filter(
-            (table) => !this.selectedAreaId || table.areaId === this.selectedAreaId,
-        );
+        const tableSearch = (this.tableSearch || '').toLowerCase().trim();
+        this.filteredTablesList = this.tables.filter((table) => {
+            const areaMatch = !this.selectedAreaId || table.areaId === this.selectedAreaId;
+            const statusMatch =
+                this.tableStatusFilter === '' || Number(table.status) === Number(this.tableStatusFilter);
+            const searchMatch =
+                !tableSearch ||
+                (table.name || '').toLowerCase().includes(tableSearch) ||
+                (table.code || '').toLowerCase().includes(tableSearch) ||
+                (table.areaName || '').toLowerCase().includes(tableSearch);
+            return table.isActive !== false && areaMatch && statusMatch && searchMatch;
+        });
+
+        const orderSearch = (this.orderSearch || '').toLowerCase().trim();
+        this.filteredOrdersList = this.openOrders.filter((order) => {
+            const typeMatch =
+                this.orderTypeFilter === '' || Number(order.orderType) === Number(this.orderTypeFilter);
+            const statusMatch =
+                this.orderStatusFilter === '' || Number(order.status) === Number(this.orderStatusFilter);
+            const searchMatch =
+                !orderSearch ||
+                (order.orderNo || '').toLowerCase().includes(orderSearch) ||
+                (order.tableName || '').toLowerCase().includes(orderSearch) ||
+                (order.customerName || '').toLowerCase().includes(orderSearch) ||
+                (order.customerPhoneNo || '').toLowerCase().includes(orderSearch);
+            return typeMatch && statusMatch && searchMatch;
+        });
 
         const search = (this.menuSearch || '').toLowerCase().trim();
         this.filteredMenuItemsList = this.menuItems.filter((item) => {
@@ -1614,6 +1963,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         const existing = this.cart.find((line) => !line.id && line.configKey === key);
         if (existing) {
             existing.qty += 1;
+            this.orderDirty = true;
             this.recalculateViewState();
             return;
         }
@@ -1640,6 +1990,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
             discountAmount: 0,
             notes: '',
         });
+        this.orderDirty = true;
         this.recalculateViewState();
     }
 
@@ -1745,7 +2096,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         this.splitBillQuantities = nextQuantities;
     }
 
-    private afterOrderChange(orderId?: string): void {
+    private afterOrderChange(orderId?: string, afterRefresh?: () => void): void {
         this.restaurantOrderService.getOpenOrdersForPos().subscribe((orders) => {
             this.openOrders = orders || [];
             this.selectedOrder = orderId ? this.openOrders.find((order) => order.id === orderId) || null : null;
@@ -1755,12 +2106,15 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
                     ? RestaurantOrderType.DineIn
                     : (this.selectedOrder.orderType ?? RestaurantOrderType.TakeAway);
                 this.cart = this.hydrateCartLines(this.selectedOrder.items || []);
+                this.syncCustomerFromOrder();
                 this.loadTickets(this.selectedOrder.id);
             } else {
                 this.cart = [];
                 this.tickets = [];
             }
+            this.orderDirty = false;
             this.recalculateViewState();
+            afterRefresh?.();
             this.restaurantSetupService.getTables(null).subscribe((tables) => {
                 this.tables = tables || [];
                 this.recalculateViewState();

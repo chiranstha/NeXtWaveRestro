@@ -74,6 +74,15 @@ const modules = <ErpModule>[
     description: 'Z report, KOT speed, food cost, voids, payout variance.',
   ),
   ErpModule(
+    kind: ModuleKind.restaurantPayroll,
+    title: 'Staff & Payroll',
+    group: 'Restaurant',
+    path: '/app/main/restaurant/payroll',
+    icon: Icons.badge_rounded,
+    color: AppColors.violet,
+    description: 'Shifts, attendance, wages, tips, service charge, payslips.',
+  ),
+  ErpModule(
     kind: ModuleKind.accountGroups,
     title: 'Account Groups',
     group: 'Accounting',

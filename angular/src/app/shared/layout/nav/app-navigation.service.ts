@@ -72,6 +72,12 @@ export class AppNavigationService {
                         'fa-duotone fa-chart-column',
                         '/app/main/restaurant/reports'
                     ),
+                    new AppMenuItem(
+                        'Restaurant Payroll',
+                        'Pages.Restaurant.Payroll',
+                        'fa-duotone fa-money-check-dollar',
+                        '/app/main/restaurant/payroll'
+                    ),
                 ]
             ),
             new AppMenuItem('Accounting', 'Pages.Accounting', 'fa-duotone fa-books', '', [],
@@ -548,7 +554,7 @@ export class AppNavigationService {
 
             new AppMenuItem(
                 'Administration',
-                '',
+                'Pages.Administration',
                 'fa-duotone fa-gear',
                 '',
                 [],

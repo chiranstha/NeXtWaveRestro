@@ -186,6 +186,10 @@ public class AppSettingProvider : SettingProvider
                 new SettingDefinition(AppSettings.UserManagement.IsRestrictedEmailDomainEnabled,
                     GetFromAppSettings(AppSettings.UserManagement.IsRestrictedEmailDomainEnabled, "false"),
                     scopes: SettingScopes.Tenant, clientVisibilityProvider: _visibleSettingClientVisibilityProvider),
+                new SettingDefinition(AppSettings.UserManagement.EmployeeDefaultPassword,
+                    GetFromAppSettings(AppSettings.UserManagement.EmployeeDefaultPassword,
+                        ErpConsts.DefaultRestaurantEmployeePassword),
+                    scopes: SettingScopes.Tenant),
 
                 new SettingDefinition(AppSettings.ErpSettings.SalesRate,
                     GetFromAppSettings(AppSettings.ErpSettings.SalesRate, "0"), scopes: SettingScopes.Tenant),

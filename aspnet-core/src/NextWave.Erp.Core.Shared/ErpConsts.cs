@@ -26,6 +26,8 @@ public class ErpConsts
 
     public const string AbpApiClientUserAgent = "AbpApiClient";
 
+    public const string DefaultRestaurantEmployeePassword = "Abc123!@#";
+
     // Note:
     // Minimum accepted payment amount. If a payment amount is less then that minimum value payment progress will continue without charging payment
     // Even though we can use multiple payment methods, users always can go and use the highest accepted payment amount.

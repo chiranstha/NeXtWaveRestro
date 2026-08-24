@@ -1,305 +1,270 @@
 <div [@routerTransition]>
-  
+  <div [class]="containerClass">
+    <!-- Premium Page Intro -->
+    <header class="page-intro card shadow-sm border animate__animated animate__fadeIn p-3 p-lg-4 mb-2">
+      <div class="row g-3 w-100 align-items-center">
+        <div class="col-lg">
+          <div class="page-intro__content">
+            <span class="page-intro__eyebrow text-primary fs-6 fw-bold mb-2">{{ 'Financial Report' | localize }}</span>
+            <h1 class="page-intro__title text-body fs-5 fw-bold mb-1">{{ 'Balance Sheet' | localize }}</h1>
+            <p class="page-intro__subtitle text-muted m-0 fs-6">
+              {{ 'Assets, liabilities, posted capital and reserves, and the current-period result at a specific point in time.' | localize }}
+            </p>
+          </div>
+        </div>
 
-    <div [class]="containerClass + ' balance-sheet-page'">
-        <section class="statement-header">
-            <div class="statement-header__main">
-                <span class="statement-header__eyebrow">Financial Statement</span>
-                <h1 class="statement-header__title">Balance Sheet</h1>
-                <div class="statement-header__meta">
-                    <span>
-                        <i class="fas fa-calendar-day"></i>
-                        {{ myForm?.get('fromMiti')?.value || '-' }}
-                    </span>
-                    <i class="fas fa-arrow-right statement-header__separator"></i>
-                    <span>
-                        <i class="fas fa-calendar-check"></i>
-                        {{ myForm?.get('toMiti')?.value || '-' }}
-                    </span>
-                </div>
+        <div class="col-lg-auto">
+          <div class="page-intro__status card shadow-sm border d-flex align-items-center gap-3 px-4 py-3 rounded-3 transition-all" 
+               [ngClass]="statementVerified ? 'border-success bg-success-subtle text-success' : 'border-danger bg-danger-subtle text-danger'"
+               [attr.title]="statementIntegrityMessage">
+            <i class="fad fs-4" [ngClass]="statementVerified ? 'fa-check-circle text-success' : 'fa-exclamation-triangle text-danger'"></i>
+            <div class="page-intro__status-text text-end">
+              <span class="label fw-semibold text-uppercase opacity-75 d-block">
+                {{ statementIntegrityStatus | localize }}
+              </span>
+              <strong class="value fs-4 fw-bold">{{ 'Difference' | localize }}: {{ formatCurrency(statementDifference) }}</strong>
             </div>
+          </div>
+        </div>
+      </div>
+    </header>
 
-            <div class="statement-header__position">
-                <span class="statement-header__position-label">Net Worth</span>
-                <strong class="statement-header__position-value">
-                    @if (!loading) {
-                        {{ formatCurrency(netWorth) }}
-                    } @else {
-                        <span class="inline-loader">
-                            <span class="spinner-grow spinner-grow-sm text-primary" role="status"></span>
-                            Loading
-                        </span>
-                    }
-                </strong>
-            </div>
-        </section>
-
-        <section class="metrics-grid">
-            <article class="metric-card metric-card--assets">
-                <span class="metric-card__accent"></span>
-                <div class="metric-card__icon">
-                    <i class="fas fa-landmark"></i>
-                </div>
-                <div class="metric-card__body">
-                    <span class="metric-card__label">{{ l('TotalAssets') }}</span>
-                    <strong class="metric-card__value">
-                        @if (!loading) {
-                            {{ formatCurrency(totalAssets) }}
-                        } @else {
-                            <span class="metric-card__skeleton"></span>
-                        }
-                    </strong>
-                    <small class="metric-card__hint">Debit position</small>
-                </div>
-            </article>
-
-            <article class="metric-card metric-card--liabilities">
-                <span class="metric-card__accent"></span>
-                <div class="metric-card__icon">
-                    <i class="fas fa-file-invoice-dollar"></i>
-                </div>
-                <div class="metric-card__body">
-                    <span class="metric-card__label">{{ l('TotalLiabilities') }}</span>
-                    <strong class="metric-card__value">
-                        @if (!loading) {
-                            {{ formatCurrency(totalLiabilities) }}
-                        } @else {
-                            <span class="metric-card__skeleton"></span>
-                        }
-                    </strong>
-                    <small class="metric-card__hint">Credit position</small>
-                </div>
-            </article>
-
-            <article class="metric-card metric-card--equity">
-                <span class="metric-card__accent"></span>
-                <div class="metric-card__icon">
-                    <i class="fas fa-balance-scale"></i>
-                </div>
-                <div class="metric-card__body">
-                    <span class="metric-card__label">{{ l('NetWorth') }}</span>
-                    <strong class="metric-card__value">
-                        @if (!loading) {
-                            {{ formatCurrency(netWorth) }}
-                        } @else {
-                            <span class="metric-card__skeleton"></span>
-                        }
-                    </strong>
-                    <small class="metric-card__hint">Owner's equity</small>
-                </div>
-            </article>
-
-            <article class="metric-card metric-card--working-capital">
-                <span class="metric-card__accent"></span>
-                <div class="metric-card__icon">
-                    <i class="fas fa-coins"></i>
-                </div>
-                <div class="metric-card__body">
-                    <span class="metric-card__label">{{ l('WorkingCapital') }}</span>
-                    <strong class="metric-card__value">
-                        @if (!loading) {
-                            {{ formatCurrency(workingCapital) }}
-                        } @else {
-                            <span class="metric-card__skeleton"></span>
-                        }
-                    </strong>
-                    <small class="metric-card__hint">Current liquidity</small>
-                </div>
-            </article>
-        </section>
-
-        <section class="filter-panel">
-            <div class="filter-panel__header">
-                <div class="filter-panel__title">
-                    <span class="filter-panel__icon">
-                        <i class="fas fa-sliders-h"></i>
-                    </span>
-                    <div>
-                        <h2>Report Controls</h2>
-                        <p>Period, refresh, and statement output</p>
-                    </div>
-                </div>
-
-                <div class="filter-panel__actions">
-                    <button
-                        type="button"
-                        (click)="toggleAdvancedFilters()"
-                        [class.is-active]="advancedFiltersAreShown"
-                        class="control-button control-button--primary"
-                    >
-                        <i class="fas fa-filter"></i>
-                        <span>{{ advancedFiltersAreShown ? 'Hide Filters' : 'Show Filters' }}</span>
-                    </button>
-                    <button
-                        type="button"
-                        (click)="refresh()"
-                        [disabled]="loading"
-                        [title]="l('Refresh')"
-                        class="icon-button"
-                    >
-                        <i [class.fa-spin]="loading" class="fas fa-sync-alt"></i>
-                    </button>
-                </div>
-            </div>
-
-            @if (advancedFiltersAreShown) {
-                <div class="filter-panel__body">
-                    <form [formGroup]="myForm" class="filter-form">
-                        <div class="filter-field">
-                            <label class="form-label">From Miti</label>
-                            <ne-datepicker formControlName="fromMiti"></ne-datepicker>
-                        </div>
-                        <div class="filter-field">
-                            <label class="form-label">To Miti</label>
-                            <ne-datepicker formControlName="toMiti"></ne-datepicker>
-                        </div>
-                        <div class="filter-field filter-field--action">
-                            <button
-                                type="button"
-                                (click)="onAdvanceSearch()"
-                                [disabled]="loading"
-                                class="btn btn-primary apply-button"
-                            >
-                                <i class="fas fa-search me-2"></i>
-                                Apply Filters
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            }
-        </section>
-
-        @if (!showPdfOk) {
-            <main class="report-workspace">
-                <div class="report-toolbar">
-                    <div class="report-toolbar__heading">
-                        <span class="report-toolbar__icon">
-                            <i class="fas fa-book-open"></i>
-                        </span>
-                        <div>
-                            <h2>Statement Ledger</h2>
-                            <p>Assets compared against liabilities and equity</p>
-                        </div>
-                    </div>
-
-                    <div class="report-toolbar__tools">
-                        <label class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input (input)="searchDataTable($event)" [placeholder]="l('Search') + '...'" type="text" />
-                        </label>
-
-                        <div class="btn-group toolbar-group" role="group">
-                            <button
-                                type="button"
-                                (click)="expandAll()"
-                                [title]="l('ExpandAll')"
-                                class="icon-button icon-button--success"
-                            >
-                                <i class="fas fa-expand-arrows-alt"></i>
-                            </button>
-                            <button
-                                type="button"
-                                (click)="collapseAll()"
-                                [title]="l('CollapseAll')"
-                                class="icon-button icon-button--danger"
-                            >
-                                <i class="fas fa-compress-arrows-alt"></i>
-                            </button>
-                        </div>
-
-                        <div class="dropdown">
-                            <button
-                                type="button"
-                                class="control-button control-button--export dropdown-toggle"
-                                data-bs-toggle="dropdown"
-                            >
-                                <i class="fas fa-download"></i>
-                                <span>Export</span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                                <li>
-                                    <a (click)="exportToExcel()" class="dropdown-item">
-                                        <i class="fas fa-file-excel me-2 text-success"></i>
-                                        Export to Excel
-                                    </a>
-                                </li>
-                                <li>
-                                    <a (click)="showPdf()" class="dropdown-item">
-                                        <i class="fas fa-file-pdf me-2 text-danger"></i>
-                                        View PDF
-                                    </a>
-                                </li>
-                                <li>
-                                    <a (click)="exportToExcelfromAPI(true)" class="dropdown-item">
-                                        <i class="fas fa-cloud-download-alt me-2 text-primary"></i>
-                                        Download Full Excel
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="report-grid-shell">
-                    <ag-grid-angular
-                        #agGrid
-                        (gridReady)="onGridReady($event)"
-                        [animateRows]="true"
-                        [autoGroupColumnDef]="autoGroupColumnDef"
-                        [columnDefs]="columnDefs"
-                        [defaultColDef]="defaultColDef"
-                        [enableCellTextSelection]="true"
-                        [getDataPath]="getDataPath"
-                        [groupDefaultExpanded]="groupDefaultExpanded"
-                        [headerHeight]="52"
-                        [rowData]="rowData"
-                        [rowClassRules]="rowClassRules"
-                        [rowHeight]="54"
-                        [suppressCellFocus]="true"
-                        [treeData]="true"
-                        class="ag-theme-balham balance-sheet-grid"
-                        style="width: 100%; height: 640px"
-                        [loading]="gridLoading"
-                    ></ag-grid-angular>
-
-                    @if (loading) {
-                        <div class="loader-wrapper">
-                            <div class="loader-card">
-                                <div class="spinner"></div>
-                                <span>Preparing balance sheet</span>
-                            </div>
-                        </div>
-                    }
-
-                    @if (rowData.length === 0 && !loading) {
-                        <div class="empty-state">
-                            <span class="empty-state__icon">
-                                <i class="fas fa-folder-open"></i>
-                            </span>
-                            <h3>No Data Available</h3>
-                            <p>No financial records were found for the selected balance sheet period.</p>
-                        </div>
-                    }
-                </div>
-            </main>
-        }
-
-        @if (showPdfOk) {
-            <section class="pdf-workspace">
-                <div class="pdf-workspace__header">
-                    <div>
-                        <span class="pdf-workspace__eyebrow">Report Preview</span>
-                        <h2>{{ title }}</h2>
-                    </div>
-                    <button type="button" (click)="back()" class="control-button">
-                        <i class="fas fa-chevron-left"></i>
-                        <span>Back to Grid</span>
-                    </button>
-                </div>
-                <div class="pdf-workspace__body">
-                    <app-report-pdf [pdfdata]="pdfUrl" [title]="title"></app-report-pdf>
-                </div>
-            </section>
-        }
+    <!-- Dynamic Metric Cards -->
+    <div class="row g-3 page-metrics mb-2">
+      <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+        <article class="stat-card stat-card--primary card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-primary transition-all position-relative overflow-hidden">
+          <div class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-primary-subtle fs-5 w-11 h-11">
+            <i class="fad fa-chart-pie"></i>
+          </div>
+          <div class="stat-card__content flex-fill">
+            <span class="stat-card__label text-muted fw-semibold text-uppercase">{{ 'Total Assets' | localize }}</span>
+            <h3 class="stat-card__value text-body fs-4 my-1">{{ formatCurrency(totalAssets) }}</h3>
+            <small class="stat-card__meta text-muted opacity-75">{{ 'Current & Non-Current' | localize }}</small>
+          </div>
+        </article>
+      </div>
+      
+      <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+        <article class="stat-card stat-card--success card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-success transition-all position-relative overflow-hidden">
+          <div class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-success-subtle fs-5 w-11 h-11">
+            <i class="fad fa-file-invoice-dollar"></i>
+          </div>
+          <div class="stat-card__content flex-fill">
+            <span class="stat-card__label text-muted fw-semibold text-uppercase">{{ 'Total Liabilities' | localize }}</span>
+            <h3 class="stat-card__value text-body fs-4 my-1">{{ formatCurrency(totalLiabilities) }}</h3>
+            <small class="stat-card__meta text-muted opacity-75">{{ 'Current & Long-term' | localize }}</small>
+          </div>
+        </article>
+      </div>
+      
+      <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+        <article class="stat-card stat-card--info card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-info transition-all position-relative overflow-hidden">
+          <div class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-info-subtle fs-5 w-11 h-11">
+            <i class="fad fa-balance-scale"></i>
+          </div>
+          <div class="stat-card__content flex-fill">
+            <span class="stat-card__label text-muted fw-semibold text-uppercase">{{ 'Posted Capital & Reserves' | localize }}</span>
+            <h3 class="stat-card__value text-body fs-4 my-1">{{ formatCurrency(capitalAndReserves) }}</h3>
+            <small class="stat-card__meta text-muted opacity-75">{{ 'Ledger balances only' | localize }}</small>
+          </div>
+        </article>
+      </div>
+      
+      <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
+        <article class="stat-card stat-card--warning card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-warning transition-all position-relative overflow-hidden">
+          <div class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-warning-subtle fs-5 w-11 h-11">
+            <i class="fad fa-coins"></i>
+          </div>
+          <div class="stat-card__content flex-fill">
+            <span class="stat-card__label text-muted fw-semibold text-uppercase">{{ 'Current-period Result' | localize }}</span>
+            <h3 class="stat-card__value text-body fs-4 my-1">{{ formatCurrency(currentPeriodResult) }}</h3>
+            <small class="stat-card__meta text-muted opacity-75">
+              {{ (currentPeriodResult >= 0 ? 'Profit / surplus from P&L' : 'Loss / deficit from P&L') | localize }}
+            </small>
+          </div>
+        </article>
+      </div>
     </div>
-</div>
+
+    <!-- Enhanced Filter Section -->
+    <section class="filter-shell card shadow-sm border mb-3 overflow-visible position-relative" *ngIf="!showPdfOk">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-3">
+          <span class="badge-light-primary bg-primary-subtle text-primary fs-6 me-2 p-2 pe-3 rounded fw-semibold">
+            <i class="fad fa-filter me-2"></i>
+            {{ l('ReportControls') }}
+          </span>
+          <h2 class="card-label mb-0 text-body fs-6 fw-bold">{{ l('FilterPeriod') }}</h2>
+        </div>
+        <div class="d-flex gap-2">
+          <button (click)="advancedFiltersAreShown = !advancedFiltersAreShown" class="btn btn-sm"
+            [ngClass]="advancedFiltersAreShown ? 'btn-light-danger' : 'btn-light-primary'">
+            <i class="fad" [ngClass]="advancedFiltersAreShown ? 'fa-chevron-up me-2' : 'fa-chevron-down me-2'"></i>
+            {{ (advancedFiltersAreShown ? l('HideFilters') : l('ShowFilters')) }}
+          </button>
+          <button (click)="refresh()" [disabled]="loading" class="btn btn-sm btn-light-info">
+            <i class="fad fa-sync-alt" [class.fa-spin]="loading"></i>
+          </button>
+        </div>
+      </div>
+
+      @if (advancedFiltersAreShown) {
+      <div class="filter-form animate__animated animate__slideInDown p-3">
+        <form [formGroup]="myForm" class="row g-3 align-items-end">
+          <div class="col-xl-4 col-md-6">
+            <label class="form-label fw-bold text-muted small text-uppercase mb-2">
+              <i class="fad fa-calendar-star text-info me-2"></i>{{ l('FromDate') }}
+            </label>
+            <div class="input-group">
+              <ne-datepicker #fromDate
+                          [disableFinancialYear]="true"
+                          [formControl]="myForm.controls['fromMiti']"
+                          [npDatePickerId]="'balanceSheetFromMiti'"
+                          language="en"
+                          placeholder="Select an item"
+                        ></ne-datepicker>
+            </div>
+          </div>
+
+          <div class="col-xl-4 col-md-6">
+            <label class="form-label fw-bold text-muted small text-uppercase mb-2">
+              <i class="fad fa-calendar-star text-info me-2"></i>{{ l('ToDate') }}
+            </label>
+            <div class="input-group">
+              <ne-datepicker #toDate
+                          [disableFinancialYear]="true"
+                          [formControl]="myForm.controls['toMiti']"
+                          [npDatePickerId]="'balanceSheetToMiti'"
+                          language="en"
+                          placeholder="Select an item"
+                        ></ne-datepicker>
+            </div>
+          </div>
+
+          <div class="col-xl-2 col-md-6">
+            <button (click)="loadReport()" [disabled]="loading" class="btn btn-primary w-100 shadow-sm">
+              <i class="fad fa-search me-2"></i>{{ l('ApplyFilters') }}
+            </button>
+          </div>
+        </form>
+      </div>
+      }
+    </section>
+
+    <!-- Main Report Surface -->
+    <main class="report-surface d-flex flex-column gap-3" *ngIf="!showPdfOk">
+      <div class="report-toolbar card shadow-sm border d-flex align-items-center justify-content-between gap-3 p-2 p-md-3 bg-body position-relative">
+        <div class="search-inline flex-grow-1 me-3 d-flex align-items-center" style="flex: 0 0 60%; max-width: 60%; min-width: 280px;">
+          <span class="me-3 text-muted d-flex align-items-center"><i class="fad fa-search fs-5"></i></span>
+          <input (input)="searchDataTable($event.target.value)" class="form-control flex-grow-1 border bg-body rounded-pill"
+            placeholder="{{ 'Search accounts, balances or amounts...' | localize }}" type="text" />
+        </div>
+        
+        <div class="report-toolbar__buttons d-flex gap-2">
+          <div class="btn-group shadow-sm">
+            <button (click)="expandAll()" class="btn btn-sm btn-white text-success border">
+              <i class="fad fa-expand-arrows me-2"></i>{{ 'Expand' | localize }}
+            </button>
+            <button (click)="collapseAll()" class="btn btn-sm btn-white text-danger border">
+              <i class="fad fa-compress-arrows me-2"></i>{{ 'Collapse' | localize }}
+            </button>
+          </div>
+
+          <div class="dropdown" #exportDropdown>
+            <button (click)="toggleExportDropdown($event)" class="btn btn-sm btn-white border dropdown-toggle shadow-sm" type="button"
+              [attr.aria-expanded]="exportDropdownOpen">
+              <i class="fad fa-cloud-download me-2 text-primary"></i>{{ 'Export Report' | localize }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-2" [class.show]="exportDropdownOpen">
+              <li><a (click)="exportToExcel(); exportDropdownOpen = false" class="dropdown-item rounded-2 py-2">
+                  <i class="fad fa-file-excel text-success me-3"></i>{{ 'Export to Excel' | localize }}
+                </a></li>
+              <li><a (click)="!loading && showPdf(); exportDropdownOpen = false" [class.disabled]="loading"
+                  class="dropdown-item rounded-2 py-2">
+                  <i class="fad fa-file-pdf text-danger me-3"></i>{{ 'Download PDF' | localize }}
+                </a></li>
+              <li><a (click)="exportToExcelfromAPI(true); exportDropdownOpen = false" class="dropdown-item rounded-2 py-2">
+                  <i class="fad fa-cloud-download-alt text-primary me-3"></i>{{ 'Download Full Excel' | localize }}
+                </a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="report-grid position-relative card shadow-sm border">
+        @if (loading) {
+        <div class="loader-overlay position-absolute inset-0 d-flex align-items-center justify-content-center">
+          <div class="text-center">
+            <div class="spinner-grow text-primary mb-3" role="status"></div>
+            <p class="text-muted fw-bold small text-uppercase letter-spacing-1">{{ 'Analyzing Balance Sheet...' | localize }}</p>
+          </div>
+        </div>
+        }
+
+        @if (!loading && (!rowData || rowData.length === 0)) {
+        <div class="empty-state text-center py-5 px-4">
+          <i class="fad fa-folders empty-state__icon text-muted fs-1 mb-4 opacity-50"></i>
+          <h3 class="fw-bold">{{ 'No Data Found' | localize }}</h3>
+          <p class="text-muted">{{ 'Try adjusting your filters to see results' | localize }}</p>
+        </div>
+        }
+
+        <div class="ag-theme-balham w-100" style="height: auto; width: 100%;" *ngIf="!loading && rowData && rowData.length > 0">
+          <ag-grid-angular #agGrid domLayout="autoHeight" (gridReady)="onGridReady($event)" [columnDefs]="columnDefs"
+            [defaultColDef]="defaultColDef" [treeData]="true" [getDataPath]="getDataPath" 
+            [autoGroupColumnDef]="autoGroupColumnDef" [groupDefaultExpanded]="groupDefaultExpanded"
+            [animateRows]="true" [enableCellTextSelection]="true" [rowData]="rowData"
+            class="ag-theme-balham w-100"></ag-grid-angular>
+        </div>
+      </div>
+
+      <!-- Compact & Elegant Footer -->
+      <footer class="report-summary card shadow-sm border animate__animated animate__fadeInUp d-flex align-items-center justify-content-between gap-3 p-3 bg-body">
+        <div class="report-summary__info d-flex align-items-center gap-4">
+          <div class="d-flex flex-column">
+            <span class="text-muted small text-uppercase fw-bold">{{ 'Total Records' | localize }}</span>
+            <span class="fs-5 fw-bold text-primary">{{ rowData?.length || 0 }}</span>
+          </div>
+        </div>
+        <div class="report-summary__totals d-flex gap-3 ms-auto">
+          <div class="total-chip total-chip--assets shadow-sm d-flex align-items-center rounded-3 bg-primary-subtle text-primary border-primary fw-bold gap-3 border border-transparent p-2 px-4 py-2">
+            <i class="fad fa-chart-pie"></i>
+            <div class="d-flex flex-column">
+              <span class="small opacity-75 fw-bold" style="font-size: 0.65rem;">{{ 'TOTAL ASSETS' | localize }}</span>
+              <span class="fs-6">{{ formatCurrency(totalAssets) }}</span>
+            </div>
+          </div>
+          <div class="total-chip total-chip--liabilities shadow-sm d-flex align-items-center rounded-3 bg-success-subtle text-success border-success fw-bold gap-3 border border-transparent p-2 px-4 py-2">
+            <i class="fad fa-file-invoice-dollar"></i>
+            <div class="d-flex flex-column">
+              <span class="small opacity-75 fw-bold" style="font-size: 0.65rem;">{{ 'TOTAL LIABILITIES' | localize }}</span>
+              <span class="fs-6">{{ formatCurrency(totalLiabilities) }}</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <!-- PDF Modal View -->
+    @if (showPdfOk) {
+    <div class="report-pdf-overlay animate__animated animate__fadeIn bg-body position-fixed shadow-lg overflow-hidden">
+      <div class="card h-100 border-0 shadow-lg">
+        <div class="card-header bg-white py-3 border-bottom-0 d-flex justify-content-between align-items-center">
+          <h3 class="card-title fw-bold text-dark mb-0">
+            <i class="fad fa-file-pdf me-2 text-danger"></i>{{ 'Generated PDF Report' | localize }}
+          </h3>
+          <button (click)="back()" class="btn btn-light-danger btn-sm shadow-sm rounded-pill px-4">
+            <i class="fad fa-times me-2"></i>{{ 'Close Preview' | localize }}
+          </button>
+        </div>
+        <div class="card-body p-0">
+          <app-report-pdf [pdfdata]="pdfUrl" [title]="title" class="h-100"></app-report-pdf>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- PDF Viewer Section -->
+    <div class="animate-up" *ngIf="showPdfOk">
+      <div class="card shadow-sm border-0 mb-4">
+

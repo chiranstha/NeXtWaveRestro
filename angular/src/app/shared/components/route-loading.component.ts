@@ -21,10 +21,12 @@ import { takeUntil } from 'rxjs/operators';
     imports: [],
     template: `
         @if (isLoading) {
-            <div class="route-loading-overlay">
-                <div class="loading-container">
-                    <div class="spinner"></div>
-                    <p class="loading-text">Loading module...</p>
+            <div class="route-loading-overlay position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center">
+                <div class="text-center route-loading-content">
+                    <div class="spinner-border text-primary mb-4 route-loading-spinner" role="status">
+                        <span class="visually-hidden">Loading module...</span>
+                    </div>
+                    <p class="m-0 fs-6 text-muted">Loading module...</p>
                 </div>
             </div>
         }
@@ -33,47 +35,20 @@ import { takeUntil } from 'rxjs/operators';
     styles: [
         `
             .route-loading-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
                 background: rgba(255, 255, 255, 0.95);
-                display: flex;
-                justify-content: center;
-                align-items: center;
                 z-index: 9999;
                 opacity: 1;
                 transition: opacity 0.3s ease-out;
             }
 
-            .loading-container {
-                text-align: center;
+            .route-loading-content {
                 transform: translateY(-50px);
             }
 
-            .spinner {
+            .route-loading-spinner {
                 width: 50px;
                 height: 50px;
-                border: 4px solid #e0e0e0;
-                border-top: 4px solid #2196f3;
-                border-radius: 50%;
-                animation: spin 1s linear infinite;
-                margin: 0 auto 20px;
-            }
-
-            .loading-text {
-                margin: 0;
-                font-size: 16px;
-                color: #666;
-                font-family:
-                    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            }
-
-            @keyframes spin {
-                to {
-                    transform: rotate(360deg);
-                }
+                border-width: 4px;
             }
 
             /* Smooth fade out */

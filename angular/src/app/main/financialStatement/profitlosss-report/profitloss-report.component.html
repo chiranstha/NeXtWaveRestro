@@ -1,368 +1,294 @@
 <div [@routerTransition]>
-    <div [class]="containerClass + ' profit-loss-page'">
-        <header class="page-intro animate__animated animate__fadeIn mb-3">
-            <div class="row g-3 align-items-center">
-                <div class="col-lg">
-                    <div class="page-intro__content">
-                        <span class="page-intro__eyebrow">
-                            {{ l('FinancialReport') }}
-                        </span>
-                        <h1 class="page-intro__title">{{ l('ProfitAndLoss') }}</h1>
-                        <p class="page-intro__subtitle">
-                            {{ l('ComprehensiveRevenueExpenseAnalysis') }}
-                        </p>
-                    </div>
-                </div>
-                <div class="col-lg-auto">
-                    <div
-                        [ngClass]="netProfit >= 0 ? 'page-intro__status--positive' : 'page-intro__status--negative'"
-                        class="page-intro__status"
-                    >
-                        <i
-                            [ngClass]="netProfit >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'"
-                            class="fad page-intro__status-icon"
-                        ></i>
-                        <div class="page-intro__status-text">
-                            <span class="page-intro__status-label">
-                                {{ netProfit >= 0 ? l('NetProfit') : l('NetLoss') }}
-                            </span>
-                            <strong class="page-intro__status-value">
-                                @if (!loading) {
-                                    {{ formatCurrency(netProfit) }}
-                                } @else {
-                                    <div class="d-inline-flex align-items-center gap-2">
-                                        <div
-                                            [ngClass]="netProfit >= 0 ? 'text-success' : 'text-danger'"
-                                            class="spinner-grow spinner-grow-sm"
-                                            role="status"
-                                        >
-                                            <span class="visually-hidden">Loading...</span>
-                                        </div>
-                                        <small class="text-muted">{{ l('Loading') }}</small>
-                                    </div>
-                                }
-                            </strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
+  <div [class]="containerClass">
 
-        @if (showPdfOk) {
-            <section class="report-pdf card shadow-sm border mb-3">
-                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                    <h3 class="fs-5 fw-bold mb-0">{{ title }}</h3>
-                    <button type="button" (click)="back()" class="btn btn-light-primary btn-sm px-4">
-                        <i class="fas fa-chevron-left me-2"></i>
-                        {{ l('Back') }}
-                    </button>
-                </div>
-                <div class="card-body p-0">
-                    <ngx-extended-pdf-viewer [src]="pdfUrl" height="80vh"></ngx-extended-pdf-viewer>
-                </div>
-            </section>
-        }
-
-        <div class="row g-3 page-metrics mb-2">
-            <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.1s">
-                <article
-                    class="stat-card stat-card--primary card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-primary transition-all position-relative overflow-hidden"
-                >
-                    <div
-                        class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-primary-subtle fs-5 w-11 h-11"
-                    >
-                        <i class="fad fa-wallet"></i>
-                    </div>
-                    <div class="stat-card__content flex-fill">
-                        <span class="stat-card__label text-muted fw-semibold text-uppercase">
-                            {{ l('TotalRevenue') }}
-                        </span>
-                        <h3 class="stat-card__value text-body fs-4 my-1">
-                            @if (!loading) {
-                                {{ formatCurrency(totalRevenue) }}
-                            } @else {
-                                <div class="d-inline-flex align-items-center gap-2">
-                                    <div class="spinner-grow spinner-grow-sm text-primary" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                    <small class="text-muted">{{ l('Loading') }}</small>
-                                </div>
-                            }
-                        </h3>
-                        <small class="stat-card__meta text-muted opacity-75">{{ l('GrossIncome') }}</small>
-                    </div>
-                </article>
-            </div>
-            <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.2s">
-                <article
-                    class="stat-card stat-card--info card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-info transition-all position-relative overflow-hidden"
-                >
-                    <div
-                        class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-info-subtle fs-5 w-11 h-11"
-                    >
-                        <i class="fad fa-chart-line"></i>
-                    </div>
-                    <div class="stat-card__content flex-fill">
-                        <span class="stat-card__label text-muted fw-semibold text-uppercase">
-                            {{ l('GrossProfit') }}
-                        </span>
-                        <h3 class="stat-card__value text-body fs-4 my-1">
-                            @if (!loading) {
-                                {{ formatCurrency(grossProfit) }}
-                            } @else {
-                                <div class="d-inline-flex align-items-center gap-2">
-                                    <div class="spinner-grow spinner-grow-sm text-info" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                    <small class="text-muted">{{ l('Loading') }}</small>
-                                </div>
-                            }
-                        </h3>
-                        <small class="stat-card__meta text-muted opacity-75">{{ l('BeforeExpenses') }}</small>
-                    </div>
-                </article>
-            </div>
-            <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.3s">
-                <article
-                    class="stat-card stat-card--warning card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-warning transition-all position-relative overflow-hidden"
-                >
-                    <div
-                        class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-warning-subtle fs-5 w-11 h-11"
-                    >
-                        <i class="fad fa-receipt"></i>
-                    </div>
-                    <div class="stat-card__content flex-fill">
-                        <span class="stat-card__label text-muted fw-semibold text-uppercase">
-                            {{ l('TotalExpenses') }}
-                        </span>
-                        <h3 class="stat-card__value text-body fs-4 my-1">
-                            @if (!loading) {
-                                {{ formatCurrency(totalExpenses) }}
-                            } @else {
-                                <div class="d-inline-flex align-items-center gap-2">
-                                    <div class="spinner-grow spinner-grow-sm text-warning" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                    <small class="text-muted">{{ l('Loading') }}</small>
-                                </div>
-                            }
-                        </h3>
-                        <small class="stat-card__meta text-muted opacity-75">{{ l('OperatingCosts') }}</small>
-                    </div>
-                </article>
-            </div>
-            <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.4s">
-                <article
-                    [ngClass]="netProfit >= 0 ? 'stat-card--success text-success' : 'stat-card--danger text-danger'"
-                    class="stat-card card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 transition-all position-relative overflow-hidden"
-                >
-                    <div
-                        [ngClass]="netProfit >= 0 ? 'bg-success-subtle' : 'bg-danger-subtle'"
-                        class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 fs-5 w-11 h-11"
-                    >
-                        <i [class]="netProfit >= 0 ? 'fad fa-balance-scale-right' : 'fad fa-balance-scale-left'"></i>
-                    </div>
-                    <div class="stat-card__content flex-fill">
-                        <span class="stat-card__label text-muted fw-semibold text-uppercase">
-                            {{ netProfit >= 0 ? l('NetProfit') : l('NetLoss') }}
-                        </span>
-                        <h3 class="stat-card__value text-body fs-4 my-1">
-                            @if (!loading) {
-                                {{ formatCurrency(netProfit) }}
-                            } @else {
-                                <div class="d-inline-flex align-items-center gap-2">
-                                    <div class="spinner-grow spinner-grow-sm text-success" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>
-                                    <small class="text-muted">{{ l('Loading') }}</small>
-                                </div>
-                            }
-                        </h3>
-                        <small class="stat-card__meta text-muted opacity-75">{{ l('FinalResult') }}</small>
-                    </div>
-                </article>
-            </div>
+    <!-- Premium Page Intro -->
+    <header class="page-intro card shadow-sm border animate__animated animate__fadeIn p-3 p-lg-4 mb-2">
+      <div class="row g-3 w-100 align-items-center">
+        <div class="col-lg">
+          <div class="page-intro__content">
+            <span class="page-intro__eyebrow text-primary fs-6 fw-bold mb-2">{{ l('FinancialReport') }}</span>
+            <h1 class="page-intro__title text-body fs-5 fw-bold mb-1">{{ l('ProfitAndLoss') }}</h1>
+            <p class="page-intro__subtitle text-muted m-0 fs-6">
+              {{ l('ComprehensiveRevenueExpenseAnalysis') }}
+            </p>
+          </div>
         </div>
 
-        <section class="filter-shell card shadow-sm border mb-3 overflow-visible position-relative">
-            <div class="card-header filter-shell__header">
-                <div class="filter-shell__title">
-                    <span class="filter-shell__badge">
-                        <i class="fad fa-filter me-2"></i>
-                        {{ l('ReportControls') }}
-                    </span>
-                    <h2 class="filter-shell__heading">{{ l('FilterPeriod') }}</h2>
-                </div>
-                <div class="filter-shell__actions">
-                    <button
-                        type="button"
-                        (click)="advancedFiltersAreShown = !advancedFiltersAreShown"
-                        [ngClass]="advancedFiltersAreShown ? 'btn-light-danger' : 'btn-light-primary'"
-                        class="btn btn-sm filter-action"
-                    >
-                        <i
-                            [ngClass]="advancedFiltersAreShown ? 'fa-chevron-up me-2' : 'fa-chevron-down me-2'"
-                            class="fad"
-                        ></i>
-                        {{ advancedFiltersAreShown ? l('HideFilters') : l('ShowFilters') }}
-                    </button>
-                    <button
-                        type="button"
-                        (click)="refresh()"
-                        [disabled]="loading"
-                        [title]="l('Refresh')"
-                        class="btn btn-sm btn-light-info filter-refresh"
-                    >
-                        <i [class.fa-spin]="loading" class="fad fa-sync-alt"></i>
-                    </button>
-                </div>
+        <div class="col-lg-auto">
+          <div class="page-intro__status card shadow-sm border d-flex align-items-center gap-3 px-4 py-3 rounded-3 transition-all" 
+               [ngClass]="netProfit >= 0 ? 'border-success bg-success-subtle text-success' : 'border-danger bg-danger-subtle text-danger'">
+            <i class="fad fs-4" [ngClass]="netProfit >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down'"></i>
+            <div class="page-intro__status-text text-end">
+              <span class="label fw-semibold text-uppercase opacity-75 d-block">{{ netProfit >= 0 ? l('NetProfit') : l('NetLoss') }}</span>
+              <strong class="value fs-4 fw-bold">
+                <ng-container *ngIf="!loading; else loadingStatus">{{ formatCurrency(netProfit) }}</ng-container>
+                <ng-template #loadingStatus>
+                  <div class="d-inline-flex align-items-center gap-2">
+                    <div class="spinner-grow spinner-grow-sm" [ngClass]="netProfit >= 0 ? 'text-success' : 'text-danger'" role="status"><span class="visually-hidden">Loading...</span></div>
+                    <small class="text-muted">{{ l('Loading') }}</small>
+                  </div>
+                </ng-template>
+              </strong>
             </div>
-            @if (advancedFiltersAreShown) {
-                <div class="filter-form animate__animated animate__slideInDown p-3">
-                    <form [formGroup]="myForm" class="row g-3 align-items-end">
-                        <div class="col-xl-4 col-md-6">
-                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">
-                                <i class="fad fa-calendar-star text-info me-2"></i>
-                                {{ l('FromDate') }}
-                            </label>
-                            <div class="input-group">
-                                <ne-datepicker
-                                    #fromDate
-                                    [disableFinancialYear]="true"
-                                    [formControl]="myForm.controls['fromMiti']"
-                                    [npDatePickerId]="'fromMiti'"
-                                    language="en"
-                                    placeholder="Select an item"
-                                    name="fromMiti"
-                                ></ne-datepicker>
-                            </div>
-                        </div>
-                        <div class="col-xl-4 col-md-6">
-                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">
-                                <i class="fad fa-calendar-star text-info me-2"></i>
-                                {{ l('ToDate') }}
-                            </label>
-                            <div class="input-group">
-                                <ne-datepicker
-                                    #toDate
-                                    [disableFinancialYear]="true"
-                                    [formControl]="myForm.controls['toMiti']"
-                                    [npDatePickerId]="'toMiti'"
-                                    language="en"
-                                    placeholder="Select an item"
-                                    name="toMiti"
-                                ></ne-datepicker>
-                            </div>
-                        </div>
-                        <div class="col-xl-2 col-md-6">
-                            <button
-                                type="button"
-                                (click)="getProfitAndLossReport()"
-                                [disabled]="loading"
-                                class="btn btn-primary w-100 shadow-sm"
-                            >
-                                <i class="fad fa-search me-2"></i>
-                                {{ l('ApplyFilters') }}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            }
-        </section>
+          </div>
+        </div>
+      </div>
+    </header>
 
-        <main class="report-surface d-flex flex-column gap-3">
-            <div class="report-toolbar d-flex align-items-center justify-content-between gap-3 position-relative">
-                <div class="search-inline d-flex align-items-center">
-                    <span class="me-3 text-muted d-flex align-items-center"><i class="fad fa-search fs-5"></i></span>
-                    <input
-                        (input)="searchDataTable($event)"
-                        [placeholder]="l('Search') + '...'"
-                        class="form-control flex-grow-1"
-                        type="text"
-                    />
+    <!-- Dynamic Metric Cards -->
+    <div class="row g-3 page-metrics mb-2">
+      <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+        <article class="stat-card stat-card--primary card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-primary transition-all position-relative overflow-hidden">
+          <div class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-primary-subtle fs-5 w-11 h-11">
+            <i class="fad fa-wallet"></i>
+          </div>
+          <div class="stat-card__content flex-fill">
+            <span class="stat-card__label text-muted fw-semibold text-uppercase">{{ l('TotalRevenue') }}</span>
+            <h3 class="stat-card__value text-body fs-4 my-1">
+              <ng-container *ngIf="!loading; else loadingRevenue">{{ formatCurrency(totalRevenue) }}</ng-container>
+              <ng-template #loadingRevenue>
+                <div class="d-inline-flex align-items-center gap-2">
+                  <div class="spinner-grow spinner-grow-sm text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+                  <small class="text-muted">{{ l('Loading') }}</small>
                 </div>
-                <div class="report-toolbar__buttons d-flex gap-2">
-                    <div class="btn-group toolbar-group">
-                        <button
-                            type="button"
-                            (click)="expandAll()"
-                            class="btn btn-sm toolbar-btn toolbar-btn--success"
-                        >
-                            <i class="fad fa-expand-arrows me-2"></i>
-                            {{ l('Expand') }}
-                        </button>
-                        <button
-                            type="button"
-                            (click)="collapseAll()"
-                            class="btn btn-sm toolbar-btn toolbar-btn--danger"
-                        >
-                            <i class="fad fa-compress-arrows me-2"></i>
-                            {{ l('Collapse') }}
-                        </button>
-                    </div>
-                    <button
-                        type="button"
-                        (click)="exportToExcel()"
-                        [disabled]="loading"
-                        class="btn btn-sm toolbar-btn toolbar-btn--export"
-                    >
-                        <i class="fad fa-file-excel me-2 text-success"></i>
-                        {{ l('Export') }}
-                    </button>
-                    <button
-                        type="button"
-                        (click)="exportToPdf()"
-                        [disabled]="loading"
-                        class="btn btn-sm toolbar-btn toolbar-btn--pdf"
-                    >
-                        <i class="fad fa-file-pdf me-2 text-danger"></i>
-                        PDF
-                    </button>
-                </div>
-            </div>
-            <div class="report-grid position-relative card shadow-sm border">
-                @if (loading) {
-                    <div
-                        class="loader-overlay position-absolute inset-0 d-flex align-items-center justify-content-center"
-                    >
-                        <div class="text-center">
-                            <div class="spinner-grow text-primary mb-3" role="status"></div>
-                            <p class="text-muted fw-bold small text-uppercase letter-spacing-1">
-                                {{ l('AnalyzingFinancialData') }}
-                            </p>
-                        </div>
-                    </div>
-                }
-                @if (rowData.length === 0 && !loading) {
-                    <div class="empty-state text-center py-5 px-4">
-                        <i class="fad fa-folder-open empty-state__icon text-muted fs-1 mb-4 opacity-50"></i>
-                        <h3 class="fw-bold">{{ l('NoDataAvailable') }}</h3>
-                        <p class="text-muted">{{ l('NoFinancialRecords') }}</p>
-                    </div>
-                }
-                <ag-grid-angular
-                    #agGrid
-                    (gridReady)="onGridReady($event)"
-                    [animateRows]="true"
-                    [autoGroupColumnDef]="autoGroupColumnDef"
-                    [columnDefs]="columnDefs"
-                    [defaultColDef]="defaultColDef"
-                    [enableCellTextSelection]="true"
-                    [getDataPath]="getDataPath"
-                    [groupDefaultExpanded]="groupDefaultExpanded"
-                    [headerHeight]="54"
-                    [rowData]="rowData"
-                    [rowClassRules]="rowClassRules"
-                    [rowHeight]="58"
-                    [suppressCellFocus]="true"
-                    [treeData]="true"
-                    class="ag-theme-balham profit-loss-grid w-100"
-                    domLayout="autoHeight"
-                    [loading]="gridLoading"
-                ></ag-grid-angular>
-            </div>
+              </ng-template>
+            </h3>
+            <small class="stat-card__meta text-muted opacity-75">{{ l('GrossIncome') }}</small>
+          </div>
+        </article>
+      </div>
 
-        
-        </main>
+      <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+        <article class="stat-card stat-card--info card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-info transition-all position-relative overflow-hidden">
+          <div class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-info-subtle fs-5 w-11 h-11">
+            <i class="fad fa-chart-line"></i>
+          </div>
+          <div class="stat-card__content flex-fill">
+            <span class="stat-card__label text-muted fw-semibold text-uppercase">{{ l('GrossProfit') }}</span>
+            <h3 class="stat-card__value text-body fs-4 my-1">
+              <ng-container *ngIf="!loading; else loadingGross">{{ formatCurrency(grossProfit) }}</ng-container>
+              <ng-template #loadingGross>
+                <div class="d-inline-flex align-items-center gap-2">
+                  <div class="spinner-grow spinner-grow-sm text-info" role="status"><span class="visually-hidden">Loading...</span></div>
+                  <small class="text-muted">{{ l('Loading') }}</small>
+                </div>
+              </ng-template>
+            </h3>
+            <small class="stat-card__meta text-muted opacity-75">{{ l('BeforeExpenses') }}</small>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+        <article class="stat-card stat-card--warning card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-warning transition-all position-relative overflow-hidden">
+          <div class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-warning-subtle fs-5 w-11 h-11">
+            <i class="fad fa-receipt"></i>
+          </div>
+          <div class="stat-card__content flex-fill">
+            <span class="stat-card__label text-muted fw-semibold text-uppercase">{{ l('TotalExpenses') }}</span>
+            <h3 class="stat-card__value text-body fs-4 my-1">
+              <ng-container *ngIf="!loading; else loadingExpenses">{{ formatCurrency(totalExpenses) }}</ng-container>
+              <ng-template #loadingExpenses>
+                <div class="d-inline-flex align-items-center gap-2">
+                  <div class="spinner-grow spinner-grow-sm text-warning" role="status"><span class="visually-hidden">Loading...</span></div>
+                  <small class="text-muted">{{ l('Loading') }}</small>
+                </div>
+              </ng-template>
+            </h3>
+            <small class="stat-card__meta text-muted opacity-75">{{ l('OperatingCosts') }}</small>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
+        <article class="stat-card card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 transition-all position-relative overflow-hidden"
+                 [ngClass]="netProfit >= 0 ? 'stat-card--success text-success' : 'stat-card--danger text-danger'">
+          <div class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 fs-5 w-11 h-11"
+               [ngClass]="netProfit >= 0 ? 'bg-success-subtle' : 'bg-danger-subtle'">
+            <i [class]="netProfit >= 0 ? 'fad fa-balance-scale-right' : 'fad fa-balance-scale-left'"></i>
+          </div>
+          <div class="stat-card__content flex-fill">
+            <span class="stat-card__label text-muted fw-semibold text-uppercase">{{ netProfit >= 0 ? l('NetProfit') : l('NetLoss') }}</span>
+            <h3 class="stat-card__value text-body fs-4 my-1">
+              <ng-container *ngIf="!loading; else loadingNet">{{ formatCurrency(netProfit) }}</ng-container>
+              <ng-template #loadingNet>
+                <div class="d-inline-flex align-items-center gap-2">
+                  <div class="spinner-grow spinner-grow-sm text-success" role="status"><span class="visually-hidden">Loading...</span></div>
+                  <small class="text-muted">{{ l('Loading') }}</small>
+                </div>
+              </ng-template>
+            </h3>
+            <small class="stat-card__meta text-muted opacity-75">{{ l('FinalResult') }}</small>
+          </div>
+        </article>
+      </div>
     </div>
+
+    <!-- Enhanced Filter Section -->
+    <section class="filter-shell card shadow-sm border mb-3 overflow-visible position-relative">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-3">
+          <span class="badge-light-primary bg-primary-subtle text-primary fs-6 me-2 p-2 pe-3 rounded fw-semibold">
+            <i class="fad fa-filter me-2"></i>
+            {{ l('ReportControls') }}
+          </span>
+          <h2 class="card-label mb-0 text-body fs-6 fw-bold">{{ l('FilterPeriod') }}</h2>
+        </div>
+        <div class="d-flex gap-2">
+          <button (click)="advancedFiltersAreShown = !advancedFiltersAreShown" class="btn btn-sm"
+            [ngClass]="advancedFiltersAreShown ? 'btn-light-danger' : 'btn-light-primary'">
+            <i class="fad" [ngClass]="advancedFiltersAreShown ? 'fa-chevron-up me-2' : 'fa-chevron-down me-2'"></i>
+            {{ (advancedFiltersAreShown ? l('HideFilters') : l('ShowFilters')) }}
+          </button>
+          <button (click)="refresh()" [disabled]="loading" class="btn btn-sm btn-light-info">
+            <i class="fad fa-sync-alt" [class.fa-spin]="loading"></i>
+          </button>
+        </div>
+      </div>
+
+      @if (advancedFiltersAreShown) {
+      <div class="filter-form animate__animated animate__slideInDown p-3">
+        <form [formGroup]="myForm" class="row g-3 align-items-end">
+          
+          <div class="col-xl-4 col-md-6">
+            <label class="form-label fw-bold text-muted small text-uppercase mb-2">
+              <i class="fad fa-calendar-star text-info me-2"></i>{{ l('FromDate') }}
+              
+            </label>
+            <div class="input-group">
+             
+              <ne-datepicker #fromDate
+                          [disableFinancialYear]="true"
+                          [formControl]="myForm.controls['fromMiti']"
+                          [npDatePickerId]="'fromMiti'"
+                          language="en"
+                          placeholder="Select an item"
+                        ></ne-datepicker>
+              
+            </div>
+          </div>
+
+          <div class="col-xl-4 col-md-6">
+            <label class="form-label fw-bold text-muted small text-uppercase mb-2">
+              <i class="fad fa-calendar-star text-info me-2"></i>{{ l('ToDate') }}
+            </label>
+            <div class="input-group">
+             
+              <ne-datepicker #toDate
+                          [disableFinancialYear]="true"
+                          [formControl]="myForm.controls['toMiti']"
+                          [npDatePickerId]="'toMiti'"
+                          language="en"
+                          placeholder="Select an item"
+                        ></ne-datepicker>
+              
+              
+            </div>
+          </div>
+
+          
+          <div class="col-xl-2 col-md-6">
+            <button (click)="getProfitAndLossReport()" [disabled]="loading" class="btn btn-primary w-100 shadow-sm">
+              <i class="fad fa-search me-2"></i>{{ l('ApplyFilters') }}
+            </button>
+          </div>
+        </form>
+      </div>
+      }
+    </section>
+
+    <!-- Main Report Surface -->
+    <main class="report-surface d-flex flex-column gap-3">
+      <div class="report-toolbar card shadow-sm border d-flex align-items-center justify-content-between gap-3 p-2 p-md-3 bg-body position-relative">
+        <div class="search-inline flex-grow-1 me-3 d-flex align-items-center" style="flex: 0 0 60%; max-width: 60%; min-width: 280px;">
+          <span class="me-3 text-muted d-flex align-items-center"><i class="fad fa-search fs-5"></i></span>
+          <input (input)="searchDataTable($event)" class="form-control flex-grow-1 border bg-body rounded-pill"
+            [placeholder]="l('Search') + '...'" type="text" />
+        </div>
+
+        <div class="report-toolbar__buttons d-flex gap-2">
+          <div class="btn-group shadow-sm">
+            <button (click)="expandAll()" class="btn btn-sm btn-white text-success border">
+              <i class="fad fa-expand-arrows me-2"></i>{{ l('Expand') }}
+            </button>
+            <button (click)="collapseAll()" class="btn btn-sm btn-white text-danger border">
+              <i class="fad fa-compress-arrows me-2"></i>{{ l('Collapse') }}
+            </button>
+          </div>
+
+          <button (click)="exportToExcel()" class="btn btn-sm btn-white border shadow-sm">
+            <i class="fad fa-file-excel me-2 text-success"></i>{{ l('Export') }}
+          </button>
+        </div>
+      </div>
+
+      <div class="report-grid position-relative card shadow-sm border">
+        <div *ngIf="loading" class="loader-overlay position-absolute inset-0 d-flex align-items-center justify-content-center" style="z-index: 10; background: rgba(255,255,255,0.9);">
+          <div class="text-center">
+            <div class="spinner-grow text-primary mb-3" role="status"></div>
+            <p class="text-muted fw-bold small text-uppercase letter-spacing-1">{{ l('AnalyzingFinancialData') }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="rowData.length === 0 && !loading" class="empty-state text-center py-5 px-4">
+          <i class="fad fa-folder-open empty-state__icon text-muted fs-1 mb-4 opacity-50"></i>
+          <h3 class="fw-bold">{{ l('NoDataAvailable') }}</h3>
+          <p class="text-muted">{{ l('NoFinancialRecords') }}</p>
+        </div>
+
+        <ag-grid-angular #agGrid domLayout="autoHeight" (gridReady)="onGridReady($event)"
+          [rowData]="rowData" [columnDefs]="columnDefs" [defaultColDef]="defaultColDef" 
+          [treeData]="true" [getDataPath]="getDataPath" [autoGroupColumnDef]="autoGroupColumnDef"
+          [groupDefaultExpanded]="groupDefaultExpanded" [animateRows]="true" [enableCellTextSelection]="true"
+          class="ag-theme-balham w-100">
+        </ag-grid-angular>
+      </div>
+
+      <!-- Compact & Elegant Footer -->
+      <footer class="report-summary card shadow-sm border animate__animated animate__fadeInUp d-flex align-items-center justify-content-between gap-3 p-3 bg-body">
+        <div class="report-summary__info d-flex align-items-center gap-4">
+          <div class="d-flex flex-column">
+            <span class="text-muted small text-uppercase fw-bold">{{ l('TotalCategories') }}</span>
+            <span class="fs-5 fw-bold text-primary">{{ rowData?.length || 0 }}</span>
+          </div>
+        </div>
+
+        <div class="report-summary__totals d-flex gap-3 ms-auto">
+          <div class="total-chip total-chip--revenue shadow-sm d-flex align-items-center rounded-3 bg-success-subtle text-success border-success fw-bold gap-3 border border-transparent p-2 px-4 py-2">
+            <i class="fad fa-arrow-alt-up"></i>
+            <div class="d-flex flex-column">
+              <span class="small opacity-75 fw-bold" style="font-size: 0.65rem;">{{ l('REVENUE') }}</span>
+              <span class="fs-6">
+                <ng-container *ngIf="!loading; else loadingFooterRevenue">{{ formatCurrency(totalRevenue) }}</ng-container>
+                <ng-template #loadingFooterRevenue>
+                  <div class="d-inline-flex align-items-center gap-2">
+                    <div class="spinner-grow spinner-grow-sm text-success" role="status"><span class="visually-hidden">Loading...</span></div>
+                    <small class="text-muted">{{ l('Loading') }}</small>
+                  </div>
+                </ng-template>
+              </span>
+            </div>
+          </div>
+
+          <div class="total-chip total-chip--expenses shadow-sm d-flex align-items-center rounded-3 bg-danger-subtle text-danger border-danger fw-bold gap-3 border border-transparent p-2 px-4 py-2">
+            <i class="fad fa-arrow-alt-down"></i>
+            <div class="d-flex flex-column">
+              <span class="small opacity-75 fw-bold" style="font-size: 0.65rem;">{{ l('EXPENSES') }}</span>
+              <span class="fs-6">
+                <ng-container *ngIf="!loading; else loadingFooterExpenses">{{ formatCurrency(totalExpenses) }}</ng-container>
+                <ng-template #loadingFooterExpenses>
+                  <div class="d-inline-flex align-items-center gap-2">
+                    <div class="spinner-grow spinner-grow-sm text-danger" role="status"><span class="visually-hidden">Loading...</span></div>
+                    <small class="text-muted">{{ l('Loading') }}</small>
+                  </div>
+                </ng-template>
+              </span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+  </div>
 </div>
+

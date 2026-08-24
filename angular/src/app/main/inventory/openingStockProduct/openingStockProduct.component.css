@@ -1,179 +1,36 @@
-@media only screen and (max-width: 760px),
-(min-device-width: 768px) and (max-device-width: 1024px) {
-
-    table,
-    thead,
-    tbody,
-    th,
-    td,
-    tr {
-        display: block;
-    }
-
-    thead tr {
-        position: absolute;
-        top: -9999px;
-        left: -9999px;
-    }
-
-    tr {
-        margin: 0 0 1rem 0;
-    }
-
-    tr:nth-child(odd) {
-        background: #e8f3ff;
-    }
-
-    td div {
-        width: 351px !important;
-    }
-
-    .text-left {
-        text-align: left !important;
-    }
-
-    td {
-        border: none;
-        border-bottom: 1px solid #eee;
-        position: relative;
-        padding-left: 50%;
-        display: grid;
-        justify-content: end;
-    }
-
-    td:before {
-        position: absolute;
-        top: 0;
-        left: 2px;
-        width: 45%;
-        padding-right: 10px;
-        white-space: nowrap;
-    }
-
-    .fd-input:last-child {
-        margin-right: -22px;
-    }
-
-    td:nth-of-type(1):before {
-        content: "S.N.";
-    }
-
-    td:nth-of-type(2):before {
-        content: "PRODUCT";
-    }
-
-    td:nth-of-type(3):before {
-        content: "PRODUCT GROUP";
-    }
-
-    td:nth-of-type(4):before {
-        content: "UNIT";
-    }
-
-    td:nth-of-type(5):before {
-        content: "RATE";
-    }
-
-    td:nth-of-type(6):before {
-        content: "GodOwn";
-    }
-
-    td:nth-of-type(7):before {
-        content: "RACK";
-    }
-
-    td:nth-of-type(8):before {
-        content: "OPENING QTY";
-    }
-
-    td:nth-of-type(9):before {
-        content: "EDIT";
-    }
-
-    td:nth-of-type(10):before {
-        content: "REMOVE";
-    }
+.responsive-entry-table {
+    --responsive-entry-cell-width: 351px;
+    --responsive-entry-cell-width-sm: 351px;
+    --responsive-entry-cell-width-xs: 160px;
+    --responsive-entry-cell-margin-top-sm: 0;
 }
 
 @media (min-width: 435px) and (max-width: 575px) {
-    td div {
-        width: 205px !important;
-
-    }
+    .responsive-entry-table { --responsive-entry-cell-width-sm: 205px; }
 }
 
 @media (max-width: 435px) {
-    td div {
-        width: 160px !important;
-
-    }
+    .responsive-entry-table { --responsive-entry-cell-width-sm: 160px; }
 }
 
 @media (max-width: 315px) {
-
-    td div {
-        width: 170px !important;
-        margin-top: 17px !important;
+    .responsive-entry-table {
+        --responsive-entry-cell-width-sm: 170px;
+        --responsive-entry-cell-width-xs: 170px;
+        --responsive-entry-cell-margin-top-sm: 17px;
     }
 }
 
-
-@-webkit-keyframes underBlink {
-    0% {
-        border: 1px solid rgba(0, 0, 0, .2) !important;
-    }
-    100% {
-        border: 2px solid rgba(255, 5, 5, 0.5) !important;
-    }
-}
-
-@-moz-keyframes underBlink {
-    0% {
-        border: 1px solid rgba(0, 0, 0, .2) !important;
-    }
-    100% {
-        border: 2px solid rgba(255, 5, 5, 0.5) !important;
-    }
-}
-
-@-o-keyframes underBlink {
-    0% {
-        border: 1px solid rgba(0, 0, 0, .2);
-    }
-    100% {
-        border: 2px solid rgba(255, 5, 5, 0.5);
-    }
-}
-
-@keyframes underBlink {
-    0% {
-        border: 1px solid rgba(0, 0, 0, .2) !important;
-    }
-    100% {
-        border: 2px solid rgba(255, 5, 5, 0.5) !important;
-    }
-}
-
-@-webkit-keyframes blinker {
-    from {
-        opacity: 1.0;
-    }
-    to {
-        opacity: 0.0;
-    }
-}
-
-.blink {
-    text-decoration: blink;
-    border: 1px solid red !important;
-    color: red !important;
-    -webkit-animation-name: blinker;
-    -webkit-animation-duration: 0.6s;
-    -webkit-animation-iteration-count: infinite;
-    -webkit-animation-timing-function: ease-in-out;
-    -webkit-animation-direction: alternate;
-}
-
-.table-heading {
-    background-color: #afd8fb;
+@media only screen and (max-width: 760px),
+    (min-device-width: 768px) and (max-device-width: 1024px) {
+    td:nth-of-type(1)::before { content: 'S.N.'; }
+    td:nth-of-type(2)::before { content: 'PRODUCT'; }
+    td:nth-of-type(3)::before { content: 'PRODUCT GROUP'; }
+    td:nth-of-type(4)::before { content: 'UNIT'; }
+    td:nth-of-type(5)::before { content: 'RATE'; }
+    td:nth-of-type(6)::before { content: 'GodOwn'; }
+    td:nth-of-type(7)::before { content: 'RACK'; }
+    td:nth-of-type(8)::before { content: 'OPENING QTY'; }
+    td:nth-of-type(9)::before { content: 'EDIT'; }
+    td:nth-of-type(10)::before { content: 'REMOVE'; }
 }

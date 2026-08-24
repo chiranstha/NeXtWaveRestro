@@ -17,7 +17,6 @@ import { ColDef } from 'ag-grid-community';
     animations: [appModuleAnimation],
     selector: 'app-purchase-return-report',
     templateUrl: './purchaseReturnReport.component.html',
-    styleUrls: ['./purchaseReturnReport.component.css'],
 })
 export class PurchaseReturnReportComponent extends AppComponentBase implements OnInit, OnDestroy {
     public destroy$ = new Subject<void>();

@@ -339,7 +339,7 @@ export class LoginService {
             // Password reset
             this._router.navigate(['account/reset-password'], {
                 queryParams: {
-                    c: authenticateResult.c,
+                    c: authenticateResult.c || authenticateResult.passwordResetCode,
                 },
             });
             this.clear();

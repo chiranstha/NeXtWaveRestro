@@ -69,6 +69,7 @@
                 "src/app/shared/core.less",
                 "src/app/shared/layout/layout.less",
                 "src/styles-complete-optimized.css",
+                "src/styles-override.css",
                 "node_modules/sweetalert2/dist/sweetalert2.css",
                 "node_modules/famfamfam-flags/dist/sprite/famfamfam-flags.css",
                 "node_modules/quill/dist/quill.core.css",
@@ -211,7 +212,8 @@
               "node_modules/ag-grid-community/styles/ag-theme-balham.css",
               "src/app/shared/core.less",
               "src/app/shared/layout/layout.less",
-              "src/styles-complete-optimized.css"
+              "src/styles-complete-optimized.css",
+              "src/styles-override.css"
                        ],
             "scripts": [
               "node_modules/@microsoft/signalr/dist/browser/signalr.min.js",

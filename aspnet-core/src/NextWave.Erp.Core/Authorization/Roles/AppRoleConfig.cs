@@ -39,6 +39,36 @@ public static class AppRoleConfig
 
         roleManagementConfig.StaticRoles.Add(
             new StaticRoleDefinition(
+                StaticRoleNames.Tenants.RestaurantSalesManager,
+                MultiTenancySides.Tenant)
+            );
+
+        roleManagementConfig.StaticRoles.Add(
+            new StaticRoleDefinition(
+                StaticRoleNames.Tenants.RestaurantOperationsManager,
+                MultiTenancySides.Tenant)
+            );
+
+        roleManagementConfig.StaticRoles.Add(
+            new StaticRoleDefinition(
+                StaticRoleNames.Tenants.RestaurantInventoryManager,
+                MultiTenancySides.Tenant)
+            );
+
+        roleManagementConfig.StaticRoles.Add(
+            new StaticRoleDefinition(
+                StaticRoleNames.Tenants.RestaurantFinanceManager,
+                MultiTenancySides.Tenant)
+            );
+
+        roleManagementConfig.StaticRoles.Add(
+            new StaticRoleDefinition(
+                StaticRoleNames.Tenants.RestaurantPayrollManager,
+                MultiTenancySides.Tenant)
+            );
+
+        roleManagementConfig.StaticRoles.Add(
+            new StaticRoleDefinition(
                 StaticRoleNames.Tenants.RestaurantCashier,
                 MultiTenancySides.Tenant)
             );
@@ -58,6 +88,12 @@ public static class AppRoleConfig
         roleManagementConfig.StaticRoles.Add(
             new StaticRoleDefinition(
                 StaticRoleNames.Tenants.RestaurantInventory,
+                MultiTenancySides.Tenant)
+            );
+
+        roleManagementConfig.StaticRoles.Add(
+            new StaticRoleDefinition(
+                StaticRoleNames.Tenants.RestaurantPayroll,
                 MultiTenancySides.Tenant)
             );
     }

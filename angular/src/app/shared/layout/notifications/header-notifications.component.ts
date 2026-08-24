@@ -25,6 +25,7 @@ import { RouterModule } from '@angular/router';
     encapsulation: ViewEncapsulation.None,
     changeDetection: ChangeDetectionStrategy.Eager,
     imports: [CommonModule, UtilsModule, BsDropdownModule, RouterModule],
+    host: { class: 'd-flex align-items-center flex-shrink-0' },
 })
 export class HeaderNotificationsComponent extends AppComponentBase implements OnInit {
     private _notificationService = inject(NotificationServiceProxy);
@@ -32,7 +33,7 @@ export class HeaderNotificationsComponent extends AppComponentBase implements On
     private _cd = inject(ChangeDetectorRef);
     _zone = inject(NgZone);
     @Input() customStyle =
-        'btn btn-active-color-primary btn-active-light btn-custom btn-icon btn-icon-muted h-20px w-20px position-relative';
+        'btn btn-active-color-primary btn-active-light btn-custom btn-icon btn-icon-muted w-35px h-35px w-md-40px h-md-40px position-relative';
     @Input() iconStyle = 'fa-duotone fa-regular fa-bell-ring unread-notification fs-6';
     @Input() isRight = true;
     notifications: IFormattedUserNotification[] = [];

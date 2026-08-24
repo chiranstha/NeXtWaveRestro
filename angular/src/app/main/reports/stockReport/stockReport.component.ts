@@ -17,7 +17,6 @@ import { appModuleAnimation } from '@shared/animations/routerTransition';
     standalone: false,
     selector: 'appstockreport',
     templateUrl: './stockReport.component.html',
-    styleUrls: ['./stockReport.component.css'],
     animations: [appModuleAnimation],
     changeDetection: ChangeDetectionStrategy.OnPush
 })

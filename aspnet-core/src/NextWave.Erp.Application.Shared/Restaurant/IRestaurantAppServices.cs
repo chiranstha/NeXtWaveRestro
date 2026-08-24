@@ -148,5 +148,6 @@ namespace NextWave.Erp.Restaurant
         Task<List<RestaurantFoodCostingReportDto>> GetFoodCosting(RestaurantReportFilterDto input);
         Task<List<RestaurantWastageReportDto>> GetWastageReport(RestaurantReportFilterDto input);
         Task<List<RestaurantLowStockSuggestionDto>> GetLowStockReport(RestaurantReportFilterDto input);
+        Task<RestaurantPayrollReportBundleDto> GetPayrollReport(RestaurantReportFilterDto input);
     }
 }

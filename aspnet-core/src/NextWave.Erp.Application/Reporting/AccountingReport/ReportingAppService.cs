@@ -244,17 +244,6 @@ namespace NextWave.Erp.Reporting.AccountingReport
 
         }
 
-        public async Task<List<UniversalDropdownDto>> GetAllFinancialYearDropDown()
-        {
-            return (await financialYeaRepository.GetAll().Where(x => x.TenantId == AbpSession.TenantId).AsNoTracking()
-                .ToListAsync()).Select(x =>
-                new UniversalDropdownDto
-                {
-                    Id = x.Id,
-                    DisplayName = x.Name
-                }).ToList();
-        }
-
         public async Task<List<UniversalDropdownDto>> GetAllCashOrBankForTableDropdown()
         {
             return await accountLedgerRepository.GetAll().Where(x => x.TenantId == AbpSession.TenantId && !x.IsDelete).AsNoTracking()

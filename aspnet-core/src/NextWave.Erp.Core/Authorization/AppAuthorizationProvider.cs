@@ -326,7 +326,17 @@ public class AppAuthorizationProvider : AuthorizationProvider
             multiTenancySides: MultiTenancySides.Tenant);
         restaurant.CreateChildPermission(AppPermissions.PagesRestaurantSync, L("RestaurantMobileSync"),
             multiTenancySides: MultiTenancySides.Tenant);
-        restaurant.CreateChildPermission(AppPermissions.PagesRestaurantReports, L("RestaurantReports"),
+        var restaurantReports = restaurant.CreateChildPermission(AppPermissions.PagesRestaurantReports, L("RestaurantReports"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        restaurantReports.CreateChildPermission(AppPermissions.PagesRestaurantReportsSales, L("RestaurantReportsSales"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        restaurantReports.CreateChildPermission(AppPermissions.PagesRestaurantReportsOperations, L("RestaurantReportsOperations"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        restaurantReports.CreateChildPermission(AppPermissions.PagesRestaurantReportsInventory, L("RestaurantReportsInventory"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        restaurantReports.CreateChildPermission(AppPermissions.PagesRestaurantReportsPayroll, L("RestaurantReportsPayroll"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        restaurantReports.CreateChildPermission(AppPermissions.PagesRestaurantReportsAuditFinance, L("RestaurantReportsAuditFinance"),
             multiTenancySides: MultiTenancySides.Tenant);
         var restaurantInventory = restaurant.CreateChildPermission(AppPermissions.PagesRestaurantInventory, L("RestaurantInventory"),
             multiTenancySides: MultiTenancySides.Tenant);
@@ -348,6 +358,25 @@ public class AppAuthorizationProvider : AuthorizationProvider
         restaurantChannels.CreateChildPermission(AppPermissions.PagesRestaurantPayouts, L("RestaurantPayouts"),
             multiTenancySides: MultiTenancySides.Tenant);
         restaurant.CreateChildPermission(AppPermissions.PagesRestaurantCustomerOrdering, L("RestaurantCustomerOrdering"),
+            multiTenancySides: MultiTenancySides.Tenant);
+
+        var restaurantPayroll = restaurant.CreateChildPermission(AppPermissions.PagesRestaurantPayroll, L("RestaurantPayroll"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        var restaurantPayrollStaff = restaurantPayroll.CreateChildPermission(AppPermissions.PagesRestaurantPayrollStaff, L("RestaurantPayrollStaff"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        restaurantPayrollStaff.CreateChildPermission(AppPermissions.PagesRestaurantPayrollStaffAccess, L("RestaurantPayrollStaffAccess"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        var restaurantPayrollAttendance = restaurantPayroll.CreateChildPermission(AppPermissions.PagesRestaurantPayrollAttendance, L("RestaurantPayrollAttendance"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        restaurantPayrollAttendance.CreateChildPermission(AppPermissions.PagesRestaurantPayrollAttendanceManage, L("RestaurantPayrollAttendanceManage"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        restaurantPayroll.CreateChildPermission(AppPermissions.PagesRestaurantPayrollProcess, L("RestaurantPayrollProcess"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        restaurantPayroll.CreateChildPermission(AppPermissions.PagesRestaurantPayrollApprove, L("RestaurantPayrollApprove"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        restaurantPayroll.CreateChildPermission(AppPermissions.PagesRestaurantPayrollReports, L("RestaurantPayrollReports"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        restaurantPayroll.CreateChildPermission(AppPermissions.PagesRestaurantPayrollOwnPayslip, L("RestaurantPayrollOwnPayslip"),
             multiTenancySides: MultiTenancySides.Tenant);
 
 

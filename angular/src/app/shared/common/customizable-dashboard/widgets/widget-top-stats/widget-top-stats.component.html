@@ -1,30 +1,37 @@
 @if (statCards.length) {
-    <div class="stat-grid">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-5 g-3">
         @for (card of statCards; track trackByLabel($index, card)) {
-            <article
-                [ngClass]="'stat-card--' + card.variant"
-                aria-label="{{ card.label }}"
-                class="stat-card"
-                role="group"
-            >
+            <div class="col">
+                <article
+                    aria-label="{{ card.label }}"
+                    class="stat-card position-relative d-flex flex-column justify-content-between h-100 min-h-150px overflow-hidden bg-body border border-gray-200 p-5 rounded-4 shadow-sm"
+                    role="group"
+                >
                 <!-- Decoration / Glow -->
                 <div class="stat-card__glow"></div>
-                <div class="stat-card__top">
-                    <div aria-hidden="true" class="stat-card__icon">
-                        <i [ngClass]="card.icon" class="fa-duotone">
+                <div class="stat-card__top d-flex align-items-center justify-content-between position-relative mb-3 z-2">
+                    <div
+                        [ngClass]="'bg-light-' + card.variant + ' text-' + card.variant"
+                        aria-hidden="true"
+                        class="stat-card__icon d-flex align-items-center justify-content-center h-40px rounded-3 w-40px"
+                    >
+                        <i [ngClass]="card.icon" class="fa-duotone fs-5">
                             @for (path of card.paths; track path) {
                                 <span [ngClass]="path"></span>
                             }
                         </i>
                     </div>
-                    <span class="stat-card__chip">{{ card.chip }}</span>
+                    <span
+                        [ngClass]="'bg-light-' + card.variant + ' text-' + card.variant"
+                        class="fs-9 fw-semibold px-2 py-1 text-uppercase rounded-pill"
+                    >{{ card.chip }}</span>
                 </div>
-                <div class="stat-card__main">
-                    <div class="stat-card__value">{{ card.value || '—' }}</div>
+                <div class="stat-card__main position-relative d-flex align-items-baseline gap-2 z-2">
+                    <div class="fs-2 fw-bold lh-1 mb-0 text-gray-800">{{ card.value || '—' }}</div>
                     @if (card.trend) {
                         <div
-                            [ngClass]="card.trend > 0 ? 'positive' : card.trend < 0 ? 'negative' : 'neutral'"
-                            class="stat-card__trend"
+                            [ngClass]="card.trend > 0 ? 'badge-light-success text-success' : card.trend < 0 ? 'badge-light-danger text-danger' : 'badge-light-secondary text-gray-600'"
+                            class="badge d-inline-flex align-items-center fw-semibold gap-1 px-2 py-1 rounded-1"
                         >
                             @if (card.trend > 0) {
                                 <i class="fa-solid fa-arrow-trend-up"></i>
@@ -39,33 +46,36 @@
                         </div>
                     }
                 </div>
-                <div class="stat-card__label">{{ card.label }}</div>
+                <div class="fw-medium mt-1 position-relative small text-gray-600 z-2">{{ card.label }}</div>
                 @if (card.progress != null) {
-                    <div aria-hidden="true" class="stat-card__progress">
-                        <div [style.width]="card.progress + '%'" class="stat-card__progress-bar"></div>
+                    <div aria-hidden="true" class="progress h-5px overflow-hidden bg-light rounded-pill mt-3">
+                        <div [style.width]="card.progress + '%'" [ngClass]="'bg-' + card.variant" class="progress-bar rounded-pill"></div>
                     </div>
                 }
-            </article>
+                </article>
+            </div>
         }
     </div>
 } @else {
-    <div class="stat-grid stat-grid--skeleton">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-5 g-3 opacity-75">
         @for (_ of skeletonSlots; track _; let i = $index) {
-            <article aria-hidden="true" class="stat-card stat-card--skeleton">
-                <div class="stat-card__top">
-                    <div class="stat-card__icon shimmer"></div>
-                    <span class="stat-card__chip shimmer"></span>
+            <div class="col">
+            <article aria-hidden="true" class="stat-card stat-card--skeleton position-relative d-flex flex-column justify-content-between h-100 min-h-150px overflow-hidden bg-light border border-dashed border-gray-400 p-5 rounded-4 shadow-none">
+                <div class="stat-card__top d-flex align-items-center justify-content-between position-relative mb-3 z-2">
+                    <div class="stat-card__icon shimmer d-flex align-items-center justify-content-center position-relative overflow-hidden rounded-1"></div>
+                    <span class="stat-card__chip shimmer fw-semibold text-uppercase position-relative overflow-hidden rounded-1"></span>
                 </div>
-                <div class="stat-card__main">
-                    <div class="stat-card__value shimmer"></div>
-                    <div class="stat-card__trend shimmer"></div>
+                <div class="stat-card__main position-relative d-flex align-items-baseline gap-2 z-2">
+                    <div class="stat-card__value shimmer fw-bold lh-1 mb-0 position-relative overflow-hidden rounded-1"></div>
+                    <div class="stat-card__trend shimmer d-inline-flex align-items-center fw-semibold position-relative overflow-hidden rounded-1"></div>
                 </div>
-                <div class="stat-card__label shimmer"></div>
-                <div class="stat-card__progress">
-                    <div class="stat-card__progress-bar shimmer" style="width: 60%"></div>
+                <div class="stat-card__label shimmer fw-medium mt-1 position-relative small z-2 overflow-hidden rounded-1"></div>
+                <div class="stat-card__progress overflow-hidden bg-light rounded-pill mt-3">
+                    <div class="stat-card__progress-bar shimmer h-100 position-relative overflow-hidden rounded-pill" style="width: 60%"></div>
                 </div>
                 <div class="stat-card__description shimmer"></div>
             </article>
+            </div>
         }
     </div>
 }

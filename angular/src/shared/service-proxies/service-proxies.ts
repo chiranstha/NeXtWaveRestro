@@ -32183,64 +32183,6 @@ export class ReportingServiceProxy {
     /**
      * @return OK
      */
-    getAllFinancialYearDropDown(): Observable<UniversalDropdownDto[]> {
-        let url_ = this.baseUrl + "/api/services/app/Reporting/GetAllFinancialYearDropDown";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAllFinancialYearDropDown(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAllFinancialYearDropDown(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<UniversalDropdownDto[]>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<UniversalDropdownDto[]>;
-        }));
-    }
-
-    protected processGetAllFinancialYearDropDown(response: HttpResponseBase): Observable<UniversalDropdownDto[]> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(UniversalDropdownDto.fromJS(item));
-            }
-            else {
-                result200 = null as any;
-            }
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @return OK
-     */
     getAllCashOrBankForTableDropdown(): Observable<UniversalDropdownDto[]> {
         let url_ = this.baseUrl + "/api/services/app/Reporting/GetAllCashOrBankForTableDropdown";
         url_ = url_.replace(/[?&]$/, "");
@@ -63681,6 +63623,7 @@ export interface IFinancialStatementDto {
 export class FinancialYearSelectDto implements IFinancialYearSelectDto {
     financialYearId!: string;
     financialYear!: string | undefined;
+    active!: boolean;
 
     constructor(data?: IFinancialYearSelectDto) {
         if (data) {
@@ -63695,6 +63638,7 @@ export class FinancialYearSelectDto implements IFinancialYearSelectDto {
         if (_data) {
             this.financialYearId = _data["financialYearId"];
             this.financialYear = _data["financialYear"];
+            this.active = _data["active"];
         }
     }
 
@@ -63709,6 +63653,7 @@ export class FinancialYearSelectDto implements IFinancialYearSelectDto {
         data = typeof data === 'object' ? data : {};
         data["financialYearId"] = this.financialYearId;
         data["financialYear"] = this.financialYear;
+        data["active"] = this.active;
         return data;
     }
 }
@@ -63716,6 +63661,7 @@ export class FinancialYearSelectDto implements IFinancialYearSelectDto {
 export interface IFinancialYearSelectDto {
     financialYearId: string;
     financialYear: string | undefined;
+    active: boolean;
 }
 
 export class FindOrganizationUnitRolesInput implements IFindOrganizationUnitRolesInput {
@@ -83534,6 +83480,7 @@ export class RestaurantConsumptionLedgerDto implements IRestaurantConsumptionLed
     orderNo!: string | undefined;
     orderItemId!: string;
     salesMasterId!: string;
+    salesVoucherNo!: string | undefined;
     salesDetailId!: string | undefined;
     voucherNo!: string | undefined;
     menuProductId!: string;
@@ -83564,6 +83511,7 @@ export class RestaurantConsumptionLedgerDto implements IRestaurantConsumptionLed
             this.orderNo = _data["orderNo"];
             this.orderItemId = _data["orderItemId"];
             this.salesMasterId = _data["salesMasterId"];
+            this.salesVoucherNo = _data["salesVoucherNo"];
             this.salesDetailId = _data["salesDetailId"];
             this.voucherNo = _data["voucherNo"];
             this.menuProductId = _data["menuProductId"];
@@ -83594,6 +83542,7 @@ export class RestaurantConsumptionLedgerDto implements IRestaurantConsumptionLed
         data["orderNo"] = this.orderNo;
         data["orderItemId"] = this.orderItemId;
         data["salesMasterId"] = this.salesMasterId;
+        data["salesVoucherNo"] = this.salesVoucherNo;
         data["salesDetailId"] = this.salesDetailId;
         data["voucherNo"] = this.voucherNo;
         data["menuProductId"] = this.menuProductId;
@@ -83617,6 +83566,7 @@ export interface IRestaurantConsumptionLedgerDto {
     orderNo: string | undefined;
     orderItemId: string;
     salesMasterId: string;
+    salesVoucherNo: string | undefined;
     salesDetailId: string | undefined;
     voucherNo: string | undefined;
     menuProductId: string;
@@ -91683,6 +91633,7 @@ export class TenantUserManagementSettingsEditDto implements ITenantUserManagemen
     isRestrictedEmailDomainEnabledForApplication!: boolean;
     isQrLoginEnabled!: boolean;
     isQrLoginEnabledForApplication!: boolean;
+    defaultEmployeePassword!: string | undefined;
 
     constructor(data?: ITenantUserManagementSettingsEditDto) {
         if (data) {
@@ -91709,6 +91660,7 @@ export class TenantUserManagementSettingsEditDto implements ITenantUserManagemen
             this.isRestrictedEmailDomainEnabledForApplication = _data["isRestrictedEmailDomainEnabledForApplication"];
             this.isQrLoginEnabled = _data["isQrLoginEnabled"];
             this.isQrLoginEnabledForApplication = _data["isQrLoginEnabledForApplication"];
+            this.defaultEmployeePassword = _data["defaultEmployeePassword"];
         }
     }
 
@@ -91735,6 +91687,7 @@ export class TenantUserManagementSettingsEditDto implements ITenantUserManagemen
         data["isRestrictedEmailDomainEnabledForApplication"] = this.isRestrictedEmailDomainEnabledForApplication;
         data["isQrLoginEnabled"] = this.isQrLoginEnabled;
         data["isQrLoginEnabledForApplication"] = this.isQrLoginEnabledForApplication;
+        data["defaultEmployeePassword"] = this.defaultEmployeePassword;
         return data;
     }
 }
@@ -91754,6 +91707,7 @@ export interface ITenantUserManagementSettingsEditDto {
     isRestrictedEmailDomainEnabledForApplication: boolean;
     isQrLoginEnabled: boolean;
     isQrLoginEnabledForApplication: boolean;
+    defaultEmployeePassword: string | undefined;
 }
 
 export class ThemeFooterSettingsDto implements IThemeFooterSettingsDto {

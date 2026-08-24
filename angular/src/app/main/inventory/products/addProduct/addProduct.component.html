@@ -21,7 +21,7 @@
                 {{ l(this.id ? 'Update' : 'Save') }}
             </button>
 
-            <button (click)="close()" class="btn btn-sm fw-bold btn-light-success" id="cancel">
+            <button (click)="close()" class="btn btn-sm fw-bold btn-light-success fw-medium" id="cancel">
                 <i class="fa-duotone fa-circle-xmark fs-2 me-1">
                     <span class="path1"></span>
                     <span class="path2"></span>
@@ -33,7 +33,7 @@
     </sub-header>
 
     <div [class]="containerClass">
-        <div class="card card-custom product-form-container">
+        <div class="card card-custom product-form-container bg-light rounded-3 shadow-sm">
             <div class="card-body p-0">
                 <!-- Loading state indicator -->
 
@@ -42,17 +42,17 @@
                     <div appCustomEnter>
                         <div class="container-fluid px-5">
                             <!-- Main product information section -->
-                            <h4 class="product-section-title mt-4">{{ l('Product Information') }}</h4>
+                            <h4 class="product-section-title border-start border-4 border-primary fw-bold mt-4 ps-3 text-gray-700">{{ l('Product Information') }}</h4>
 
                             <div class="row gx-5">
                                 <!-- Left column -->
                                 <div class="col-lg-6 col-md-6 col-sm-12">
-                                    <div class="form-card p-4">
+                                    <div class="form-card bg-white mb-5 rounded-3 shadow-sm p-4 border-0">
                                         <div class="row">
                                             <!-- Product Type -->
                                             <div class="col-md-6 mb-2">
                                                 <div class="mb-1">
-                                                    <label class="required form-label" for="productType">{{ l('Product
+                                                    <label class="required form-label fw-medium" for="productType">{{ l('Product
                                                         Type') }}</label>
                                                     <ng-select #productTypes (change)="onChangeType($event.id)"
                                                         (keyup.enter)="gotoProductGroup()" [items]="allProductType"
@@ -63,7 +63,7 @@
                                                         required>
                                                     </ng-select>
                                                     <div *ngIf="this.form.get('productType').invalid && (this.form.get('productType').dirty || this.form.get('productType').touched)"
-                                                        class="alert alert-danger alert-height mt-1" role="alert">
+                                                        class="alert alert-danger border-start border-4 mt-1 px-3 py-1 rounded-1" role="alert">
                                                         <div class="alert-div">Required!</div>
                                                     </div>
                                                 </div>
@@ -72,7 +72,7 @@
                                             <!-- Product Group -->
                                             <div class="col-md-6 mb-2">
                                                 <div class="mb-1">
-                                                    <label class="required form-label" for="productGroupId">{{
+                                                    <label class="required form-label fw-medium" for="productGroupId">{{
                                                         l('Product Group') }}</label>
                                                     <ng-select #productGroup (keyup)="gotoProductCode($event)"
                                                         [items]="allProductGoups" appendTo="body"
@@ -82,7 +82,7 @@
                                                         [ngClass]="{'is-invalid': this.form.get('productGroupId').invalid && (this.form.get('productGroupId').dirty || this.form.get('productGroupId').touched)}">
                                                     </ng-select>
                                                     <div *ngIf="this.form.get('productGroupId').invalid && (this.form.get('productGroupId').dirty || this.form.get('productGroupId').touched)"
-                                                        class="alert alert-danger alert-height mt-1" role="alert">
+                                                        class="alert alert-danger border-start border-4 mt-1 px-3 py-1 rounded-1" role="alert">
                                                         <div class="alert-div">Required!</div>
                                                     </div>
                                                 </div>
@@ -91,7 +91,7 @@
                                             <!-- Product Code -->
                                             <div class="col-md-6 mb-2">
                                                 <div class="mb-1">
-                                                    <label class="required form-label" for="productCode">{{ l('Product
+                                                    <label class="required form-label fw-medium" for="productCode">{{ l('Product
                                                         Code') }}</label>
                                                     <input #productCodes (keyup)="gotoProductName($event)"
                                                         class="form-control" formControlName="productCode"
@@ -103,7 +103,7 @@
                                             <!-- Product Name -->
                                             <div class="col-md-6 mb-2">
                                                 <div class="mb-1">
-                                                    <label class="required form-label" for="name">{{ l('Product Name')
+                                                    <label class="required form-label fw-medium" for="name">{{ l('Product Name')
                                                         }}</label>
                                                     <input #productName (input)="titleCase($event.target.value)"
                                                         (keyup)="gotoTax($event)" class="form-control"
@@ -116,7 +116,7 @@
                                                     <div
                                                         *ngIf="this.form.get('name').invalid && (this.form.get('name').dirty || this.form.get('name').touched)">
                                                         <div *ngIf="this.form.get('name').errors?.forbiddenName"
-                                                            class="alert alert-danger alert-height mt-1" role="alert">
+                                                            class="alert alert-danger border-start border-4 mt-1 px-3 py-1 rounded-1" role="alert">
                                                             <div class="alert-div">Name cannot be product!</div>
                                                         </div>
                                                     </div>
@@ -126,7 +126,7 @@
                                             <!-- Tax -->
                                             <div class="col-md-6 mb-2">
                                                 <div class="mb-1">
-                                                    <label class="required form-label" for="taxId">{{ l('Tax')
+                                                    <label class="required form-label fw-medium" for="taxId">{{ l('Tax')
                                                         }}</label>
                                                     <ng-select #tax (keyup)="gotoUnit($event)" [items]="allTaxes"
                                                         bindLabel="taxName" bindValue="taxId" formControlName="taxId"
@@ -135,7 +135,7 @@
                                                         required>
                                                     </ng-select>
                                                     <div *ngIf="this.form.get('taxId').invalid && (this.form.get('taxId').dirty || this.form.get('taxId').touched)"
-                                                        class="alert alert-danger alert-height mt-1" role="alert">
+                                                        class="alert alert-danger border-start border-4 mt-1 px-3 py-1 rounded-1" role="alert">
                                                         <div class="alert-div">Required!</div>
                                                     </div>
                                                 </div>
@@ -144,7 +144,7 @@
                                             <!-- Unit -->
                                             <div class="col-md-6 mb-2">
                                                 <div class="mb-1">
-                                                    <label class="required form-label" for="unitId">{{ l('Unit')
+                                                    <label class="required form-label fw-medium" for="unitId">{{ l('Unit')
                                                         }}</label>
                                                     <ng-select #units (change)="onChangeUnit($event.id)"
                                                         [items]="allUnits" appendTo="body" bindLabel="displayName"
@@ -154,7 +154,7 @@
                                                         required>
                                                     </ng-select>
                                                     <div *ngIf="this.form.get('unitId').invalid && (this.form.get('unitId').dirty || this.form.get('unitId').touched)"
-                                                        class="alert alert-danger alert-height mt-1" role="alert">
+                                                        class="alert alert-danger border-start border-4 mt-1 px-3 py-1 rounded-1" role="alert">
                                                         <div class="alert-div">Required!</div>
                                                     </div>
                                                 </div>
@@ -163,14 +163,14 @@
                                     </div>
 
                                     <!-- Additional Product Attributes -->
-                                    <div class="form-card p-4 mt-4">
+                                    <div class="form-card bg-white mb-5 rounded-3 shadow-sm p-4 mt-4 border-0">
                                         <h5 class="mb-3 text-muted">{{ l('Product Attributes') }}</h5>
                                         <div class="row">
 
                                             <!-- HS Code -->
                                             <div class="col-md-6 mb-2">
                                                 <div class="mb-1">
-                                                    <label class="form-label" for="hsCode">{{ l('HS Code') }}</label>
+                                                    <label class="form-label fw-medium" for="hsCode">{{ l('HS Code') }}</label>
                                                     <input #hsCode (keyup)="gotoPurchaseRate($event)"
                                                         class="form-control" formControlName="hsCode" id="hsCode"
                                                         list="hsCodes" maxlength="50" placeholder="Enter HS Code"
@@ -179,7 +179,7 @@
                                                         <option *ngFor="let item of allHscodes">{{ item }}</option>
                                                     </datalist>
                                                     <div *ngIf="hsCodeMatched"
-                                                        class="alert alert-danger alert-height mt-1" role="alert">
+                                                        class="alert alert-danger border-start border-4 mt-1 px-3 py-1 rounded-1" role="alert">
                                                         <div class="alert-div">This HSCode is not accepted.</div>
                                                     </div>
                                                 </div>
@@ -191,13 +191,13 @@
                                 <!-- Right column -->
                                 <div class="col-lg-6 col-md-6 col-sm-12">
                                     <!-- Pricing section -->
-                                    <div class="form-card p-4">
+                                    <div class="form-card bg-white mb-5 rounded-3 shadow-sm p-4 border-0">
                                         <h5 class="mb-3 text-muted">{{ l('Pricing Information') }}</h5>
                                         <div class="row">
                                             <!-- Purchase Rate -->
                                             <div class="col-md-6 mb-2">
                                                 <div class="mb-1">
-                                                    <label class="required form-label" for="purchaseRate">{{ l('Purchase
+                                                    <label class="required form-label fw-medium" for="purchaseRate">{{ l('Purchase
                                                         Rate') }}</label>
                                                     <div class="input-group">
                                                         <span class="input-group-text bg-light">₹</span>
@@ -212,7 +212,7 @@
                                             <!-- MRP -->
                                             <div class="col-md-6 mb-2">
                                                 <div class="mb-1">
-                                                    <label class="required form-label" for="mrp">{{ l('MRP') }}</label>
+                                                    <label class="required form-label fw-medium" for="mrp">{{ l('MRP') }}</label>
                                                     <div class="input-group">
                                                         <span class="input-group-text bg-light">₹</span>
                                                         <input #mrps (input)="setSalesRate()" (keyup)="gotoSalesRate($event)"
@@ -226,7 +226,7 @@
                                             <!-- Sales Rate -->
                                             <div class="col-md-6 mb-2">
                                                 <div class="mb-1">
-                                                    <label class="required form-label" for="salesRate">{{ l('Sales
+                                                    <label class="required form-label fw-medium" for="salesRate">{{ l('Sales
                                                         Rate') }}</label>
                                                     <div class="input-group">
                                                         <span class="input-group-text bg-light">₹</span>
@@ -236,7 +236,7 @@
                                                             type="number" />
                                                     </div>
                                                     <div *ngIf="this.form.get('purchaseRate').value > this.form.get('salesRate').value && (this.form.get('salesRate').dirty || this.form.get('salesRate').touched)"
-                                                        class="alert alert-danger alert-height mt-1" role="alert">
+                                                        class="alert alert-danger border-start border-4 mt-1 px-3 py-1 rounded-1" role="alert">
                                                         <div class="alert-div">Sales rate must be higher than Purchase
                                                             rate</div>
                                                     </div>
@@ -246,7 +246,7 @@
                                             <!-- Margin -->
                                             <div class="col-md-6 mb-2">
                                                 <div class="mb-1">
-                                                    <label class="required form-label" for="margin">{{ l('Margin %')
+                                                    <label class="required form-label fw-medium" for="margin">{{ l('Margin %')
                                                         }}</label>
                                                     <div class="input-group">
                                                         <input #margin (keyup)="gotoMinimunStock($event)"
@@ -260,7 +260,7 @@
                                     </div>
 
                                     <!-- Stock management section -->
-                                    <div class="form-card p-4 mt-4">
+                                    <div class="form-card bg-white mb-5 rounded-3 shadow-sm p-4 mt-4 border-0">
                                         <h5 class="mb-3 text-muted">
                                             {{ isStockCalculatedProductType() ? l('Stock Management') : l('Description') }}
                                         </h5>
@@ -268,7 +268,7 @@
                                             <!-- Min Stock -->
                                             <div class="col-md-4 mb-2">
                                                 <div class="mb-1">
-                                                    <label class="required form-label" for="minimumStock">{{ l('Min
+                                                    <label class="required form-label fw-medium" for="minimumStock">{{ l('Min
                                                         Stock') }}</label>
                                                     <input #minimiumStock (keyup)="gotoMaximumStock($event)"
                                                         class="form-control" formControlName="minimumStock"
@@ -280,7 +280,7 @@
                                             <!-- Max Stock -->
                                             <div class="col-md-4 mb-2">
                                                 <div class="mb-1">
-                                                    <label class="required form-label" for="maximumStock">{{ l('Max
+                                                    <label class="required form-label fw-medium" for="maximumStock">{{ l('Max
                                                         Stock') }}</label>
                                                     <input #maximumStocks (keyup)="gotoReorderLevel($event)"
                                                         class="form-control" formControlName="maximumStock"
@@ -288,7 +288,7 @@
                                                         type="number" />
                                                 </div>
                                                 <div *ngIf="this.form.get('minimumStock').value > this.form.get('maximumStock').value && (this.form.get('maximumStock').dirty || this.form.get('maximumStock').touched)"
-                                                    class="alert alert-danger alert-height mt-1" role="alert">
+                                                    class="alert alert-danger border-start border-4 mt-1 px-3 py-1 rounded-1" role="alert">
                                                     <div class="alert-div">Max stock must be higher than Min stock</div>
                                                 </div>
                                             </div>
@@ -296,7 +296,7 @@
                                             <!-- Re-order Level -->
                                             <div class="col-md-4 mb-2">
                                                 <div class="mb-1">
-                                                    <label class="required form-label" for="reorderLevel">{{ l('Re-order
+                                                    <label class="required form-label fw-medium" for="reorderLevel">{{ l('Re-order
                                                         Level') }}</label>
                                                     <input #reOrder (keyup)="gotoDescription($event)"
                                                         class="form-control" formControlName="reorderLevel"
@@ -310,7 +310,7 @@
                                         <div class="row">
                                             <div class="col-md-12 mb-2">
                                                 <div class="mb-1">
-                                                    <label class="form-label" for="description">{{ l('Description')
+                                                    <label class="form-label fw-medium" for="description">{{ l('Description')
                                                         }}</label>
                                                     <textarea #description class="form-control"
                                                         formControlName="description" id="description" maxlength="100"
@@ -323,7 +323,7 @@
                                         <div class="row" *ngIf="this.form.get('productType').value == 3">
                                             <div class="col-md-6 mb-2">
                                                 <div class="mb-1">
-                                                    <label class="form-label" for="validityPeriod">{{ l('Validity
+                                                    <label class="form-label fw-medium" for="validityPeriod">{{ l('Validity
                                                         Period') }}</label>
                                                     <div class="input-group">
                                                         <input class="form-control" formControlName="validityPeriod"
@@ -338,15 +338,15 @@
                             </div>
 
                             <!-- Product Options section -->
-                            <h4 class="product-section-title mt-5" *ngIf="isStockCalculatedProductType()">{{ l('Product Options') }}</h4>
-                            <div class="form-card p-4 product-options-card" *ngIf="isStockCalculatedProductType()">
+                            <h4 class="product-section-title border-start border-4 border-primary fw-bold mt-5 ps-3 text-gray-700" *ngIf="isStockCalculatedProductType()">{{ l('Product Options') }}</h4>
+                            <div class="form-card bg-white mb-5 rounded-3 shadow-sm p-4 product-options-card border-0" *ngIf="isStockCalculatedProductType()">
                                 <div class="row">
                                     <!-- Opening Stock -->
                                     <div class="col-lg-4 col-md-6 mb-3">
-                                        <div class="option-item">
+                                        <div class="option-item d-flex py-3 align-items-center">
                                             <input (change)="openOpeningStock()" class="form-check-input me-3"
                                                 formControlName="isOpeningStock" id="isOpeningStock" type="checkbox" />
-                                            <label class="form-label mb-0" for="isOpeningStock">{{ l('Configure Opening
+                                            <label class="form-label mb-0 fw-medium" for="isOpeningStock">{{ l('Configure Opening
                                                 Stock') }}</label>
                                         </div>
                                     </div>
@@ -354,8 +354,8 @@
                             </div>
 
                             <!-- Opening Stock section -->
-                            <div *ngIf="isStockCalculatedProductType() && this.form.value.isOpeningStock" class="form-card p-0 mt-4">
-                                <div class="card-header-custom d-flex justify-content-between align-items-center">
+                            <div *ngIf="isStockCalculatedProductType() && this.form.value.isOpeningStock" class="form-card bg-white mb-5 rounded-3 shadow-sm p-0 mt-4 border-0">
+                                <div class="card-header-custom d-flex px-5 py-4 rounded-top-3 text-white justify-content-between align-items-center fw-medium">
                                     <h3 class="card-title m-0">{{ l('Opening Stock') }}</h3>
                                     <button (click)="addOpeningStock()" class="btn btn-sm btn-light fw-bold" id="add">
                                         <i class="fa-duotone fa-grid-2-plus fs-2 me-1">
@@ -366,11 +366,11 @@
                                         Add New Entry
                                     </button>
                                 </div>
-                                <div class="table-container">
-                                    <div class="table-responsive overflow-x-auto h-450px">
-                                        <table class="table table-row-dashed table-row-gray-300 table-hover"
+                                <div class="table-container overflow-hidden rounded-3 shadow-sm">
+                                <div class="table-responsive overflow-x-auto mh-450px overflow-y-auto">
+                                        <table class="table table-row-dashed table-row-gray-300 table-hover mb-0 responsive-entry-table"
                                             formArrayName="openingStock">
-                                            <thead>
+                                            <thead class="table-light">
                                                 <tr class="text-center text-gray-700 fw-bold">
                                                     <th class="min-w-10px">S.N.</th>
                                                     <th class="min-w-120px">Quantity</th>

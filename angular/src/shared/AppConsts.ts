@@ -1,5 +1,6 @@
 export class AppConsts {
     static readonly tenancyNamePlaceHolderInUrl = '{TENANCY_NAME}';
+
     static remoteServiceBaseUrl: string;
     static remoteServiceBaseUrlFormat: string;
     static appBaseUrl: string;
@@ -7,32 +8,47 @@ export class AppConsts {
     static appBaseUrlFormat: string;
     static recaptchaSiteKey: string;
     static subscriptionExpireNootifyDayCount: number;
+
+
     static localeMappings: any = [];
+
     static readonly userManagement = {
         defaultAdminUserName: 'admin',
     };
+
     static readonly localization = {
         defaultLocalizationSourceName: 'Erp',
     };
+
     static readonly authorization = {
         encrptedAuthTokenName: 'enc_auth_token',
     };
+
     static readonly grid = {
         defaultPageSize: 50,
     };
+
     static readonly suktasStorage = {
         financialYear: 'financialYear',
         getAllBranches: 'getAllBranches',
         stockReportForm: 'stockReportForm',
     };
     static readonly MinimumUpgradePaymentAmount = 1;
+
     /// <summary>
     /// Gets current version of the application.
     /// It's also shown in the web page.
     /// </summary>
     static readonly WebAppGuiVersion = '13.3.0';
+
     /// <summary>
     /// Redirects users to host URL when using subdomain as tenancy name for not existing tenants
     /// </summary>
     static readonly PreventNotExistingTenantSubdomains = false;
+
+
+static readonly agLicenseKey = 'RG93bmxvYWREZXZUb29sc0NPTVtGVUxMXVtCT1RIXVt2MzNdX05ERXdNak0xT0RRd01EQXdNQT09NGVhNDRkMTY3OGJmZDM4ZDA2MmZmYTRkZDY0YWJiODc=';
+     // A deployment can supply a dedicated AG Charts key through assets/appconfig*.json.
+     // When it is blank, the shared AG Grid/AG Charts Enterprise Bundle key is used.
+     static agChartsLicenseKey = '';
 }

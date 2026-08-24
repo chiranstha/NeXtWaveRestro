@@ -1,21 +1,5 @@
-th {
-    padding: 0.15em;
-    text-align: left;
-    outline: initial;
-    text-align: center;
-    height: 40px;
-    padding-bottom: 8px;
-}
-
-td {
-    padding: 0.15em;
-    text-align: left;
-    outline: initial;
-    text-align: center;
-}
-
-@media only screen and (max-width: 992px) and (min-width: 576px) {
-    .device_margin {
-        margin-top: 25px;
-    }
+:host ::ng-deep .app-sub-header-title > h1 {
+    font-family: 'AvenirNext', Helvetica, sans-serif;
+    font-size: 1.75rem !important;
+    line-height: 1.2 !important;
 }

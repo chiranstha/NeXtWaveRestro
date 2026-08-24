@@ -3,13 +3,43 @@
         <div class="row g-0 min-vh-100">
             <!-- Welcome Text
             ========================= -->
-            <div class="col-md-6 d-sm-none d-none d-md-block d-md-block">
+            <div class="col-md-6 d-none d-md-block">
                 <div class="hero-wrap d-flex align-items-center h-100">
                     <div class="hero-mask opacity-8 bg-primary"></div>
-                    <div
-                        class="hero-bg hero-bg-scroll"
-                        style="background-image: url('/assets/common/images/{{ backgroundImageName }}.svg');"
-                    ></div>
+                    <div class="hero-bg hero-bg-scroll" aria-hidden="true">
+                        <div class="restaurant-grid"></div>
+                        <div class="restaurant-visual">
+                            <div class="restaurant-plate">
+                                <span class="plate-rim"></span>
+                                <span class="plate-garnish plate-garnish-one"></span>
+                                <span class="plate-garnish plate-garnish-two"></span>
+                                <span class="plate-garnish plate-garnish-three"></span>
+                            </div>
+                            <div class="restaurant-cutlery">
+                                <span class="fork"></span>
+                                <span class="knife"></span>
+                            </div>
+                            <div class="order-ticket">
+                                <span class="ticket-title"></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span class="ticket-total"></span>
+                            </div>
+                            <div class="kitchen-status">
+                                <span class="status-dot"></span>
+                                <span class="status-line status-line-wide"></span>
+                                <span class="status-line"></span>
+                                <span class="status-ready">Ready</span>
+                            </div>
+                            <div class="table-map">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="hero-content w-100 min-vh-100 d-flex flex-column">
                         <div class="row g-0">
                             <div class="col-11 col-sm-10 col-lg-9 mx-auto">
@@ -18,7 +48,7 @@
                                     <a
                                         (click)="goToHome()"
                                         [class.mb-12]="!isSelectEditionPage()"
-                                        class="d-flex justify-content-center"
+                                        class="brand-lockup d-inline-flex align-items-center justify-content-center rounded bg-white shadow-lg"
                                         href=""
                                     >
                                         <img alt="nextwave" class="h-100px" src="/assets/common/images/applogo.png" />
@@ -28,8 +58,49 @@
                         </div>
                         <div class="row g-0 my-auto">
                             <div class="col-11 col-sm-10 col-lg-9 mx-auto">
-                                <h1 class="text-11 text-white mb-4 welcome-title">Sign in</h1>
-                                <p class="text-4 text-white lh-base mb-5">to continue to NextWave Restro</p>
+                                <div class="hero-eyebrow d-inline-flex align-items-center mb-5">
+                                    <span class="hero-eyebrow-dot"></span>
+                                    Restaurant operations, connected
+                                </div>
+                                <h1 class="text-white fw-bolder mb-4 welcome-title">
+                                    Serve faster. Delight every guest.
+                                </h1>
+                                <p class="text-4 text-white fw-bold lh-base mb-7 welcome-subtitle">
+                                    One restaurant workspace for tables, orders, kitchen flow, billing, stock, and
+                                    sales.
+                                </p>
+                                <div
+                                    class="restaurant-login-highlights d-grid gap-4 mt-8 text-white fw-bold"
+                                    aria-label="Restaurant platform highlights"
+                                >
+                                    <div class="restaurant-login-highlight d-flex align-items-center gap-4">
+                                        <span
+                                            class="highlight-icon d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                                            aria-hidden="true"
+                                        >
+                                            01
+                                        </span>
+                                        <span>Faster order-to-kitchen flow</span>
+                                    </div>
+                                    <div class="restaurant-login-highlight d-flex align-items-center gap-4">
+                                        <span
+                                            class="highlight-icon d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                                            aria-hidden="true"
+                                        >
+                                            02
+                                        </span>
+                                        <span>Smoother tables and billing</span>
+                                    </div>
+                                    <div class="restaurant-login-highlight d-flex align-items-center gap-4">
+                                        <span
+                                            class="highlight-icon d-inline-flex align-items-center justify-content-center rounded-circle flex-shrink-0"
+                                            aria-hidden="true"
+                                        >
+                                            03
+                                        </span>
+                                        <span>Live stock and sales visibility</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -72,13 +143,15 @@
                     </div>
                     <!--end::Content-->
                     <!--begin::Footer-->
-                    <div [class.pt-0]="isSelectEditionPage()" class="d-flex flex-center flex-column-auto p-10">
-                        <!--begin::Links-->
-                        <div class="d-flex align-items-center fw-bold fs-6">
-                            <language-switch class="mx-auto"></language-switch>
+                    @if (!isLoginPage() && !isResetPasswordPage()) {
+                        <div [class.pt-0]="isSelectEditionPage()" class="d-flex flex-center flex-column-auto p-10">
+                            <!--begin::Links-->
+                            <div class="d-flex align-items-center fw-bold fs-6">
+                                <language-switch class="mx-auto"></language-switch>
+                            </div>
+                            <!--end::Links-->
                         </div>
-                        <!--end::Links-->
-                    </div>
+                    }
                 </div>
             </div>
             <!-- Login Form End -->

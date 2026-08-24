@@ -1,14 +1,5 @@
-.stock-used-detail-card {
-    border-radius: 8px;
-}
-
 .stock-used-table-wrap {
     max-height: 460px;
-    overflow: auto;
-}
-
-.stock-used-table td {
-    vertical-align: top;
 }
 
 .stock-used-table ng-select {
@@ -16,34 +7,16 @@
 }
 
 .stock-used-note {
-    align-items: center;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
     min-height: 42px;
 }
 
 .stock-used-total-box {
-    align-items: center;
-    background: #fbfcfd;
-    border: 1px solid #e4e6ef;
-    border-radius: 8px;
-    display: grid;
-    gap: 10px;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    padding: 12px;
-}
-
-.stock-used-total-box > div {
-    display: grid;
-    gap: 4px;
 }
 
 .stock-used-total-box strong {
     color: #181c32;
     font-size: 1.1rem;
-    font-weight: 800;
-    line-height: 1.1;
 }
 
 .restaurant-muted {
@@ -53,22 +26,15 @@
 .restaurant-label {
     color: #5e6278;
     font-size: 0.72rem;
-    font-weight: 800;
     letter-spacing: 0;
-    text-transform: uppercase;
 }
 
 .restaurant-status {
-    align-items: center;
     border-radius: 6px;
-    display: inline-flex;
     font-size: 0.72rem;
     font-weight: 800;
-    gap: 4px;
-    line-height: 1;
     min-height: 22px;
     padding: 4px 7px;
-    white-space: nowrap;
 }
 
 .restaurant-status-primary {

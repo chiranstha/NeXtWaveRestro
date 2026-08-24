@@ -1,24 +1,24 @@
-<div class="permission-tree-container">
+<div class="permission-tree-container bg-white p-2 rounded-1 shadow-sm">
     <!-- Compact Header -->
     <div class="d-flex align-items-center gap-2 mb-2">
-        <div class="search-container flex-grow-1 mb-0">
-            <i class="fas fa-search"></i>
+        <div class="search-container flex-grow-1 mb-2 position-relative">
+            <i class="fas fa-search fs-9 position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
             <input
                 (input)="filterPermissions(filter)"
                 [(ngModel)]="filter"
                 [placeholder]="l('SearchPermissions')"
-                class="form-control"
+                class="form-control form-control-sm border border-gray-300 fs-8 h-30px ps-8 rounded-1"
                 type="text"
             />
         </div>
-        <div class="tree-toolbar mb-0 p-0 border-0">
-            <button (click)="expandAll()" [title]="l('ExpandAll')" class="btn btn-light-primary btn-sm" type="button">
+        <div class="tree-toolbar mb-0 p-0 border-0 d-flex justify-content-end align-items-center gap-1">
+            <button (click)="expandAll()" [title]="l('ExpandAll')" class="btn btn-light-primary btn-sm fs-9 lh-sm px-2 py-1 rounded-1" type="button">
                 <i class="fas fa-expand-alt"></i>
             </button>
             <button
                 (click)="collapseAll()"
                 [title]="l('CollapseAll')"
-                class="btn btn-light-secondary btn-sm"
+                class="btn btn-light-secondary btn-sm fs-9 lh-sm px-2 py-1 rounded-1"
                 type="button"
             >
                 <i class="fas fa-compress-alt"></i>
@@ -26,27 +26,27 @@
         </div>
     </div>
     <!-- Quick Selection Toolbar -->
-    <div class="tree-toolbar justify-content-between">
+    <div class="tree-toolbar d-flex justify-content-between align-items-center gap-1 mb-1 pb-1 border-bottom">
         <div class="text-muted small">
-            <span class="badge badge-compact bg-light text-primary border">{{ grantedCount }} / {{ totalCount }}</span>
+            <span class="badge bg-light border fs-9 px-1 py-0 rounded-1 text-primary">{{ grantedCount }} / {{ totalCount }}</span>
         </div>
         <div class="d-flex gap-1">
-            <button (click)="selectAll()" class="btn btn-outline-primary btn-sm" type="button">
+            <button (click)="selectAll()" class="btn btn-outline-primary btn-sm fs-9 lh-sm px-2 py-1 rounded-1" type="button">
                 {{ 'SelectAll' | localize }}
             </button>
-            <button (click)="deselectAll()" class="btn btn-outline-danger btn-sm" type="button">
+            <button (click)="deselectAll()" class="btn btn-outline-danger btn-sm fs-9 lh-sm px-2 py-1 rounded-1" type="button">
                 {{ 'DeselectAll' | localize }}
             </button>
         </div>
     </div>
     <!-- Scrollable Tree Structure -->
-    <div class="tree-root" style="max-height: 450px">
-        <ul class="permission-list">
+    <div class="tree-root mh-450px overflow-y-auto pe-1">
+        <ul class="permission-list list-unstyled ps-0 m-0">
             <ng-container *ngTemplateOutlet="recursiveNode; context: { $implicit: rootNodes }"></ng-container>
         </ul>
         <!-- Empty State -->
         @if (rootNodes.length === 0) {
-            <div class="tree-empty">
+            <div class="text-center p-3 fs-9 text-muted">
                 <i class="fas fa-shield-alt"></i>
                 <p>{{ 'NoPermissionsFound' | localize }}</p>
             </div>
@@ -56,49 +56,52 @@
     <ng-template #recursiveNode let-nodes>
         @for (node of nodes; track node) {
             <li [hidden]="!node.isVisible" class="permission-node">
-                <div [class.collapsed]="!node.isExpanded" class="permission-item">
+                <div [class.collapsed]="!node.isExpanded" class="permission-item mb-0">
                     <div
                         (click)="onPermissionClick(node)"
-                        [class.granted]="node.isGranted"
                         [class.parent]="node.children.length > 0"
-                        class="permission-row"
+                        [ngClass]="node.isGranted ? 'bg-light-primary border-primary border-opacity-10' : 'bg-hover-light border-transparent'"
+                        class="permission-row border cursor-pointer d-flex align-items-center px-1 py-0 position-relative rounded-1"
                     >
                         <!-- Indentation spacer -->
                         @if (node.children.length > 0) {
                             <div
                                 (click)="toggleNode(node, $event)"
                                 [class.collapsed]="!node.isExpanded"
-                                class="toggle-btn"
+                                class="toggle-btn cursor-pointer d-flex align-items-center justify-content-center h-20px me-1 text-gray-500 w-20px"
                             >
                                 <i class="fas fa-caret-down"></i>
                             </div>
                         } @else {
-                            <div class="toggle-btn opacity-25">
-                                <i class="fas fa-minus small" style="font-size: 8px"></i>
+                            <div class="d-flex align-items-center justify-content-center h-20px me-1 opacity-25 text-gray-500 w-20px">
+                                <i class="fas fa-minus fs-9"></i>
                             </div>
                         }
                         <!-- Compact Checkbox -->
-                        <div class="checkbox-container">
-                            <div class="custom-checkbox">
-                                <i class="fas fa-check"></i>
+                        <div class="d-flex align-items-center me-2">
+                            <div
+                                [ngClass]="node.isGranted ? 'bg-primary border-primary' : 'bg-white border-gray-400'"
+                                class="custom-checkbox align-items-center border d-flex h-15px justify-content-center rounded-1 w-15px"
+                            >
+                                <i class="fas fa-check fs-10 text-white" [class.d-none]="!node.isGranted"></i>
                             </div>
                         </div>
                         <!-- Label & Icon -->
-                        <div class="permission-label d-flex align-items-center">
+                        <div class="d-flex align-items-center flex-grow-1 fs-8 overflow-hidden text-gray-800 text-nowrap" [class.fw-semibold]="node.children.length > 0">
                             @if (node.children.length > 0) {
-                                <i class="fas fa-folder me-1 text-warning"></i>
+                                <i class="fas fa-folder fs-8 me-1 text-warning w-15px"></i>
                             }
                             @if (node.children.length === 0) {
-                                <i class="fas fa-key me-1 text-info opacity-75"></i>
+                                <i class="fas fa-key fs-8 me-1 text-info opacity-75 w-15px"></i>
                             }
                             <span>{{ node.displayName }}</span>
                         </div>
                         <!-- Tech Name (Always subtle) -->
-                        <span class="permission-name d-none d-lg-inline">{{ node.name }}</span>
+                        <span class="d-none d-lg-inline font-monospace fs-9 ms-2 opacity-50 text-gray-500">{{ node.name }}</span>
                     </div>
                     <!-- Children Container -->
                     @if (node.children.length > 0) {
-                        <ul [hidden]="!node.isExpanded" class="permission-list children-container">
+                        <ul [hidden]="!node.isExpanded" class="permission-list border-start border-gray-200 list-unstyled m-0 ms-2 ps-3">
                             <ng-container
                                 *ngTemplateOutlet="recursiveNode; context: { $implicit: node.children }"
                             ></ng-container>

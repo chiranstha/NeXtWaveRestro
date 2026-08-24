@@ -10,11 +10,11 @@
 }
 
 .filter-shell {
-    z-index: 1060;
+    z-index: 30;
 }
 
 .report-toolbar {
-    z-index: 1050;
+    z-index: 20;
 }
 
 .report-grid {
@@ -31,7 +31,7 @@
     font-weight: var(--bs-font-weight-semibold) !important;
 }
 
-
+/* Loading & Empty State */
 .loader-overlay {
     position: absolute;
     inset: 0;
@@ -42,3 +42,4 @@
     justify-content: center;
     z-index: 10;
 }
+

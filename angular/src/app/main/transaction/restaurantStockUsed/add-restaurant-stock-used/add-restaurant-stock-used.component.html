@@ -71,7 +71,7 @@
                             </div>
                         </div>
 
-                        <div class="card shadow-sm my-4 p-2 stock-used-detail-card">
+                        <div class="card shadow-sm my-4 p-2 stock-used-detail-card rounded-3">
                             <div class="card-header">
                                 <h3 class="card-title fw-bold">{{ l('Stock Used Details') }}</h3>
                                 <div class="card-toolbar">
@@ -88,9 +88,9 @@
                                 </div>
                             </div>
 
-                            <div class="table-responsive stock-used-table-wrap">
+                            <div class="table-responsive stock-used-table-wrap overflow-auto">
                                 <table
-                                    class="table table-row-dashed table-row-gray-300 table-striped stock-used-table"
+                                    class="table table-row-dashed table-row-gray-300 table-striped stock-used-table align-top"
                                     formArrayName="lines"
                                 >
                                     <thead class="bg-tableHead">
@@ -200,8 +200,8 @@
 
                         <div class="row mt-3">
                             <div class="col-lg-8 col-xl-8 col-md-7 col-sm-12">
-                                <div class="stock-used-note">
-                                    <span class="restaurant-status restaurant-status-primary">
+                                <div class="stock-used-note align-items-center d-flex flex-wrap gap-2">
+                                    <span class="restaurant-status restaurant-status-primary align-items-center d-inline-flex gap-1 lh-1 text-nowrap">
                                         {{ l('Stock Issue') }}
                                     </span>
                                     <span class="restaurant-muted">
@@ -210,14 +210,14 @@
                                 </div>
                             </div>
                             <div class="col-lg-4 col-xl-4 col-md-5 col-sm-12">
-                                <div class="stock-used-total-box">
-                                    <div>
-                                        <span class="restaurant-label">{{ l('Total Qty') }}</span>
-                                        <strong>{{ totalQty | number: '1.2-3' }}</strong>
+                                <div class="stock-used-total-box align-items-center d-grid bg-light border rounded-3 gap-2 p-3">
+                                    <div class="d-grid gap-1">
+                                        <span class="restaurant-label text-uppercase fw-bold">{{ l('Total Qty') }}</span>
+                                        <strong class="fw-bolder lh-1">{{ totalQty | number: '1.2-3' }}</strong>
                                     </div>
-                                    <div>
-                                        <span class="restaurant-label">{{ l('Total Amount') }}</span>
-                                        <strong>{{ totalAmount | number: '1.2-2' }}</strong>
+                                    <div class="d-grid gap-1">
+                                        <span class="restaurant-label text-uppercase fw-bold">{{ l('Total Amount') }}</span>
+                                        <strong class="fw-bolder lh-1">{{ totalAmount | number: '1.2-2' }}</strong>
                                     </div>
                                 </div>
                             </div>

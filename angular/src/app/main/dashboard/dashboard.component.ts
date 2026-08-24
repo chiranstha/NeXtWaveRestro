@@ -35,7 +35,12 @@ import {
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NepaliDatepickerModule } from '@app/shared/common/nepalidatepicker/nepali-datepicker-angular.module';
 import { DateTime } from 'luxon';
-import { finalize, forkJoin, Subscription, timer } from 'rxjs';
+import { finalize, forkJoin, of, Subscription, timer } from 'rxjs';
+import { RestaurantStylesComponent } from '../restaurant/restaurant-styles.component';
+import {
+    RestaurantPayrollReportBundleDto,
+    RestaurantReportsApiService,
+} from '../restaurant/restaurant-reports/restaurant-reports-api.service';
 
 interface RestaurantDashboardFilter {
     fromDate: string;
@@ -56,14 +61,23 @@ interface DashboardMetric {
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
     templateUrl: './dashboard.component.html',
-    styleUrls: ['../restaurant/restaurant-shared.css', './dashboard.component.css'],
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation],
-    imports: [CommonModule, FormsModule, NgSelectModule, NepaliDatepickerModule, SubHeaderComponent, LocalizePipe],
+    imports: [
+        CommonModule,
+        FormsModule,
+        NgSelectModule,
+        NepaliDatepickerModule,
+        SubHeaderComponent,
+        LocalizePipe,
+        RestaurantStylesComponent,
+    ],
+    providers: [RestaurantReportsApiService],
 })
 export class DashboardComponent extends AppComponentBase implements OnInit, OnDestroy {
     private readonly refreshIntervalMs = 5 * 60 * 1000;
     private readonly restaurantReportsService = inject(RestaurantReportsServiceProxy);
+    private readonly restaurantReportsApiService = inject(RestaurantReportsApiService);
     private readonly restaurantSetupService = inject(RestaurantSetupServiceProxy);
     private readonly restaurantMenuService = inject(RestaurantMenuServiceProxy);
     private readonly reportingServiceProxy = inject(ReportingServiceProxy);
@@ -80,11 +94,40 @@ export class DashboardComponent extends AppComponentBase implements OnInit, OnDe
     wastage: RestaurantWastageReportDto[] = [];
     foodCosting: RestaurantFoodCostingReportDto[] = [];
     lowStock: RestaurantLowStockSuggestionDto[] = [];
+    payrollReport: RestaurantPayrollReportBundleDto = this.emptyPayrollReport();
     tables: RestaurantTableDto[] = [];
     categories: RestaurantMenuCategoryDto[] = [];
     waiters: GetUserDropdownDto[] = [];
     lastRefreshedAt: DateTime | null = null;
     refreshSubscription: Subscription | undefined;
+
+    get canUseTableFilter(): boolean {
+        return this.isGranted('Pages.Restaurant.Setup');
+    }
+
+    get canUseCategoryFilter(): boolean {
+        return this.isGranted('Pages.Restaurant.Menu');
+    }
+
+    get canViewSalesReports(): boolean {
+        return this.canViewReportCategory('Pages.Restaurant.Reports.Sales');
+    }
+
+    get canViewOperationsReports(): boolean {
+        return this.canViewReportCategory('Pages.Restaurant.Reports.Operations');
+    }
+
+    get canViewInventoryReports(): boolean {
+        return this.canViewReportCategory('Pages.Restaurant.Reports.Inventory');
+    }
+
+    get canViewPayrollReports(): boolean {
+        return this.canViewReportCategory('Pages.Restaurant.Reports.Payroll');
+    }
+
+    get canViewAuditReports(): boolean {
+        return this.canViewReportCategory('Pages.Restaurant.Reports.AuditFinance');
+    }
 
     constructor(injector: Injector) {
         super(injector);
@@ -111,15 +154,18 @@ export class DashboardComponent extends AppComponentBase implements OnInit, OnDe
         const categoryId = this.filter.categoryId || null;
 
         forkJoin({
-            summary: this.restaurantReportsService.getPosSalesSummary(fromDate, toDate, tableId, waiterUserId, categoryId),
-            itemSales: this.restaurantReportsService.getItemSales(fromDate, toDate, tableId, waiterUserId, categoryId),
-            tableSales: this.restaurantReportsService.getTableSales(fromDate, toDate, tableId, waiterUserId, categoryId),
-            waiterSales: this.restaurantReportsService.getWaiterSales(fromDate, toDate, tableId, waiterUserId, categoryId),
-            kotBotStatus: this.restaurantReportsService.getKotBotStatus(fromDate, toDate, tableId, waiterUserId, categoryId),
-            settlements: this.restaurantReportsService.getSettlementReport(fromDate, toDate, tableId, waiterUserId, categoryId),
-            wastage: this.restaurantReportsService.getWastageReport(fromDate, toDate, tableId, waiterUserId, categoryId),
-            foodCosting: this.restaurantReportsService.getFoodCosting(fromDate, toDate, tableId, waiterUserId, categoryId),
-            lowStock: this.restaurantReportsService.getLowStockReport(fromDate, toDate, tableId, waiterUserId, categoryId),
+            summary: this.canViewSalesReports ? this.restaurantReportsService.getPosSalesSummary(fromDate, toDate, tableId, waiterUserId, categoryId) : of(new RestaurantPosSalesSummaryDto()),
+            itemSales: this.canViewSalesReports ? this.restaurantReportsService.getItemSales(fromDate, toDate, tableId, waiterUserId, categoryId) : of([]),
+            tableSales: this.canViewOperationsReports ? this.restaurantReportsService.getTableSales(fromDate, toDate, tableId, waiterUserId, categoryId) : of([]),
+            waiterSales: this.canViewOperationsReports ? this.restaurantReportsService.getWaiterSales(fromDate, toDate, tableId, waiterUserId, categoryId) : of([]),
+            kotBotStatus: this.canViewOperationsReports ? this.restaurantReportsService.getKotBotStatus(fromDate, toDate, tableId, waiterUserId, categoryId) : of([]),
+            settlements: this.canViewAuditReports ? this.restaurantReportsService.getSettlementReport(fromDate, toDate, tableId, waiterUserId, categoryId) : of([]),
+            wastage: this.canViewInventoryReports ? this.restaurantReportsService.getWastageReport(fromDate, toDate, tableId, waiterUserId, categoryId) : of([]),
+            foodCosting: this.canViewInventoryReports ? this.restaurantReportsService.getFoodCosting(fromDate, toDate, tableId, waiterUserId, categoryId) : of([]),
+            lowStock: this.canViewInventoryReports ? this.restaurantReportsService.getLowStockReport(fromDate, toDate, tableId, waiterUserId, categoryId) : of([]),
+            payrollReport: this.canViewPayrollReports
+                ? this.restaurantReportsApiService.getPayrollReport(fromDate, toDate, tableId, waiterUserId, categoryId)
+                : of(this.emptyPayrollReport()),
         })
             .pipe(finalize(() => this.finishLoading()))
             .subscribe((result) => {
@@ -132,6 +178,7 @@ export class DashboardComponent extends AppComponentBase implements OnInit, OnDe
                 this.wastage = result.wastage || [];
                 this.foodCosting = result.foodCosting || [];
                 this.lowStock = result.lowStock || [];
+                this.payrollReport = result.payrollReport || this.emptyPayrollReport();
                 this.lastRefreshedAt = DateTime.local();
                 this.cdr.markForCheck();
             });
@@ -147,6 +194,9 @@ export class DashboardComponent extends AppComponentBase implements OnInit, OnDe
     }
 
     get kpiMetrics(): DashboardMetric[] {
+        if (!this.canViewSalesReports) {
+            return [];
+        }
         return [
             {
                 label: this.l('Orders'),
@@ -179,16 +229,16 @@ export class DashboardComponent extends AppComponentBase implements OnInit, OnDe
         ];
     }
 
-    get operationMetrics(): DashboardMetric[] {
+    get decisionMetrics(): DashboardMetric[] {
         return [
-            {
+            ...(this.canViewOperationsReports ? [{
                 label: this.l('Pending KOT/BOT'),
                 value: this.formatInteger(this.pendingTicketCount),
                 accent: 'warning',
                 icon: 'fa-kitchen-set',
                 subText: `${this.cancelledTicketCount} ${this.l('Cancelled')}`,
-            },
-            {
+            }] : []),
+            ...(this.canViewInventoryReports ? [{
                 label: this.l('Low Stock'),
                 value: this.formatInteger(this.lowStock.length),
                 accent: this.lowStock.length ? 'danger' : 'success',
@@ -208,7 +258,33 @@ export class DashboardComponent extends AppComponentBase implements OnInit, OnDe
                 accent: 'primary',
                 icon: 'fa-bowl-food',
                 subText: `${this.foodCosting.length} ${this.l('Items')}`,
-            },
+            }] : []),
+            ...(this.canViewPayrollReports ? [{
+                label: this.l('Active Employees'),
+                value: this.formatInteger(this.payrollReport.summary.activeEmployeeCount),
+                accent: 'primary',
+                icon: 'fa-users',
+                subText: `${this.payrollReport.summary.attendanceRecordCount} ${this.l('Attendance records')}`,
+            }, {
+                label: this.l('Net Payroll'),
+                value: this.formatMoney(this.payrollReport.summary.totalNet),
+                accent: 'success',
+                icon: 'fa-money-check-dollar',
+                subText: `${this.payrollReport.summary.payrollRunCount} ${this.l('Pay runs')}`,
+            }] : []),
+            ...(this.canViewAuditReports ? [{
+                label: this.l('Settled Sales'),
+                value: this.formatMoney(this.totalSettledSales),
+                accent: 'success',
+                icon: 'fa-money-bill-transfer',
+                subText: `${this.settledOrderCount} ${this.l('Orders')}`,
+            }, {
+                label: this.l('Settlement Discounts'),
+                value: this.formatMoney(this.totalSettlementDiscounts),
+                accent: 'danger',
+                icon: 'fa-tags',
+                subText: `${this.settlements.length} ${this.l('Payment methods')}`,
+            }] : []),
         ];
     }
 
@@ -235,7 +311,19 @@ export class DashboardComponent extends AppComponentBase implements OnInit, OnDe
     }
 
     get totalSalesForShare(): number {
-        return Math.max(this.value(this.summary?.grandTotal), 1);
+        return Math.max(this.totalSettledSales, 1);
+    }
+
+    get totalSettledSales(): number {
+        return this.settlements.reduce((sum, row) => sum + this.value(row.grandTotal), 0);
+    }
+
+    get totalSettlementDiscounts(): number {
+        return this.settlements.reduce((sum, row) => sum + this.value(row.discountAmount), 0);
+    }
+
+    get settledOrderCount(): number {
+        return this.settlements.reduce((sum, row) => sum + this.value(row.orderCount), 0);
     }
 
     get pendingTicketCount(): number {
@@ -268,8 +356,8 @@ export class DashboardComponent extends AppComponentBase implements OnInit, OnDe
 
     private loadLookups(): void {
         forkJoin({
-            tables: this.restaurantSetupService.getTables(null),
-            categories: this.restaurantMenuService.getCategories(),
+            tables: this.canUseTableFilter ? this.restaurantSetupService.getTables(null) : of([]),
+            categories: this.canUseCategoryFilter ? this.restaurantMenuService.getCategories() : of([]),
             waiters: this.reportingServiceProxy.getAllUserDropdown(),
         }).subscribe((result) => {
             this.tables = result.tables || [];
@@ -277,6 +365,35 @@ export class DashboardComponent extends AppComponentBase implements OnInit, OnDe
             this.waiters = result.waiters || [];
             this.cdr.markForCheck();
         });
+    }
+
+    private canViewReportCategory(permission: string): boolean {
+        const categoryPermissions = [
+            'Pages.Restaurant.Reports.Sales',
+            'Pages.Restaurant.Reports.Operations',
+            'Pages.Restaurant.Reports.Inventory',
+            'Pages.Restaurant.Reports.Payroll',
+            'Pages.Restaurant.Reports.AuditFinance',
+        ];
+        const hasSpecificCategory = categoryPermissions.some((item) => this.isGranted(item));
+        return !hasSpecificCategory || this.isGranted(permission);
+    }
+
+    private emptyPayrollReport(): RestaurantPayrollReportBundleDto {
+        return {
+            summary: {
+                activeEmployeeCount: 0,
+                payrollRunCount: 0,
+                attendanceRecordCount: 0,
+                totalGross: 0,
+                totalDeduction: 0,
+                totalNet: 0,
+                totalOvertimeHours: 0,
+            },
+            runs: [],
+            employeeCosts: [],
+            attendance: [],
+        };
     }
 
     private createDefaultFilter(): RestaurantDashboardFilter {

@@ -2,7 +2,7 @@
     <sub-header [title]="'Dashboard' | localize">
         <div class="d-flex align-items-center" role="actions">
             @if (!loading && userDashboard && userDashboard.filters && userDashboard.filters.length > 0) {
-                <button (click)="filterModal.show()" class="btn btn-sm btn-light-primary btn-filter" type="button">
+                <button (click)="filterModal.show()" class="btn btn-sm btn-light-primary btn-filter me-2" type="button">
                     <i class="fa fa-filter"></i>
                     {{ 'Filter' | localize }}
                 </button>
@@ -40,12 +40,14 @@
                                     [ngClass]="{ 'no-tab': !moreThanOnePage() }"
                                     [options]="options[i]"
                                     [perfectScrollOptions]="{ wheelPropagation: false }"
+                                    class="bg-transparent"
                                     perfectScrollbar
                                 >
                                     @for (widget of page.widgets; track widget) {
                                         <gridster-item
                                             (itemResize)="onGridSterItemResize(widget)"
                                             [item]="widget.gridInformation"
+                                            class="bg-transparent"
                                         >
                                             <ng-container
                                                 *ngComponentOutlet="
@@ -56,7 +58,7 @@
                                             @if (editModeEnabled) {
                                                 <button
                                                     (click)="removeItem(widget.gridInformation)"
-                                                    class="btn btn-sm bg-danger deleteWidgetButton"
+                                                    class="btn btn-sm bg-danger deleteWidgetButton position-absolute top-0 end-0 text-center border-0 shadow-none"
                                                 >
                                                     <i class="fa-duotone fa-regular fa-xmark text-white"></i>
                                                 </button>
@@ -69,7 +71,7 @@
                     </tabset>
                 </div>
                 @if (editModeEnabled) {
-                    <div class="div-dashboard-customization d-flex w-auto shadow-lg">
+                    <div class="div-dashboard-customization d-flex w-auto shadow-lg position-fixed">
                         <div class="me-1 border-right">
                             <button
                                 (click)="openAddWidgetModal()"

@@ -19,7 +19,6 @@ namespace NextWave.Erp.Reporting.AccountingReport
     [AbpAuthorize(AppPermissions.PagesAccountLedgerReport)]
     public class AccountLedgerReport(
     IRepository<LedgerPosting, Guid> ledgerPostingRepository,
-    IRepository<FinancialYear, Guid> financialYearRepository,
     IRepository<AccountGroup, Guid> accountGroupRepository,
     IRepository<AccountLedger, Guid> accountLedgerRepository,
     IAccountLedgerExcelExporter excelExporter
@@ -31,8 +30,9 @@ namespace NextWave.Erp.Reporting.AccountingReport
 
         public async Task<List<AccountLedgerReportList>> GetReport(Guid groupId, bool isZeroBalance, string? fromMiti, string? toMiti)
         {
-            var fromDate = FinancialYear.FromDate;
-            var toDate = FinancialYear.ToDate;
+            var reportFinancialYear = FinancialYear;
+            var fromDate = reportFinancialYear.FromDate;
+            var toDate = reportFinancialYear.ToDate;
 
             if (!string.IsNullOrWhiteSpace(fromMiti))
                 fromDate = DateConverter.ConvertToEnglish(fromMiti).Date;
@@ -56,12 +56,14 @@ namespace NextWave.Erp.Reporting.AccountingReport
                     x.Credit,
                     VoucherName = x.VoucherTypeFk.Name
                 })
-                .Where(x => x.TenantId == AbpSession.TenantId && x.FinancialYearId == FinancialYearId);
+                .Where(x => x.TenantId == AbpSession.TenantId && x.FinancialYearId == reportFinancialYear.Id);
+
+            HashSet<Guid>? applicableGroupIds = null;
 
             // Apply filters
             if (groupId != Guid.Empty)
             {
-                var applicableGroupIds = await GetGroupIdsRecursivelyAsync(groupId);
+                applicableGroupIds = await GetGroupIdsRecursivelyAsync(groupId);
                 baseQuery = baseQuery.Where(x => applicableGroupIds.Contains(x.AccountGroupId));
             }
 
@@ -89,10 +91,19 @@ namespace NextWave.Erp.Reporting.AccountingReport
 
             var returnList = new List<AccountLedgerReportList>();
 
-            var accountNameList = await accountLedgerRepository.GetAll()
+            var accountLedgerIdsWithPostings = result.Select(x => x.AccountLedgerId).ToList();
+            var accountNameQuery = accountLedgerRepository.GetAll()
                 .AsNoTracking()
                 .Include(e => e.AccountGroupFk)
-                .Where(e => result.Select(x => x.AccountLedgerId).Contains(e.Id))
+                .Where(e => e.TenantId == AbpSession.TenantId);
+
+            if (applicableGroupIds != null)
+                accountNameQuery = accountNameQuery.Where(e => applicableGroupIds.Contains(e.AccountGroupId));
+
+            if (!isZeroBalance)
+                accountNameQuery = accountNameQuery.Where(e => accountLedgerIdsWithPostings.Contains(e.Id));
+
+            var accountNameList = await accountNameQuery
                 .Select(x => new
                 {
                     x.Id,
@@ -103,21 +114,25 @@ namespace NextWave.Erp.Reporting.AccountingReport
                     x.Phone
                 })
                 .ToListAsync();
+
+            var postingByLedgerId = result.ToDictionary(x => x.AccountLedgerId);
+
             // Calculate derived fields in memory
-            foreach (var item in result)
+            foreach (var getLedger in accountNameList)
             {
-                var getLedger = accountNameList.FirstOrDefault(e => e.Id == item.AccountLedgerId);
-                var opening = item.OpeningBalance + item.PriorBalance;
-                var closing = opening + item.Debit - item.Credit;
-                if (getLedger == null) continue;
+                postingByLedgerId.TryGetValue(getLedger.Id, out var item);
+                var opening = (item?.OpeningBalance ?? 0) + (item?.PriorBalance ?? 0);
+                var debit = item?.Debit ?? 0;
+                var credit = item?.Credit ?? 0;
+                var closing = opening + debit - credit;
                 var model = new AccountLedgerReportList
                 {
-                    AccountLedgerId = item.AccountLedgerId,
+                    AccountLedgerId = getLedger.Id,
                     LedgerName = getLedger.Name,
                     OpeningDr = opening > 0 ? opening : 0,
                     OpeningCr = opening < 0 ? Math.Abs(opening) : 0,
-                    Debit = item.Debit,
-                    Credit = item.Credit,
+                    Debit = debit,
+                    Credit = credit,
                     BalanceDr = closing > 0 ? Math.Abs(closing) : 0,
                     BalanceCr = closing < 0 ? Math.Abs(closing) : 0,
                     Address = getLedger.Address,
@@ -195,7 +210,7 @@ namespace NextWave.Erp.Reporting.AccountingReport
 
         public async Task<CurrentFinancialYearDto> GetFinancialYears()
         {
-            var data = await financialYearRepository.FirstOrDefaultAsync(x => x.Id == FinancialYearId);
+            var data = FinancialYear;
             return new CurrentFinancialYearDto
             {
                 FromDate = data.FromDate,
@@ -204,7 +219,6 @@ namespace NextWave.Erp.Reporting.AccountingReport
                 ToMiti = data.ToMiti
             };
         }
-
 
         //public async Task<byte[]> GetPdfDownload(Guid groupId, bool isShowZero, string? fromMiti, string? toMiti)
         //{

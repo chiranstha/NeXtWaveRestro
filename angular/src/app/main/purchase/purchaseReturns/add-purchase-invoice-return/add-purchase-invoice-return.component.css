@@ -1,231 +1,27 @@
 @media only screen and (max-width: 760px),
-(min-device-width: 768px) and (max-device-width: 1024px) {
+    (min-device-width: 768px) and (max-device-width: 1024px) {
+    td:nth-of-type(1)::before { content: 'S.N.'; }
+    td:nth-of-type(2)::before { content: 'PRODUCT CODE'; }
+    td:nth-of-type(3)::before { content: 'PRODUCT NAME'; }
+    td:nth-of-type(4)::before { content: 'QTY'; }
+    td:nth-of-type(5)::before { content: 'IMEI'; }
+    td:nth-of-type(6)::before { content: 'UNIT'; }
+    td:nth-of-type(7)::before { content: 'GodOwn'; }
+    td:nth-of-type(8)::before { content: 'RACK'; }
+    td:nth-of-type(9)::before { content: 'RATE'; }
+    td:nth-of-type(10)::before { content: 'GROSS AMOUNT'; }
+    td:nth-of-type(11)::before { content: 'DISCOUNT %'; }
+    td:nth-of-type(12)::before { content: 'DISCOUNT'; }
+    td:nth-of-type(13)::before { content: 'NET AMOUNT'; }
+    td:nth-of-type(14)::before { content: 'TAX'; }
+    td:nth-of-type(15)::before { content: 'TAX AMOUNT'; }
+    td:nth-of-type(16)::before { content: 'TOTAL AMOUNT'; }
+    td:nth-of-type(17)::before { content: 'EDIT'; }
+    td:nth-of-type(18)::before { content: 'REMOVE'; }
 
-    table,
-    thead,
-    tbody,
-    th,
-    td,
-    tr {
-        display: block;
-    }
-
-    thead tr {
-        position: absolute;
-        top: -9999px;
-        left: -9999px;
-    }
-
-    tr {
-        margin: 0 0 1rem 0;
-    }
-
-    .tr-one {
-        display: none;
-    }
-
-    tr:nth-child(odd) {
-        background: #e8f3ff;
-    }
-
-    td div {
-        width: 351px !important;
-    }
-
-    .imei-td div {
-        width: 266px !important;
-        margin-top: 17px !important;
-    }
-
-    .text-left {
-        text-align: left !important;
-    }
-
-    td {
-        border: none;
-        border-bottom: 1px solid #eee;
-        position: relative;
-        padding-left: 50%;
-        display: grid;
-        justify-content: end;
-    }
-
-    td:before {
-        position: absolute;
-        top: 0;
-        left: 2px;
-        width: 45%;
-        padding-right: 10px;
-        white-space: nowrap;
-    }
-
-
-    .fd-input:last-child {
-        margin-right: -22px;
-    }
-
-    td:nth-of-type(1):before {
-        content: "S.N.";
-    }
-
-    td:nth-of-type(2):before {
-        content: "PRODUCT CODE";
-    }
-
-    td:nth-of-type(3):before {
-        content: "PRODUCT NAME";
-    }
-
-
-    td:nth-of-type(4):before {
-        content: "QTY";
-    }
-
-    td:nth-of-type(5):before {
-        content: "IMEI";
-    }
-
-    td:nth-of-type(6):before {
-        content: "UNIT";
-    }
-
-    td:nth-of-type(7):before {
-        content: "GodOwn";
-    }
-
-    td:nth-of-type(8):before {
-        content: "RACK";
-    }
-
-    td:nth-of-type(9):before {
-        content: "RATE";
-    }
-
-    td:nth-of-type(10):before {
-        content: "GROSS AMOUNT";
-    }
-
-    td:nth-of-type(11):before {
-        content: "DISCOUNT %";
-    }
-
-    td:nth-of-type(12):before {
-        content: "DISCOUNT ";
-    }
-
-    td:nth-of-type(13):before {
-        content: "NET AMOUNT";
-    }
-
-    td:nth-of-type(14):before {
-        content: "TAX";
-    }
-
-    td:nth-of-type(15):before {
-        content: "TAX AMOUNT";
-    }
-
-    td:nth-of-type(16):before {
-        content: "TOTAL AMOUNT";
-    }
-
-    td:nth-of-type(17):before {
-        content: "EDIT";
-    }
-
-    td:nth-of-type(18):before {
-        content: "REMOVE";
-    }
-
-    /* imei table */
-    .imei-td td:nth-of-type(1):before {
-        content: "S.N.";
-    }
-
-    .imei-td td:nth-of-type(2):before {
-        content: "IMEI";
-    }
-
-    .imei-td td:nth-of-type(3):before {
-        content: "OPTION";
-    }
-
-    /* upload file table */
-    .upload-td:nth-of-type(1):before {
-        content: "S.N.";
-    }
-
-    .upload-td:nth-of-type(2):before {
-        content: "FILE NAME";
-    }
-
-    .upload-td:nth-of-type(3):before {
-        content: "FILE TYPE";
-    }
-
-    .upload-td:nth-of-type(4):before {
-        content: "FILE";
-    }
-
-    .upload-td:nth-of-type(5):before {
-        content: "DELETE";
-    }
-
-
-}
-
-/*
-@media (min-width: 435px) and (max-width: 575px) {
-    td div {
-        width: 205px !important;
-
-    }
-
-    .imei-td {
-        height: auto !important;
-    }
-
-    .imei-td div {
-        margin-top: 20px !important;
-    }
-}
-
-@media (max-width: 435px) {
-    td div {
-        width: 110px !important;
-
-    }
-} */
-
-
-@media (max-width: 600px) {
-    td {
-        height: auto;
-    }
-
-    .imei-td div {
-        width: 210px !important;
-        margin-top: 17px !important;
-    }
-
-    td div {
-        width: 200px !important;
-        margin-top: 17px !important;
-    }
-}
-
-
-@media (max-width: 350px) {
-    td {
-        height: auto;
-    }
-
-    .fold-overflow {
-        overflow: auto;
-    }
-
-    td div {
-        width: 170px !important;
-        margin-top: 17px !important;
-    }
+    .upload-td:nth-of-type(1)::before { content: 'S.N.'; }
+    .upload-td:nth-of-type(2)::before { content: 'FILE NAME'; }
+    .upload-td:nth-of-type(3)::before { content: 'FILE TYPE'; }
+    .upload-td:nth-of-type(4)::before { content: 'FILE'; }
+    .upload-td:nth-of-type(5)::before { content: 'DELETE'; }
 }

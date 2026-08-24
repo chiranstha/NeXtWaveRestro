@@ -191,21 +191,25 @@ namespace NextWave.Erp.Accounting
         [DisableAuditing]
         public async Task<List<FinancialYearSelectDto>> GetAllFinancialYear()
         {
-            var dateselect = await financialYearRepository.GetAll().OrderBy(x => x.FromDate).ToListAsync();
+            var currentFinancialYearId = FinancialYearId;
+            var dateselect = await financialYearRepository.GetAll()
+                .Where(x => x.TenantId == AbpSession.GetTenantId())
+                .OrderByDescending(x => x.FromDate)
+                .ToListAsync();
             var list = new List<FinancialYearSelectDto>();
             foreach (var item in dateselect)
             {
                 var model = new FinancialYearSelectDto
                 {
                     FinancialYearId = item.Id,
-                    FinancialYear = item.Name
+                    FinancialYear = item.Name,
+                    Active = item.Id == currentFinancialYearId
                 };
                 list.Add(model);
             }
 
             return list;
         }
-
 
         public async Task ChangeFinancialYear(Guid financialYearId)
         {

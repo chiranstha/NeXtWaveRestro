@@ -238,3 +238,177 @@ circle[class="eye-pupil"] {
                 cy 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
                 fill 0.3s ease;
 }
+
+/* Restaurant sign-in card */
+.login-form {
+    color: #15283a;
+}
+
+.login-heading {
+    text-align: left;
+}
+
+.login-kicker {
+    display: inline-block;
+    margin-bottom: 0.85rem;
+    color: #c66b18;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.login-form .form-control-solid {
+    min-height: 54px;
+    background: #f8fafc !important;
+    border: 1px solid #d8e1ea !important;
+    color: #15283a;
+    transition:
+        border-color 0.16s ease,
+        box-shadow 0.16s ease,
+        background-color 0.16s ease;
+}
+
+.login-form .form-control-solid:focus {
+    background: #ffffff !important;
+    border-color: #0e8f96 !important;
+    box-shadow: 0 0 0 4px rgba(14, 143, 150, 0.13) !important;
+}
+
+.password-input {
+    padding-right: 4.5rem !important;
+    letter-spacing: 0;
+}
+
+.password-field-scrambling {
+    color: transparent !important;
+    caret-color: transparent;
+}
+
+.password-shuffle-layer {
+    left: 1.5rem;
+    right: 4.8rem;
+    z-index: 4;
+    overflow: hidden;
+    color: #15283a;
+    font-family: Consolas, "Liberation Mono", monospace;
+    font-size: 1.075rem;
+    font-weight: 700;
+    line-height: 1;
+    pointer-events: none;
+    text-overflow: clip;
+    white-space: nowrap;
+}
+
+.login-form .btn-primary {
+    min-height: 50px;
+    border: 0 !important;
+    border-radius: 8px !important;
+    background: linear-gradient(135deg, #0b4b78 0%, #0e8f96 62%, #12a8a7 100%) !important;
+    box-shadow: 0 14px 26px rgba(11, 75, 120, 0.22);
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.login-form .btn-primary:hover:not(:disabled) {
+    box-shadow: 0 18px 30px rgba(14, 143, 150, 0.24);
+    transform: translateY(-1px);
+}
+
+.login-form .btn-primary:disabled {
+    background: #a8becb !important;
+    box-shadow: none;
+}
+
+.login-form .form-check-label,
+.login-support-links {
+    color: #64748b;
+}
+
+.login-support-links {
+    text-align: center;
+    font-size: 0.92rem;
+}
+
+.password-toggle {
+    right: 12px;
+    width: 42px;
+    height: 42px;
+    margin: 0;
+    opacity: 0.9;
+    color: #15283a;
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        opacity 0.18s ease;
+}
+
+.hidden-toggle {
+    visibility: visible;
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.password-toggle:hover {
+    border-color: #acd8da !important;
+    background: #effafa !important;
+    box-shadow: 0 8px 18px rgba(14, 143, 150, 0.14);
+}
+
+.password-toggle:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 4px rgba(14, 143, 150, 0.16);
+}
+
+.password-toggle:hover .eye-outline,
+.password-toggle:hover .eyelash {
+    stroke: #0e8f96;
+}
+
+.password-toggle:hover .eye-pupil {
+    fill: #0e8f96;
+}
+
+.eye-outline,
+.eyelash {
+    stroke: #465d6f;
+}
+
+.eye-pupil {
+    fill: #465d6f;
+}
+
+.eye-closed .closed-eye-icon {
+    transform: scale(1.05);
+}
+
+.eye-open .eye-outline,
+.eye-open .eye-pupil {
+    stroke: #0e8f96;
+}
+
+.eye-open .eye-pupil {
+    fill: #0e8f96;
+}
+
+.password-animating .eye-outline,
+.password-animating .eyelash {
+    stroke: #f59e42;
+}
+
+.password-animating .eye-pupil {
+    fill: #f59e42;
+}
+
+@media (max-width: 575.98px) {
+    .login-heading {
+        text-align: center;
+    }
+
+    .login-form .mb-5.d-flex {
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}

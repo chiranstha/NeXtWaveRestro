@@ -26,13 +26,14 @@ import {
 } from '@shared/service-proxies/service-proxies';
 import { ColDef, ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 import { DateTime } from 'luxon';
-import { finalize, forkJoin } from 'rxjs';
+import { finalize, forkJoin, of } from 'rxjs';
 import {
     RestaurantDailySalesSummaryReportDto,
     RestaurantDiscountReportDto,
     RestaurantItemMarginReportDto,
     RestaurantFoodCostingReportDto,
     RestaurantLowStockReportDto,
+    RestaurantPayrollReportBundleDto,
     RestaurantRecipeCostingReportDto,
     RestaurantReportsApiService,
     RestaurantSettlementReportDto,
@@ -52,16 +53,23 @@ interface RestaurantReportFilter {
 }
 
 interface RestaurantAgGridReport {
+    type: RestaurantReportType;
     title: string;
     columnDefs: ColDef[];
     rowData: () => object[];
     height: number;
 }
 
+interface RestaurantReportKpi {
+    label: string;
+    value: string;
+}
+
+type RestaurantReportType = 'sales' | 'operations' | 'inventory' | 'payroll' | 'audit';
+
 @Component({
     selector: 'restaurant-reports',
     templateUrl: './restaurant-reports.component.html',
-    styleUrls: ['../restaurant-shared.css'],
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation],
     providers: [RestaurantReportsApiService],
@@ -79,6 +87,25 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
     };
     noRowsOverlayTemplate = '';
     reportGridSections: RestaurantAgGridReport[] = [];
+    readonly reportTypes: Array<{ key: RestaurantReportType; label: string; icon: string }> = [
+        { key: 'sales', label: 'Sales', icon: 'fa-chart-line' },
+        { key: 'operations', label: 'Operations', icon: 'fa-people-group' },
+        { key: 'inventory', label: 'Inventory & Cost', icon: 'fa-boxes-stacked' },
+        { key: 'payroll', label: 'Payroll & Attendance', icon: 'fa-money-check-dollar' },
+        { key: 'audit', label: 'Audit & Finance', icon: 'fa-shield-halved' },
+    ];
+    private readonly reportPermissionByType: Record<RestaurantReportType, string> = {
+        sales: 'Pages.Restaurant.Reports.Sales',
+        operations: 'Pages.Restaurant.Reports.Operations',
+        inventory: 'Pages.Restaurant.Reports.Inventory',
+        payroll: 'Pages.Restaurant.Reports.Payroll',
+        audit: 'Pages.Restaurant.Reports.AuditFinance',
+    };
+    activeReportType: RestaurantReportType = 'sales';
+    primaryChartTitle = '';
+    secondaryChartTitle = '';
+    primaryChartOptions: any = { data: [], series: [] };
+    secondaryChartOptions: any = { data: [], series: [] };
     dateFiltersVisible = true;
     summary: RestaurantPosSalesSummaryDto | undefined;
     materialConsumption: RestaurantMaterialConsumptionReportDto[] = [];
@@ -97,9 +124,70 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
     foodCosting: RestaurantFoodCostingReportDto[] = [];
     wastageReport: RestaurantWastageReportDto[] = [];
     lowStockReport: RestaurantLowStockReportDto[] = [];
+    payrollReport: RestaurantPayrollReportBundleDto = this.createEmptyPayrollReport();
     tables: RestaurantTableDto[] = [];
     categories: RestaurantMenuCategoryDto[] = [];
     waiters: GetUserDropdownDto[] = [];
+
+    get canUseTableFilter(): boolean {
+        return this.isGranted('Pages.Restaurant.Setup');
+    }
+
+    get canUseCategoryFilter(): boolean {
+        return this.isGranted('Pages.Restaurant.Menu');
+    }
+
+    get visibleReportGridSections(): RestaurantAgGridReport[] {
+        return this.reportGridSections.filter((section) => section.type === this.activeReportType);
+    }
+
+    get visibleReportTypes(): Array<{ key: RestaurantReportType; label: string; icon: string }> {
+        return this.reportTypes.filter((type) => this.canViewReportType(type.key));
+    }
+
+    get reportKpis(): RestaurantReportKpi[] {
+        const money = (value: number | null | undefined) =>
+            Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const sum = <T>(rows: T[], value: (row: T) => number) => rows.reduce((total, row) => total + value(row), 0);
+
+        switch (this.activeReportType) {
+            case 'operations':
+                return [
+                    { label: this.l('Open Tickets'), value: String(this.kotBotStatus.filter((row) => (row.status || '').toLowerCase() === 'pending').length) },
+                    { label: this.l('Cancelled Tickets'), value: String(this.kotBotStatus.filter((row) => (row.status || '').toLowerCase() === 'cancelled').length) },
+                    { label: this.l('Waiters'), value: String(this.waiterPerformance.length) },
+                    { label: this.l('Tables'), value: String(this.tableTurnover.length) },
+                ];
+            case 'inventory':
+                return [
+                    { label: this.l('Low Stock Items'), value: String(this.lowStockReport.length) },
+                    { label: this.l('Wastage'), value: money(sum(this.wastageReport, (row) => Number(row.amount || 0))) },
+                    { label: this.l('Stock Consumption'), value: money(sum(this.materialConsumption, (row) => Number(row.amount || 0))) },
+                    { label: this.l('Food Cost Items'), value: String(this.foodCosting.length) },
+                ];
+            case 'payroll':
+                return [
+                    { label: this.l('Active Employees'), value: String(this.payrollReport.summary.activeEmployeeCount || 0) },
+                    { label: this.l('Payroll Runs'), value: String(this.payrollReport.summary.payrollRunCount || 0) },
+                    { label: this.l('Gross Payroll'), value: money(this.payrollReport.summary.totalGross) },
+                    { label: this.l('Net Payroll'), value: money(this.payrollReport.summary.totalNet) },
+                ];
+            case 'audit':
+                return [
+                    { label: this.l('Void / Cancelled'), value: String(this.voidCancelledAudit.length) },
+                    { label: this.l('Discounts'), value: money(sum(this.discountReport, (row) => Number(row.totalDiscountAmount || 0))) },
+                    { label: this.l('Payment Methods'), value: String(this.settlementReport.length) },
+                    { label: this.l('Settled Sales'), value: money(sum(this.settlementReport, (row) => Number(row.grandTotal || 0))) },
+                ];
+            default:
+                return [
+                    { label: this.l('Orders'), value: String(this.summary?.orderCount || 0) },
+                    { label: this.l('Sales'), value: money(this.summary?.grandTotal) },
+                    { label: this.l('Average Bill'), value: money(this.summary?.averageBill) },
+                    { label: this.l('Discounts'), value: money(this.summary?.discountAmount) },
+                ];
+        }
+    }
 
     private restaurantReportsService = inject(RestaurantReportsServiceProxy);
     private restaurantReportsApiService = inject(RestaurantReportsApiService);
@@ -110,11 +198,12 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
 
     constructor() {
         super(inject(Injector));
-        this.noRowsOverlayTemplate = `<span class="restaurant-grid-empty">${this.l('NoData')}</span>`;
+        this.noRowsOverlayTemplate = `<span class="restaurant-grid-empty fw-bolder">${this.l('NoData')}</span>`;
         this.reportGridSections = this.createReportGridSections();
     }
 
     ngOnInit(): void {
+        this.activeReportType = this.visibleReportTypes[0]?.key || 'sales';
         this.loadLookups();
         this.refresh();
     }
@@ -124,11 +213,11 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
     }
 
     loadLookups(): void {
-        this.restaurantSetupService.getTables(null).subscribe((result) => {
+        (this.canUseTableFilter ? this.restaurantSetupService.getTables(null) : of([])).subscribe((result) => {
             this.tables = result || [];
             this.cdr.markForCheck();
         });
-        this.restaurantMenuService.getCategories().subscribe((result) => {
+        (this.canUseCategoryFilter ? this.restaurantMenuService.getCategories() : of([])).subscribe((result) => {
             this.categories = result || [];
             this.cdr.markForCheck();
         });
@@ -136,6 +225,15 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
             this.waiters = result || [];
             this.cdr.markForCheck();
         });
+    }
+
+    selectReportType(type: RestaurantReportType): void {
+        if (!this.canViewReportType(type)) {
+            return;
+        }
+        this.activeReportType = type;
+        this.updateCharts();
+        this.cdr.markForCheck();
     }
 
     refresh(): void {
@@ -146,121 +244,133 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
         const tableId = this.filter.tableId || null;
         const waiterUserId = this.filter.waiterUserId || null;
         const categoryId = this.filter.categoryId || null;
+        const canViewSales = this.canViewReportType('sales');
+        const canViewOperations = this.canViewReportType('operations');
+        const canViewInventory = this.canViewReportType('inventory');
+        const canViewPayroll = this.canViewReportType('payroll');
+        const canViewAudit = this.canViewReportType('audit');
 
         forkJoin({
-            summary: this.restaurantReportsService.getPosSalesSummary(
+            summary: canViewSales ? this.restaurantReportsService.getPosSalesSummary(
                 fromDate,
                 toDate,
                 tableId,
                 waiterUserId,
                 categoryId,
-            ),
-            materialConsumption: this.restaurantReportsService.getMaterialConsumption(
+            ) : of(new RestaurantPosSalesSummaryDto()),
+            materialConsumption: canViewInventory ? this.restaurantReportsService.getMaterialConsumption(
                 fromDate,
                 toDate,
                 tableId,
                 waiterUserId,
                 categoryId,
-            ),
-            itemSales: this.restaurantReportsService.getItemSales(fromDate, toDate, tableId, waiterUserId, categoryId),
-            tableSales: this.restaurantReportsService.getTableSales(
+            ) : of([]),
+            itemSales: canViewSales ? this.restaurantReportsService.getItemSales(fromDate, toDate, tableId, waiterUserId, categoryId) : of([]),
+            tableSales: canViewOperations ? this.restaurantReportsService.getTableSales(
                 fromDate,
                 toDate,
                 tableId,
                 waiterUserId,
                 categoryId,
-            ),
-            waiterSales: this.restaurantReportsService.getWaiterSales(
+            ) : of([]),
+            waiterSales: canViewOperations ? this.restaurantReportsService.getWaiterSales(
                 fromDate,
                 toDate,
                 tableId,
                 waiterUserId,
                 categoryId,
-            ),
-            dailySalesSummary: this.restaurantReportsApiService.getDailySalesSummary(
+            ) : of([]),
+            dailySalesSummary: canViewSales ? this.restaurantReportsApiService.getDailySalesSummary(
                 fromDate,
                 toDate,
                 tableId,
                 waiterUserId,
                 categoryId,
-            ),
-            kotBotStatus: this.restaurantReportsApiService.getKotBotStatus(
+            ) : of([]),
+            kotBotStatus: canViewOperations ? this.restaurantReportsApiService.getKotBotStatus(
                 fromDate,
                 toDate,
                 tableId,
                 waiterUserId,
                 categoryId,
-            ),
-            itemSalesWithMargin: this.restaurantReportsApiService.getItemSalesWithMargin(
+            ) : of([]),
+            itemSalesWithMargin: canViewSales ? this.restaurantReportsApiService.getItemSalesWithMargin(
                 fromDate,
                 toDate,
                 tableId,
                 waiterUserId,
                 categoryId,
-            ),
-            waiterPerformance: this.restaurantReportsApiService.getWaiterPerformance(
+            ) : of([]),
+            waiterPerformance: canViewOperations ? this.restaurantReportsApiService.getWaiterPerformance(
                 fromDate,
                 toDate,
                 tableId,
                 waiterUserId,
                 categoryId,
-            ),
-            tableTurnover: this.restaurantReportsApiService.getTableTurnover(
+            ) : of([]),
+            tableTurnover: canViewOperations ? this.restaurantReportsApiService.getTableTurnover(
                 fromDate,
                 toDate,
                 tableId,
                 waiterUserId,
                 categoryId,
-            ),
-            voidCancelledAudit: this.restaurantReportsApiService.getVoidCancelledAudit(
+            ) : of([]),
+            voidCancelledAudit: canViewAudit ? this.restaurantReportsApiService.getVoidCancelledAudit(
                 fromDate,
                 toDate,
                 tableId,
                 waiterUserId,
                 categoryId,
-            ),
-            discountReport: this.restaurantReportsApiService.getDiscountReport(
+            ) : of([]),
+            discountReport: canViewAudit ? this.restaurantReportsApiService.getDiscountReport(
                 fromDate,
                 toDate,
                 tableId,
                 waiterUserId,
                 categoryId,
-            ),
-            settlementReport: this.restaurantReportsApiService.getSettlementReport(
+            ) : of([]),
+            settlementReport: canViewAudit ? this.restaurantReportsApiService.getSettlementReport(
                 fromDate,
                 toDate,
                 tableId,
                 waiterUserId,
                 categoryId,
-            ),
-            recipeCosting: this.restaurantReportsApiService.getRecipeCosting(
+            ) : of([]),
+            recipeCosting: canViewInventory ? this.restaurantReportsApiService.getRecipeCosting(
                 fromDate,
                 toDate,
                 tableId,
                 waiterUserId,
                 categoryId,
-            ),
-            foodCosting: this.restaurantReportsApiService.getFoodCosting(
+            ) : of([]),
+            foodCosting: canViewInventory ? this.restaurantReportsApiService.getFoodCosting(
                 fromDate,
                 toDate,
                 tableId,
                 waiterUserId,
                 categoryId,
-            ),
-            wastageReport: this.restaurantReportsApiService.getWastageReport(
+            ) : of([]),
+            wastageReport: canViewInventory ? this.restaurantReportsApiService.getWastageReport(
                 fromDate,
                 toDate,
                 tableId,
                 waiterUserId,
                 categoryId,
-            ),
-            lowStockReport: this.restaurantReportsApiService.getLowStockReport(
+            ) : of([]),
+            lowStockReport: canViewInventory ? this.restaurantReportsApiService.getLowStockReport(
                 fromDate,
                 toDate,
                 tableId,
                 waiterUserId,
                 categoryId,
-            ),
+            ) : of([]),
+            payrollReport: canViewPayroll ? this.restaurantReportsApiService.getPayrollReport(
+                fromDate,
+                toDate,
+                tableId,
+                waiterUserId,
+                categoryId,
+            ) : of(this.createEmptyPayrollReport()),
         })
             .pipe(finalize(() => this.finishLoading()))
             .subscribe((result) => {
@@ -281,6 +391,8 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                 this.foodCosting = result.foodCosting || [];
                 this.wastageReport = result.wastageReport || [];
                 this.lowStockReport = result.lowStockReport || [];
+                this.payrollReport = result.payrollReport || this.createEmptyPayrollReport();
+                this.updateCharts();
                 this.cdr.markForCheck();
             });
     }
@@ -309,14 +421,163 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
         return value ? value.replace(/\//g, '-') : '';
     }
 
+    canViewReportType(type: RestaurantReportType): boolean {
+        const hasAnySpecificPermission = Object.values(this.reportPermissionByType).some((permission) =>
+            this.isGranted(permission),
+        );
+
+        return !hasAnySpecificPermission || this.isGranted(this.reportPermissionByType[type]);
+    }
+
     private finishLoading(): void {
         this.loading = false;
         this.cdr.markForCheck();
     }
 
+    private updateCharts(): void {
+        const top = <T>(rows: T[], amount: (row: T) => number) =>
+            [...rows].sort((left, right) => amount(right) - amount(left)).slice(0, 10);
+
+        switch (this.activeReportType) {
+            case 'sales': {
+                const daily = new Map<string, { label: string; sales: number; orders: number }>();
+                for (const row of this.dailySalesSummary) {
+                    const label = this.formatGridDate(row.date);
+                    const value = daily.get(label) || { label, sales: 0, orders: 0 };
+                    value.sales += Number(row.grandTotal || 0);
+                    value.orders += Number(row.orderCount || 0);
+                    daily.set(label, value);
+                }
+                this.primaryChartTitle = this.l('Daily Sales Trend');
+                this.primaryChartOptions = this.chartOptions([...daily.values()], [
+                    { type: 'line', xKey: 'label', yKey: 'sales', yName: this.l('Sales') },
+                    { type: 'bar', xKey: 'label', yKey: 'orders', yName: this.l('Orders') },
+                ]);
+                this.secondaryChartTitle = this.l('Top Selling Items');
+                this.secondaryChartOptions = this.chartOptions(
+                    top(this.itemSales, (row) => Number(row.grandTotal || 0)).map((row) => ({
+                        label: row.productName,
+                        sales: Number(row.grandTotal || 0),
+                    })),
+                    [{ type: 'bar', xKey: 'label', yKey: 'sales', yName: this.l('Sales') }],
+                );
+                break;
+            }
+            case 'operations':
+                this.primaryChartTitle = this.l('Waiter Performance');
+                this.primaryChartOptions = this.chartOptions(
+                    top(this.waiterPerformance, (row) => Number(row.grandTotal || 0)).map((row) => ({
+                        label: row.waiterName,
+                        sales: Number(row.grandTotal || 0),
+                        orders: Number(row.orderCount || 0),
+                    })),
+                    [
+                        { type: 'bar', xKey: 'label', yKey: 'sales', yName: this.l('Sales') },
+                        { type: 'bar', xKey: 'label', yKey: 'orders', yName: this.l('Orders') },
+                    ],
+                );
+                this.secondaryChartTitle = this.l('Table Turnover');
+                this.secondaryChartOptions = this.chartOptions(
+                    top(this.tableTurnover, (row) => Number(row.grandTotal || 0)).map((row) => ({
+                        label: row.tableName,
+                        sales: Number(row.grandTotal || 0),
+                        minutes: Number(row.averageMinutes || 0),
+                    })),
+                    [
+                        { type: 'bar', xKey: 'label', yKey: 'sales', yName: this.l('Sales') },
+                        { type: 'line', xKey: 'label', yKey: 'minutes', yName: this.l('Average Minutes') },
+                    ],
+                );
+                break;
+            case 'inventory':
+                this.primaryChartTitle = this.l('Food Cost by Item');
+                this.primaryChartOptions = this.chartOptions(
+                    top(this.foodCosting, (row) => Number(row.salesAmount || 0)).map((row) => ({
+                        label: row.productName,
+                        sales: Number(row.salesAmount || 0),
+                        cost: Number(row.actualCostAmount || row.theoreticalCostAmount || 0),
+                    })),
+                    [
+                        { type: 'bar', xKey: 'label', yKey: 'sales', yName: this.l('Sales') },
+                        { type: 'bar', xKey: 'label', yKey: 'cost', yName: this.l('Cost') },
+                    ],
+                );
+                this.secondaryChartTitle = this.l('Low Stock Exposure');
+                this.secondaryChartOptions = this.chartOptions(
+                    top(this.lowStockReport, (row) => Number(row.suggestedQty || 0)).map((row) => ({
+                        label: row.productName,
+                        available: Number(row.availableQty || 0),
+                        minimum: Number(row.minimumStock || 0),
+                    })),
+                    [
+                        { type: 'bar', xKey: 'label', yKey: 'available', yName: this.l('Available') },
+                        { type: 'line', xKey: 'label', yKey: 'minimum', yName: this.l('Minimum') },
+                    ],
+                );
+                break;
+            case 'payroll':
+                this.primaryChartTitle = this.l('Payroll Run Cost');
+                this.primaryChartOptions = this.chartOptions(
+                    [...this.payrollReport.runs].reverse().map((row) => ({
+                        label: row.runNumber,
+                        gross: Number(row.totalGross || 0),
+                        net: Number(row.totalNet || 0),
+                        deductions: Number(row.totalDeduction || 0),
+                    })),
+                    [
+                        { type: 'bar', xKey: 'label', yKey: 'gross', yName: this.l('Gross') },
+                        { type: 'bar', xKey: 'label', yKey: 'net', yName: this.l('Net') },
+                        { type: 'bar', xKey: 'label', yKey: 'deductions', yName: this.l('Deductions') },
+                    ],
+                );
+                this.secondaryChartTitle = this.l('Employee Payroll Cost');
+                this.secondaryChartOptions = this.chartOptions(
+                    top(this.payrollReport.employeeCosts, (row) => Number(row.grossPay || 0)).map((row) => ({
+                        label: row.employeeName,
+                        gross: Number(row.grossPay || 0),
+                        net: Number(row.netPay || 0),
+                    })),
+                    [
+                        { type: 'bar', xKey: 'label', yKey: 'gross', yName: this.l('Gross') },
+                        { type: 'bar', xKey: 'label', yKey: 'net', yName: this.l('Net') },
+                    ],
+                );
+                break;
+            case 'audit':
+                this.primaryChartTitle = this.l('Settlement Mix');
+                this.primaryChartOptions = this.chartOptions(
+                    this.settlementReport.map((row) => ({
+                        label: row.paymentMethodName,
+                        amount: Number(row.grandTotal || 0),
+                    })),
+                    [{ type: 'pie', angleKey: 'amount', legendItemKey: 'label' }],
+                );
+                this.secondaryChartTitle = this.l('Largest Discounts');
+                this.secondaryChartOptions = this.chartOptions(
+                    top(this.discountReport, (row) => Number(row.totalDiscountAmount || 0)).map((row) => ({
+                        label: row.orderNo,
+                        discount: Number(row.totalDiscountAmount || 0),
+                    })),
+                    [{ type: 'bar', xKey: 'label', yKey: 'discount', yName: this.l('Discount') }],
+                );
+                break;
+        }
+    }
+
+    private chartOptions(data: object[], series: object[]): any {
+        return {
+            data,
+            series,
+            background: { fill: 'transparent' },
+            legend: { enabled: true, position: 'bottom' },
+            padding: { top: 12, right: 12, bottom: 12, left: 12 },
+        };
+    }
+
     private createReportGridSections(): RestaurantAgGridReport[] {
         return [
             {
+                type: 'inventory',
                 title: this.l('Material Consumption'),
                 rowData: () => this.materialConsumption,
                 height: 300,
@@ -328,6 +589,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                 ],
             },
             {
+                type: 'sales',
                 title: this.l('Item Sales'),
                 rowData: () => this.itemSales,
                 height: 300,
@@ -339,6 +601,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                 ],
             },
             {
+                type: 'operations',
                 title: this.l('Table Sales'),
                 rowData: () => this.tableSales,
                 height: 260,
@@ -349,6 +612,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                 ],
             },
             {
+                type: 'operations',
                 title: this.l('Waiter Sales'),
                 rowData: () => this.waiterSales,
                 height: 260,
@@ -359,6 +623,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                 ],
             },
             {
+                type: 'sales',
                 title: this.l('Daily Sales Summary'),
                 rowData: () => this.dailySalesSummary,
                 height: 360,
@@ -375,6 +640,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                 ],
             },
             {
+                type: 'operations',
                 title: this.l('KOT/BOT Pending and Cancelled'),
                 rowData: () => this.kotBotStatus,
                 height: 380,
@@ -393,6 +659,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                 ],
             },
             {
+                type: 'sales',
                 title: this.l('Item Sales With Margin'),
                 rowData: () => this.itemSalesWithMargin,
                 height: 360,
@@ -409,6 +676,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                 ],
             },
             {
+                type: 'operations',
                 title: this.l('Waiter Performance'),
                 rowData: () => this.waiterPerformance,
                 height: 340,
@@ -423,6 +691,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                 ],
             },
             {
+                type: 'operations',
                 title: this.l('Table Turnover'),
                 rowData: () => this.tableTurnover,
                 height: 340,
@@ -437,6 +706,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                 ],
             },
             {
+                type: 'audit',
                 title: this.l('Void/Cancelled Bill Audit'),
                 rowData: () => this.voidCancelledAudit,
                 height: 380,
@@ -454,6 +724,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                 ],
             },
             {
+                type: 'audit',
                 title: this.l('Discount Report'),
                 rowData: () => this.discountReport,
                 height: 380,
@@ -471,6 +742,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                 ],
             },
             {
+                type: 'audit',
                 title: this.l('Settlement Report'),
                 rowData: () => this.settlementReport,
                 height: 320,
@@ -485,6 +757,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                 ],
             },
             {
+                type: 'inventory',
                 title: this.l('Recipe Costing'),
                 rowData: () => this.recipeCosting,
                 height: 380,
@@ -500,12 +773,13 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                         valueGetter: (params) => this.formatRecipeLines(params),
                     },
                     this.numberColumn('Menu Price', 'menuPrice'),
-                    this.numberColumn('Recipe Cost', 'totalRecipeCost'),
+                    this.numberColumn('Recipe Cost', 'recipeCost'),
                     this.numberColumn('Food Cost %', 'foodCostPercent'),
                     this.numberColumn('Margin', 'marginAmount'),
                 ],
             },
             {
+                type: 'inventory',
                 title: this.l('Food Costing'),
                 rowData: () => this.foodCosting,
                 height: 360,
@@ -514,14 +788,15 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                     this.textColumn('Category', 'categoryName', 160),
                     this.numberColumn('Sold Qty', 'soldQty'),
                     this.numberColumn('Sales', 'salesAmount'),
-                    this.numberColumn('Recipe Cost', 'theoreticalRecipeCost'),
-                    this.numberColumn('Actual Issue', 'actualStockIssueCost'),
-                    this.numberColumn('Wastage', 'wastageCost'),
-                    this.numberColumn('Gross Margin', 'grossMargin'),
+                    this.numberColumn('Recipe Cost', 'theoreticalCostAmount'),
+                    this.numberColumn('Actual Issue', 'actualCostAmount'),
+                    this.numberColumn('Wastage', 'wastageCostAmount'),
+                    this.numberColumn('Gross Margin', 'marginAmount'),
                     this.numberColumn('Food Cost %', 'foodCostPercent'),
                 ],
             },
             {
+                type: 'inventory',
                 title: this.l('Wastage Report'),
                 rowData: () => this.wastageReport,
                 height: 340,
@@ -537,6 +812,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                 ],
             },
             {
+                type: 'inventory',
                 title: this.l('Low Stock Report'),
                 rowData: () => this.lowStockReport,
                 height: 340,
@@ -557,7 +833,76 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                     },
                 ],
             },
+            {
+                type: 'payroll',
+                title: this.l('Payroll Runs'),
+                rowData: () => this.payrollReport.runs,
+                height: 340,
+                columnDefs: [
+                    this.textColumn('Run', 'runNumber', 150),
+                    this.dateColumn('Period Start', 'periodStart'),
+                    this.dateColumn('Period End', 'periodEnd'),
+                    {
+                        headerName: this.l('Status'),
+                        field: 'status',
+                        minWidth: 120,
+                        valueFormatter: (params) => ['Draft', 'Approved', 'Paid'][Number(params.value)] || '-',
+                    },
+                    this.integerColumn('Employees', 'employeeCount'),
+                    this.numberColumn('Gross', 'totalGross'),
+                    this.numberColumn('Deductions', 'totalDeduction'),
+                    this.numberColumn('Net', 'totalNet'),
+                ],
+            },
+            {
+                type: 'payroll',
+                title: this.l('Employee Payroll Cost'),
+                rowData: () => this.payrollReport.employeeCosts,
+                height: 380,
+                columnDefs: [
+                    this.textColumn('Employee', 'employeeName', 190),
+                    this.textColumn('Staff Code', 'staffCode', 130),
+                    this.textColumn('Job Role', 'jobRole', 160),
+                    this.numberColumn('Worked Hours', 'workedHours'),
+                    this.numberColumn('Overtime', 'overtimeHours'),
+                    this.numberColumn('Basic Pay', 'basicPay'),
+                    this.numberColumn('Allowance', 'allowance'),
+                    this.numberColumn('Tips & Service', 'tipsAndServiceCharge'),
+                    this.numberColumn('Gross', 'grossPay'),
+                    this.numberColumn('Deductions', 'totalDeduction'),
+                    this.numberColumn('Net', 'netPay'),
+                ],
+            },
+            {
+                type: 'payroll',
+                title: this.l('Attendance Summary'),
+                rowData: () => this.payrollReport.attendance,
+                height: 300,
+                columnDefs: [
+                    this.textColumn('Status', 'statusName', 170),
+                    this.integerColumn('Records', 'recordCount'),
+                    this.numberColumn('Regular Hours', 'regularHours'),
+                    this.numberColumn('Overtime Hours', 'overtimeHours'),
+                ],
+            },
         ];
+    }
+
+    private createEmptyPayrollReport(): RestaurantPayrollReportBundleDto {
+        return {
+            summary: {
+                activeEmployeeCount: 0,
+                payrollRunCount: 0,
+                attendanceRecordCount: 0,
+                totalGross: 0,
+                totalDeduction: 0,
+                totalNet: 0,
+                totalOvertimeHours: 0,
+            },
+            runs: [],
+            employeeCosts: [],
+            attendance: [],
+        };
     }
 
     private textColumn(headerName: string, field: string, minWidth = 140): ColDef {
@@ -610,7 +955,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
         return lines
             .map(
                 (line) =>
-                    `${line.rawMaterialName}: ${this.formatGridNumber(line.qty, 2, 3)} ${line.unitName || ''} / ${this.formatGridNumber(line.unitCost)} / ${this.formatGridNumber(line.wastagePercentage, 0, 2)}%`,
+                    `${line.rawMaterialName}: ${this.formatGridNumber(line.quantity, 2, 3)} ${line.unitName || ''} / ${this.formatGridNumber(line.costRate)} / ${this.formatGridNumber(line.wastagePercentage, 0, 2)}%`,
             )
             .join('\n');
     }

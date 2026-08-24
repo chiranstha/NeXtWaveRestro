@@ -4,12 +4,14 @@ using System.Web;
 using Abp;
 using Abp.Authorization;
 using Abp.Configuration;
+using Abp.Domain.Uow;
 using Abp.Extensions;
 using Abp.Runtime.Security;
 using Abp.Runtime.Session;
 using Abp.UI;
 using Abp.Zero.Configuration;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using NextWave.Erp.Authorization.Accounts.Dto;
 using NextWave.Erp.Authorization.Impersonation;
 using NextWave.Erp.Authorization.Users;
@@ -153,30 +155,77 @@ public class AccountAppService : ErpAppServiceBase, IAccountAppService
 
     public async Task<ResetPasswordOutput> ResetPassword(ResetPasswordInput input)
     {
+        var passwordResetTenantId = input.TenantId ?? await ResolveTenantIdFromPasswordResetCode(input);
+
+        if (passwordResetTenantId.HasValue)
+        {
+            using (CurrentUnitOfWork.SetTenantId(passwordResetTenantId))
+            {
+                return await ResetPasswordInternal(input);
+            }
+        }
+
+        return await ResetPasswordInternal(input);
+    }
+
+    private async Task<ResetPasswordOutput> ResetPasswordInternal(ResetPasswordInput input)
+    {
         if (input.ExpireDate < Clock.Now)
         {
             throw new UserFriendlyException(L("PasswordResetLinkExpired"));
         }
 
-        var user = await UserManager.GetUserByIdAsync(input.UserId);
+        var user = await UserManager.Users.FirstOrDefaultAsync(u => u.Id == input.UserId);
         if (user == null || user.PasswordResetCode.IsNullOrEmpty() || user.PasswordResetCode != input.ResetCode)
         {
             throw new UserFriendlyException(L("InvalidPasswordResetCode"), L("InvalidPasswordResetCode_Detail"));
         }
 
-        await UserManager.InitializeOptionsAsync(AbpSession.TenantId);
+        await UserManager.InitializeOptionsAsync(user.TenantId);
         CheckErrors(await UserManager.ChangePasswordAsync(user, input.Password));
         user.PasswordResetCode = null;
         user.IsEmailConfirmed = true;
         user.ShouldChangePasswordOnNextLogin = false;
 
         await UserManager.UpdateAsync(user);
+        await ExpireUserSessionsAsync(user);
 
         return new ResetPasswordOutput
         {
             CanLogin = user.IsActive,
             UserName = user.UserName
         };
+    }
+
+    private async Task ExpireUserSessionsAsync(User user)
+    {
+        CheckErrors(await UserManager.UpdateSecurityStampAsync(user));
+
+        await _cacheManager
+            .GetCache(AppConsts.SecurityStampKey)
+            .SetAsync(GetSecurityStampCacheKey(user.TenantId, user.Id), user.SecurityStamp);
+    }
+
+    private static string GetSecurityStampCacheKey(int? tenantId, long userId)
+    {
+        return $"{tenantId}.{userId}";
+    }
+
+    private async Task<int?> ResolveTenantIdFromPasswordResetCode(ResetPasswordInput input)
+    {
+        if (input.UserId <= 0 || input.ResetCode.IsNullOrEmpty())
+        {
+            return null;
+        }
+
+        using (CurrentUnitOfWork.DisableFilter(AbpDataFilters.MayHaveTenant))
+        {
+            return await UserManager.Users
+                .IgnoreQueryFilters()
+                .Where(u => u.Id == input.UserId && !u.IsDeleted && u.PasswordResetCode == input.ResetCode)
+                .Select(u => u.TenantId)
+                .FirstOrDefaultAsync();
+        }
     }
 
     public async Task SendEmailActivationLink(SendEmailActivationLinkInput input)

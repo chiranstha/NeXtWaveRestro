@@ -128,7 +128,6 @@ interface RestaurantMenuItemTagForm {
 @Component({
     selector: 'restaurant-menu',
     templateUrl: './restaurant-menu.component.html',
-    styleUrls: ['../restaurant-shared.css'],
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation],
     changeDetection: ChangeDetectionStrategy.Eager,
@@ -763,7 +762,7 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
     }
 
     itemRouteClass(item: RestaurantMenuRouteSource): string {
-        return this.menuRoute(item) === 'kitchen' ? 'restaurant-status-warning' : 'restaurant-status-success';
+        return this.menuRoute(item) === 'kitchen' ? 'bg-light-warning text-warning' : 'bg-light-success text-success';
     }
 
     menuBehaviorText(item: RestaurantMenuItemDto): string {
@@ -776,10 +775,10 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
 
     menuBehaviorClass(item: RestaurantMenuItemDto): string {
         if (item.productType === ProductTypeEnum.Services) {
-            return 'restaurant-status-neutral';
+            return 'bg-light text-gray-600';
         }
 
-        return item.hasRecipe ? 'restaurant-status-success' : 'restaurant-status-primary';
+        return item.hasRecipe ? 'bg-light-success text-success' : 'bg-light-primary text-primary';
     }
 
     stationTypeText(type: number): string {

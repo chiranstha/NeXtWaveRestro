@@ -7,7 +7,6 @@ import { LocalizePipe } from '@shared/common/pipes/localize.pipe';
 @Component({
     templateUrl: './theme-selection-panel.component.html',
     selector: 'theme-selection-panel',
-    styleUrls: ['./theme-selection-panel.less'],
     encapsulation: ViewEncapsulation.None,
     imports: [NgClass, LocalizePipe],
     changeDetection: ChangeDetectionStrategy.Eager,

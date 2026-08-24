@@ -13,7 +13,6 @@ import { ColDef } from 'ag-grid-community';
     animations: [appModuleAnimation],
     selector: 'app-purchase-party-tax-report',
     templateUrl: './purchasePartyTaxReport.component.html',
-    styleUrls: ['./purchasePartyTaxReport.component.css'],
 })
 export class PurchasePartyTaxReportComponent extends AppComponentBase implements OnInit {
     loading = false;

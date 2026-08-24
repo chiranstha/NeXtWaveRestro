@@ -1,6 +1,8 @@
 import {
     ChangeDetectorRef,
     Component,
+    ElementRef,
+    HostListener,
     OnDestroy,
     OnInit,
     ViewChild,
@@ -15,9 +17,12 @@ import { FileDownloadService } from '@shared/utils/file-download.service';
 import { Subject } from 'rxjs';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
+import { CommonModule, NgClass } from '@angular/common';
+import { LocalizePipe } from '@shared/common/pipes/localize.pipe';
 
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, GridApi, GridReadyEvent, GetDataPath } from 'ag-grid-enterprise';
+import { AgGridFeatureModule } from '@app/shared/common/ag-grid/ag-grid-feature.module';
 
 import { NepaliDatepickerComponent } from '../../../shared/common/nepalidatepicker/nepali-datepicker-angular.component';
 @Component({
@@ -25,7 +30,15 @@ import { NepaliDatepickerComponent } from '../../../shared/common/nepalidatepick
     templateUrl: './balance-sheet.component.html',
     styleUrls: ['./balance-sheet.component.css'],
     animations: [appModuleAnimation],
-    imports: [FormsModule, ReactiveFormsModule, NepaliDatepickerComponent, AgGridAngular],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        NepaliDatepickerComponent,
+        AgGridFeatureModule,
+        NgClass,
+        LocalizePipe,
+    ],
     changeDetection: ChangeDetectionStrategy.Eager,
     schemas: [NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -35,6 +48,7 @@ export class BalanceSheetComponent extends AppComponentBase implements OnInit, O
     private _fb = inject(FormBuilder);
     private _changeDetector = inject(ChangeDetectorRef);
     @ViewChild('agGrid') agGrid: AgGridAngular;
+    @ViewChild('exportDropdown', { static: false }) exportDropdownRef: ElementRef;
 
     pageTitle = 'BalanceSheet';
     public gridApi: GridApi;
@@ -86,6 +100,7 @@ export class BalanceSheetComponent extends AppComponentBase implements OnInit, O
     };
 
     loading = false;
+    exportDropdownOpen = false;
     advancedFiltersAreShown = false;
     myForm: FormGroup;
     showPdfOk = false;
@@ -95,6 +110,13 @@ export class BalanceSheetComponent extends AppComponentBase implements OnInit, O
 
     totalAssets = 0;
     totalLiabilities = 0;
+    capitalAndReserves = 0;
+    currentPeriodResult = 0;
+    priorYearRetainedEarnings = 0;
+    statementDifference = 0;
+    statementVerified = false;
+    statementIntegrityStatus = '';
+    statementIntegrityMessage = '';
     netWorth = 0;
     workingCapital = 0;
     private reportRequestId = 0;
@@ -228,52 +250,113 @@ export class BalanceSheetComponent extends AppComponentBase implements OnInit, O
     calculateSummary(): void {
         this.totalAssets = 0;
         this.totalLiabilities = 0;
+        this.capitalAndReserves = 0;
+        this.currentPeriodResult = 0;
+        this.priorYearRetainedEarnings = 0;
         this.netWorth = 0;
         this.workingCapital = 0;
         let currentAssets = 0;
         let currentLiabilities = 0;
-        this.allData.forEach((node) => {
-            const name = node.data.name.toLowerCase();
+        this.rowData.forEach((node) => {
+            const name = String(node.name || '').toLowerCase();
 
             if (name.includes('assets')) {
-                this.totalAssets += node.data.debit || 0;
+                this.totalAssets += node.debit || 0;
                 if (name.includes('current')) {
-                    currentAssets += node.data.debit || 0;
+                    currentAssets += node.debit || 0;
                 }
             }
 
             if (name.includes('liabilities') || name.includes('capital') || name.includes('equity')) {
-                this.totalLiabilities += node.data.credit || 0;
+                this.totalLiabilities += node.credit || 0;
                 if (name.includes('current')) {
-                    currentLiabilities += node.data.credit || 0;
+                    currentLiabilities += node.credit || 0;
                 }
             }
 
             if (name.includes('capital') || name.includes('equity')) {
-                this.netWorth += node.data.credit || 0;
+                this.netWorth += node.credit || 0;
+                this.capitalAndReserves += node.credit || 0;
+            }
+
+            if (
+                name.includes('current period') ||
+                name.includes('profit and loss') ||
+                name.includes('profit & loss') ||
+                name === 'net profit' ||
+                name === 'net loss'
+            ) {
+                this.currentPeriodResult += (node.credit || 0) - (node.debit || 0);
+            }
+
+            if (name.includes('retained earning') || name.includes('prior year')) {
+                this.priorYearRetainedEarnings += (node.credit || 0) - (node.debit || 0);
             }
         });
+
+        const totalRow = [...this.rowData]
+            .reverse()
+            .find((row) => String(row.name || '').trim().toLowerCase() === 'total');
+        if (totalRow) {
+            this.totalAssets = Number(totalRow.debit) || 0;
+            this.totalLiabilities = Number(totalRow.credit) || 0;
+        }
 
         this.workingCapital = currentAssets - currentLiabilities;
 
         if (this.netWorth === 0) {
             this.netWorth = this.totalAssets - (this.totalLiabilities - this.netWorth);
         }
+
+        this.statementDifference = this.totalAssets - this.totalLiabilities;
+        this.statementVerified = Math.abs(this.statementDifference) < 0.01;
+        this.statementIntegrityStatus = this.statementVerified ? 'Verified' : 'Out of Balance';
+        this.statementIntegrityMessage = this.statementVerified
+            ? 'Assets and liabilities are balanced.'
+            : 'Assets and liabilities differ for the selected period.';
     }
     onGridReady(params: GridReadyEvent): void {
         this.gridApi = params.api;
         this.gridApi.sizeColumnsToFit();
     }
     searchDataTable(event: any): void {
-        const { value } = event.target;
+        const value = typeof event === 'string' ? event : event?.target?.value;
         if (this.gridApi) {
-            (this.gridApi as any).setQuickFilter(value);
+            this.gridApi.setGridOption('quickFilterText', value || '');
+        }
+    }
+    toggleExportDropdown(event: Event): void {
+        event.stopPropagation();
+        this.exportDropdownOpen = !this.exportDropdownOpen;
+    }
+    @HostListener('document:click', ['$event'])
+    onDocumentClick(event: Event): void {
+        if (
+            this.exportDropdownOpen &&
+            this.exportDropdownRef &&
+            !this.exportDropdownRef.nativeElement.contains(event.target)
+        ) {
+            this.exportDropdownOpen = false;
         }
     }
     toggleAdvancedFilters(): void {
         this.advancedFiltersAreShown = !this.advancedFiltersAreShown;
     }
     exportToExcel(): void {
+        if (!this.gridApi) {
+            return;
+        }
+
+        this.gridApi.exportDataAsExcel({
+            fileName: `BalanceSheet_${new Date().toISOString().split('T')[0]}.xlsx`,
+            sheetName: 'Balance Sheet',
+        });
+    }
+    exportToExcelfromAPI(event: any): void {
+        if (!event) {
+            return;
+        }
+
         const { fromMiti, toMiti } = this.getReportDateRange();
         this.loading = true;
         this._proxy
@@ -288,11 +371,6 @@ export class BalanceSheetComponent extends AppComponentBase implements OnInit, O
                     this.notify.error(this.l('ExportFailed'));
                 },
             });
-    }
-    exportToExcelfromAPI(event: any): void {
-        if (event) {
-            this.exportToExcel();
-        }
     }
     showPdf(): void {
         this.showPdfOk = true;

@@ -1,81 +1,60 @@
 <div [@routerTransition] class="cash-flow-page">
-    <div class="card mb-3">
-        <div class="card-body">
-            <form [formGroup]="form" class="filter-row">
-                <div>
-                    <label class="form-label">From Miti</label>
-                    <ne-datepicker formControlName="fromMiti"></ne-datepicker>
-                </div>
-                <div>
-                    <label class="form-label">To Miti</label>
-                    <ne-datepicker formControlName="toMiti"></ne-datepicker>
-                </div>
-                <div>
-                    <label class="form-label">Comparison</label>
-                    <select class="form-select" formControlName="comparisonPeriod">
-                        <option value="previous-year">Previous Year</option>
-                        <option value="previous-quarter">Previous Quarter</option>
-                        <option value="previous-month">Previous Month</option>
-                    </select>
-                </div>
-                <div class="btn-wrap">
-                    <button type="button" class="btn btn-primary" (click)="loadReport()" [disabled]="loading">
-                        Load Cash Flow
-                    </button>
-                    <button type="button" class="btn btn-outline-success ms-2" (click)="exportToExcel()" [disabled]="loading">
-                        Excel
-                    </button>
-                    <button type="button" class="btn btn-outline-danger ms-2" (click)="showPdf()" [disabled]="loading">
-                        PDF
-                    </button>
-                </div>
-            </form>
+    <header class="cash-flow-hero card border shadow-sm mb-3">
+        <div>
+            <span class="cash-flow-eyebrow">Financial Statement</span>
+            <h1>Cash Flow Statement</h1>
+            <div class="cash-flow-period" *ngIf="form">
+                <span><i class="fa-duotone fa-calendar-day"></i>{{ form.value.fromMiti || '—' }}</span>
+                <i class="fa-solid fa-arrow-right-long"></i>
+                <span><i class="fa-duotone fa-calendar-check"></i>{{ form.value.toMiti || '—' }}</span>
+            </div>
         </div>
-    </div>
+        <div class="cash-flow-hero__status">
+            <span>Net cash movement</span>
+            <strong>Rs. {{ formatAmount(currentNetCash) }}</strong>
+            <small>{{ rows.length }} statement rows</small>
+        </div>
+    </header>
+
+    <section class="cash-flow-metrics mb-3">
+        <article class="cash-metric cash-metric--current"><i class="fa-duotone fa-money-bill-transfer"></i><div><span>Current period</span><strong>Rs. {{ formatAmount(currentNetCash) }}</strong><small>Net cash change</small></div></article>
+        <article class="cash-metric cash-metric--previous"><i class="fa-duotone fa-clock-rotate-left"></i><div><span>Comparison period</span><strong>Rs. {{ formatAmount(previousNetCash) }}</strong><small>Prior movement</small></div></article>
+        <article class="cash-metric cash-metric--operating"><i class="fa-duotone fa-briefcase"></i><div><span>Operating activities</span><strong>Rs. {{ formatAmount(operatingCash) }}</strong><small>Current period</small></div></article>
+        <article class="cash-metric cash-metric--investing"><i class="fa-duotone fa-chart-line-up"></i><div><span>Investing activities</span><strong>Rs. {{ formatAmount(investingCash) }}</strong><small>Current period</small></div></article>
+    </section>
+
+    <section class="cash-flow-controls card border shadow-sm mb-3">
+        <div class="cash-flow-section-heading">
+            <span class="cash-flow-section-icon"><i class="fa-duotone fa-sliders"></i></span>
+            <div><h2>Report Controls</h2><p>Period, comparison, refresh, and statement output</p></div>
+            <button type="button" class="btn btn-sm btn-light-primary ms-auto" (click)="toggleFilters()"><i class="fa-duotone fa-filter-list me-1"></i>{{ filtersExpanded ? 'Hide Filters' : 'Show Filters' }}</button>
+        </div>
+        <form *ngIf="filtersExpanded" [formGroup]="form" class="cash-flow-filter-form">
+            <div><label>From Date (NP)</label><ne-datepicker formControlName="fromMiti"></ne-datepicker></div>
+            <div><label>To Date (NP)</label><ne-datepicker formControlName="toMiti"></ne-datepicker></div>
+            <div><label>Comparison</label><select class="form-select" formControlName="comparisonPeriod"><option value="previous-year">Previous Year</option><option value="previous-quarter">Previous Quarter</option><option value="previous-month">Previous Month</option></select></div>
+            <button type="button" class="btn btn-primary" (click)="loadReport()" [disabled]="loading"><i class="fa-duotone fa-rotate-right me-2"></i>{{ loading ? 'Loading…' : 'Refresh Report' }}</button>
+        </form>
+    </section>
 
     @if (showPdfOk) {
-        <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <strong>{{ title }}</strong>
-                <button type="button" class="btn btn-light-primary btn-sm" (click)="back()">Back</button>
-            </div>
-            <div class="card-body p-0">
-                <ngx-extended-pdf-viewer [src]="pdfUrl" height="80vh"></ngx-extended-pdf-viewer>
-            </div>
-        </div>
+        <section class="card border shadow-sm mb-3 overflow-hidden">
+            <div class="cash-flow-section-heading"><span class="cash-flow-section-icon"><i class="fa-duotone fa-file-pdf"></i></span><div><h2>{{ title }}</h2><p>Printable statement output</p></div><button type="button" class="btn btn-light-primary btn-sm ms-auto" (click)="back()">Back to Grid</button></div>
+            <ngx-extended-pdf-viewer [src]="pdfUrl" height="80vh"></ngx-extended-pdf-viewer>
+        </section>
     }
 
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <strong>Cash Flow Statement</strong>
-            @if (loading) {
-                <span class="badge text-bg-secondary">Loading...</span>
-            }
-        </div>
-        <div class="card-body table-wrap">
-            <table class="table table-sm table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th>Particular</th>
-                        <th>Type</th>
-                        <th>Current Amount</th>
-                        <th>Previous Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (row of rows; track $index) {
-                        <tr>
-                            <td>{{ row.name }}</td>
-                            <td>{{ row.groupType }}</td>
-                            <td class="text-end">{{ row.currentAmount | number: '1.2-2' }}</td>
-                            <td class="text-end">{{ row.previousAmount | number: '1.2-2' }}</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-            @if (rows.length === 0 && !loading) {
-                <div class="text-muted">No cash flow rows found for selected period.</div>
-            }
-        </div>
-    </div>
+    @if (!showPdfOk) {
+        <section class="cash-flow-grid-card card border shadow-sm">
+            <div class="cash-flow-section-heading"><span class="cash-flow-section-icon"><i class="fa-duotone fa-water"></i></span><div><h2>Cash Flow Ledger</h2><p>Current period compared with the selected reference period</p></div></div>
+            <div class="cash-flow-toolbar">
+                <label class="cash-flow-search"><i class="fa-duotone fa-magnifying-glass"></i><input #cashFlowSearch type="search" class="form-control" placeholder="Search cash flow activities…" (input)="search(cashFlowSearch.value)" /></label>
+                <div class="d-flex gap-2"><button type="button" class="btn btn-light-success" (click)="exportToExcel()" [disabled]="!rows.length"><i class="fa-duotone fa-file-excel me-2"></i>Excel</button><button type="button" class="btn btn-light-danger" (click)="showPdf()" [disabled]="loading"><i class="fa-duotone fa-file-pdf me-2"></i>PDF</button></div>
+            </div>
+            <div class="cash-flow-grid ag-theme-balham">
+                <ag-grid-angular [rowData]="rows" [columnDefs]="columnDefs" [defaultColDef]="defaultColDef" [treeData]="true" [getDataPath]="getDataPath" [autoGroupColumnDef]="autoGroupColumnDef" [groupDefaultExpanded]="1" [statusBar]="statusBar" [enableCharts]="true" [loading]="loading" [rowHeight]="46" [headerHeight]="46" [floatingFiltersHeight]="40" (gridReady)="onGridReady($event)"></ag-grid-angular>
+            </div>
+            <footer class="cash-flow-grid-footer"><span><strong>{{ rows.length }}</strong> cash-flow rows</span><span>Enterprise filters, Excel export, hierarchy, and charting enabled</span></footer>
+        </section>
+    }
 </div>

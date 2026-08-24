@@ -55,6 +55,12 @@ export class AccountComponent extends AppComponentBase implements OnInit {
     isSelectEditionPage(): boolean {
         return this._router.url.indexOf('/account/select-edition') >= 0;
     }
+    isLoginPage(): boolean {
+        return this._router.url.indexOf('/account/login') >= 0;
+    }
+    isResetPasswordPage(): boolean {
+        return this._router.url.indexOf('/account/reset-password') >= 0;
+    }
     ngOnInit(): void {
         this.today = this.nepaliDateService.getCurrentNepaliDate();
         this._loginService.init();

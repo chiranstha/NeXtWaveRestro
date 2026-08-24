@@ -24,7 +24,6 @@ import { LocalizePipe } from '@shared/common/pipes/localize.pipe';
 import { PermissionPipe } from '@shared/common/pipes/permission.pipe';
 @Component({
     templateUrl: './roles.component.html',
-    styleUrls: ['./roles.component.less'],
     animations: [appModuleAnimation],
     imports: [
         SubHeaderComponent,
