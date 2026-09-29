@@ -69,6 +69,7 @@ namespace NextWave.Erp.Restaurant
     public interface IRestaurantBillingAppService : IApplicationService
     {
         Task<RestaurantStockValidationDto> ValidateOrderStock(ValidateRestaurantBillStockDto input);
+        Task<FinalizeRestaurantBillResultDto> GetBillStatus(string clientRequestId);
         Task<FinalizeRestaurantBillResultDto> FinalizeBill(FinalizeRestaurantBillDto input);
     }
 

@@ -39,6 +39,10 @@ namespace NextWave.Erp.Sales.Dtos
 
         public Guid? PaymentMethodLedgerId { get; set; }
 
+        public List<SalesPaymentAllocationDto> PaymentAllocations { get; set; } = new();
+        public decimal RestaurantTipAmount { get; set; }
+        public Guid? RestaurantTipLedgerId { get; set; }
+
         public decimal? VatRefundAmount { get; set; }
 
         public string LrNo { get; set; }

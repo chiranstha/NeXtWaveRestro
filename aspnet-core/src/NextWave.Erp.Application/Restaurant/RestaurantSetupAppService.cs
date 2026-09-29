@@ -22,7 +22,8 @@ namespace NextWave.Erp.Restaurant
         IRepository<RestaurantTable, Guid> tableRepository,
         IRepository<RestaurantStation, Guid> stationRepository,
         IRepository<RestaurantDevice, Guid> deviceRepository,
-        IRepository<RestaurantChangeLog, Guid> changeLogRepository)
+        IRepository<RestaurantChangeLog, Guid> changeLogRepository,
+        IRepository<NextWave.Erp.Accounting.AccountLedger, Guid> accountLedgerRepository)
         : ErpAppServiceBase, IRestaurantSetupAppService
     {
         public async Task<List<RestaurantAreaDto>> GetAreas()
@@ -261,6 +262,8 @@ namespace NextWave.Erp.Restaurant
                 ServiceChargePercent = await GetDecimalSetting(
                     AppSettings.ErpSettings.RestaurantServiceChargePercent,
                     tenantId),
+                TipLedgerId = Guid.TryParse(await SettingManager.GetSettingValueForTenantAsync(
+                    AppSettings.ErpSettings.RestaurantTipLedgerId, tenantId), out var tipLedgerId) ? tipLedgerId : null,
                 RequireManagerPinForSensitiveActions = await GetBoolSetting(
                     AppSettings.ErpSettings.RestaurantRequireManagerPinForSensitiveActions,
                     tenantId),
@@ -294,6 +297,10 @@ namespace NextWave.Erp.Restaurant
             var negativeStockStatus = NormalizeOption(input.NegativeStockStatus, new[] { "Allow", "Warn", "Block" }, "Warn");
             var tableWorkflow = NormalizeOption(input.TableWorkflow, new[] { "TableSession", "PerOrder" }, "TableSession");
 
+            if (input.TipLedgerId.HasValue && await accountLedgerRepository.CountAsync(x =>
+                    x.Id == input.TipLedgerId.Value && x.TenantId == tenantId) == 0)
+                throw new UserFriendlyException("Select an active restaurant tip ledger");
+
             await SettingManager.ChangeSettingForTenantAsync(
                 tenantId,
                 AppSettings.ErpSettings.RestaurantVatPercent,
@@ -302,6 +309,10 @@ namespace NextWave.Erp.Restaurant
                 tenantId,
                 AppSettings.ErpSettings.RestaurantServiceChargePercent,
                 ClampPercent(input.ServiceChargePercent).ToString(System.Globalization.CultureInfo.InvariantCulture));
+            await SettingManager.ChangeSettingForTenantAsync(
+                tenantId,
+                AppSettings.ErpSettings.RestaurantTipLedgerId,
+                input.TipLedgerId?.ToString() ?? string.Empty);
             await SettingManager.ChangeSettingForTenantAsync(
                 tenantId,
                 AppSettings.ErpSettings.RestaurantRequireManagerPinForSensitiveActions,

@@ -1,0 +1,94 @@
+.sales-invoice-page {
+    --sales-border: #e8edf4;
+    --sales-muted: #778397;
+    --sales-ink: #243247;
+    color: var(--sales-ink);
+}
+
+.sales-invoice-page sub-header { display: block; }
+.sales-page-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.sales-invoice-container { width: 100%; max-width: none; padding-inline: 12px; }
+.sales-workspace-card { margin: 0; border: 0; background: transparent; box-shadow: none; }
+.sales-workspace-card > .card-body { padding: 0; }
+.sales-form-shell { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+.sales-fields-card,
+.sales-details-card,
+.sales-upload-panel {
+    background: #fff;
+    border: 1px solid var(--sales-border);
+    border-radius: 13px;
+    box-shadow: 0 3px 14px rgba(31, 48, 74, .035);
+}
+.sales-fields-card { padding: 18px 20px 13px; }
+.sales-fields-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 20px; row-gap: 13px; }
+.sales-field { min-width: 0; }
+.sales-field .form-label, .sales-totals-grid .form-label { display: block; margin-bottom: 6px; color: #344258; font-size: 13px; font-weight: 600; }
+.sales-invoice-page .form-control,
+.sales-invoice-page .ng-select .ng-select-container,
+.sales-invoice-page ne-datepicker .form-control { min-height: 38px; border-color: #e2e7ee; border-radius: 8px; color: #29364b; box-shadow: none; }
+.sales-invoice-page textarea.form-control { min-height: 58px; }
+.sales-input-with-action { display: flex; align-items: stretch; min-width: 0; }
+.sales-input-with-action > ng-select { flex: 1; min-width: 0; }
+.sales-inline-add { width: 38px; flex: 0 0 38px; border: 1px solid #e2e7ee; border-radius: 0 8px 8px 0; background: #fff; color: #6288d3; }
+.sales-input-with-action .ng-select .ng-select-container { border-radius: 8px 0 0 8px; }
+.field-error { margin-top: 4px; color: #dc3545; font-size: 11px; }
+
+.sales-details-card { display: flex; flex-direction: column; min-height: min(570px, 58vh); padding: 0 12px 12px; }
+.sales-details-heading { min-height: 62px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 4px 12px; }
+.sales-details-heading h3 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 16px; font-weight: 700; }
+.sales-details-heading h3 i { color: #91a0b6; }
+.sales-detail-tools { display: flex; align-items: center; gap: 14px; }
+.sales-detail-tools .btn { min-height: 36px; border-radius: 8px; white-space: nowrap; }
+.sales-stock-qty { color: #738096; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.sales-stock-qty strong { padding-left: 3px; font-size: 15px; }
+.sales-table-scroll { flex: 1 1 auto; min-height: 250px; overflow: auto; border-top: 1px solid #edf0f5; }
+.sales-lines-table { width: 100%; min-width: 1450px; margin: 0; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
+.sales-lines-table th { height: 38px; padding: 8px 7px; background: #f8f9fb; color: #758195; font-size: 11px; font-weight: 600; text-align: center; white-space: nowrap; }
+.sales-lines-table td { height: 54px; padding: 5px 6px; background: #fff; text-align: center; }
+.sales-lines-table th:first-child { border-radius: 7px 0 0 0; }
+.sales-lines-table th:last-child { border-radius: 0 7px 0 0; }
+.sales-lines-table th:first-child, .sales-lines-table td:first-child { width: 48px; }
+.sales-lines-table th:nth-child(2), .sales-lines-table td:nth-child(2) { width: 250px; }
+.sales-lines-table th:last-child, .sales-lines-table td:last-child { width: 56px; }
+.sales-lines-table td .form-control { min-height: 38px; padding: 6px 10px; }
+.sales-lines-table .ng-select .ng-select-container { min-height: 38px; }
+.sales-lines-table td:nth-child(2) .ng-select { min-width: 230px; }
+.sales-lines-table .remove-line-btn { display: inline-flex; align-items: center; justify-content: center; border: 0; background: #fff3f4; color: #cf7181; }
+
+.sales-totals-card { padding-top: 12px; }
+.sales-totals-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 0 8px 10px; }
+.sales-totals-heading h3 { margin: 0 0 3px; font-size: 14px; font-weight: 700; }
+.sales-totals-heading small { color: #7d899b; font-size: 11px; }
+.sales-totals-heading small i { margin-right: 3px; }
+.sales-grand-total { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.sales-grand-total span { color: #758195; font-size: 11px; font-weight: 600; }
+.sales-grand-total strong { color: #2763c7; font-size: 18px; }
+.sales-totals-grid { display: grid; grid-template-columns: repeat(6, minmax(115px, 1fr)); gap: 12px; padding: 11px 8px 0; border-top: 1px solid #edf0f5; }
+.sales-totals-grid > div { min-width: 0; }
+.sales-totals-grid .form-control { min-height: 36px; text-align: right; }
+
+.sales-upload-panel { padding: 10px 14px; }
+.sales-upload-panel .expand-upload { min-height: 26px; }
+.sales-upload-panel .card-upload { margin-top: 10px; }
+.sales-footer-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; gap: 16px 20px; padding: 0 2px 12px; }
+.sales-footer-fields .sales-description-field { grid-column: span 2; }
+.sales-footer-fields textarea.form-control { min-height: 58px; }
+.sales-print-toggle { display: flex; align-items: center; gap: 8px; min-height: 39px; padding-left: 8px; color: #344258; font-size: 13px; font-weight: 600; }
+.sales-print-toggle .form-check-input { width: 20px; height: 20px; margin: 0; }
+
+@media (max-width: 1100px) {
+    .sales-fields-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .sales-details-card { min-height: 460px; }
+    .sales-totals-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .sales-footer-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .sales-footer-fields .sales-description-field { grid-column: span 2; }
+}
+@media (max-width: 650px) {
+    .sales-invoice-container { padding-inline: 7px; }
+    .sales-fields-card { padding: 14px; }
+    .sales-fields-grid, .sales-totals-grid, .sales-footer-fields { grid-template-columns: 1fr; }
+    .sales-footer-fields .sales-description-field { grid-column: auto; }
+    .sales-details-heading { align-items: flex-start; flex-direction: column; padding: 12px 3px; }
+    .sales-detail-tools { width: 100%; flex-wrap: wrap; justify-content: space-between; }
+    .sales-totals-heading { align-items: flex-start; }
+}

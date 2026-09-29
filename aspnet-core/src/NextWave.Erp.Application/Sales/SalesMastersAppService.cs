@@ -2865,6 +2865,66 @@ namespace NextWave.Erp.Sales
             // Get cash ledger for reference
             var cashLedger =
                 await accountLedgerRepository.FirstOrDefaultAsync(x => x.Name == "Cash" && x.TenantId == tenantId);
+            var allocations = input.PaymentAllocations?.Where(x => x.Amount > 0).ToList() ?? new List<SalesPaymentAllocationDto>();
+            if (allocations.Count > 0)
+            {
+                if (allocations.Sum(x => x.Amount) != grandTotal + input.RestaurantTipAmount)
+                    throw new UserFriendlyException("Restaurant payment allocations do not match the invoice and tip total");
+                if (input.RestaurantTipAmount < 0 ||
+                    (input.RestaurantTipAmount > 0 && !input.RestaurantTipLedgerId.HasValue))
+                    throw new UserFriendlyException("A valid restaurant tip ledger is required before tips can be posted");
+
+                if (cashLedger?.Id == input.LedgerId)
+                {
+                    foreach (var allocation in allocations)
+                    {
+                        var ledgerId = allocation.PaymentMethod == PaymentMethod.Cash
+                            ? cashLedger.Id
+                            : allocation.PaymentLedgerId ?? throw new UserFriendlyException("Select a ledger for every card or QR allocation");
+                        await ledgerPostingRepository.InsertAsync(new LedgerPosting
+                        {
+                            TenantId = tenantId,
+                            VoucherNumbering = voucherNumbering,
+                            Date = DateConverter.ConvertToEnglish(input.DateMiti),
+                            DateMiti = input.DateMiti,
+                            VoucherTypeId = voucherTypeId,
+                            VoucherNo = voucherNo,
+                            LedgerId = ledgerId,
+                            DetailId = input.SalesAccountId,
+                            Debit = allocation.Amount,
+                            FinancialYearId = FinancialYearId,
+                            Credit = 0,
+                            InvoiceNo = voucherNo,
+                            PostingNumber = postingNumbering,
+                            MasterId = salesMasterId
+                        });
+                    }
+                    if (input.RestaurantTipAmount > 0)
+                        await ledgerPostingRepository.InsertAsync(new LedgerPosting
+                        {
+                            TenantId = tenantId,
+                            VoucherNumbering = voucherNumbering,
+                            Date = DateConverter.ConvertToEnglish(input.DateMiti),
+                            DateMiti = input.DateMiti,
+                            VoucherTypeId = voucherTypeId,
+                            VoucherNo = voucherNo,
+                            LedgerId = input.RestaurantTipLedgerId.Value,
+                            DetailId = input.SalesAccountId,
+                            Debit = 0,
+                            FinancialYearId = FinancialYearId,
+                            Credit = input.RestaurantTipAmount,
+                            InvoiceNo = voucherNo,
+                            PostingNumber = postingNumbering,
+                            MasterId = salesMasterId
+                        });
+                }
+                else
+                    await CreateRestaurantReceiptVoucherPos(
+                        input, salesMaster, voucherNo, allocations, grandTotal, input.RestaurantTipAmount,
+                        input.RestaurantTipLedgerId);
+
+                return;
+            }
 
             if (cashLedger?.Id == input.LedgerId)
             {
@@ -3974,6 +4034,152 @@ namespace NextWave.Erp.Sales
                     //    int x = 100;
                     //    float asd = 2343f;
                 }
+            }
+        }
+
+        private async Task CreateRestaurantReceiptVoucherPos(
+            CreateOrEditSalesMasterDto input,
+            SalesMaster salesMaster,
+            string invoiceVoucherNo,
+            List<SalesPaymentAllocationDto> allocations,
+            decimal invoiceAmount,
+            decimal tipAmount,
+            Guid? tipLedgerId)
+        {
+            var tenantId = AbpSession.TenantId;
+            var receiptVoucherTypeId = await VoucherTypeManager.GetVoucherTypeId("ReceiptVoucher");
+            var invoiceVoucherTypeId = await VoucherTypeManager.GetVoucherTypeId("SalesInvoice");
+            var voucherNumbering = await GetReceiptMasterInlineVoucherNo();
+            var voucherNo = await GetReceiptMasterVoucherNo();
+            var postingNumbering = PostingNumbering + 1;
+            var total = allocations.Sum(x => x.Amount);
+            var receipt = new ReceiptMaster
+            {
+                VoucherNumbering = voucherNumbering,
+                VoucherNo = voucherNo,
+                PostingNumbering = postingNumbering,
+                Date = DateConverter.ConvertToEnglish(input.DateMiti),
+                DateMiti = input.DateMiti,
+                RefVoucherNo = invoiceVoucherNo,
+                RefVoucherTypeId = invoiceVoucherTypeId,
+                TotalAmount = total,
+                Description = "Restaurant settlement for " + invoiceVoucherNo,
+                VoucherTypeId = receiptVoucherTypeId,
+                FinancialYearId = FinancialYearId,
+                CreateUserId = AbpSession.UserId,
+                TenantId = tenantId,
+                LedgerId = allocations[0].PaymentLedgerId ??
+                    await accountLedgerRepository.GetAll()
+                        .Where(x => x.TenantId == AbpSession.TenantId && x.Name == "Cash")
+                        .Select(x => x.Id).FirstOrDefaultAsync()
+            };
+            if (receipt.LedgerId == Guid.Empty)
+                throw new UserFriendlyException("Configure a valid restaurant payment ledger before billing");
+
+            var receiptId = await receiptMasterRepository.InsertAndGetIdAsync(receipt);
+            foreach (var allocation in allocations)
+            {
+                var ledgerId = allocation.PaymentLedgerId ?? throw new UserFriendlyException(
+                    "Select a ledger for every card, QR, or cash payment");
+                await ledgerPostingRepository.InsertAsync(new LedgerPosting
+                {
+                    TenantId = tenantId,
+                    VoucherNumbering = voucherNumbering,
+                    Date = receipt.Date,
+                    DateMiti = input.DateMiti,
+                    VoucherTypeId = receiptVoucherTypeId,
+                    VoucherNo = voucherNo,
+                    LedgerId = ledgerId,
+                    DetailId = input.LedgerId,
+                    Debit = allocation.Amount,
+                    Credit = 0,
+                    InvoiceNo = invoiceVoucherNo,
+                    FinancialYearId = FinancialYearId,
+                    MasterId = receiptId,
+                    PostingNumber = postingNumbering
+                });
+            }
+
+            var appliedInvoiceAmount = 0m;
+            if (invoiceAmount > 0)
+            {
+                var detailId = await receiptDetailRepository.InsertAndGetIdAsync(new ReceiptDetail
+                {
+                    Amount = invoiceAmount,
+                    ChequeNo = string.Empty,
+                    ChequeMiti = string.Empty,
+                    LedgerId = input.LedgerId,
+                    ReceiptMasterId = receiptId,
+                    TenantId = tenantId
+                });
+                await ledgerPostingRepository.InsertAsync(new LedgerPosting
+                {
+                    TenantId = tenantId,
+                    VoucherNumbering = voucherNumbering,
+                    Date = receipt.Date,
+                    DateMiti = input.DateMiti,
+                    VoucherTypeId = receiptVoucherTypeId,
+                    VoucherNo = voucherNo,
+                    LedgerId = input.LedgerId,
+                    DetailId = receipt.LedgerId,
+                    Debit = 0,
+                    Credit = invoiceAmount,
+                    InvoiceNo = invoiceVoucherNo,
+                    FinancialYearId = FinancialYearId,
+                    MasterId = receiptId,
+                    PostingNumber = postingNumbering
+                });
+                appliedInvoiceAmount = invoiceAmount;
+
+                var customerLedger = await accountLedgerRepository.FirstOrDefaultAsync(
+                    x => x.Id == input.LedgerId && x.TenantId == AbpSession.TenantId);
+                if (customerLedger?.IsBillByBill == true)
+                    await partyBalanceService.CreateReceiptTaskAsync(new AdjustmentEntryDto
+                    {
+                        MasterId = salesMaster.Id,
+                        MasterVoucherNo = invoiceVoucherNo,
+                        MasterVoucherNumbering = salesMaster.VoucherNumbering,
+                        LedgerId = input.LedgerId,
+                        Date = receipt.Date,
+                        OnAccountPaid = appliedInvoiceAmount,
+                        Amount = appliedInvoiceAmount,
+                        VoucherNo = voucherNo,
+                        VoucherNumbering = voucherNumbering,
+                        DetailId = detailId,
+                        VoucherTypeId = receiptVoucherTypeId
+                    });
+            }
+
+            if (tipAmount > 0)
+            {
+                if (!tipLedgerId.HasValue)
+                    throw new UserFriendlyException("Configure a restaurant tip ledger before collecting tips");
+                await receiptDetailRepository.InsertAsync(new ReceiptDetail
+                {
+                    Amount = tipAmount,
+                    ChequeNo = "Restaurant tip",
+                    ChequeMiti = string.Empty,
+                    LedgerId = tipLedgerId.Value,
+                    ReceiptMasterId = receiptId,
+                    TenantId = tenantId
+                });
+                await ledgerPostingRepository.InsertAsync(new LedgerPosting
+                {
+                    TenantId = tenantId,
+                    VoucherNumbering = voucherNumbering,
+                    Date = receipt.Date,
+                    DateMiti = input.DateMiti,
+                    VoucherTypeId = receiptVoucherTypeId,
+                    VoucherNo = voucherNo,
+                    LedgerId = tipLedgerId.Value,
+                    DetailId = receipt.LedgerId,
+                    Debit = 0,
+                    Credit = tipAmount,
+                    InvoiceNo = invoiceVoucherNo,
+                    FinancialYearId = FinancialYearId,
+                    MasterId = receiptId,
+                    PostingNumber = postingNumbering
+                });
             }
         }
 

@@ -89,6 +89,7 @@ namespace NextWave.Erp.Restaurant.Dtos
     {
         public decimal VatPercent { get; set; }
         public decimal ServiceChargePercent { get; set; }
+        public Guid? TipLedgerId { get; set; }
         public bool RequireManagerPinForSensitiveActions { get; set; }
         public string ManagerPin { get; set; }
         public string NegativeStockStatus { get; set; }
