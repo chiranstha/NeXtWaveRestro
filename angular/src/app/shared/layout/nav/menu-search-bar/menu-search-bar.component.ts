@@ -1,4 +1,4 @@
-import { Component, Injector, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Injector, inject, ChangeDetectionStrategy, Input } from '@angular/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { AppNavigationService } from '../app-navigation.service';
@@ -20,6 +20,22 @@ export class MenuSearchBarComponent extends AppComponentBase {
     searchMenuResults: any[];
     isMenuSearchActive = false;
     searchQuery = '';
+    private _alwaysActive = false;
+
+    @Input()
+    set alwaysActive(value: boolean) {
+        this._alwaysActive = value;
+        if (value) {
+            this.isMenuSearchActive = true;
+            this.allMenuItems = this.getAllMenuItems();
+        }
+    }
+
+    get alwaysActive(): boolean {
+        return this._alwaysActive;
+    }
+
+    @Input() searchPlaceholder = '';
     constructor() {
         const injector = inject(Injector);
         super();

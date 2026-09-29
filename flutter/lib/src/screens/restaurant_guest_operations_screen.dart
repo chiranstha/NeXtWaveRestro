@@ -296,7 +296,7 @@ class _RestaurantReservationsScreenState
             const SizedBox(height: 8),
             if (reservation.status == 0 || reservation.status == 3 || reservation.status == 1)
               DropdownButtonFormField<String>(
-                value: selectedId,
+                initialValue: selectedId,
                 isExpanded: true,
                 decoration: const InputDecoration(
                   labelText: 'Suitable table',

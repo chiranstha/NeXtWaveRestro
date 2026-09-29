@@ -4,7 +4,7 @@
         (keydown.enter)="onEnter()"
         [(ngModel)]="searchQuery"
         class="form-control menuSearchBarInput"
-        placeholder="{{ 'QuickNav' | localize }}"
+        [placeholder]="searchPlaceholder || ('QuickNav' | localize)"
         type="text"
     />
 }
