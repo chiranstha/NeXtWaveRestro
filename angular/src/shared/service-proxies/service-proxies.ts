@@ -34053,23 +34053,20 @@ export class RestaurantCustomerOrderingServiceProxy {
      * @param orderId (optional) 
      * @return OK
      */
-    getOrderStatus(orderId: string | undefined): Observable<RestaurantCustomerOrderStatusDto> {
-        let url_ = this.baseUrl + "/api/services/app/RestaurantCustomerOrdering/GetOrderStatus?";
-        if (orderId === null)
-            throw new globalThis.Error("The parameter 'orderId' cannot be null.");
-        else if (orderId !== undefined)
-            url_ += "orderId=" + encodeURIComponent("" + orderId) + "&";
-        url_ = url_.replace(/[?&]$/, "");
+    getOrderStatus(input: { orderId: string; statusAccessToken: string }): Observable<RestaurantCustomerOrderStatusDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantCustomerOrdering/GetOrderStatus";
 
         let options_ : any = {
+            body: JSON.stringify(input),
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Content-Type": "application/json",
                 "Accept": "application/json"
             })
         };
 
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
             return this.processGetOrderStatus(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
@@ -34977,6 +34974,55 @@ export class RestaurantKdsServiceProxy {
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    updateTicketItemStatuses(body: BulkUpdateRestaurantTicketItemStatusDto | undefined): Observable<BulkUpdateRestaurantTicketItemStatusResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantKds/UpdateTicketItemStatuses";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateTicketItemStatuses(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateTicketItemStatuses(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BulkUpdateRestaurantTicketItemStatusResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BulkUpdateRestaurantTicketItemStatusResultDto>;
+        }));
+    }
+
+    protected processUpdateTicketItemStatuses(response: HttpResponseBase): Observable<BulkUpdateRestaurantTicketItemStatusResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                const resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                return _observableOf(resultData200 ? BulkUpdateRestaurantTicketItemStatusResultDto.fromJS(resultData200) : null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
         return _observableOf(null as any);
@@ -63291,6 +63337,9 @@ export class FinalizeRestaurantBillDto implements IFinalizeRestaurantBillDto {
     confirmNegativeStock!: boolean;
     tipAmount!: number | undefined;
     customerPaidAmount!: number | undefined;
+    cashShiftId!: string | undefined;
+    clientRequestId!: string | undefined;
+    tenders!: any[] | undefined;
     billLines!: FinalizeRestaurantBillLineDto[] | undefined;
 
     constructor(data?: IFinalizeRestaurantBillDto) {
@@ -63318,6 +63367,9 @@ export class FinalizeRestaurantBillDto implements IFinalizeRestaurantBillDto {
             this.confirmNegativeStock = _data["confirmNegativeStock"];
             this.tipAmount = _data["tipAmount"];
             this.customerPaidAmount = _data["customerPaidAmount"];
+            this.cashShiftId = _data["cashShiftId"];
+            this.clientRequestId = _data["clientRequestId"];
+            this.tenders = _data["tenders"];
             if (Array.isArray(_data["billLines"])) {
                 this.billLines = [] as any;
                 for (let item of _data["billLines"])
@@ -63349,6 +63401,9 @@ export class FinalizeRestaurantBillDto implements IFinalizeRestaurantBillDto {
         data["confirmNegativeStock"] = this.confirmNegativeStock;
         data["tipAmount"] = this.tipAmount;
         data["customerPaidAmount"] = this.customerPaidAmount;
+        data["cashShiftId"] = this.cashShiftId;
+        data["clientRequestId"] = this.clientRequestId;
+        data["tenders"] = this.tenders;
         if (Array.isArray(this.billLines)) {
             data["billLines"] = [];
             for (let item of this.billLines)
@@ -63373,6 +63428,9 @@ export interface IFinalizeRestaurantBillDto {
     confirmNegativeStock: boolean;
     tipAmount: number | undefined;
     customerPaidAmount: number | undefined;
+    cashShiftId?: string | undefined;
+    clientRequestId?: string | undefined;
+    tenders?: any[] | undefined;
     billLines: FinalizeRestaurantBillLineDto[] | undefined;
 }
 
@@ -78014,7 +78072,8 @@ export enum PaymentMethod {
     Credit = 2,
     Card_Swipe = 3,
     NA = 4,
-    LC = 5,
+    LC = 4,
+    QR = 5,
 }
 
 export enum PaymentOptions {
@@ -86842,6 +86901,8 @@ export class RestaurantTicketDto implements IRestaurantTicketDto {
     cancelledAt!: DateTime | undefined;
     printedAt!: DateTime | undefined;
     lastPrintedAt!: DateTime | undefined;
+    printStatus!: string | undefined;
+    lastPrintConfirmedAt!: DateTime | undefined;
     printCount!: number;
     isReprint!: boolean;
     orderNotes!: string | undefined;
@@ -86880,6 +86941,8 @@ export class RestaurantTicketDto implements IRestaurantTicketDto {
             this.cancelledAt = _data["cancelledAt"] ? DateTime.fromISO(_data["cancelledAt"].toString()) : undefined as any;
             this.printedAt = _data["printedAt"] ? DateTime.fromISO(_data["printedAt"].toString()) : undefined as any;
             this.lastPrintedAt = _data["lastPrintedAt"] ? DateTime.fromISO(_data["lastPrintedAt"].toString()) : undefined as any;
+            this.printStatus = _data["printStatus"];
+            this.lastPrintConfirmedAt = _data["lastPrintConfirmedAt"] ? DateTime.fromISO(_data["lastPrintConfirmedAt"].toString()) : undefined as any;
             this.printCount = _data["printCount"];
             this.isReprint = _data["isReprint"];
             this.orderNotes = _data["orderNotes"];
@@ -86922,6 +86985,8 @@ export class RestaurantTicketDto implements IRestaurantTicketDto {
         data["cancelledAt"] = this.cancelledAt ? this.cancelledAt.toString() : undefined as any;
         data["printedAt"] = this.printedAt ? this.printedAt.toString() : undefined as any;
         data["lastPrintedAt"] = this.lastPrintedAt ? this.lastPrintedAt.toString() : undefined as any;
+        data["printStatus"] = this.printStatus;
+        data["lastPrintConfirmedAt"] = this.lastPrintConfirmedAt ? this.lastPrintConfirmedAt.toString() : undefined as any;
         data["printCount"] = this.printCount;
         data["isReprint"] = this.isReprint;
         data["orderNotes"] = this.orderNotes;
@@ -86957,6 +87022,8 @@ export interface IRestaurantTicketDto {
     cancelledAt: DateTime | undefined;
     printedAt: DateTime | undefined;
     lastPrintedAt: DateTime | undefined;
+    printStatus: string | undefined;
+    lastPrintConfirmedAt: DateTime | undefined;
     printCount: number;
     isReprint: boolean;
     orderNotes: string | undefined;
@@ -93127,6 +93194,86 @@ export interface IUpdateRestaurantTicketItemStatusDto {
     ticketItemId: string;
     status: RestaurantOrderItemStatus;
     cancelReason: string | undefined;
+}
+
+export class BulkUpdateRestaurantTicketItemStatusDto implements IBulkUpdateRestaurantTicketItemStatusDto {
+    ticketItemIds!: string[] | undefined;
+    status!: RestaurantOrderItemStatus;
+
+    constructor(data?: IBulkUpdateRestaurantTicketItemStatusDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.ticketItemIds = _data["ticketItemIds"];
+            this.status = _data["status"];
+        }
+    }
+
+    static fromJS(data: any): BulkUpdateRestaurantTicketItemStatusDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkUpdateRestaurantTicketItemStatusDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["ticketItemIds"] = this.ticketItemIds;
+        data["status"] = this.status;
+        return data;
+    }
+}
+
+export interface IBulkUpdateRestaurantTicketItemStatusDto {
+    ticketItemIds: string[] | undefined;
+    status: RestaurantOrderItemStatus;
+}
+
+export class BulkUpdateRestaurantTicketItemStatusResultDto implements IBulkUpdateRestaurantTicketItemStatusResultDto {
+    updatedCount!: number;
+    skippedCount!: number;
+
+    constructor(data?: IBulkUpdateRestaurantTicketItemStatusResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.updatedCount = _data["updatedCount"];
+            this.skippedCount = _data["skippedCount"];
+        }
+    }
+
+    static fromJS(data: any): BulkUpdateRestaurantTicketItemStatusResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkUpdateRestaurantTicketItemStatusResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["updatedCount"] = this.updatedCount;
+        data["skippedCount"] = this.skippedCount;
+        return data;
+    }
+}
+
+export interface IBulkUpdateRestaurantTicketItemStatusResultDto {
+    updatedCount: number;
+    skippedCount: number;
 }
 
 export class UpdateRestaurantTicketStatusDto implements IUpdateRestaurantTicketStatusDto {

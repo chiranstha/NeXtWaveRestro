@@ -10,6 +10,7 @@ namespace NextWave.Erp.Restaurant
     public class RestaurantStation : Entity<Guid>, IMayHaveTenant
     {
         [StringLength(150)] public string Name { get; set; }
+        [StringLength(128)] public string PrintRouteName { get; set; }
         public RestaurantStationType StationType { get; set; }
         public bool IsActive { get; set; } = true;
         public bool IsDeleted { get; set; }

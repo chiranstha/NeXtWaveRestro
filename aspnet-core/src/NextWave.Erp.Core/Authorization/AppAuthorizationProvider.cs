@@ -359,6 +359,10 @@ public class AppAuthorizationProvider : AuthorizationProvider
             multiTenancySides: MultiTenancySides.Tenant);
         restaurant.CreateChildPermission(AppPermissions.PagesRestaurantCustomerOrdering, L("RestaurantCustomerOrdering"),
             multiTenancySides: MultiTenancySides.Tenant);
+        restaurant.CreateChildPermission(AppPermissions.PagesRestaurantReservations, L("RestaurantReservations"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        restaurant.CreateChildPermission(AppPermissions.PagesRestaurantPrinterSetup, L("RestaurantPrinterSetup"),
+            multiTenancySides: MultiTenancySides.Tenant);
 
         var restaurantPayroll = restaurant.CreateChildPermission(AppPermissions.PagesRestaurantPayroll, L("RestaurantPayroll"),
             multiTenancySides: MultiTenancySides.Tenant);

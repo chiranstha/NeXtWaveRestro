@@ -15,41 +15,10 @@
 
     <div [class]="containerClass">
         <div class="restaurant-page overflow-x-hidden gap-5 mw-100 d-grid min-w-0">
-            <div class="restaurant-nav align-items-center bg-white border border-gray-300 d-flex gap-2 overflow-x-auto p-2 rounded-3">
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/pos" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-cash-register"></i>
-                    {{ 'POS' | localize }}
-                </a>
-                <a class="restaurant-nav-link active bg-hover-light bg-light-primary flex-shrink-0 text-gray-600 text-hover-dark text-primary align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/setup">
-                    <i class="fa fa-sliders"></i>
-                    {{ 'Setup' | localize }}
-                </a>
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/menu" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-utensils"></i>
-                    {{ 'Menu' | localize }}
-                </a>
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/inventory" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-boxes-stacked"></i>
-                    {{ 'Inventory' | localize }}
-                </a>
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/channels" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-store"></i>
-                    {{ 'Channels' | localize }}
-                </a>
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/kds" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-tv"></i>
-                    {{ 'KDS' | localize }}
-                </a>
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/reports" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-chart-line"></i>
-                    {{ 'Reports' | localize }}
-                </a>
-                <a *ngIf="isGranted('Pages.Restaurant.Payroll')" class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/payroll" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-money-check-dollar"></i>
-                    {{ 'Payroll' | localize }}
-                </a>
+            <div class="alert alert-info d-flex flex-wrap justify-content-between align-items-center gap-2 mb-0" *ngIf="returnToMenu">
+                <span>{{ 'Station setup opened from menu item setup.' | localize }}</span>
+                <a class="btn btn-sm btn-light-primary" routerLink="/app/main/restaurant/menu" [queryParams]="{ resumeWizard: 'true' }">{{ 'Return to menu setup' | localize }}</a>
             </div>
-
             <div class="restaurant-metric-row d-grid gap-4">
                 <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
                     <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Dining Areas' | localize }}</span>
@@ -172,44 +141,19 @@
                     <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
                         <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Dining Areas' | localize }}</div>
                     </div>
-                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
-                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="areas.length; else noAreas">
-                            <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
-                                <tr>
-                                    <th class="align-middle text-uppercase">{{ 'Name' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Description' | localize }}</th>
-                                    <th class="text-end align-middle text-uppercase">{{ 'Status' | localize }}</th>
-                                    <th class="align-middle text-uppercase"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let area of areas">
-                                    <td class="fw-bold align-middle">{{ area.name }}</td>
-                                    <td class="align-middle">{{ area.description || '-' }}</td>
-                                    <td class="text-end align-middle">
-                                        <span
-                                            class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
-                                            [class.bg-light-success]="area.isActive" [class.text-success]="area.isActive"
-                                            [class.bg-light]="!area.isActive" [class.text-gray-600]="!area.isActive"
-                                        >
-                                            {{ area.isActive ? ('Active' | localize) : ('Inactive' | localize) }}
-                                        </span>
-                                    </td>
-                                    <td class="text-end align-middle">
-                                        <button
-                                            class="btn btn-xs btn-light-primary align-items-center d-inline-flex fs-9 justify-content-center"
-                                            (click)="editArea(area)"
-                                            tooltip="{{ 'Edit' | localize }}"
-                                        >
-                                            <i class="fa fa-pencil"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <ng-template #noAreas>
-                            <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'NoData' | localize }}</div>
-                        </ng-template>
+                    <div class="card-body p-0 restaurant-ag-grid-wrap overflow-hidden min-w-0">
+                        <ag-grid-angular
+                            class="ag-theme-balham restaurant-report-grid rounded-bottom-3 w-100"
+                            style="height: 500px"
+                            [columnDefs]="areaColumnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [rowData]="areas"
+                            [animateRows]="true"
+                            [enableCellTextSelection]="true"
+                            [overlayNoRowsTemplate]="noRowsOverlayTemplate"
+                            [suppressCellFocus]="true"
+                            (cellClicked)="onSetupGridCellClicked($event)"
+                        ></ag-grid-angular>
                     </div>
                 </div>
             </div>
@@ -295,42 +239,19 @@
                     <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
                         <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Tables' | localize }}</div>
                     </div>
-                    <div class="card-body p-0 restaurant-scroll mh-500px restaurant-table-wrap overflow-x-auto overflow-auto">
-                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="tables.length; else noTables">
-                            <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
-                                <tr>
-                                    <th class="align-middle text-uppercase">{{ 'Table' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Area' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Capacity' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Status' | localize }}</th>
-                                    <th class="align-middle text-uppercase"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let table of tables">
-                                    <td class="fw-bold align-middle">{{ table.name }}</td>
-                                    <td class="align-middle">{{ table.areaName }}</td>
-                                    <td class="align-middle">{{ table.capacity }}</td>
-                                    <td class="align-middle">
-                                        <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-primary text-primary align-items-center d-inline-flex lh-1 mw-100 text-nowrap">
-                                            {{ tableStatusText(table.status) }}
-                                        </span>
-                                    </td>
-                                    <td class="text-end align-middle">
-                                        <button
-                                            class="btn btn-xs btn-light-primary align-items-center d-inline-flex fs-9 justify-content-center"
-                                            (click)="editTable(table)"
-                                            tooltip="{{ 'Edit' | localize }}"
-                                        >
-                                            <i class="fa fa-pencil"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <ng-template #noTables>
-                            <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'NoData' | localize }}</div>
-                        </ng-template>
+                    <div class="card-body p-0 restaurant-ag-grid-wrap overflow-hidden min-w-0">
+                        <ag-grid-angular
+                            class="ag-theme-balham restaurant-report-grid rounded-bottom-3 w-100"
+                            style="height: 500px"
+                            [columnDefs]="tableColumnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [rowData]="tables"
+                            [animateRows]="true"
+                            [enableCellTextSelection]="true"
+                            [overlayNoRowsTemplate]="noRowsOverlayTemplate"
+                            [suppressCellFocus]="true"
+                            (cellClicked)="onSetupGridCellClicked($event)"
+                        ></ag-grid-angular>
                     </div>
                 </div>
             </div>
@@ -386,48 +307,19 @@
                     <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
                         <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Kitchen / Bar Stations' | localize }}</div>
                     </div>
-                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
-                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="stations.length; else noStations">
-                            <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
-                                <tr>
-                                    <th class="align-middle text-uppercase">{{ 'Station' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Type' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Status' | localize }}</th>
-                                    <th class="align-middle text-uppercase"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let station of stations">
-                                    <td class="fw-bold align-middle">{{ station.name }}</td>
-                                    <td class="align-middle">
-                                        <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-primary text-primary align-items-center d-inline-flex lh-1 mw-100 text-nowrap">
-                                            {{ stationTypeText(station.stationType) }}
-                                        </span>
-                                    </td>
-                                    <td class="align-middle">
-                                        <span
-                                            class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
-                                            [class.bg-light-success]="station.isActive" [class.text-success]="station.isActive"
-                                            [class.bg-light]="!station.isActive" [class.text-gray-600]="!station.isActive"
-                                        >
-                                            {{ station.isActive ? ('Active' | localize) : ('Inactive' | localize) }}
-                                        </span>
-                                    </td>
-                                    <td class="text-end align-middle">
-                                        <button
-                                            class="btn btn-xs btn-light-primary align-items-center d-inline-flex fs-9 justify-content-center"
-                                            (click)="editStation(station)"
-                                            tooltip="{{ 'Edit' | localize }}"
-                                        >
-                                            <i class="fa fa-pencil"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <ng-template #noStations>
-                            <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'NoData' | localize }}</div>
-                        </ng-template>
+                    <div class="card-body p-0 restaurant-ag-grid-wrap overflow-hidden min-w-0">
+                        <ag-grid-angular
+                            class="ag-theme-balham restaurant-report-grid rounded-bottom-3 w-100"
+                            style="height: 500px"
+                            [columnDefs]="stationColumnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [rowData]="stations"
+                            [animateRows]="true"
+                            [enableCellTextSelection]="true"
+                            [overlayNoRowsTemplate]="noRowsOverlayTemplate"
+                            [suppressCellFocus]="true"
+                            (cellClicked)="onSetupGridCellClicked($event)"
+                        ></ag-grid-angular>
                     </div>
                 </div>
             </div>
@@ -479,65 +371,19 @@
                     <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
                         <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Mobile Devices' | localize }}</div>
                     </div>
-                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
-                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="devices.length; else noDevices">
-                            <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
-                                <tr>
-                                    <th class="align-middle text-uppercase">{{ 'Device' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Code' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'User' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Status' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Sync' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Cursor' | localize }}</th>
-                                    <th class="align-middle text-uppercase"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let device of devices">
-                                    <td class="fw-bold align-middle">{{ device.name }}</td>
-                                    <td class="align-middle">{{ device.deviceCode }}</td>
-                                    <td class="align-middle">{{ device.userId || '-' }}</td>
-                                    <td class="align-middle">
-                                        <span
-                                            class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
-                                            [class.bg-light-success]="device.status === 0" [class.text-success]="device.status === 0"
-                                            [class.bg-light-danger]="device.status === 1" [class.text-danger]="device.status === 1"
-                                        >
-                                            {{ deviceStatusText(device.status) }}
-                                        </span>
-                                    </td>
-                                    <td class="align-middle">
-                                        <span
-                                            class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
-                                            [class.bg-light-success]="!device.hasConflict && device.lastSyncAt" [class.text-success]="!device.hasConflict && device.lastSyncAt"
-                                            [class.bg-light-warning]="!device.hasConflict && !device.lastSyncAt" [class.text-warning]="!device.hasConflict && !device.lastSyncAt"
-                                            [class.bg-light-danger]="device.hasConflict" [class.text-danger]="device.hasConflict"
-                                        >
-                                            {{ syncStatusText(device) }}
-                                        </span>
-                                        <div class="restaurant-muted text-gray-600" *ngIf="device.lastSyncError">
-                                            {{ device.lastSyncError }}
-                                        </div>
-                                    </td>
-                                    <td class="align-middle">
-                                        <div>{{ 'Pulled' | localize }}: {{ device.lastPulledSeq || 0 }}</div>
-                                        <div>{{ 'Ack' | localize }}: {{ device.lastAcknowledgedSeq || 0 }}</div>
-                                    </td>
-                                    <td class="text-end align-middle">
-                                        <button
-                                            class="btn btn-xs btn-light-primary align-items-center d-inline-flex fs-9 justify-content-center"
-                                            (click)="editDevice(device)"
-                                            tooltip="{{ 'Edit' | localize }}"
-                                        >
-                                            <i class="fa fa-pencil"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <ng-template #noDevices>
-                            <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'NoData' | localize }}</div>
-                        </ng-template>
+                    <div class="card-body p-0 restaurant-ag-grid-wrap overflow-hidden min-w-0">
+                        <ag-grid-angular
+                            class="ag-theme-balham restaurant-report-grid rounded-bottom-3 w-100"
+                            style="height: 500px"
+                            [columnDefs]="deviceColumnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [rowData]="devices"
+                            [animateRows]="true"
+                            [enableCellTextSelection]="true"
+                            [overlayNoRowsTemplate]="noRowsOverlayTemplate"
+                            [suppressCellFocus]="true"
+                            (cellClicked)="onSetupGridCellClicked($event)"
+                        ></ag-grid-angular>
                     </div>
                 </div>
             </div>
@@ -583,7 +429,8 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">{{ 'Manager PIN' | localize }}</label>
-                                <input class="form-control" type="password" formControlName="managerPin" />
+                                <input class="form-control" type="password" autocomplete="new-password" formControlName="managerPin" placeholder="Leave blank to keep the saved PIN" />
+                                <small class="form-text text-muted">The saved PIN is never displayed. Enter a new 4–12 digit PIN only when changing it.</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label d-block">{{ 'Manager Approval' | localize }}</label>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="ar">
   <texts>
     <text name="HomePage">الرئيسية</text>
@@ -841,17 +841,8 @@
     <text name="RecurringSubscriptionUpgradeNote">سيتم فرض رسوم على فرق السعر بين نسختك الحالية والنسخه المرتقى لها.</text>
     <text name="Theme_Default">إفتراضي</text>
     <text name="Theme_Theme1">تصميم  1</text>
-    <text name="Theme_Theme2">تصميم  2</text>
-    <text name="Theme_Theme3">تصميم  3</text>
-    <text name="Theme_Theme4">تصميم  4</text>
-    <text name="Theme_Theme5">تصميم  5</text>
-    <text name="Theme_Theme6">تصميم  6</text>
-    <text name="Theme_Theme7">تصميم  7</text>
     <text name="Theme_Theme8">تصميم  8</text>
-    <text name="Theme_Theme9">تصميم  9</text>
-    <text name="Theme_Theme10">تصميم  10</text>
     <text name="Theme_Theme11">تصميم  11</text>
-    <text name="Theme_Theme12">تصميم  12</text>
     <text name="SelectATheme">اختر تصميم</text>
     <text name="QuickThemeSelection">الاختيار السريع للتصميم</text>
     <text name="IsQuickThemeSelectEnabled">هل الاختيار السريع للتصاميم مفعّل</text>

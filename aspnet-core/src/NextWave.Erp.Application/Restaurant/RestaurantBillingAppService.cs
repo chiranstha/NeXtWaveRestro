@@ -15,6 +15,10 @@ using NextWave.Erp.Sales.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using System.Transactions;
 using System.Threading.Tasks;
 
 namespace NextWave.Erp.Restaurant
@@ -25,6 +29,8 @@ namespace NextWave.Erp.Restaurant
         IRepository<RestaurantOrderItem, Guid> orderItemRepository,
         IRepository<RestaurantBillLine, Guid> billLineRepository,
         IRepository<RestaurantBillPayment, Guid> billPaymentRepository,
+        IRepository<RestaurantBillTender, Guid> billTenderRepository,
+        IRepository<RestaurantCashShift, Guid> cashShiftRepository,
         IRepository<RestaurantTable, Guid> tableRepository,
         IRepository<RestaurantTableSession, Guid> tableSessionRepository,
         IRepository<Product, Guid> productRepository,
@@ -53,8 +59,49 @@ namespace NextWave.Erp.Restaurant
 
         public async Task<FinalizeRestaurantBillResultDto> FinalizeBill(FinalizeRestaurantBillDto input)
         {
-            using var uow = unitOfWorkManager.Begin(new UnitOfWorkOptions { IsTransactional = true });
+            if (input == null || input.OrderId == Guid.Empty)
+                throw new UserFriendlyException("Restaurant order not found");
+
+            using var uow = unitOfWorkManager.Begin(new UnitOfWorkOptions
+            {
+                IsTransactional = true,
+                IsolationLevel = IsolationLevel.Serializable
+            });
             var tenantId = AbpSession.GetTenantId();
+
+            var requestId = input.ClientRequestId?.Trim();
+            var requestHash = string.IsNullOrWhiteSpace(requestId) ? null : HashBillingRequest(input);
+            if (!string.IsNullOrWhiteSpace(requestId))
+            {
+                if (requestId.Length > 100)
+                    throw new UserFriendlyException("Billing request ID is too long");
+
+                var previousPayment = await billPaymentRepository.FirstOrDefaultAsync(x =>
+                    x.TenantId == tenantId && x.ClientRequestId == requestId);
+                if (previousPayment != null)
+                {
+                    if (!string.Equals(previousPayment.RequestHash, requestHash, StringComparison.Ordinal))
+                        throw new UserFriendlyException("This billing request ID was already used for different bill details");
+
+                    var previousOrder = await orderRepository.FirstOrDefaultAsync(x =>
+                        x.Id == previousPayment.OrderId && x.TenantId == tenantId);
+                    await uow.CompleteAsync();
+                    return new FinalizeRestaurantBillResultDto
+                    {
+                        OrderId = previousPayment.OrderId,
+                        OrderNo = previousOrder?.OrderNo,
+                        SalesMasterId = previousPayment.SalesMasterId,
+                        IsFullyBilled = previousPayment.IsOrderFullyBilled,
+                        RemainingGrandTotal = previousPayment.RemainingGrandTotal,
+                        BillAmount = previousPayment.BillAmount,
+                        TipAmount = previousPayment.TipAmount,
+                        PayableAmount = previousPayment.PayableAmount,
+                        CustomerPaidAmount = previousPayment.CustomerPaidAmount,
+                        ReturnAmount = previousPayment.ReturnAmount
+                    };
+                }
+            }
+
             var order = await orderRepository.FirstOrDefaultAsync(x => x.Id == input.OrderId && x.TenantId == tenantId);
             if (order == null) throw new UserFriendlyException("Restaurant order not found");
             if (order.Status is RestaurantOrderStatus.Billed or RestaurantOrderStatus.Closed)
@@ -90,6 +137,18 @@ namespace NextWave.Erp.Restaurant
             var netAmount = billableLines.Sum(x => x.NetAmount);
             var grandTotal = billableLines.Sum(x => x.Amount);
             var payment = BuildPaymentAmounts(grandTotal, input);
+
+            if (input.Tenders?.Count > 1)
+                throw new UserFriendlyException("Multiple payment methods need their accounting ledgers configured before split payment can be enabled");
+
+            if (input.CashShiftId.HasValue)
+            {
+                var shift = await cashShiftRepository.FirstOrDefaultAsync(x =>
+                    x.Id == input.CashShiftId.Value && x.TenantId == tenantId && !x.IsClosed &&
+                    x.OpenedByUserId == AbpSession.UserId);
+                if (shift == null)
+                    throw new UserFriendlyException("Open cash shift not found for the signed-in cashier");
+            }
 
             var salesInput = new CreateOrEditSalesMasterDto
             {
@@ -147,7 +206,7 @@ namespace NextWave.Erp.Restaurant
 
             var salesMasterId = await salesMastersAppService.CreateOrEdit(salesInput);
 
-            await billPaymentRepository.InsertAsync(new RestaurantBillPayment
+            var billPayment = new RestaurantBillPayment
             {
                 TenantId = tenantId,
                 OrderId = order.Id,
@@ -157,8 +216,39 @@ namespace NextWave.Erp.Restaurant
                 PayableAmount = payment.PayableAmount,
                 CustomerPaidAmount = payment.CustomerPaidAmount,
                 ReturnAmount = payment.ReturnAmount,
+                PaymentMethod = input.PaymentMethod,
+                CashShiftId = input.CashShiftId,
+                ClientRequestId = requestId,
+                RequestHash = requestHash,
                 PaidAt = DateTime.Now
-            });
+            };
+            var billPaymentId = await billPaymentRepository.InsertAndGetIdAsync(billPayment);
+
+            if (input.Tenders?.Count == 1)
+            {
+                var tender = input.Tenders[0];
+                if (tender.PaymentMethod != input.PaymentMethod || tender.Amount != payment.PayableAmount)
+                    throw new UserFriendlyException("The single tender must match the method and full payable amount");
+
+                var receivedAmount = tender.ReceivedAmount > 0 ? tender.ReceivedAmount : payment.CustomerPaidAmount;
+                if (tender.PaymentMethod == PaymentMethod.Cash && receivedAmount < payment.PayableAmount)
+                    throw new UserFriendlyException("Cash received must cover the payable amount");
+                if (tender.PaymentMethod != PaymentMethod.Cash && receivedAmount != payment.PayableAmount)
+                    throw new UserFriendlyException("Non-cash tender must exactly match its allocated amount");
+
+                await billTenderRepository.InsertAsync(new RestaurantBillTender
+                {
+                    TenantId = tenantId,
+                    BillPaymentId = billPaymentId,
+                    CashShiftId = input.CashShiftId,
+                    PaymentMethod = tender.PaymentMethod,
+                    PaymentLedgerId = tender.PaymentLedgerId ?? input.PaymentMethodLedgerId,
+                    Amount = payment.PayableAmount,
+                    ReceivedAmount = receivedAmount,
+                    ChangeAmount = tender.PaymentMethod == PaymentMethod.Cash ? receivedAmount - payment.PayableAmount : 0,
+                    Reference = tender.Reference?.Trim()
+                });
+            }
 
             foreach (var line in billableLines)
             {
@@ -182,6 +272,8 @@ namespace NextWave.Erp.Restaurant
 
             await CurrentUnitOfWork.SaveChangesAsync();
             var isFullyBilled = await IsOrderFullyBilled(order.Id, tenantId);
+            billPayment.IsOrderFullyBilled = isFullyBilled;
+            billPayment.RemainingGrandTotal = await GetRemainingGrandTotal(order.Id, tenantId);
 
             if (isFullyBilled)
             {
@@ -231,6 +323,8 @@ namespace NextWave.Erp.Restaurant
             if (affectedProductIds.Count > 0)
                 await reorderService.GenerateDraftPurchaseOrdersForProductsAsync(affectedProductIds, input.DateMiti);
 
+            await billPaymentRepository.UpdateAsync(billPayment);
+
             await uow.CompleteAsync();
             var remainingGrandTotal = await GetRemainingGrandTotal(order.Id, tenantId);
             return new FinalizeRestaurantBillResultDto
@@ -270,6 +364,9 @@ namespace NextWave.Erp.Restaurant
             if (input.PaymentMethod is PaymentMethod.Cash or PaymentMethod.Card_Swipe or PaymentMethod.QR &&
                 customerPaidAmount < payableAmount)
                 throw new UserFriendlyException("Customer paid amount must be greater than or equal to payable amount");
+            if (input.PaymentMethod is not PaymentMethod.Cash and not PaymentMethod.Credit &&
+                customerPaidAmount > payableAmount)
+                throw new UserFriendlyException("Change can only be issued against cash");
 
             return new RestaurantBillPaymentAmounts
             {
@@ -277,10 +374,16 @@ namespace NextWave.Erp.Restaurant
                 TipAmount = tipAmount,
                 PayableAmount = payableAmount,
                 CustomerPaidAmount = customerPaidAmount,
-                ReturnAmount = input.PaymentMethod == PaymentMethod.Credit
-                    ? 0
-                    : Math.Max(0, customerPaidAmount - payableAmount)
+                ReturnAmount = input.PaymentMethod == PaymentMethod.Cash
+                    ? Math.Max(0, customerPaidAmount - payableAmount)
+                    : 0
             };
+        }
+
+        private static string HashBillingRequest(FinalizeRestaurantBillDto input)
+        {
+            var request = JsonSerializer.Serialize(input);
+            return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(request)));
         }
 
         private async Task<List<RestaurantBillableLine>> BuildBillableLines(

@@ -21,6 +21,7 @@ import {
     UpdateRestaurantAggregatorOrderStatusDto,
 } from '@shared/service-proxies/service-proxies';
 import { DateTime } from 'luxon';
+import { ActivatedRoute } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 
 type RestaurantChannelsTab = 'channels' | 'mapping' | 'orders' | 'payouts';
@@ -99,6 +100,8 @@ interface RestaurantPayoutImportForm {
     standalone: false,
 })
 export class RestaurantChannelsComponent extends AppComponentBase implements OnInit {
+    returnToMenu = false;
+    private requestedMenuItemId = '';
     activeTab: RestaurantChannelsTab = 'channels';
     loading = false;
     saving = false;
@@ -134,12 +137,18 @@ export class RestaurantChannelsComponent extends AppComponentBase implements OnI
 
     private channelService = inject(RestaurantChannelServiceProxy);
     private menuService = inject(RestaurantMenuServiceProxy);
+    private route = inject(ActivatedRoute);
 
     constructor() {
         super(inject(Injector));
     }
 
     ngOnInit(): void {
+        this.returnToMenu = this.route.snapshot.queryParamMap.get('returnToMenu') === 'true';
+        this.requestedMenuItemId = this.route.snapshot.queryParamMap.get('menuItemId') || '';
+        if (this.route.snapshot.queryParamMap.get('tab') === 'mapping') {
+            this.activeTab = 'mapping';
+        }
         this.refresh();
     }
 
@@ -196,6 +205,9 @@ export class RestaurantChannelsComponent extends AppComponentBase implements OnI
 
                 this.resetAccountForm(false);
                 this.resetItemForm(false);
+                if (this.requestedMenuItemId && this.menuItems.some((item) => item.id === this.requestedMenuItemId)) {
+                    this.itemForm.menuItemId = this.requestedMenuItemId;
+                }
                 this.resetQuickAcceptForms();
             });
     }

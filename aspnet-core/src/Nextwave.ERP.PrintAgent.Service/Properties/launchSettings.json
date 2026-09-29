@@ -1,0 +1,15 @@
+{
+  "profiles": {
+    "Nextwave.ERP.PrintAgent.Service": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "PrintAgent__Urls": "https://localhost:61620",
+        "PrintAgent__DataDirectory": "%TEMP%\\NextwaveERP\\PrintAgent-Dev",
+        "PrintAgent__ManagementPipeName": "NextwaveERP.PrintAgent.Management.Dev"
+      },
+      "applicationUrl": "https://localhost:61620;http://localhost:61621"
+    }
+  }
+}

@@ -24,6 +24,8 @@ namespace NextWave.Erp.Restaurant
         public DateTime? CancelledAt { get; set; }
         public DateTime? PrintedAt { get; set; }
         public DateTime? LastPrintedAt { get; set; }
+        public DateTime? PrintRequestedAt { get; set; }
+        public DateTime? LastPrintConfirmedAt { get; set; }
         public int PrintCount { get; set; }
         [StringLength(500)] public string CancelReason { get; set; }
         public int? TenantId { get; set; }

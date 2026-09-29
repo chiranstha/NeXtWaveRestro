@@ -1,53 +1,65 @@
-<!--begin::Signin-->
-<div [@routerTransition] class="login-form">
-    <div class="pb-10 pt-lg-0 pt-5 login-heading">
-        <span class="login-kicker">Restaurant workspace</span>
-        <h3 class="fw-bolder text-dark fs-h4 fs-h1-lg mb-3">{{ 'LogIn' | localize }}</h3>
-        <p class="mb-0 text-muted fw-bold">Welcome back. Your next service starts here.</p>
-    </div>
-    <!--begin::Form-->
-    <form #loginForm="ngForm" (ngSubmit)="login()" class="login-form form" method="post">
-        <div class="mb-5">
-            <input
-                #userNameOrEmailAddressInput="ngModel"
-                [(ngModel)]="loginService.authenticateModel.userNameOrEmailAddress"
-                [attr.aria-label]="'UserNameOrEmail' | localize"
-                autoFocus
-                autocomplete="new-password"
-                class="form-control form-control-solid h-auto py-4 px-6 rounded-lg fs-h6"
-                name="userNameOrEmailAddress"
-                placeholder="{{ 'UserNameOrEmail' | localize }} *"
-                required
-                type="text"
-            />
-            @if (!userNameOrEmailAddressInput.touched) {
+<div class="login-wrap" [@routerTransition]>
+    <header class="login-header">
+        <div class="login-kicker">RESTAURANT WORKSPACE</div>
+        <h1 class="login-title">Welcome back<span>.</span></h1>
+        <p class="login-subtitle">
+            Sign in to your restaurant workspace.<br />Everything you need to run service, right where you left it.
+        </p>
+    </header>
+
+    <form #loginForm="ngForm" class="login-form form" method="post" (ngSubmit)="login()">
+        <div class="login-field">
+            <label class="login-label" for="login-username">{{ 'UserNameOrEmail' | localize }}</label>
+            <div class="login-input-wrap">
+                <span class="login-input-icon" aria-hidden="true"><i class="fas fa-user"></i></span>
+                <input
+                    #userNameOrEmailAddressInput="ngModel"
+                    [(ngModel)]="loginService.authenticateModel.userNameOrEmailAddress"
+                    [attr.aria-label]="'UserNameOrEmail' | localize"
+                    autoFocus
+                    autocomplete="username"
+                    class="login-input"
+                    id="login-username"
+                    name="userNameOrEmailAddress"
+                    placeholder="{{ 'UserNameOrEmail' | localize }}"
+                    required
+                    type="text"
+                />
+            </div>
+            @if (userNameOrEmailAddressInput.touched || loginForm.submitted) {
                 <validation-messages [formCtrl]="userNameOrEmailAddressInput"></validation-messages>
             }
         </div>
-        <div class="mb-5" data-kt-password-meter="true">
-            <div class="position-relative mb-3">
+
+        <div class="login-field" data-kt-password-meter="true">
+            <div class="login-label-row">
+                <label class="login-label" for="loginPassword">{{ 'Password' | localize }}</label>
+                <a id="forget-password" class="login-forgot-link" routerLink="/account/forgot-password">
+                    {{ 'ForgotPassword' | localize }}
+                </a>
+            </div>
+            <div class="login-input-wrap">
+                <span class="login-input-icon" aria-hidden="true"><i class="fas fa-lock"></i></span>
                 <input
                     id="loginPassword"
                     #passwordInput="ngModel"
                     [(ngModel)]="loginService.authenticateModel.password"
-                    [attr.aria-label]="'Password' | localize"
                     [class.password-field-scrambling]="passwordAnimation"
                     [type]="showPassword ? 'text' : 'password'"
-                    autocomplete="new-password"
-                    class="form-control form-control-solid h-auto px-6 py-4 rounded-lg fs-h6 password-input"
+                    autocomplete="current-password"
+                    class="login-input password-input"
                     maxlength="32"
                     name="password"
-                    placeholder="{{ 'Password' | localize }} *"
+                    placeholder="{{ 'Password' | localize }}"
                     required
                 />
                 @if (passwordAnimation) {
-                    <span class="password-shuffle-layer position-absolute top-50 translate-middle-y" aria-hidden="true">
-                        {{ passwordShuffleText }}
-                    </span>
+                    <span class="password-shuffle-layer" aria-hidden="true">{{ passwordShuffleText }}</span>
                 }
-                <!--begin::Visibility toggle-->
                 <button
                     #passwordToggle
+                    type="button"
+                    class="password-toggle"
                     (click)="togglePasswordVisibility()"
                     (mousemove)="trackMousePosition($event)"
                     [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
@@ -60,111 +72,84 @@
                         'hidden-toggle': !hasPasswordValue,
                     }"
                     aria-controls="loginPassword"
-                    class="position-absolute translate-middle-y top-50 end-0 d-flex align-items-center justify-content-center p-0 border rounded bg-white password-toggle"
-                    type="button"
                 >
-                    <div class="simple-eye">
-                        <!-- Open Eye (visible when password is shown) -->
-                        <svg class="open-eye-icon" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+                    <span class="simple-eye">
+                        <svg class="open-eye-icon" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                             <path class="eye-outline" d="M50,10C25,10,5,30,5,30s20,20,45,20s45-20,45-20S75,10,50,10z" />
                             <circle [attr.cx]="eyePositionX" [attr.cy]="eyePositionY" class="eye-pupil" r="15" />
                         </svg>
-                        <!-- Closed Eye (visible when password is hidden) -->
-                        <svg class="closed-eye-icon" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+                        <svg class="closed-eye-icon" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                             <path class="eyelash" d="M10,15 Q20,5 30,15" />
                             <path class="eyelash" d="M30,10 Q40,0 50,10" />
                             <path class="eyelash" d="M50,5 Q60,-5 70,5" />
                             <path class="eyelash" d="M70,10 Q80,0 90,10" />
                             <path class="eye-outline" d="M10,15 Q50,-5 90,15" />
                         </svg>
-                    </div>
+                    </span>
                 </button>
-                <!--end::Visibility toggle-->
             </div>
-            @if (!passwordInput.touched) {
+            @if (passwordInput.touched || loginForm.submitted) {
                 <validation-messages [formCtrl]="passwordInput"></validation-messages>
             }
         </div>
-        <div class="mb-5 d-flex justify-content-between mt-4">
-            <label class="form-check form-check-custom form-check-solid" for="rememberMe">
+
+        <div class="login-remember">
+            <label class="login-check-label" for="rememberMe">
                 <input
                     [(ngModel)]="loginService.rememberMe"
-                    class="form-check-input"
+                    class="login-checkbox"
                     id="rememberMe"
                     name="rememberMe"
                     type="checkbox"
                     value="true"
                 />
-                <span class="form-check-label">
-                    {{ 'RememberMe' | localize }}
-                </span>
+                <span class="login-check-text">{{ 'RememberMe' | localize }}</span>
             </label>
-            <a
-                class="text-primary fs-h6 fw-bolder text-hover-primary"
-                id="forget-password"
-                routerLink="/account/forgot-password"
-            >
-                {{ 'ForgotPassword' | localize }}
-            </a>
         </div>
-        <!--begin::Action-->
-        <div class="pb-lg-0 pb-5">
-            <button
-                [disabled]="loginForm.invalid"
-                class="btn w-100 btn-primary fw-bolder fs-h6 px-8 py-3 my-3 me-3"
-                type="submit"
-            >
+
+        <button
+            type="submit"
+            class="login-btn"
+            [disabled]="loginForm.invalid || submitting"
+            [attr.aria-busy]="submitting"
+        >
+            @if (submitting) {
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                {{ 'PleaseWait' | localize }}
+            } @else {
                 {{ 'LogIn' | localize }}
-            </button>
-        </div>
-        <!--end::Action-->
+                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+            }
+        </button>
     </form>
-    <!--end::Form-->
-    <!--begin::Options-->
+
     @if ((multiTenancySideIsTeanant || !isMultiTenancyEnabled) && loginService.externalLoginProviders.length > 0) {
-        <div class="mt-10 mb-2">
-            <div class="divider">
-                <span>{{ 'LoginWith' | localize }}</span>
-            </div>
-        </div>
-    }
-    @if ((multiTenancySideIsTeanant || !isMultiTenancyEnabled) && loginService.externalLoginProviders.length > 0) {
-        <div class="pb-lg-0 pb-5 login__options">
+        <div class="login-divider"><span>{{ 'LoginWith' | localize }}</span></div>
+        <div class="login__options">
             @for (provider of loginService.externalLoginProviders; track provider) {
-                <a
-                    (click)="externalLogin(provider)"
-                    class="btn btn-sm btn-light-primary fw-bolder py-2 mb-2 ml-0 me-2"
-                    title="{{ provider.name }}"
-                >
-                    <i class="fab fa-{{ provider.icon }}"></i>
-                    {{ provider.name }}
-                </a>
+                <button type="button" class="external-login-btn" (click)="externalLogin(provider)" title="{{ provider.name }}">
+                    <i class="fab fa-{{ provider.icon }}" aria-hidden="true"></i>{{ provider.name }}
+                </button>
             }
         </div>
     }
-    <!--end::Options-->
-</div>
-<div class="mt-6 login-support-links">
-    @if (isPasswordlessLoginEnabled) {
-        <span>
-            <span>{{ 'PasswordlessLogin_Description' | localize }}</span>
-            <a href="/account/passwordless-login" id="passwordless-btn">{{ 'ClickHere' | localize }}</a>
-        </span>
-    }
-    <div class="mt-2">
-        <span>{{ 'NotAMemberYet' | localize }}</span>
-    </div>
-    @if (isSelfRegistrationAllowed) {
-        <span>
-            <a routerLink="/account/register">{{ 'CreateAnAccount' | localize }}</a>
-            <span class="pipe-divider">|</span>
-        </span>
-    }
-    @if (!multiTenancySideIsTeanant && isTenantSelfRegistrationAllowed) {
-        <span>
-            <a routerLink="/account/select-edition">{{ 'NewTenant' | localize }}</a>
-            <span class="pipe-divider">|</span>
-        </span>
-    }
-    <a id="email-activation-btn" routerLink="/account/email-activation">{{ 'EmailActivation' | localize }}</a>
+
+    <footer class="login-footer-plain">
+        @if (isPasswordlessLoginEnabled) {
+            <div class="login-support-line">
+                <span>{{ 'PasswordlessLogin_Description' | localize }}</span>
+                <a href="/account/passwordless-login" id="passwordless-btn" class="login-footer-link">{{ 'ClickHere' | localize }}</a>
+            </div>
+        }
+        <p class="login-footer-text">{{ 'NotAMemberYet' | localize }}</p>
+        <div class="login-footer-links">
+            @if (isSelfRegistrationAllowed) {
+                <a routerLink="/account/register" class="login-footer-link">{{ 'CreateAnAccount' | localize }}</a>
+            }
+            @if (!multiTenancySideIsTeanant && isTenantSelfRegistrationAllowed) {
+                <a routerLink="/account/select-edition" class="login-footer-link">{{ 'NewTenant' | localize }}</a>
+            }
+            <a routerLink="/account/email-activation" id="email-activation-btn" class="login-footer-link">{{ 'EmailActivation' | localize }}</a>
+        </div>
+    </footer>
 </div>

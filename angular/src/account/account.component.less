@@ -2014,3 +2014,390 @@ ul.text-danger {
     border-radius: 12px;
   }
 }
+
+/* Academic ERP-inspired account shell for the Restro sign-in page. */
+@property --restro-account-border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes restro-account-border-rotate {
+  to { --restro-account-border-angle: 360deg; }
+}
+
+.account-login-shell {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: minmax(0, 50%) minmax(0, 50%);
+  background: #f7f9fc;
+  color: #15263c;
+  font-family: Sofia Pro, sans-serif;
+}
+
+.account-login-shell .account-story {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 44px clamp(36px, 5vw, 88px) 30px;
+  color: #fff;
+  background: radial-gradient(ellipse at 0% 95%, #1755aa 0, transparent 55%), linear-gradient(145deg, #102c53, #0b2142 65%, #102e59);
+}
+
+.account-login-shell .account-story::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 90px;
+  right: -400px;
+  width: 680px;
+  height: 680px;
+  border: 1px solid rgba(156, 197, 255, .07);
+  border-radius: 50%;
+  box-shadow: 0 0 0 70px rgba(156, 197, 255, .025), 0 0 0 140px rgba(156, 197, 255, .018);
+  pointer-events: none;
+}
+
+.account-login-shell .account-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 13px;
+  align-self: flex-start;
+  color: #fff;
+  text-decoration: none;
+}
+
+.account-login-shell .brand-mark {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, .08);
+}
+
+.account-login-shell .brand-mark img {
+  width: 39px;
+  height: 39px;
+  object-fit: contain;
+}
+
+.account-login-shell .brand-name {
+  color: #fff;
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: -.9px;
+  line-height: 1.15;
+}
+
+.account-login-shell .brand-name span {
+  display: block;
+  margin-top: 5px;
+  color: #b2c8e7;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 4px;
+}
+
+.account-login-shell .story-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 22px;
+  color: #b8d1f0;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+.account-login-shell .story-eyebrow span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #83d6ec;
+  box-shadow: 0 0 0 5px rgba(131, 214, 236, .1);
+}
+
+.account-login-shell .story-body {
+  margin: auto 0 0;
+  padding: 62px 0 0;
+}
+
+.account-login-shell .story-body h1 {
+  margin: 0 0 20px;
+  color: #fff;
+  font-size: clamp(38px, 3.55vw, 58px);
+  font-weight: 600;
+  letter-spacing: -2.1px;
+  line-height: 1.16;
+}
+
+.account-login-shell .story-headline-line {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  font-size: clamp(18px, 2.15vw, 42px);
+  letter-spacing: -1.35px;
+  white-space: nowrap;
+}
+
+.account-login-shell .story-body h1 em {
+  display: block;
+  color: #8cc9ff;
+  font-style: normal;
+}
+
+.account-login-shell .story-description {
+  max-width: 430px;
+  margin: 0;
+  color: #b9cbe1;
+  font-size: 14px;
+  line-height: 1.85;
+}
+
+.account-login-shell .restaurant-network {
+  position: relative;
+  height: 300px;
+  max-width: 520px;
+  margin-top: 30px;
+}
+
+.account-login-shell .restaurant-network::before {
+  content: '';
+  position: absolute;
+  top: 38px;
+  bottom: 24px;
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(139, 220, 255, .78), rgba(95, 136, 183, .2));
+}
+
+.account-login-shell .network-hub {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 50%;
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid #4673a5;
+  border-radius: 15px;
+  background: linear-gradient(145deg, #284f7b, #173e6c);
+  box-shadow: 0 0 0 8px rgba(105, 160, 233, .045), 0 10px 24px rgba(0, 0, 0, .15);
+  color: #9bd5ff;
+  font-size: 20px;
+  transform: translateX(-50%);
+}
+
+.account-login-shell .network-feature {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  width: 43%;
+  height: 30px;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border: 1px solid rgba(179, 209, 248, .2);
+  border-radius: 11px;
+  background: linear-gradient(135deg, rgba(44, 83, 130, .92), rgba(30, 66, 111, .82));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
+  color: #e7effa;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.account-login-shell .network-feature i {
+  flex: 0 0 14px;
+  color: #97cbff;
+  font-size: 12px;
+  text-align: center;
+}
+
+.account-login-shell .network-feature span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-login-shell .network-feature::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  height: 1px;
+  background: rgba(139, 220, 255, .72);
+}
+
+.account-login-shell .feature-orders,
+.account-login-shell .feature-tables,
+.account-login-shell .feature-staff,
+.account-login-shell .feature-customers { left: 0; }
+
+.account-login-shell .feature-kitchen,
+.account-login-shell .feature-inventory,
+.account-login-shell .feature-reports,
+.account-login-shell .feature-delivery { right: 0; }
+
+.account-login-shell .feature-orders,
+.account-login-shell .feature-kitchen { top: 52px; }
+.account-login-shell .feature-tables,
+.account-login-shell .feature-inventory { top: 93px; }
+.account-login-shell .feature-staff,
+.account-login-shell .feature-reports { top: 134px; }
+.account-login-shell .feature-customers,
+.account-login-shell .feature-delivery { top: 175px; }
+
+.account-login-shell .feature-orders::after,
+.account-login-shell .feature-tables::after,
+.account-login-shell .feature-staff::after,
+.account-login-shell .feature-customers::after { right: -16%; width: 16%; }
+
+.account-login-shell .feature-kitchen::after,
+.account-login-shell .feature-inventory::after,
+.account-login-shell .feature-reports::after,
+.account-login-shell .feature-delivery::after { left: -16%; width: 16%; }
+
+.account-login-shell .visual-caption {
+  position: absolute;
+  bottom: 1px;
+  left: 0;
+  color: #91abc9;
+  font-size: 9px;
+  letter-spacing: 2.2px;
+}
+
+.account-login-shell .story-footer {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, .12);
+  color: #dce7f5;
+  font-size: 12px;
+}
+
+.account-login-shell .story-footer small {
+  display: block;
+  margin-top: 5px;
+  color: #91abc9;
+  font-size: 10px;
+}
+
+.account-login-shell .story-footer-mark {
+  color: #8fb0dc;
+  font-size: 20px;
+}
+
+.account-login-shell .account-main {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 16px clamp(24px, 4vw, 64px) 25px;
+  background: radial-gradient(ellipse at 50% 47%, #fff 0%, #f7f9fc 78%);
+}
+
+.account-login-shell .account-topbar { display: none; }
+
+.account-login-shell .account-content {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 0;
+}
+
+.account-login-shell .account-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  min-width: 0;
+  padding: 58px 36px 32px;
+  border: 1px solid #e8edf4;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, .97);
+  box-shadow: 0 26px 75px rgba(24, 48, 80, .09), 0 3px 12px rgba(24, 48, 80, .025);
+}
+
+.account-login-shell .account-card::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: -1px;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(from var(--restro-account-border-angle, 0deg), #6ca7fa, #94d9ec, #c5a3ff, #72e6b1, #ffd166, #6ca7fa);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: restro-account-border-rotate 8s linear infinite;
+}
+
+.account-login-shell .account-language {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  inset-inline-end: 16px;
+  display: flex;
+  align-items: center;
+  padding: 7px 12px;
+  border: 1px solid #e7ecf2;
+  border-radius: 30px;
+  background: #fff;
+}
+
+.account-login-shell .account-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #8b96a6;
+  font-size: 10px;
+}
+
+.account-login-shell .mobile-brand { display: none; }
+
+.account-login-shell .account-brand:focus-visible,
+.account-login-shell .mobile-brand:focus-visible {
+  outline: 3px solid #75b7ff;
+  outline-offset: 6px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-login-shell .account-card::before { animation: none; }
+}
+
+@media (max-width: 1000px) {
+  .account-login-shell .account-story { padding-right: 30px; padding-left: 30px; }
+  .account-login-shell .story-body h1 { font-size: 40px; }
+  .account-login-shell .network-feature { gap: 5px; padding: 4px 7px; font-size: 9px; }
+  .account-login-shell .account-main { padding-right: 30px; padding-left: 30px; }
+  .account-login-shell .account-footer { flex-direction: column; gap: 5px; }
+}
+
+@media (max-width: 767.98px) {
+  .account-login-shell { display: block; }
+  .account-login-shell .account-story { display: none; }
+  .account-login-shell .account-main { min-height: 100svh; padding: 16px 24px 24px; }
+  .account-login-shell .account-topbar { display: flex; min-height: 42px; align-items: center; }
+  .account-login-shell .mobile-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #152e50;
+    text-decoration: none;
+  }
+  .account-login-shell .mobile-brand img { width: 36px; height: 36px; object-fit: contain; }
+  .account-login-shell .mobile-brand > span { font-size: 20px; font-weight: 600; letter-spacing: -.6px; line-height: 1.1; }
+  .account-login-shell .mobile-brand span span { display: block; margin-top: 5px; color: #738399; font-size: 7px; letter-spacing: 2.8px; }
+  .account-login-shell .account-content { padding: 16px 0; }
+  .account-login-shell .account-card { padding: 62px 22px 26px; border-radius: 18px; box-shadow: 0 18px 48px rgba(24, 48, 80, .08); }
+  .account-login-shell .account-language { top: 12px; inset-inline-end: 12px; }
+  .account-login-shell .account-footer { flex-direction: row; flex-wrap: wrap; font-size: 9px; }
+}

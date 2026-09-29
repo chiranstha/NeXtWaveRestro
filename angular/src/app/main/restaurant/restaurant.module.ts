@@ -19,6 +19,7 @@ import { RestaurantInventoryComponent } from './restaurant-inventory/restaurant-
 import { RestaurantMenuComponent } from './restaurant-menu/restaurant-menu.component';
 import { RestaurantNavigationComponent } from './restaurant-navigation.component';
 import { RestaurantPayrollApiService } from './restaurant-payroll/restaurant-payroll-api.service';
+import { RestaurantCashShiftApiService } from './restaurant-cash-shift-api.service';
 import { RestaurantPayrollComponent } from './restaurant-payroll/restaurant-payroll.component';
 import { RestaurantPosComponent } from './restaurant-pos/restaurant-pos.component';
 import { RestaurantReportsComponent } from './restaurant-reports/restaurant-reports.component';
@@ -57,7 +58,7 @@ import { RestaurantStylesComponent } from './restaurant-styles.component';
         RestaurantReportsComponent,
         RestaurantPayrollComponent,
     ],
-    providers: [RestaurantPayrollApiService],
+    providers: [RestaurantPayrollApiService, RestaurantCashShiftApiService],
     schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
 })
 export class RestaurantModule {}

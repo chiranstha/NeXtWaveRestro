@@ -76,6 +76,7 @@ export class AddProductComponent extends AppComponentBase implements OnInit, OnD
     expanded1 = false;
     price: number;
     title = 'Create Product';
+    returnToMenu = false;
     allProductGoups: UniversalDropdownDto[];
     allUnits: UniversalDropdownDto[];
     allUnitsOpeningStock: UniversalDropdownDto[];
@@ -182,6 +183,11 @@ export class AddProductComponent extends AppComponentBase implements OnInit, OnD
     ngOnInit(): void {
         this.createForm();
         this.id = this.route.snapshot.params['pid'];
+        this.returnToMenu = this.route.snapshot.queryParamMap.get('returnToMenu') === 'true';
+        if (!this.id && this.route.snapshot.queryParamMap.get('productType') === 'rawMaterial') {
+            this.form.get('productType')?.setValue(ProductTypeEnum.RawMaterial);
+            this.onChangeType(ProductTypeEnum.RawMaterial);
+        }
 
         // Initialize collections to prevent undefined errors
         this.allUnits = [];
@@ -990,7 +996,7 @@ export class AddProductComponent extends AppComponentBase implements OnInit, OnD
                             return;
                         }
 
-                        this._location.back();
+                        this.returnAfterSave();
                     });
             } else {
                 this.notify.error('Form is invalid !!');
@@ -1026,12 +1032,23 @@ export class AddProductComponent extends AppComponentBase implements OnInit, OnD
             .subscribe(() => {
                 if (this.id) {
                     this.notify.info(this.l('Updated Successfully'));
-                    this._location.back();
+                    this.returnAfterSave();
                 } else {
                     this.notify.info(this.l('Saved Successfully'));
-                    this._location.back();
+                    this.returnAfterSave();
                 }
             });
+    }
+
+    private returnAfterSave(): void {
+        if (this.returnToMenu) {
+            this._router.navigate(['/app/main/restaurant/menu'], {
+                queryParams: { resumeWizard: 'true' },
+            });
+            return;
+        }
+
+        this._location.back();
     }
 
 

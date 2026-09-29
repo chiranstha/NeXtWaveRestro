@@ -17,10 +17,33 @@ import {
     RestaurantStationDto,
     RestaurantTicketDto,
     RestaurantTicketItemDto,
+    BulkUpdateRestaurantTicketItemStatusDto,
     UpdateRestaurantTicketItemStatusDto,
     UpdateRestaurantTicketStatusDto,
 } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs';
+
+interface RestaurantKdsItemEntry {
+    ticket: RestaurantTicketDto;
+    item: RestaurantTicketItemDto;
+}
+
+interface RestaurantKdsItemTotal {
+    key: string;
+    name: string;
+    unitName: string;
+    variantName: string;
+    modifierSummary: string;
+    notes: string;
+    qty: number;
+    sentCount: number;
+    preparingCount: number;
+    readyCount: number;
+    sentQty: number;
+    preparingQty: number;
+    readyQty: number;
+    entries: RestaurantKdsItemEntry[];
+}
 
 @Component({
     selector: 'restaurant-kds',
@@ -34,10 +57,14 @@ export class RestaurantKdsComponent extends AppComponentBase implements OnInit, 
     stations: RestaurantStationDto[] = [];
     tickets: RestaurantTicketDto[] = [];
     filteredTickets: RestaurantTicketDto[] = [];
+    itemTotals: RestaurantKdsItemTotal[] = [];
+    expandedItemKeys = new Set<string>();
+    activeView: 'tickets' | 'items' = 'tickets';
     selectedStationId = '';
     selectedTicketType = '';
     selectedStatus = '';
     loading = false;
+    bulkActionKey = '';
     private refreshTimer: number | undefined;
 
     private restaurantSetupService = inject(RestaurantSetupServiceProxy);
@@ -85,7 +112,123 @@ export class RestaurantKdsComponent extends AppComponentBase implements OnInit, 
             const statusMatch = this.selectedStatus === '' || ticket.status === Number(this.selectedStatus);
             return typeMatch && statusMatch;
         });
+        this.itemTotals = this.buildItemTotals(this.filteredTickets);
         this.cdr.markForCheck();
+    }
+
+    setActiveView(view: 'tickets' | 'items'): void {
+        this.activeView = view;
+    }
+
+    toggleItemExpanded(key: string): void {
+        if (this.expandedItemKeys.has(key)) {
+            this.expandedItemKeys.delete(key);
+        } else {
+            this.expandedItemKeys.add(key);
+        }
+    }
+
+    isItemExpanded(key: string): boolean {
+        return this.expandedItemKeys.has(key);
+    }
+
+    trackItemTotal(_: number, total: RestaurantKdsItemTotal): string {
+        return total.key;
+    }
+
+    trackItemEntry(_: number, entry: RestaurantKdsItemEntry): string {
+        return entry.item.id;
+    }
+
+    eligibleItemEntries(total: RestaurantKdsItemTotal, status: number): RestaurantKdsItemEntry[] {
+        const allowedStatuses = status === 2 ? [1] : status === 3 ? [1, 2] : status === 4 ? [3] : [];
+        return total.entries.filter((entry) => allowedStatuses.includes(entry.item.status));
+    }
+
+    bulkUpdateItemStatus(total: RestaurantKdsItemTotal, status: number): void {
+        const entries = this.eligibleItemEntries(total, status);
+        if (!entries.length || this.bulkActionKey) {
+            return;
+        }
+
+        this.bulkActionKey = `${total.key}:${status}`;
+        this.restaurantKdsService
+            .updateTicketItemStatuses(
+                new BulkUpdateRestaurantTicketItemStatusDto({
+                    ticketItemIds: entries.map((entry) => entry.item.id),
+                    status,
+                }),
+            )
+            .pipe(finalize(() => {
+                this.bulkActionKey = '';
+                this.cdr.markForCheck();
+            }))
+            .subscribe((result) => {
+                const skippedText = result.skippedCount ? ` (${result.skippedCount} already changed)` : '';
+                this.notify.success(`${this.itemStatusText(status)}: ${result.updatedCount} line(s) updated${skippedText}`);
+                this.refresh();
+            }, () => this.notify.error('Items could not be updated. Refresh the KDS and retry.'));
+    }
+
+    private buildItemTotals(tickets: RestaurantTicketDto[]): RestaurantKdsItemTotal[] {
+        const totals = new Map<string, RestaurantKdsItemTotal>();
+
+        for (const ticket of tickets) {
+            if (ticket.purpose === 1) {
+                continue;
+            }
+
+            for (const item of ticket.items || []) {
+                if (item.status !== 1 && item.status !== 2 && item.status !== 3) {
+                    continue;
+                }
+
+                const name = item.itemNameSnapshot || item.productName || 'Unnamed item';
+                const unitName = item.unitName || '';
+                const variantName = item.variantNameSnapshot || '';
+                const modifierSummary = item.modifierSummary || '';
+                const notes = item.notes || '';
+                const key = JSON.stringify(
+                    [name, unitName, variantName, modifierSummary, notes].map((value) => value.trim().toLocaleLowerCase()),
+                );
+                let total = totals.get(key);
+
+                if (!total) {
+                    total = {
+                        key,
+                        name,
+                        unitName,
+                        variantName,
+                        modifierSummary,
+                        notes,
+                        qty: 0,
+                        sentCount: 0,
+                        preparingCount: 0,
+                        readyCount: 0,
+                        sentQty: 0,
+                        preparingQty: 0,
+                        readyQty: 0,
+                        entries: [],
+                    };
+                    totals.set(key, total);
+                }
+
+                total.qty += item.qty || 0;
+                if (item.status === 1) {
+                    total.sentCount++;
+                    total.sentQty += item.qty || 0;
+                } else if (item.status === 2) {
+                    total.preparingCount++;
+                    total.preparingQty += item.qty || 0;
+                } else {
+                    total.readyCount++;
+                    total.readyQty += item.qty || 0;
+                }
+                total.entries.push({ ticket, item });
+            }
+        }
+
+        return Array.from(totals.values()).sort((left, right) => right.qty - left.qty || left.name.localeCompare(right.name));
     }
 
     selectedStationName(): string {

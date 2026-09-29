@@ -45,6 +45,7 @@ public class UiCustomizationSettingsAppService : ErpAppServiceBase, IUiCustomiza
 
     public async Task ChangeThemeWithDefaultValues(string themeName)
     {
+        EnsureSupportedTheme(themeName);
         var settings = (await GetUiManagementSettings()).FirstOrDefault(s => s.Theme == themeName);
 
         var hasUiCustomizationPagePermission = await PermissionChecker.IsGrantedAsync(AppPermissions.Pages_Administration_UiCustomization);
@@ -61,12 +62,14 @@ public class UiCustomizationSettingsAppService : ErpAppServiceBase, IUiCustomiza
 
     public async Task UpdateUiManagementSettings(ThemeSettingsDto settings)
     {
+        EnsureSupportedTheme(settings?.Theme);
         var themeCustomizer = _uiThemeCustomizerFactory.GetUiCustomizer(settings.Theme);
         await themeCustomizer.UpdateUserUiManagementSettingsAsync(AbpSession.ToUserIdentifier(), settings);
     }
 
     public async Task UpdateDefaultUiManagementSettings(ThemeSettingsDto settings)
     {
+        EnsureSupportedTheme(settings?.Theme);
         var themeCustomizer = _uiThemeCustomizerFactory.GetUiCustomizer(settings.Theme);
 
         if (AbpSession.TenantId.HasValue)
@@ -104,5 +107,15 @@ public class UiCustomizationSettingsAppService : ErpAppServiceBase, IUiCustomiza
 
         var themeCustomizer = _uiThemeCustomizerFactory.GetUiCustomizer(theme);
         await themeCustomizer.UpdateDarkModeSettingsAsync(user, isDarkModeActive);
+    }
+
+    private static void EnsureSupportedTheme(string themeName)
+    {
+        if (!string.Equals(themeName, AppConsts.ThemeDefault, System.StringComparison.OrdinalIgnoreCase)
+            && !string.Equals(themeName, AppConsts.Theme8, System.StringComparison.OrdinalIgnoreCase)
+            && !string.Equals(themeName, AppConsts.Theme11, System.StringComparison.OrdinalIgnoreCase))
+        {
+            throw new Abp.UI.UserFriendlyException("Unsupported UI theme.");
+        }
     }
 }

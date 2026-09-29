@@ -247,6 +247,8 @@ public static class AppPermissions
     public const string PagesRestaurantAggregators = "Pages.Restaurant.Aggregators";
     public const string PagesRestaurantPayouts = "Pages.Restaurant.Payouts";
     public const string PagesRestaurantCustomerOrdering = "Pages.Restaurant.CustomerOrdering";
+    public const string PagesRestaurantReservations = "Pages.Restaurant.Reservations";
+    public const string PagesRestaurantPrinterSetup = "Pages.Restaurant.PrinterSetup";
     public const string PagesRestaurantPayroll = "Pages.Restaurant.Payroll";
     public const string PagesRestaurantPayrollStaff = "Pages.Restaurant.Payroll.Staff";
     public const string PagesRestaurantPayrollStaffAccess = "Pages.Restaurant.Payroll.Staff.Access";

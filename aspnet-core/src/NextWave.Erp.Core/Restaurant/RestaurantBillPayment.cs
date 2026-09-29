@@ -1,4 +1,5 @@
 using Abp.Domain.Entities;
+using NextWave.Erp.Enums;
 using NextWave.Erp.Sales;
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -19,6 +20,13 @@ namespace NextWave.Erp.Restaurant
         public decimal PayableAmount { get; set; }
         public decimal CustomerPaidAmount { get; set; }
         public decimal ReturnAmount { get; set; }
+        public PaymentMethod PaymentMethod { get; set; }
+        public Guid? CashShiftId { get; set; }
+        [ForeignKey(nameof(CashShiftId))] public RestaurantCashShift CashShiftFk { get; set; }
+        [System.ComponentModel.DataAnnotations.StringLength(100)] public string ClientRequestId { get; set; }
+        [System.ComponentModel.DataAnnotations.StringLength(64)] public string RequestHash { get; set; }
+        public decimal RemainingGrandTotal { get; set; }
+        public bool IsOrderFullyBilled { get; set; }
         public DateTime PaidAt { get; set; } = DateTime.Now;
         public int? TenantId { get; set; }
     }

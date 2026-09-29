@@ -132,6 +132,47 @@ namespace NextWave.Erp.Enums
         CounterSettlement = 1
     }
 
+    public enum RestaurantGuestOrderApprovalStatus
+    {
+        Pending = 0,
+        Approved = 1,
+        Rejected = 2
+    }
+
+    public enum RestaurantReservationStatus
+    {
+        Requested = 0,
+        Confirmed = 1,
+        Declined = 2,
+        Waitlisted = 3,
+        Seated = 4,
+        Cancelled = 5,
+        Completed = 6,
+        NoShow = 7
+    }
+
+    public enum RestaurantPrintJobType
+    {
+        KitchenTicket = 0,
+        BillReceipt = 1
+    }
+
+    public enum RestaurantPrintJobStatus
+    {
+        Pending = 0,
+        Leased = 1,
+        Printed = 2,
+        Failed = 3,
+        Cancelled = 4
+    }
+
+    public enum RestaurantSmsOutboxStatus
+    {
+        Pending = 0,
+        Sent = 1,
+        Failed = 2
+    }
+
     public enum RestaurantSyncEntityType
     {
         MenuCategory = 0,

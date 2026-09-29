@@ -9,6 +9,9 @@ using NextWave.Erp.Restaurant.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace NextWave.Erp.Restaurant
@@ -32,7 +35,10 @@ namespace NextWave.Erp.Restaurant
     {
         public async Task<RestaurantCustomerMenuDto> GetMenu(RestaurantCustomerMenuRequestDto input)
         {
-            var tenantId = ResolveTenantId(input?.TenantId);
+            var table = !string.IsNullOrWhiteSpace(input?.TableToken)
+                ? await ResolveTableQrToken(input.TableToken, input.TenantId)
+                : null;
+            var tenantId = table?.TenantId ?? ResolveTenantId(input?.TenantId);
             await EnsurePublicOrderingAvailable(tenantId);
             var now = DateTime.Now;
             var search = input?.Search?.Trim();
@@ -100,7 +106,11 @@ namespace NextWave.Erp.Restaurant
 
         public async Task<RestaurantCustomerQuoteDto> Quote(QuoteRestaurantCustomerOrderDto input)
         {
-            var tenantId = ResolveTenantId(input?.TenantId);
+            var table = !string.IsNullOrWhiteSpace(input?.TableToken)
+                ? await ResolveTableQrToken(input.TableToken, input.TenantId)
+                : null;
+            var tenantId = table?.TenantId ?? ResolveTenantId(input?.TenantId);
+            await EnsurePublicOrderingAvailable(tenantId);
             if (input?.Lines == null || input.Lines.All(x => x.Qty <= 0))
                 throw new UserFriendlyException("At least one order item is required");
 
@@ -121,12 +131,24 @@ namespace NextWave.Erp.Restaurant
 
         public async Task<CreateRestaurantCustomerOrderResultDto> CreateOrder(CreateRestaurantCustomerOrderDto input)
         {
-            var tenantId = ResolveTenantId(input?.TenantId);
             if (input == null)
                 throw new UserFriendlyException("Customer order is required");
+            var tableQrOrder = !string.IsNullOrWhiteSpace(input.TableToken);
+            RestaurantTable qrTable = null;
+            if (tableQrOrder)
+                qrTable = await ResolveTableQrToken(input.TableToken, input.TenantId);
+            else if (input.TableId.HasValue)
+                throw new UserFriendlyException("A valid table QR code is required for dine-in guest orders");
+
+            var tenantId = qrTable?.TenantId ?? ResolveTenantId(input.TenantId);
+            await EnsurePublicOrderingAvailable(tenantId);
+            if (!Guid.TryParse(input.ClientRequestId, out _))
+                throw new UserFriendlyException("A unique client request ID is required");
+            if (string.IsNullOrWhiteSpace(input.StatusAccessToken) || input.StatusAccessToken.Length < 32 || input.StatusAccessToken.Length > 128)
+                throw new UserFriendlyException("A private order status token of at least 32 characters is required");
             if (input.PaymentMode is not RestaurantCustomerPaymentMode.CashOnDelivery and not RestaurantCustomerPaymentMode.CounterSettlement)
                 throw new UserFriendlyException("Only COD and counter settlement are supported in v1");
-            if (string.IsNullOrWhiteSpace(input.CustomerPhoneNo))
+            if (!tableQrOrder && string.IsNullOrWhiteSpace(input.CustomerPhoneNo))
                 throw new UserFriendlyException("Customer phone number is required");
             var orderLines = input.Lines?.Where(x => x.Qty > 0).ToList() ?? new List<RestaurantCustomerOrderLineDto>();
             if (orderLines.Count == 0)
@@ -136,36 +158,55 @@ namespace NextWave.Erp.Restaurant
             {
                 var existing = await orderRepository.FirstOrDefaultAsync(x =>
                     x.TenantId == tenantId &&
-                    x.ClientRequestId == input.ClientRequestId);
-                if (existing != null)
+                    x.GuestClientRequestId == input.ClientRequestId);
+                if (existing != null && existing.Source == "CustomerApp")
                 {
+                    var requestHash = HashCustomerRequest(input);
+                    if (!string.Equals(existing.ClientPayloadHash, requestHash, StringComparison.Ordinal))
+                        throw new UserFriendlyException("This request ID was already used for different order details");
+
                     return new CreateRestaurantCustomerOrderResultDto
                     {
                         OrderId = existing.Id,
                         OrderNo = existing.OrderNo,
                         Status = existing.Status,
-                        Quote = await Quote(input)
+                        StatusAccessToken = input.StatusAccessToken,
+                        Quote = await GetStoredQuote(existing.Id, tenantId)
                     };
                 }
             }
 
             var quote = await Quote(input);
             RestaurantTableSession session = null;
-            if (input.TableId.HasValue)
+            if (tableQrOrder)
+            {
+                session = await tableSessionRepository.GetAll()
+                    .Where(x => x.TenantId == tenantId && x.TableId == qrTable.Id &&
+                                x.ClosedAt == null && x.Status != RestaurantOrderStatus.Closed &&
+                                x.Status != RestaurantOrderStatus.Cancelled)
+                    .OrderByDescending(x => x.OpenedAt)
+                    .FirstOrDefaultAsync();
+                if (session == null)
+                    throw new UserFriendlyException("Staff must open this table before QR ordering is available");
+            }
+            else if (input.TableId.HasValue)
                 session = await EnsureTableSession(input, tenantId);
 
             var order = new RestaurantOrder
             {
                 TenantId = tenantId,
-                OrderNo = await GetNextOrderNo(tenantId),
-                OrderType = input.TableId.HasValue && input.OrderType == RestaurantOrderType.Mobile
+                OrderNo = await GetNextOrderNo(),
+                OrderType = tableQrOrder
                     ? RestaurantOrderType.Qr
                     : input.OrderType,
                 Status = RestaurantOrderStatus.Draft,
-                TableId = input.TableId,
+                GuestApprovalStatus = tableQrOrder ? RestaurantGuestOrderApprovalStatus.Pending : null,
+                TableId = qrTable?.Id ?? input.TableId,
                 TableSessionId = session?.Id,
-                Source = "CustomerApp",
-                ClientRequestId = input.ClientRequestId,
+                Source = tableQrOrder ? "TableQr" : "CustomerApp",
+                GuestClientRequestId = input.ClientRequestId,
+                ClientPayloadHash = HashCustomerRequest(input),
+                GuestStatusTokenHash = HashStatusToken(input.StatusAccessToken),
                 CustomerName = input.CustomerName,
                 CustomerPhoneNo = input.CustomerPhoneNo,
                 Notes = BuildCustomerOrderNotes(input),
@@ -181,7 +222,7 @@ namespace NextWave.Erp.Restaurant
             for (var i = 0; i < orderLines.Count; i++)
                 await CreateOrderItem(orderId, orderLines[i], quote.Lines[i], tenantId);
 
-            if (input.TableId.HasValue)
+            if (!tableQrOrder && input.TableId.HasValue)
             {
                 var table = await tableRepository.FirstOrDefaultAsync(x => x.Id == input.TableId.Value && x.TenantId == tenantId);
                 if (table != null)
@@ -198,14 +239,22 @@ namespace NextWave.Erp.Restaurant
                 OrderId = orderId,
                 OrderNo = order.OrderNo,
                 Status = order.Status,
+                StatusAccessToken = input.StatusAccessToken,
                 Quote = quote
             };
         }
 
-        public async Task<RestaurantCustomerOrderStatusDto> GetOrderStatus(Guid orderId)
+        public async Task<RestaurantCustomerOrderStatusDto> GetOrderStatus(GetRestaurantCustomerOrderStatusDto input)
         {
-            var order = await orderRepository.FirstOrDefaultAsync(x => x.Id == orderId);
-            if (order == null)
+            var orderId = input?.OrderId ?? Guid.Empty;
+            var statusAccessToken = input?.StatusAccessToken;
+            if (string.IsNullOrWhiteSpace(statusAccessToken) || statusAccessToken.Length > 128)
+                throw new UserFriendlyException("Restaurant order not found");
+            var tokenHash = HashStatusToken(statusAccessToken);
+            var order = await orderRepository.FirstOrDefaultAsync(x =>
+                x.Id == orderId && (x.Source == "CustomerApp" || x.Source == "TableQr") && x.GuestStatusTokenHash != null);
+            if (order == null || !CryptographicOperations.FixedTimeEquals(
+                    Convert.FromHexString(order.GuestStatusTokenHash), Convert.FromHexString(tokenHash)))
                 throw new UserFriendlyException("Restaurant order not found");
 
             return new RestaurantCustomerOrderStatusDto
@@ -215,9 +264,59 @@ namespace NextWave.Erp.Restaurant
                 Status = order.Status,
                 GrandTotal = order.GrandTotal,
                 CreatedAt = order.CreatedAt,
-                SentAt = order.SentAt
+                SentAt = order.SentAt,
+                GuestApprovalStatus = order.GuestApprovalStatus,
+                GuestRejectionReason = order.GuestRejectionReason
             };
         }
+
+        private async Task<RestaurantTable> ResolveTableQrToken(string token, int? requestedTenantId)
+        {
+            if (string.IsNullOrWhiteSpace(token) || token.Length < 32 || token.Length > 128)
+                throw new UserFriendlyException("Restaurant table QR code is invalid");
+
+            var tokenHash = HashStatusToken(token);
+            var table = await tableRepository.GetAll().FirstOrDefaultAsync(x =>
+                x.QrTokenHash == tokenHash && x.IsActive && !x.IsDeleted);
+            if (table == null || !table.TenantId.HasValue ||
+                (requestedTenantId.HasValue && requestedTenantId.Value != table.TenantId.Value))
+                throw new UserFriendlyException("Restaurant table QR code is invalid or has been revoked");
+            return table;
+        }
+
+        private async Task<RestaurantCustomerQuoteDto> GetStoredQuote(Guid orderId, int tenantId)
+        {
+            var items = await orderItemRepository.GetAll()
+                .Where(x => x.TenantId == tenantId && x.OrderId == orderId)
+                .OrderBy(x => x.CreatedAt)
+                .ToListAsync();
+            return new RestaurantCustomerQuoteDto
+            {
+                GrossAmount = items.Sum(x => x.Qty * x.Rate + x.ModifierTotal),
+                DiscountAmount = items.Sum(x => x.DiscountAmount),
+                TaxAmount = items.Sum(x => x.TaxAmount),
+                NetAmount = items.Sum(x => x.NetAmount),
+                GrandTotal = items.Sum(x => x.Amount),
+                Lines = items.Select(x => new RestaurantCustomerQuoteLineDto
+                {
+                    MenuItemId = x.MenuItemId ?? Guid.Empty,
+                    VariantId = x.VariantId,
+                    ItemName = x.ItemNameSnapshot,
+                    VariantName = x.VariantNameSnapshot,
+                    Qty = x.Qty,
+                    Rate = x.Rate,
+                    ModifierTotal = x.ModifierTotal,
+                    TaxAmount = x.TaxAmount,
+                    Amount = x.Amount
+                }).ToList()
+            };
+        }
+
+        private static string HashCustomerRequest(CreateRestaurantCustomerOrderDto input) =>
+            Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(input))));
+
+        private static string HashStatusToken(string token) =>
+            Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
 
         private async Task<RestaurantCustomerQuoteLineDto> BuildQuoteLine(RestaurantCustomerOrderLineDto input, int tenantId)
         {
@@ -470,10 +569,9 @@ namespace NextWave.Erp.Restaurant
                 throw new UserFriendlyException("Own online ordering channel is currently offline");
         }
 
-        private async Task<string> GetNextOrderNo(int tenantId)
+        private Task<string> GetNextOrderNo()
         {
-            var count = await orderRepository.CountAsync(x => x.TenantId == tenantId);
-            return "RO-" + DateTime.Now.ToString("yyyyMMdd") + "-" + (count + 1).ToString("0000");
+            return Task.FromResult("RO-" + DateTime.Now.ToString("yyyyMMdd") + "-" + Guid.NewGuid().ToString("N")[..12].ToUpperInvariant());
         }
 
         private static string BuildCustomerOrderNotes(CreateRestaurantCustomerOrderDto input)

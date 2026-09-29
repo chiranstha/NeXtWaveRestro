@@ -32,6 +32,12 @@
         </div>
     </sub-header>
 
+    <div class="container-fluid" *ngIf="returnToMenu">
+        <div class="alert alert-info d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <span>{{ 'Add a raw material for the menu recipe, then return to finish setup.' | localize }}</span>
+            <a class="btn btn-sm btn-light-primary" routerLink="/app/main/restaurant/menu" [queryParams]="{ resumeWizard: 'true' }">{{ 'Return to menu setup' | localize }}</a>
+        </div>
+    </div>
     <div [class]="containerClass">
         <div class="card card-custom product-form-container bg-light rounded-3 shadow-sm">
             <div class="card-body p-0">

@@ -149,11 +149,18 @@ public class ErpDbContext : AbpZeroDbContext<Tenant, Role, User, ErpDbContext>, 
     public virtual DbSet<RestaurantMenuItemModifierGroup> RestaurantMenuItemModifierGroups { get; set; }
     public virtual DbSet<RestaurantMenuItemTag> RestaurantMenuItemTags { get; set; }
     public virtual DbSet<RestaurantTableSession> RestaurantTableSessions { get; set; }
+    public virtual DbSet<RestaurantReservation> RestaurantReservations { get; set; }
+    public virtual DbSet<RestaurantReservationOtpChallenge> RestaurantReservationOtpChallenges { get; set; }
+    public virtual DbSet<RestaurantPrintJob> RestaurantPrintJobs { get; set; }
+    public virtual DbSet<RestaurantSmsOutbox> RestaurantSmsOutbox { get; set; }
     public virtual DbSet<RestaurantOrder> RestaurantOrders { get; set; }
     public virtual DbSet<RestaurantOrderItem> RestaurantOrderItems { get; set; }
     public virtual DbSet<RestaurantOrderItemModifier> RestaurantOrderItemModifiers { get; set; }
     public virtual DbSet<RestaurantBillLine> RestaurantBillLines { get; set; }
     public virtual DbSet<RestaurantBillPayment> RestaurantBillPayments { get; set; }
+    public virtual DbSet<RestaurantBillTender> RestaurantBillTenders { get; set; }
+    public virtual DbSet<RestaurantCashShift> RestaurantCashShifts { get; set; }
+    public virtual DbSet<RestaurantCashMovement> RestaurantCashMovements { get; set; }
     public virtual DbSet<RestaurantSupplierItemMapping> RestaurantSupplierItemMappings { get; set; }
     public virtual DbSet<RestaurantStockAdjustment> RestaurantStockAdjustments { get; set; }
     public virtual DbSet<RestaurantStockAdjustmentLine> RestaurantStockAdjustmentLines { get; set; }
@@ -252,6 +259,44 @@ public class ErpDbContext : AbpZeroDbContext<Tenant, Role, User, ErpDbContext>, 
             b.HasIndex(e => new { e.TenantId, e.ProductId })
                 .HasDatabaseName("IX_tbl_RestaurantSupplierItemMapping_PreferredActive")
                 .HasFilter("[IsPreferred] = 1 AND [IsActive] = 1 AND [IsDeleted] = 0")
+                .IsUnique();
+        });
+
+        modelBuilder.Entity<RestaurantCashShift>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.RegisterName }).HasFilter("[IsClosed] = 0").IsUnique();
+            b.HasIndex(e => new { e.TenantId, e.OpenedByUserId }).HasFilter("[IsClosed] = 0").IsUnique();
+        });
+
+        modelBuilder.Entity<RestaurantCashMovement>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.CashShiftId, e.CreatedAt });
+            b.HasOne(e => e.CashShiftFk).WithMany().HasForeignKey(e => e.CashShiftId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<RestaurantBillTender>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.BillPaymentId });
+            b.HasIndex(e => new { e.TenantId, e.CashShiftId });
+            b.HasOne(e => e.BillPaymentFk).WithMany().HasForeignKey(e => e.BillPaymentId).OnDelete(DeleteBehavior.Restrict);
+            b.HasOne(e => e.CashShiftFk).WithMany().HasForeignKey(e => e.CashShiftId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<RestaurantBillPayment>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.ClientRequestId })
+                .HasFilter("[ClientRequestId] IS NOT NULL")
+                .IsUnique();
+            b.HasOne(e => e.CashShiftFk).WithMany().HasForeignKey(e => e.CashShiftId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<RestaurantOrder>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.GuestClientRequestId })
+                .HasFilter("[GuestClientRequestId] IS NOT NULL")
+                .IsUnique();
+            b.HasIndex(e => new { e.TenantId, e.PosClientRequestId })
+                .HasFilter("[PosClientRequestId] IS NOT NULL")
                 .IsUnique();
         });
 

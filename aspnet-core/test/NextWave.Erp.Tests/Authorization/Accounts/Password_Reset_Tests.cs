@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Abp.Localization;
+using Abp.Runtime.Security;
 using Abp.Timing;
 using Abp.UI;
 using Castle.MicroKernel.Registration;
@@ -11,6 +12,7 @@ using NextWave.Erp.Authorization.Users;
 using NSubstitute;
 using Shouldly;
 using Xunit;
+using System.Web;
 
 
 namespace NextWave.Erp.Tests.Authorization.Accounts
@@ -113,6 +115,28 @@ namespace NextWave.Erp.Tests.Authorization.Accounts
 
             exception.Message.ShouldContain(localizationManager.GetString(ErpConsts.LocalizationSourceName,
                 "PasswordResetLinkExpired"));
+        }
+
+        [Fact]
+        public void Should_Resolve_Tenant_From_Encrypted_Reset_Token()
+        {
+            var expireDate = Clock.Now.AddHours(1);
+            var query = HttpUtility.ParseQueryString(string.Empty);
+            query["tenantId"] = "2";
+            query["userId"] = "42";
+            query["resetCode"] = "reset-code";
+            query["expireDate"] = expireDate.ToString("O");
+            var input = new ResetPasswordInput
+            {
+                c = SimpleStringCipher.Instance.Encrypt(query.ToString())
+            };
+
+            input.Normalize();
+
+            input.TenantId.ShouldBe(2);
+            input.UserId.ShouldBe(42);
+            input.ResetCode.ShouldBe("reset-code");
+            input.ExpireDate.ShouldBe(expireDate);
         }
     }
 }

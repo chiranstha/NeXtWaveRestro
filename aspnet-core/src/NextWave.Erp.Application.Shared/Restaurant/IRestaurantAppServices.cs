@@ -72,6 +72,14 @@ namespace NextWave.Erp.Restaurant
         Task<FinalizeRestaurantBillResultDto> FinalizeBill(FinalizeRestaurantBillDto input);
     }
 
+    public interface IRestaurantCashShiftAppService : IApplicationService
+    {
+        Task<RestaurantCashShiftDto> GetCurrent(string registerName = "Main");
+        Task<RestaurantCashShiftDto> Open(OpenRestaurantCashShiftDto input);
+        Task<RestaurantCashShiftDto> AddMovement(MoveRestaurantCashDto input);
+        Task<RestaurantCashShiftDto> Close(CloseRestaurantCashShiftDto input);
+    }
+
     public interface IRestaurantInventoryAppService : IApplicationService
     {
         Task<List<UniversalDropdownDto>> GetRawMaterials();
@@ -92,6 +100,7 @@ namespace NextWave.Erp.Restaurant
         Task<List<RestaurantTicketDto>> GetOpenTickets(Guid? stationId);
         Task UpdateTicketStatus(UpdateRestaurantTicketStatusDto input);
         Task UpdateTicketItemStatus(UpdateRestaurantTicketItemStatusDto input);
+        Task<BulkUpdateRestaurantTicketItemStatusResultDto> UpdateTicketItemStatuses(BulkUpdateRestaurantTicketItemStatusDto input);
     }
 
     public interface IRestaurantSyncAppService : IApplicationService
@@ -126,7 +135,29 @@ namespace NextWave.Erp.Restaurant
         Task<RestaurantCustomerMenuDto> GetMenu(RestaurantCustomerMenuRequestDto input);
         Task<RestaurantCustomerQuoteDto> Quote(QuoteRestaurantCustomerOrderDto input);
         Task<CreateRestaurantCustomerOrderResultDto> CreateOrder(CreateRestaurantCustomerOrderDto input);
-        Task<RestaurantCustomerOrderStatusDto> GetOrderStatus(Guid orderId);
+        Task<RestaurantCustomerOrderStatusDto> GetOrderStatus(GetRestaurantCustomerOrderStatusDto input);
+    }
+
+    public interface IRestaurantGuestOperationsAppService : IApplicationService
+    {
+        Task<RestaurantTableQrDto> GenerateTableQr(EntityDto<Guid> input);
+        Task<List<RestaurantGuestOrderQueueDto>> GetPendingGuestOrders();
+        Task ReviewGuestOrder(ReviewRestaurantGuestOrderDto input);
+        Task OpenTableSession(EntityDto<Guid> input);
+        Task CloseTableSession(EntityDto<Guid> input);
+        Task<List<RestaurantReservationDto>> GetReservations(DateTime? from, DateTime? to);
+        Task<Guid> AddWalkIn(CreateRestaurantWalkInDto input);
+        Task UpdateReservation(UpdateRestaurantReservationDto input);
+        Task<RestaurantPrintJobDto> ClaimPrintJob(ClaimRestaurantPrintJobDto input);
+        Task<RestaurantPrintJobDto> ReportPrintJob(ReportRestaurantPrintJobDto input);
+        Task RetryPrintJob(EntityDto<Guid> input);
+    }
+
+    public interface IRestaurantReservationPublicAppService : IApplicationService
+    {
+        Task<RequestRestaurantReservationOtpResultDto> RequestOtp(RequestRestaurantReservationOtpDto input);
+        Task<CreateRestaurantReservationResultDto> CreateReservation(CreateRestaurantReservationRequestDto input);
+        Task<RestaurantReservationStatusDto> GetStatus(GetRestaurantReservationStatusDto input);
     }
 
     public interface IRestaurantReportsAppService : IApplicationService

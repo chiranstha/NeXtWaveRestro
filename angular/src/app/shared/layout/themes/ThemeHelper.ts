@@ -3,7 +3,8 @@ export class ThemeHelper {
         if (!abp.session?.userId) {
             return 'default';
         }
-        return abp.setting?.get ? abp.setting.get('App.UiManagement.Theme') : 'default';
+        const theme = (abp.setting?.get ? abp.setting.get('App.UiManagement.Theme') : 'default')?.toLowerCase() || 'default';
+        return ['default', 'theme8', 'theme11'].includes(theme) ? theme : 'default';
     }
     public static darkMode(): boolean {
         return abp.setting?.get

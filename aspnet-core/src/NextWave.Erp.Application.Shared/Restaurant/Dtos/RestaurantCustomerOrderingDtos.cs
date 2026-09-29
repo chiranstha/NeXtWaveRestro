@@ -7,6 +7,7 @@ namespace NextWave.Erp.Restaurant.Dtos
     public class RestaurantCustomerMenuRequestDto
     {
         public int? TenantId { get; set; }
+        public string TableToken { get; set; }
         public Guid? CategoryId { get; set; }
         public string Search { get; set; }
     }
@@ -60,6 +61,7 @@ namespace NextWave.Erp.Restaurant.Dtos
     public class QuoteRestaurantCustomerOrderDto
     {
         public int? TenantId { get; set; }
+        public string TableToken { get; set; }
         public List<RestaurantCustomerOrderLineDto> Lines { get; set; } = new();
     }
 
@@ -73,6 +75,8 @@ namespace NextWave.Erp.Restaurant.Dtos
         public string Notes { get; set; }
         public RestaurantCustomerPaymentMode PaymentMode { get; set; } = RestaurantCustomerPaymentMode.CounterSettlement;
         public string ClientRequestId { get; set; }
+        public string StatusAccessToken { get; set; }
+        public string TableToken { get; set; }
     }
 
     public class RestaurantCustomerOrderLineDto
@@ -94,6 +98,7 @@ namespace NextWave.Erp.Restaurant.Dtos
     {
         public Guid OrderId { get; set; }
         public string OrderNo { get; set; }
+        public string StatusAccessToken { get; set; }
         public RestaurantOrderStatus Status { get; set; }
         public RestaurantCustomerQuoteDto Quote { get; set; }
     }
@@ -106,5 +111,13 @@ namespace NextWave.Erp.Restaurant.Dtos
         public decimal GrandTotal { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? SentAt { get; set; }
+        public RestaurantGuestOrderApprovalStatus? GuestApprovalStatus { get; set; }
+        public string GuestRejectionReason { get; set; }
+    }
+
+    public class GetRestaurantCustomerOrderStatusDto
+    {
+        public Guid OrderId { get; set; }
+        public string StatusAccessToken { get; set; }
     }
 }

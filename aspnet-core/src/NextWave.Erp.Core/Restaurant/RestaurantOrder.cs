@@ -13,6 +13,8 @@ namespace NextWave.Erp.Restaurant
         [StringLength(50)] public string OrderNo { get; set; }
         public RestaurantOrderType OrderType { get; set; }
         public RestaurantOrderStatus Status { get; set; } = RestaurantOrderStatus.Draft;
+        public RestaurantGuestOrderApprovalStatus? GuestApprovalStatus { get; set; }
+        [StringLength(300)] public string GuestRejectionReason { get; set; }
         public Guid? TableId { get; set; }
         [ForeignKey("TableId")] public RestaurantTable TableFk { get; set; }
         public Guid? TableSessionId { get; set; }
@@ -21,6 +23,10 @@ namespace NextWave.Erp.Restaurant
         public Guid? DeviceId { get; set; }
         [StringLength(100)] public string Source { get; set; }
         [StringLength(100)] public string ClientRequestId { get; set; }
+        [StringLength(100)] public string GuestClientRequestId { get; set; }
+        [StringLength(100)] public string PosClientRequestId { get; set; }
+        [StringLength(64)] public string ClientPayloadHash { get; set; }
+        [StringLength(64)] public string GuestStatusTokenHash { get; set; }
         [StringLength(200)] public string CustomerName { get; set; }
         [StringLength(50)] public string CustomerPhoneNo { get; set; }
         [StringLength(500)] public string Notes { get; set; }

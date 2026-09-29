@@ -59,6 +59,7 @@ namespace NextWave.Erp.Accounting
         [DisableAuditing]
         public async Task<PagedResultDto<GetFinancialYearForViewDto>> GetAll(GetAllUniversalInput input)
         {
+            var currentFinancialYearId = FinancialYearId;
             var filteredFinancialYears = financialYearRepository.GetAll();
             var pagedAndFilteredFinancialYears = filteredFinancialYears
                 .OrderBy(input.Sorting ?? "id asc")
@@ -73,7 +74,7 @@ namespace NextWave.Erp.Accounting
                 ToMiti = o.ToMiti,
                 Status = o.Status,
                 IsOldYear = o.IsOldYear,
-                Active = o.Status,
+                Active = o.Id == currentFinancialYearId,
                 Id = o.Id
             }).OrderBy(x => x.FromDate).ToListAsync();
             return new PagedResultDto<GetFinancialYearForViewDto>(

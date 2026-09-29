@@ -4186,9 +4186,19 @@ namespace NextWave.Erp.Migrations
                         .HasPrecision(28, 8)
                         .HasColumnType("decimal(28,8)");
 
+                    b.Property<Guid?>("CashShiftId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ClientRequestId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<decimal>("CustomerPaidAmount")
                         .HasPrecision(28, 8)
                         .HasColumnType("decimal(28,8)");
+
+                    b.Property<bool>("IsOrderFullyBilled")
+                        .HasColumnType("bit");
 
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
@@ -4199,6 +4209,17 @@ namespace NextWave.Erp.Migrations
                     b.Property<decimal>("PayableAmount")
                         .HasPrecision(28, 8)
                         .HasColumnType("decimal(28,8)");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("RemainingGrandTotal")
+                        .HasPrecision(28, 8)
+                        .HasColumnType("decimal(28,8)");
+
+                    b.Property<string>("RequestHash")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
 
                     b.Property<decimal>("ReturnAmount")
                         .HasPrecision(28, 8)
@@ -4216,11 +4237,167 @@ namespace NextWave.Erp.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CashShiftId");
+
                     b.HasIndex("OrderId");
 
                     b.HasIndex("SalesMasterId");
 
+                    b.HasIndex("TenantId", "ClientRequestId")
+                        .IsUnique()
+                        .HasFilter("[ClientRequestId] IS NOT NULL");
+
                     b.ToTable("tbl_RestaurantBillPayment");
+                });
+
+            modelBuilder.Entity("NextWave.Erp.Restaurant.RestaurantBillTender", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(28, 8)
+                        .HasColumnType("decimal(28,8)");
+
+                    b.Property<Guid>("BillPaymentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CashShiftId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("ChangeAmount")
+                        .HasPrecision(28, 8)
+                        .HasColumnType("decimal(28,8)");
+
+                    b.Property<Guid?>("PaymentLedgerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("ReceivedAmount")
+                        .HasPrecision(28, 8)
+                        .HasColumnType("decimal(28,8)");
+
+                    b.Property<string>("Reference")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TenantId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BillPaymentId");
+
+                    b.HasIndex("CashShiftId");
+
+                    b.HasIndex("TenantId", "BillPaymentId");
+
+                    b.HasIndex("TenantId", "CashShiftId");
+
+                    b.ToTable("tbl_RestaurantBillTender");
+                });
+
+            modelBuilder.Entity("NextWave.Erp.Restaurant.RestaurantCashMovement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(28, 8)
+                        .HasColumnType("decimal(28,8)");
+
+                    b.Property<Guid>("CashShiftId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("CreatedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsCashIn")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("TenantId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CashShiftId");
+
+                    b.HasIndex("TenantId", "CashShiftId", "CreatedAt");
+
+                    b.ToTable("tbl_RestaurantCashMovement");
+                });
+
+            modelBuilder.Entity("NextWave.Erp.Restaurant.RestaurantCashShift", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal?>("CashVariance")
+                        .HasPrecision(28, 8)
+                        .HasColumnType("decimal(28,8)");
+
+                    b.Property<string>("CloseNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("ClosedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("ClosedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal?>("CountedClosingCash")
+                        .HasPrecision(28, 8)
+                        .HasColumnType("decimal(28,8)");
+
+                    b.Property<decimal?>("ExpectedClosingCash")
+                        .HasPrecision(28, 8)
+                        .HasColumnType("decimal(28,8)");
+
+                    b.Property<bool>("IsClosed")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("OpenedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("OpenedByUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("OpeningCash")
+                        .HasPrecision(28, 8)
+                        .HasColumnType("decimal(28,8)");
+
+                    b.Property<string>("RegisterName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("TenantId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "OpenedByUserId")
+                        .IsUnique()
+                        .HasFilter("[IsClosed] = 0");
+
+                    b.HasIndex("TenantId", "RegisterName")
+                        .IsUnique()
+                        .HasFilter("[IsClosed] = 0");
+
+                    b.ToTable("tbl_RestaurantCashShift");
                 });
 
             modelBuilder.Entity("NextWave.Erp.Restaurant.RestaurantChangeLog", b =>
@@ -4842,6 +5019,10 @@ namespace NextWave.Erp.Migrations
                     b.Property<DateTime?>("BilledAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("ClientPayloadHash")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
                     b.Property<string>("ClientRequestId")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -4872,6 +5053,14 @@ namespace NextWave.Erp.Migrations
                         .HasPrecision(28, 8)
                         .HasColumnType("decimal(28,8)");
 
+                    b.Property<string>("GuestClientRequestId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("GuestStatusTokenHash")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
                     b.Property<decimal>("NetAmount")
                         .HasPrecision(28, 8)
                         .HasColumnType("decimal(28,8)");
@@ -4886,6 +5075,10 @@ namespace NextWave.Erp.Migrations
 
                     b.Property<int>("OrderType")
                         .HasColumnType("int");
+
+                    b.Property<string>("PosClientRequestId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<Guid?>("SalesMasterId")
                         .HasColumnType("uniqueidentifier");
@@ -4923,6 +5116,14 @@ namespace NextWave.Erp.Migrations
                     b.HasIndex("TableId");
 
                     b.HasIndex("TableSessionId");
+
+                    b.HasIndex("TenantId", "GuestClientRequestId")
+                        .IsUnique()
+                        .HasFilter("[GuestClientRequestId] IS NOT NULL");
+
+                    b.HasIndex("TenantId", "PosClientRequestId")
+                        .IsUnique()
+                        .HasFilter("[PosClientRequestId] IS NOT NULL");
 
                     b.ToTable("tbl_RestaurantOrder");
                 });
@@ -6015,6 +6216,9 @@ namespace NextWave.Erp.Migrations
                     b.Property<DateTime?>("CancelledAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("LastPrintConfirmedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("LastPrintedAt")
                         .HasColumnType("datetime2");
 
@@ -6023,6 +6227,9 @@ namespace NextWave.Erp.Migrations
 
                     b.Property<int>("PrintCount")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("PrintRequestedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("PrintedAt")
                         .HasColumnType("datetime2");
@@ -8650,6 +8857,11 @@ namespace NextWave.Erp.Migrations
 
             modelBuilder.Entity("NextWave.Erp.Restaurant.RestaurantBillPayment", b =>
                 {
+                    b.HasOne("NextWave.Erp.Restaurant.RestaurantCashShift", "CashShiftFk")
+                        .WithMany()
+                        .HasForeignKey("CashShiftId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("NextWave.Erp.Restaurant.RestaurantOrder", "OrderFk")
                         .WithMany()
                         .HasForeignKey("OrderId")
@@ -8662,9 +8874,40 @@ namespace NextWave.Erp.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.Navigation("CashShiftFk");
+
                     b.Navigation("OrderFk");
 
                     b.Navigation("SalesMasterFk");
+                });
+
+            modelBuilder.Entity("NextWave.Erp.Restaurant.RestaurantBillTender", b =>
+                {
+                    b.HasOne("NextWave.Erp.Restaurant.RestaurantBillPayment", "BillPaymentFk")
+                        .WithMany()
+                        .HasForeignKey("BillPaymentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("NextWave.Erp.Restaurant.RestaurantCashShift", "CashShiftFk")
+                        .WithMany()
+                        .HasForeignKey("CashShiftId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("BillPaymentFk");
+
+                    b.Navigation("CashShiftFk");
+                });
+
+            modelBuilder.Entity("NextWave.Erp.Restaurant.RestaurantCashMovement", b =>
+                {
+                    b.HasOne("NextWave.Erp.Restaurant.RestaurantCashShift", "CashShiftFk")
+                        .WithMany()
+                        .HasForeignKey("CashShiftId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CashShiftFk");
                 });
 
             modelBuilder.Entity("NextWave.Erp.Restaurant.RestaurantChangeLog", b =>

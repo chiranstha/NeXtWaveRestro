@@ -57,6 +57,7 @@ import { DateTime } from 'luxon';
 import { AllowIn, ShortcutInput } from 'ng-keyboard-shortcuts';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { finalize } from 'rxjs';
+import { RestaurantCashShift, RestaurantCashShiftApiService } from '../restaurant-cash-shift-api.service';
 
 type DateTimeInput = DateTime | string | number | null | undefined;
 
@@ -159,6 +160,7 @@ type PendingOrderSwitch =
 @Component({
     selector: 'restaurant-pos',
     templateUrl: './restaurant-pos.component.html',
+    styleUrls: ['./restaurant-pos.component.css'],
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation],
     changeDetection: ChangeDetectionStrategy.Eager,
@@ -178,7 +180,13 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     tickets: RestaurantTicketDto[] = [];
     saving = false;
     loading = false;
+    cashShift: RestaurantCashShift | null = null;
+    browserOnline = navigator.onLine;
+    serverReachable = false;
+    localDraftAvailable = false;
+    localDraftSavedAt: Date | null = null;
     stockValidation: RestaurantStockValidationDto | null = null;
+    isFullscreen = false;
     selectedAreaId = '';
     selectedCategoryId = '';
     selectedRouteFilter = '';
@@ -189,6 +197,8 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     orderTypeFilter = '';
     orderStatusFilter = '';
     filteredTablesList: RestaurantTableDto[] = [];
+    tableStatusCounts: Record<string, number> = {};
+    matchingTableCount = 0;
     filteredMenuItemsList: RestaurantMenuItemDto[] = [];
     filteredOrdersList: RestaurantOrderDto[] = [];
     operationTablesList: RestaurantTableDto[] = [];
@@ -238,6 +248,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         mergeSourceOrderIds: [],
     };
     readonly orderTypeEnum = RestaurantOrderType;
+    readonly paymentMethodEnum = PaymentMethod;
     readonly ticketPurpose = RestaurantTicketPurpose;
     readonly tableStatuses = [
         { value: '0', label: 'Available' },
@@ -260,6 +271,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     readonly paymentMethods = [
         { value: PaymentMethod.Cash, label: 'Cash', icon: 'fa-money-bill' },
         { value: PaymentMethod.Card_Swipe, label: 'Card', icon: 'fa-credit-card' },
+        { value: PaymentMethod.QR, label: 'QR', icon: 'fa-qrcode' },
         { value: PaymentMethod.Credit, label: 'Credit', icon: 'fa-file-invoice' },
         { value: PaymentMethod.Cheque, label: 'Cheque', icon: 'fa-money-check' },
     ];
@@ -283,8 +295,10 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     private restaurantMenuService = inject(RestaurantMenuServiceProxy);
     private restaurantOrderService = inject(RestaurantOrderServiceProxy);
     private restaurantBillingService = inject(RestaurantBillingServiceProxy);
+    private cashShiftService = inject(RestaurantCashShiftApiService);
     private salesMastersService = inject(SalesMastersServiceProxy);
     private cdr = inject(ChangeDetectorRef);
+    private hostElement = inject(ElementRef<HTMLElement>);
     private timerHandle?: ReturnType<typeof setInterval>;
 
     @ViewChild('menuSearchInput') menuSearchInput?: ElementRef<HTMLInputElement>;
@@ -304,9 +318,15 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         this.timerHandle = setInterval(() => {
             this.currentClock = DateTime.now();
             this.recalculateViewState();
+            this.loadCashShift();
         }, 30000);
         this.recalculateViewState();
         this.refresh();
+        this.loadCashShift();
+        this.loadLocalDraftState();
+        window.addEventListener('online', this.onConnectionChange);
+        window.addEventListener('offline', this.onConnectionChange);
+        document.addEventListener('fullscreenchange', this.onFullscreenChange);
         this.salesMastersService.getAllAccountLedgerForTableDropdown().subscribe((result) => {
             this.ledgers = result || [];
             this.applyDefaultLedgerSelection();
@@ -361,6 +381,108 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         if (this.timerHandle) {
             clearInterval(this.timerHandle);
         }
+        window.removeEventListener('online', this.onConnectionChange);
+        window.removeEventListener('offline', this.onConnectionChange);
+        document.removeEventListener('fullscreenchange', this.onFullscreenChange);
+    }
+
+    async toggleFullscreen(): Promise<void> {
+        try {
+            if (document.fullscreenElement) {
+                await document.exitFullscreen();
+                return;
+            }
+
+            await this.hostElement.nativeElement.requestFullscreen();
+        } catch {
+            this.notify.warn('Full-screen mode is unavailable in this browser.');
+        }
+    }
+
+    private onFullscreenChange = (): void => {
+        this.isFullscreen = document.fullscreenElement === this.hostElement.nativeElement;
+        this.cdr.markForCheck();
+    };
+
+    private onConnectionChange = (): void => {
+        this.browserOnline = navigator.onLine;
+        this.serverReachable = false;
+        if (this.browserOnline) this.loadCashShift();
+        this.cdr.markForCheck();
+    };
+
+    loadCashShift(): void {
+        this.cashShiftService.current().subscribe({
+            next: (shift) => {
+                this.cashShift = shift;
+                this.serverReachable = true;
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                this.serverReachable = false;
+                this.cdr.markForCheck();
+            },
+        });
+    }
+
+    get posOnline(): boolean {
+        return this.browserOnline && this.serverReachable;
+    }
+
+    openCashShift(): void {
+        if (!this.posOnline) {
+            this.notify.warn('Connect to the internet before opening a cash shift');
+            return;
+        }
+        const value = window.prompt('Opening cash in the register', '0');
+        if (value === null) return;
+        const amount = Number(value);
+        if (!Number.isFinite(amount) || amount < 0) {
+            this.notify.warn('Enter a valid opening cash amount');
+            return;
+        }
+        this.cashShiftService.open(amount).subscribe((shift) => {
+            this.cashShift = shift;
+            this.notify.success('Cash shift opened');
+        });
+    }
+
+    recordCashMovement(isCashIn: boolean): void {
+        if (!this.cashShift || !this.posOnline) return;
+        const amountText = window.prompt(isCashIn ? 'Cash received into register' : 'Cash removed from register');
+        if (amountText === null) return;
+        const amount = Number(amountText);
+        const reason = (window.prompt('Reason for this cash movement') || '').trim();
+        if (!Number.isFinite(amount) || amount <= 0 || !reason) {
+            this.notify.warn('Enter a valid amount and reason');
+            return;
+        }
+        this.cashShiftService.movement(this.cashShift.id, isCashIn, amount, reason).subscribe((shift) => {
+            this.cashShift = shift;
+            this.notify.success(isCashIn ? 'Cash added to shift' : 'Cash withdrawal recorded');
+        });
+    }
+
+    closeCashShift(): void {
+        if (!this.cashShift || !this.posOnline) return;
+        const countedText = window.prompt(`Counted cash (expected ${this.cashShift.expectedClosingCash.toFixed(2)})`);
+        if (countedText === null) return;
+        const counted = Number(countedText);
+        if (!Number.isFinite(counted) || counted < 0) {
+            this.notify.warn('Enter a valid counted cash amount');
+            return;
+        }
+        const variance = Math.abs(counted - this.cashShift.expectedClosingCash) > 0.0001;
+        const note = variance ? (window.prompt('Explain the cash difference') || '').trim() : '';
+        if (variance && !note) {
+            this.notify.warn('A reason is required for a cash difference');
+            return;
+        }
+        const managerPin = variance ? (window.prompt('Manager approval PIN') || '') : '';
+        this.cashShiftService.close(this.cashShift.id, counted, note, managerPin).subscribe((shift) => {
+            this.cashShift = null;
+            this.notify.success(`Shift closed. Cash variance: ${Number(shift.cashVariance || 0).toFixed(2)}`);
+        });
     }
 
     refresh(): void {
@@ -622,6 +744,18 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     }
 
     onTableFilterChange(): void {
+        this.recalculateViewState();
+    }
+
+    selectTableStatus(status: string): void {
+        this.tableStatusFilter = status;
+        this.recalculateViewState();
+    }
+
+    resetTableFilters(): void {
+        this.tableSearch = '';
+        this.selectedAreaId = '';
+        this.tableStatusFilter = '';
         this.recalculateViewState();
     }
 
@@ -938,6 +1072,16 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
             return;
         }
 
+        if (!this.posOnline) {
+            if (sendToKitchen) {
+                this.notify.warn('Kitchen dispatch is paused until the server connection returns');
+            } else {
+                this.persistLocalDraft();
+                this.notify.info('Order draft saved on this browser. Reconnect and save it to send it to the server.');
+            }
+            return;
+        }
+
         if (!this.cart.length) {
             this.notify.warn('Add at least one menu item');
             return;
@@ -955,14 +1099,14 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         }
 
         this.saving = true;
+        const creatingNewOrder = !this.selectedOrder?.id;
         const shouldSendToKitchen = sendToKitchen && this.hasKitchenSendableLines();
+        let kitchenDispatchStarted = false;
         if (sendToKitchen && !shouldSendToKitchen) {
             this.notify.info('Stock items are direct sale; no KOT/BOT ticket needed');
         }
 
-        this.restaurantOrderService
-            .createOrEditOrder(
-                new CreateOrEditRestaurantOrderDto({
+        const orderRequest = new CreateOrEditRestaurantOrderDto({
                     id: this.selectedOrder?.id,
                     orderType: this.selectedTable ? RestaurantOrderType.DineIn : this.orderType,
                     tableId: this.selectedTable?.id || undefined,
@@ -991,13 +1135,22 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
                                 modifiers: this.buildModifierPayload(line),
                             }),
                     ),
-                }),
-            )
-            .pipe(finalize(() => (this.saving = false)))
+                });
+        if (creatingNewOrder) orderRequest.clientRequestId = this.getOrderCreationRequestId(orderRequest);
+
+        this.restaurantOrderService
+            .createOrEditOrder(orderRequest)
+            .pipe(finalize(() => {
+                if (!shouldSendToKitchen || !kitchenDispatchStarted) this.saving = false;
+            }))
             .subscribe((orderId) => {
+                localStorage.removeItem(this.localDraftStorageKey());
+                this.localDraftAvailable = false;
+                if (creatingNewOrder) localStorage.removeItem(this.orderCreationStorageKey());
                 this.notify.success(this.l('SavedSuccessfully'));
                 this.orderDirty = false;
                 if (shouldSendToKitchen) {
+                    kitchenDispatchStarted = true;
                     this.sendToKitchen(orderId, onSaved);
                 } else {
                     this.afterOrderChange(orderId, onSaved);
@@ -1005,26 +1158,119 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
             });
     }
 
+    private orderCreationStorageKey(): string {
+        return `restaurant-new-order:${this.appSession.tenantId ?? 'host'}:${this.appSession.userId ?? 'unknown'}`;
+    }
+
+    private localDraftStorageKey(): string {
+        return `restaurant-pos-draft:${this.appSession.tenantId ?? 'host'}:${this.appSession.userId ?? 'unknown'}`;
+    }
+
+    private loadLocalDraftState(): void {
+        try {
+            const draft = JSON.parse(localStorage.getItem(this.localDraftStorageKey()) || 'null');
+            this.localDraftAvailable = Array.isArray(draft?.cart) && draft.cart.length > 0;
+            this.localDraftSavedAt = draft?.savedAt ? new Date(draft.savedAt) : null;
+        } catch {
+            localStorage.removeItem(this.localDraftStorageKey());
+            this.localDraftAvailable = false;
+        }
+    }
+
+    restoreLocalDraft(): void {
+        try {
+            const draft = JSON.parse(localStorage.getItem(this.localDraftStorageKey()) || 'null');
+            if (!Array.isArray(draft?.cart) || !draft.cart.length) {
+                this.localDraftAvailable = false;
+                return;
+            }
+            if (draft.orderId) {
+                const order = this.openOrders.find((row) => row.id === draft.orderId);
+                if (!order) {
+                    this.notify.warn('The saved order is no longer open. Refresh orders before restoring this draft.');
+                    return;
+                }
+                this.selectedOrder = order;
+                this.selectedTable = this.tables.find((table) => table.id === order.tableId) || null;
+            } else {
+                this.selectedOrder = null;
+                this.selectedTable = this.tables.find((table) => table.id === draft.tableId) || null;
+            }
+            this.orderType = draft.orderType ?? RestaurantOrderType.TakeAway;
+            this.cart = draft.cart;
+            this.billForm.customerName = draft.customerName || '';
+            this.billForm.customerPhoneNo = draft.customerPhoneNo || '';
+            this.orderDirty = true;
+            this.activeContext = 'menu';
+            this.recalculateViewState();
+            this.notify.success('Local order draft restored. Save it to send the latest version to the server.');
+        } catch {
+            this.notify.error('The local order draft could not be restored');
+        }
+    }
+
+    private persistLocalDraft(): void {
+        if (!this.orderDirty || !this.cart.length) return;
+        try {
+            const draft = {
+                orderId: this.selectedOrder?.id || null,
+                orderType: this.orderType,
+                tableId: this.selectedTable?.id || null,
+                customerName: this.billForm.customerName,
+                customerPhoneNo: this.billForm.customerPhoneNo,
+                cart: this.cart,
+                savedAt: new Date().toISOString(),
+            };
+            localStorage.setItem(this.localDraftStorageKey(), JSON.stringify(draft));
+            this.localDraftAvailable = true;
+            this.localDraftSavedAt = new Date(draft.savedAt);
+        } catch {
+            this.localDraftAvailable = false;
+        }
+    }
+
+    private getOrderCreationRequestId(request: CreateOrEditRestaurantOrderDto): string {
+        const body = request.toJSON();
+        delete body.clientRequestId;
+        const signature = JSON.stringify(body);
+        const key = this.orderCreationStorageKey();
+        try {
+            const previous = JSON.parse(localStorage.getItem(key) || 'null');
+            if (previous?.signature === signature && previous?.id) return previous.id;
+            const id = this.newRequestId();
+            localStorage.setItem(key, JSON.stringify({ signature, id }));
+            return id;
+        } catch {
+            return this.newRequestId();
+        }
+    }
+
     sendToKitchen(orderId?: string, onSaved?: () => void): void {
         const id = orderId || this.selectedOrder?.id;
         if (!id) {
+            this.saving = false;
             return;
         }
 
         if (!this.hasKitchenSendableLines()) {
             this.notify.info('No kitchen/bar draft items to send');
+            this.saving = false;
             return;
         }
 
+        this.saving = true;
         const isAddOn = this.hasAddOnDraftLines();
         const stockDraftCount = this.draftStockLineCountValue;
-        this.restaurantOrderService.sendToKitchen(new EntityDtoOfGuid({ id })).subscribe(() => {
-            this.notify.success(isAddOn ? 'Add-on KOT/BOT sent' : 'KOT/BOT sent');
-            if (stockDraftCount) {
-                this.notify.info(`${stockDraftCount} stock item(s) kept for direct billing`);
-            }
-            this.afterOrderChange(id, onSaved);
-        });
+        this.restaurantOrderService
+            .sendToKitchen(new EntityDtoOfGuid({ id }))
+            .pipe(finalize(() => (this.saving = false)))
+            .subscribe(() => {
+                this.notify.success(isAddOn ? 'Add-on KOT/BOT sent' : 'KOT/BOT sent');
+                if (stockDraftCount) {
+                    this.notify.info(`${stockDraftCount} stock item(s) kept for direct billing`);
+                }
+                this.afterOrderChange(id, onSaved);
+            });
     }
 
     voidLine(line: PosCartLine, index?: number): void {
@@ -1075,6 +1321,16 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
 
     finalizeBill(): void {
         if (this.saving) {
+            return;
+        }
+
+        if (!this.posOnline) {
+            this.notify.warn('Billing is unavailable while disconnected. Your current order remains saved on the server.');
+            return;
+        }
+
+        if (!this.cashShift) {
+            this.notify.warn('Open a cashier shift before billing');
             return;
         }
 
@@ -1143,14 +1399,26 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
                 this.billForm.customerPaidAmount === null ? undefined : Number(this.billForm.customerPaidAmount || 0),
             isPrint: this.billForm.isPrint,
             confirmNegativeStock,
+            cashShiftId: this.cashShift?.id,
+            tenders: this.billForm.paymentMethod === PaymentMethod.Credit ? [] : [{
+                paymentMethod: this.billForm.paymentMethod,
+                paymentLedgerId: this.billForm.paymentMethodLedgerId || undefined,
+                amount: this.billPayableAmount,
+                receivedAmount: this.billForm.customerPaidAmount === null
+                    ? this.billPayableAmount
+                    : Number(this.billForm.customerPaidAmount || 0),
+            }],
             billLines,
         });
+        billRequest.clientRequestId = this.getBillingRequestId(billRequest);
 
         this.saving = true;
         this.restaurantBillingService
             .finalizeBill(billRequest)
             .pipe(finalize(() => (this.saving = false)))
             .subscribe((result) => {
+                localStorage.removeItem(`${this.orderCreationStorageKey()}:restaurant-bill:${billRequest.orderId}`);
+                this.loadCashShift();
                 const stockWarnings =
                     result.stockWarnings || (confirmNegativeStock ? this.getStockShortages(this.stockValidation) : []);
                 this.notify.success(
@@ -1210,12 +1478,15 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     }
 
     printTicket(ticket: RestaurantTicketDto, reprint = false): void {
+        const reason = reprint ? (window.prompt('Reason for reprinting this KOT/BOT') || '').trim() : '';
+        if (reprint && !reason) return;
+        const approvalPin = reprint ? (window.prompt('Manager PIN (if required)') || '') : '';
         const request = reprint
             ? this.restaurantOrderService.reprintTicket(
                   new ReprintRestaurantTicketDto({
                       ticketId: ticket.id,
-                      approvalPin: undefined,
-                      approvalNote: undefined,
+                      approvalPin: approvalPin || undefined,
+                      approvalNote: reason,
                   }),
               )
             : this.restaurantOrderService.getTicketForPrint(ticket.id);
@@ -1225,15 +1496,40 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
                 return;
             }
 
+            this.notify.info('Print dialog opened. Confirm that the ticket printed successfully.');
+
             if (reprint) {
                 this.loadTickets(printTicket.orderId);
-                return;
             }
 
+            if (!window.confirm('Did the ticket print successfully?')) return;
             this.restaurantOrderService.markTicketPrinted(new EntityDtoOfGuid({ id: ticket.id })).subscribe(() => {
                 this.loadTickets(printTicket.orderId);
             });
         });
+    }
+
+    private getBillingRequestId(request: FinalizeRestaurantBillDto): string {
+        const signatureData = request.toJSON();
+        delete signatureData.clientRequestId;
+        const signature = JSON.stringify(signatureData);
+        const storageKey = `restaurant-bill:${request.orderId}`;
+        try {
+            const scopedKey = `${this.orderCreationStorageKey()}:${storageKey}`;
+            const prior = JSON.parse(localStorage.getItem(scopedKey) || 'null');
+            if (prior?.signature === signature && prior?.id) return prior.id;
+            const id = this.newRequestId();
+            localStorage.setItem(scopedKey, JSON.stringify({ signature, id }));
+            return id;
+        } catch {
+            return this.newRequestId();
+        }
+    }
+
+    private newRequestId(): string {
+        return typeof crypto !== 'undefined' && 'randomUUID' in crypto
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     }
 
     cancelTicket(ticket: RestaurantTicketDto): void {
@@ -1391,7 +1687,10 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
 
     paymentMethodText(method: number): string {
         if (method === PaymentMethod.Card_Swipe) {
-            return 'Card';
+            return 'Card (manually recorded)';
+        }
+        if (method === PaymentMethod.QR) {
+            return 'QR (manually recorded)';
         }
         if (method === PaymentMethod.Credit) {
             return 'Credit';
@@ -1753,6 +2052,8 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
 
     private recalculateViewState(): void {
         const tableSearch = (this.tableSearch || '').toLowerCase().trim();
+        this.tableStatusCounts = {};
+        this.matchingTableCount = 0;
         this.filteredTablesList = this.tables.filter((table) => {
             const areaMatch = !this.selectedAreaId || table.areaId === this.selectedAreaId;
             const statusMatch =
@@ -1762,7 +2063,13 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
                 (table.name || '').toLowerCase().includes(tableSearch) ||
                 (table.code || '').toLowerCase().includes(tableSearch) ||
                 (table.areaName || '').toLowerCase().includes(tableSearch);
-            return table.isActive !== false && areaMatch && statusMatch && searchMatch;
+            const matches = table.isActive !== false && areaMatch && searchMatch;
+            if (matches) {
+                this.matchingTableCount++;
+                const status = String(table.status);
+                this.tableStatusCounts[status] = (this.tableStatusCounts[status] || 0) + 1;
+            }
+            return matches && statusMatch;
         });
 
         const orderSearch = (this.orderSearch || '').toLowerCase().trim();
@@ -1832,6 +2139,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         );
         this.recalculateTenderState();
         this.recalculatePendingConfigurator();
+        this.persistLocalDraft();
         this.cdr.markForCheck();
     }
 

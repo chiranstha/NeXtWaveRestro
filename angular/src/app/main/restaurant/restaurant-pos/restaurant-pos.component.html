@@ -12,6 +12,16 @@
             >
                 <i class="fa fa-rotate"></i>
             </button>
+            <button
+                type="button"
+                class="btn btn-sm btn-light restaurant-icon-button h-35px w-35px align-items-center d-inline-flex justify-content-center p-0"
+                (click)="toggleFullscreen()"
+                [tooltip]="(isFullscreen ? 'Exit full screen' : 'Full screen') | localize"
+                [attr.aria-label]="(isFullscreen ? 'Exit full screen' : 'Full screen') | localize"
+                [attr.aria-pressed]="isFullscreen"
+            >
+                <i class="fa" [class.fa-compress]="isFullscreen" [class.fa-expand]="!isFullscreen"></i>
+            </button>
         </div>
     </sub-header>
 
@@ -25,6 +35,7 @@
                             class="btn"
                             [class.btn-primary]="orderType === orderTypeEnum.DineIn"
                             [class.btn-light]="orderType !== orderTypeEnum.DineIn"
+                            [attr.aria-pressed]="orderType === orderTypeEnum.DineIn"
                             (click)="requestStartNewOrder(orderTypeEnum.DineIn)"
                         >
                             <i class="fa fa-chair me-1"></i>
@@ -35,6 +46,7 @@
                             class="btn"
                             [class.btn-primary]="orderType === orderTypeEnum.TakeAway"
                             [class.btn-light]="orderType !== orderTypeEnum.TakeAway"
+                            [attr.aria-pressed]="orderType === orderTypeEnum.TakeAway"
                             (click)="requestStartNewOrder(orderTypeEnum.TakeAway)"
                         >
                             <i class="fa fa-bag-shopping me-1"></i>
@@ -45,6 +57,7 @@
                             class="btn"
                             [class.btn-primary]="orderType === orderTypeEnum.Delivery"
                             [class.btn-light]="orderType !== orderTypeEnum.Delivery"
+                            [attr.aria-pressed]="orderType === orderTypeEnum.Delivery"
                             (click)="requestStartNewOrder(orderTypeEnum.Delivery)"
                         >
                             <i class="fa fa-truck me-1"></i>
@@ -52,24 +65,29 @@
                         </button>
                     </div>
 
-                    <div class="restaurant-pos-order-identity min-w-0 ps-0 ps-sm-3 pt-2 pt-sm-0">
-                        <div class="restaurant-label fs-9 fw-bold text-gray-600 text-uppercase">{{ currentOrderSubtitleText || 'New order' }}</div>
-                        <div class="restaurant-pos-current-title fs-base fw-bolder lh-sm text-break text-gray-900">
-                            {{ currentOrderTitleText || orderTypeText(orderType) }}
-                            <span *ngIf="orderDirty" class="restaurant-unsaved-dot align-middle bg-warning d-inline-block h-8px ms-1 rounded-circle w-8px" tooltip="Unsaved changes"></span>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="restaurant-pos-current align-items-center d-flex flex-row flex-wrap gap-2 justify-content-start justify-content-lg-end min-w-0">
-                    <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light text-gray-600 align-items-center d-inline-flex lh-1 mw-100 text-nowrap">
-                        <i class="fa fa-receipt"></i>
-                        {{ openOrders.length }} open
+                    <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
+                        [class.bg-light-success]="posOnline" [class.text-success]="posOnline"
+                        [class.bg-light-danger]="!posOnline" [class.text-danger]="!posOnline">
+                        <i class="fa" [class.fa-wifi]="posOnline" [class.fa-triangle-exclamation]="!posOnline"></i>
+                        {{ posOnline ? 'Connected' : (browserOnline ? 'Server unavailable — billing paused' : 'Disconnected — billing paused') }}
                     </span>
-                    <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-warning text-warning align-items-center d-inline-flex lh-1 mw-100 text-nowrap" tooltip="Current order KOT/BOT">
-                        <i class="fa fa-fire-burner"></i>
-                        {{ activeTicketCountValue }} current KOT/BOT
+                    <button *ngIf="localDraftAvailable" type="button" class="btn btn-sm btn-warning" (click)="restoreLocalDraft()">
+                        <i class="fa fa-rotate-left me-1"></i>Restore draft
+                        <small *ngIf="localDraftSavedAt">({{ localDraftSavedAt | date:'shortTime' }})</small>
+                    </button>
+                    <span *ngIf="cashShift" class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-primary text-primary align-items-center d-inline-flex lh-1 mw-100 text-nowrap">
+                        <i class="fa fa-cash-register"></i>
+                        {{ cashShift.registerName }} · expected {{ cashShift.expectedClosingCash | number:'1.2-2' }}
                     </span>
+                    <button *ngIf="!cashShift" type="button" class="btn btn-sm btn-primary" [disabled]="!posOnline" (click)="openCashShift()">Open shift</button>
+                    <ng-container *ngIf="cashShift">
+                        <button type="button" class="btn btn-sm btn-light-success" [disabled]="!posOnline" (click)="recordCashMovement(true)">Cash in</button>
+                        <button type="button" class="btn btn-sm btn-light-warning" [disabled]="!posOnline" (click)="recordCashMovement(false)">Cash out</button>
+                        <button type="button" class="btn btn-sm btn-light-danger" [disabled]="!posOnline" (click)="closeCashShift()">Close shift</button>
+                    </ng-container>
                     <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-primary text-primary align-items-center d-inline-flex lh-1 mw-100 text-nowrap" *ngIf="showTableTimer()">
                         <i class="fa fa-clock"></i>
                         {{ tableTimerText() }}
@@ -83,24 +101,26 @@
                         <button
                             type="button"
                             class="btn align-items-center d-flex gap-1 gap-xl-2 justify-content-center min-w-0 px-1 px-xl-2 py-2"
-                            [class.btn-primary]="activeContext === 'tables'"
+                            [class.is-active]="activeContext === 'tables'"
                             [class.btn-light]="activeContext !== 'tables'"
                             (click)="switchContext('tables')"
+                            title="Tables (Alt+T)"
                             role="tab"
                             [attr.aria-selected]="activeContext === 'tables'"
                         >
                             <i class="fa fa-table-cells-large"></i>
                             <span class="restaurant-pos-tab-copy d-grid lh-1 min-w-0">
-                                <span>Floor</span>
+                                <span>Tables</span>
                                 <span class="restaurant-shortcut-hint d-inline-block text-nowrap">Alt+T</span>
                             </span>
                         </button>
                         <button
                             type="button"
                             class="btn align-items-center d-flex gap-1 gap-xl-2 justify-content-center min-w-0 px-1 px-xl-2 py-2"
-                            [class.btn-primary]="activeContext === 'menu'"
+                            [class.is-active]="activeContext === 'menu'"
                             [class.btn-light]="activeContext !== 'menu'"
                             (click)="switchContext('menu', true)"
+                            title="Menu (Alt+P)"
                             role="tab"
                             [attr.aria-selected]="activeContext === 'menu'"
                         >
@@ -113,9 +133,10 @@
                         <button
                             type="button"
                             class="btn align-items-center d-flex gap-1 gap-xl-2 justify-content-center min-w-0 px-1 px-xl-2 py-2"
-                            [class.btn-primary]="activeContext === 'orders'"
+                            [class.is-active]="activeContext === 'orders'"
                             [class.btn-light]="activeContext !== 'orders'"
                             (click)="switchContext('orders')"
+                            title="Orders (Alt+O)"
                             role="tab"
                             [attr.aria-selected]="activeContext === 'orders'"
                         >
@@ -124,12 +145,12 @@
                                 <span>Orders</span>
                                 <span class="restaurant-shortcut-hint d-inline-block text-nowrap">Alt+O</span>
                             </span>
-                            <span class="badge badge-circle badge-light d-none d-xxl-inline-flex flex-grow-0 flex-shrink-0">{{ openOrders.length }}</span>
+                            <span class="pos-tab-count">{{ openOrders.length }}</span>
                         </button>
                         <button
                             type="button"
                             class="btn align-items-center d-flex gap-1 gap-xl-2 justify-content-center min-w-0 px-1 px-xl-2 py-2"
-                            [class.btn-primary]="activeContext === 'tickets'"
+                            [class.is-active]="activeContext === 'tickets'"
                             [class.btn-light]="activeContext !== 'tickets'"
                             (click)="switchContext('tickets')"
                             role="tab"
@@ -137,93 +158,70 @@
                         >
                             <i class="fa fa-print"></i>
                             KOT/BOT
-                            <span class="badge badge-circle badge-light d-none d-xxl-inline-flex flex-grow-0 flex-shrink-0">{{ tickets.length }}</span>
+                            <span class="pos-tab-count">{{ tickets.length }}</span>
                         </button>
                     </div>
 
                     <div class="card-body restaurant-pos-workspace-body d-flex flex-grow-1 min-h-0 overflow-hidden p-2">
                         <ng-container [ngSwitch]="activeContext">
                             <div *ngSwitchCase="'tables'" class="restaurant-pos-pane d-flex flex-column flex-grow-1 gap-2 min-h-0 min-w-0">
-                                <div class="restaurant-pos-filterbar align-items-center flex-grow-0 flex-shrink-0 row g-2">
-                                    <div class="col-12 col-xl">
-                                        <div class="input-group input-group-sm">
-                                            <span class="input-group-text bg-white"><i class="fa fa-search"></i></span>
-                                            <input
-                                                type="search"
-                                                class="form-control"
-                                                [(ngModel)]="tableSearch"
-                                                (ngModelChange)="onTableFilterChange()"
-                                                placeholder="Search table, code, or area"
-                                                aria-label="Search tables"
-                                            />
-                                        </div>
+                                <div class="pos-floor-heading">
+                                    <div>
+                                        <h2>Table overview</h2>
+                                        <p>Select a table to start or continue an order.</p>
                                     </div>
-                                    <div class="col-12 col-sm-6 col-xl-4">
-                                        <select
-                                            class="form-select form-select-sm w-100"
-                                            [(ngModel)]="tableStatusFilter"
-                                            (ngModelChange)="onTableFilterChange()"
-                                            aria-label="Filter table status"
-                                        >
-                                            <option value="">All statuses</option>
-                                            <option *ngFor="let status of tableStatuses" [value]="status.value">{{ status.label }}</option>
-                                        </select>
-                                    </div>
-                                    <span class="restaurant-filter-count align-items-center col-auto d-none d-xl-flex fs-9 fw-bolder text-gray-600 text-nowrap">{{ filteredTablesList.length }} tables</span>
+                                    <span class="pos-result-count" aria-live="polite">{{ filteredTablesList.length }} tables</span>
                                 </div>
-
-                                <div class="restaurant-category-strip restaurant-scrollbar-hidden d-flex min-h-40px flex-grow-0 flex-shrink-0 gap-2 overflow-x-auto overflow-y-hidden pb-1">
-                                    <button
-                                        type="button"
-                                        class="btn btn-sm flex-grow-0 flex-shrink-0"
-                                        [class.btn-primary]="!selectedAreaId"
-                                        [class.btn-light]="selectedAreaId"
-                                        (click)="selectArea('')"
-                                    >
-                                        All areas
+                                <div class="pos-floor-filters">
+                                    <label class="pos-search">
+                                        <i class="fa fa-search" aria-hidden="true"></i>
+                                        <input type="search" [(ngModel)]="tableSearch" (ngModelChange)="onTableFilterChange()"
+                                            placeholder="Search table, code or area…" aria-label="Search tables" />
+                                    </label>
+                                    <select class="form-select pos-area-select" [(ngModel)]="selectedAreaId"
+                                        (ngModelChange)="onTableFilterChange()" aria-label="Dining area">
+                                        <option value="">All dining areas</option>
+                                        <option *ngFor="let area of areas; trackBy: trackByEntityId" [value]="area.id">{{ area.name }}</option>
+                                    </select>
+                                </div>
+                                <div class="pos-status-filters" role="group" aria-label="Table status">
+                                    <button type="button" class="pos-status-filter" [class.is-active]="tableStatusFilter === ''"
+                                        [attr.aria-pressed]="tableStatusFilter === ''" (click)="selectTableStatus('')">
+                                        All <span>{{ matchingTableCount }}</span>
                                     </button>
-                                    <button
-                                        type="button"
-                                        class="btn btn-sm flex-grow-0 flex-shrink-0"
-                                        *ngFor="let area of areas; trackBy: trackByEntityId"
-                                        [class.btn-primary]="selectedAreaId === area.id"
-                                        [class.btn-light]="selectedAreaId !== area.id"
-                                        (click)="selectArea(area.id)"
-                                    >
-                                        {{ area.name }}
+                                    <button type="button" class="pos-status-filter" *ngFor="let status of tableStatuses"
+                                        [class.is-active]="tableStatusFilter === status.value" [attr.data-status]="status.value"
+                                        [attr.aria-pressed]="tableStatusFilter === status.value" (click)="selectTableStatus(status.value)">
+                                        <span class="pos-status-dot" aria-hidden="true"></span>
+                                        {{ status.label }} <span>{{ tableStatusCounts[status.value] || 0 }}</span>
                                     </button>
                                 </div>
 
                                 <div class="restaurant-pos-results-scroll restaurant-scrollbar flex-grow-1 min-h-0 overflow-x-hidden overflow-y-auto pe-1">
                                     <div
-                                        class="restaurant-touch-grid restaurant-table-grid align-content-start align-items-start d-grid gap-2"
+                                        class="restaurant-table-grid pos-table-grid"
                                         *ngIf="filteredTablesList.length; else emptyTables"
                                     >
                                         <button
                                             type="button"
-                                            class="restaurant-touch-button align-items-start bg-hover-light bg-white border border-hover-primary d-flex flex-column gap-1 justify-content-start min-h-65px min-w-0 position-relative px-2 py-2 rounded-3 restaurant-table-tile text-gray-700 text-hover-dark text-start text-wrap"
+                                            class="restaurant-table-tile pos-table"
                                             *ngFor="let table of filteredTablesList; trackBy: trackByEntityId"
-                                            [class.active]="selectedTable?.id === table.id"
-                                            [class.bg-light-primary]="selectedTable?.id === table.id"
-                                            [class.border-primary]="selectedTable?.id === table.id"
-                                            [class.text-gray-900]="selectedTable?.id === table.id"
+                                            [class.is-selected]="selectedTable?.id === table.id"
+                                            [attr.data-status]="table.status"
+                                            [attr.aria-pressed]="selectedTable?.id === table.id"
                                             (click)="selectTable(table)"
                                         >
-                                            <span
-                                                *ngIf="selectedTable?.id === table.id"
-                                                class="bg-primary end-0 h-10px m-2 position-absolute rounded-circle top-0 w-10px"
-                                            ></span>
-                                            <span class="d-flex align-items-start justify-content-between mw-100 w-100 gap-2">
-                                                <span class="min-w-0">
-                                                    <strong class="restaurant-table-name d-block fs-8 fw-bolder mw-100 overflow-hidden text-gray-900 text-nowrap text-truncate">{{ table.name }}</strong>
-                                                    <small class="restaurant-muted text-gray-600">{{ table.code || table.areaName || 'Floor' }}</small>
-                                                </span>
-                                                <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap" [ngClass]="tableStatusClass(table.status)">
+                                            <span class="pos-table-top">
+                                                <span class="pos-table-icon"><i class="fa fa-chair" aria-hidden="true"></i></span>
+                                                <span class="pos-table-status">
+                                                    <span class="pos-status-dot" aria-hidden="true"></span>
                                                     {{ tableStatusText(table.status) }}
                                                 </span>
                                             </span>
-                                            <span class="d-flex align-items-center justify-content-between mw-100 w-100 mt-auto">
-                                                <small class="restaurant-muted text-gray-600">{{ table.capacity || 0 }} seats</small>
+                                            <strong class="pos-table-name">{{ table.name }}</strong>
+                                            <small class="pos-table-area">{{ table.areaName || table.code || 'Dining area' }}</small>
+                                            <span class="pos-table-bottom">
+                                                <small><i class="fa fa-user-group" aria-hidden="true"></i> {{ table.capacity || 0 }} seats</small>
                                                 <ng-container *ngIf="orderForTable(table) as tableOrder">
                                                     <strong>{{ tableOrder.grandTotal | number: '1.2-2' }}</strong>
                                                 </ng-container>
@@ -233,7 +231,12 @@
                                 </div>
 
                                 <ng-template #emptyTables>
-                                    <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 text-center"><i class="fa fa-chair me-1"></i>No tables match these filters.</div>
+                                    <div class="pos-no-results">
+                                        <i class="fa fa-search" aria-hidden="true"></i>
+                                        <strong>No tables found</strong>
+                                        <p>Try another search, dining area or status.</p>
+                                        <button type="button" class="btn btn-light-primary" (click)="resetTableFilters()">Clear filters</button>
+                                    </div>
                                 </ng-template>
                             </div>
 
@@ -256,7 +259,8 @@
                                     <span class="restaurant-filter-count align-items-center col-auto d-none d-xl-flex fs-9 fw-bolder text-gray-600 text-nowrap">{{ filteredMenuItemsList.length }} items</span>
                                 </div>
 
-                                <div class="restaurant-category-strip restaurant-scrollbar-hidden d-flex min-h-40px flex-grow-0 flex-shrink-0 gap-2 overflow-x-auto overflow-y-hidden pb-1">
+                                <div class="pos-menu-filter-row">
+                                <div class="restaurant-category-strip restaurant-scrollbar-hidden d-flex min-h-40px flex-grow-0 flex-shrink-0 gap-2 overflow-x-auto overflow-y-hidden pb-1" aria-label="Menu categories">
                                     <button
                                         type="button"
                                         class="btn btn-sm flex-grow-0 flex-shrink-0"
@@ -277,7 +281,7 @@
                                         {{ category.name }}
                                     </button>
                                 </div>
-                                <div class="restaurant-category-strip restaurant-route-strip restaurant-scrollbar-hidden d-flex min-h-40px flex-grow-0 flex-shrink-0 gap-2 overflow-x-auto overflow-y-hidden pb-1">
+                                <div class="restaurant-category-strip restaurant-route-strip restaurant-scrollbar-hidden d-flex min-h-40px flex-grow-0 flex-shrink-0 gap-2 overflow-x-auto overflow-y-hidden pb-1" aria-label="Item type">
                                     <button
                                         type="button"
                                         class="btn btn-sm flex-grow-0 flex-shrink-0"
@@ -285,7 +289,7 @@
                                         [class.btn-light]="selectedRouteFilter"
                                         (click)="selectedRouteFilter = ''; onMenuFilterChange()"
                                     >
-                                        All types
+                                        All items
                                     </button>
                                     <button
                                         type="button"
@@ -306,12 +310,13 @@
                                         <i class="fa fa-box me-1"></i>Stock
                                     </button>
                                 </div>
+                                </div>
 
                                 <div class="restaurant-pos-results-scroll restaurant-scrollbar flex-grow-1 min-h-0 overflow-x-hidden overflow-y-auto pe-1">
                                     <div class="restaurant-menu-grid d-grid gap-2" *ngIf="filteredMenuItemsList.length; else emptyMenu">
                                         <button
                                             type="button"
-                                            class="restaurant-touch-button align-items-start bg-hover-light bg-white border border-hover-primary border-primary border-start border-2 d-flex flex-column gap-1 justify-content-start min-h-75px min-w-0 px-2 py-2 restaurant-menu-tile rounded-3 shadow-sm text-gray-700 text-hover-dark text-start text-wrap"
+                                            class="restaurant-touch-button restaurant-menu-tile pos-menu-tile"
                                             [class.border-success]="!isKitchenItem(item)"
                                             [class.bg-light]="isSoldOut(item)"
                                             [class.border-danger]="isSoldOut(item)"
@@ -321,26 +326,24 @@
                                             [disabled]="isSoldOut(item)"
                                             (click)="addMenuItem(item)"
                                         >
-                                            <span class="restaurant-menu-tile-head align-items-center d-flex gap-2 mb-1 mw-100 w-100">
+                                            <span class="restaurant-menu-tile-head pos-menu-tile-head">
                                                 <span class="restaurant-menu-avatar align-items-center d-inline-flex flex-shrink-0 fs-8 fw-bolder h-30px justify-content-center overflow-hidden rounded-2 text-gray-900 w-30px" [style.background]="item.colorHex || '#eef6ff'">
                                                     <img *ngIf="item.imageUrl" class="h-100 object-fit-cover w-100" [src]="item.imageUrl" alt="" />
                                                     <span *ngIf="!item.imageUrl">{{ itemInitial(item) }}</span>
                                                 </span>
-                                                <span class="restaurant-menu-tile-body d-grid gap-1 min-w-0">
+                                                <span class="restaurant-menu-tile-body pos-menu-tile-body">
                                                     <strong class="restaurant-menu-title fs-8 fw-bolder lh-sm text-break text-gray-900">{{ item.displayName }}</strong>
                                                     <small class="restaurant-muted text-gray-600">{{ item.categoryName || 'Menu item' }}</small>
                                                 </span>
                                             </span>
-                                            <span class="restaurant-menu-price-row align-items-center d-flex gap-2 justify-content-between mb-1 mw-100 w-100">
+                                            <span class="restaurant-menu-price-row pos-menu-tile-footer">
                                                 <span class="restaurant-menu-price fs-8 fw-bolder text-gray-900 text-nowrap">{{ item.price | number: '1.2-2' }}</span>
-                                                <span class="restaurant-menu-badges align-items-center d-flex flex-wrap gap-1 justify-content-end w-auto">
-                                                    <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap" [ngClass]="itemRouteClass(item)">
+                                                <span class="pos-menu-tile-meta">
+                                                    <span class="pos-menu-route" [class.is-stock]="!isKitchenItem(item)" [attr.title]="itemRouteText(item)" [attr.aria-label]="itemRouteText(item)">
                                                         <i [class]="isKitchenItem(item) ? 'fa fa-fire-burner' : 'fa fa-box'"></i>
-                                                        {{ itemRouteText(item) }}
                                                     </span>
-                                                    <span *ngIf="item.hasVariants" class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light text-gray-600 align-items-center d-inline-flex lh-1 mw-100 text-nowrap">Variant</span>
-                                                    <span *ngIf="item.hasModifiers" class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-primary text-primary align-items-center d-inline-flex lh-1 mw-100 text-nowrap">Add-on</span>
-                                                    <span *ngIf="isSoldOut(item)" class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-danger text-danger align-items-center d-inline-flex lh-1 mw-100 text-nowrap">Sold out</span>
+                                                    <span *ngIf="item.hasVariants || item.hasModifiers" class="pos-menu-options">Options</span>
+                                                    <span *ngIf="isSoldOut(item)" class="pos-menu-sold-out">Sold out</span>
                                                 </span>
                                             </span>
                                         </button>
@@ -396,23 +399,26 @@
                                     <div class="restaurant-ticket-list d-grid gap-2" *ngIf="filteredOrdersList.length; else emptyOrders">
                                         <button
                                             type="button"
-                                            class="restaurant-ticket-row restaurant-order-row align-items-stretch align-items-sm-center bg-white border border-gray-200 d-flex flex-column flex-sm-row gap-2 justify-content-between min-h-55px p-2 rounded-3 text-start w-100 min-w-0"
+                                            class="restaurant-ticket-row restaurant-order-row align-items-center bg-white border border-gray-200 gap-2 min-h-55px rounded-3 text-start w-100 min-w-0"
                                             *ngFor="let order of filteredOrdersList; trackBy: trackByEntityId"
                                             [class.border-primary]="selectedOrder?.id === order.id"
+                                            [class.is-selected]="selectedOrder?.id === order.id"
                                             (click)="selectOrder(order)"
                                         >
-                                            <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-primary text-primary align-items-center d-inline-flex lh-1 mw-100 text-nowrap">#{{ indexOrderNo(order.orderNo) }}</span>
-                                            <span class="flex-grow-1 min-w-0">
-                                                <strong class="d-block text-truncate">{{ order.tableName || orderTypeText(order.orderType) }}</strong>
-                                                <small class="restaurant-muted text-gray-600 d-block text-truncate">
+                                            <span class="pos-order-number">#{{ indexOrderNo(order.orderNo) }}</span>
+                                            <span class="pos-order-identity">
+                                                <strong>{{ order.tableName || orderTypeText(order.orderType) }}</strong>
+                                                <small>
                                                     {{ order.orderNo }}
                                                     <ng-container *ngIf="order.customerName">&middot; {{ order.customerName }}</ng-container>
                                                 </small>
                                             </span>
-                                            <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap" [ngClass]="lineStatusClass(order.status)">
-                                                {{ orderStatusText(order.status) }}
+                                            <span class="pos-order-meta">
+                                                <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap" [ngClass]="lineStatusClass(order.status)">
+                                                    {{ orderStatusText(order.status) }}
+                                                </span>
+                                                <strong class="restaurant-total-sm">{{ order.grandTotal | number: '1.2-2' }}</strong>
                                             </span>
-                                            <strong class="restaurant-total-sm fs-base fw-bolder text-gray-900">{{ order.grandTotal | number: '1.2-2' }}</strong>
                                         </button>
                                     </div>
                                 </div>
@@ -441,6 +447,8 @@
                                                 <small class="restaurant-muted text-gray-600">
                                                     {{ ticket.stationName || 'Kitchen' }} &middot; {{ ticketPurposeText(ticket.purpose) }}
                                                 </small>
+                                                <small class="text-warning d-block" *ngIf="ticket.printStatus === 'Print requested'">Print requested — awaiting staff confirmation</small>
+                                                <small class="text-success d-block" *ngIf="ticket.printStatus === 'Printed'">Staff confirmed printed</small>
                                             </span>
                                             <small class="restaurant-muted text-gray-600" *ngIf="ticket.sentAt">{{ ticketElapsedText(ticket) }}</small>
                                             <button
@@ -486,12 +494,13 @@
             <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 bg-white align-items-stretch align-items-sm-center flex-column flex-sm-row justify-content-between d-flex">
                 <div class="min-w-0">
                     <div class="d-flex align-items-center gap-2">
-                        <h3 class="card-title fw-bolder text-gray-900 mb-0 text-truncate fs-7 lh-sm m-0">{{ currentOrderTitleText || 'Current order' }}</h3>
+                        <h3 class="card-title fw-bolder text-gray-900 mb-0 text-truncate fs-7 lh-sm m-0">{{ selectedTable?.name || (selectedOrder ? currentOrderTitleText : 'Current order') }}</h3>
                         <span *ngIf="orderDirty" class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-warning text-warning align-items-center d-inline-flex lh-1 mw-100 text-nowrap">Unsaved</span>
                     </div>
                     <div class="restaurant-muted fs-9 lh-sm mt-1 text-gray-600">
-                        {{ currentOrderSubtitleText }} &middot; {{ cartItemCountValue }} items / {{ cart.length }} lines
+                        {{ currentOrderSubtitleText }} &middot; {{ cartItemCountValue }} items
                     </div>
+                    <div *ngIf="selectedTable && selectedOrder" class="pos-order-reference">{{ selectedOrder.orderNo }}</div>
                 </div>
                 <button
                     type="button"
@@ -560,9 +569,12 @@
                 </div>
 
                 <ng-template #emptyCart>
-                    <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 text-center">
-                        <i class="fa fa-bell-concierge d-block mb-2"></i>
-                        Select a table or order, then add menu items.
+                    <div class="pos-empty-cart">
+                        <span class="pos-empty-icon"><i class="fa fa-receipt" aria-hidden="true"></i></span>
+                        <h3>{{ orderType === orderTypeEnum.DineIn && !selectedTable ? 'Ready for the next guest' : 'Let’s take an order' }}</h3>
+                        <p>{{ orderType === orderTypeEnum.DineIn && !selectedTable ? 'Choose a table on the left. Its order will appear here.' : 'Add items from the menu to get started.' }}</p>
+                        <button *ngIf="(selectedTable || orderType !== orderTypeEnum.DineIn) && activeContext !== 'menu'" type="button"
+                            class="btn btn-light-primary" (click)="switchContext('menu', true)">Browse menu <i class="fa fa-arrow-right ms-2"></i></button>
                     </div>
                 </ng-template>
             </div>
@@ -582,6 +594,7 @@
                         [buttonBusy]="saving"
                         [disabled]="!cart.length || saving"
                         (click)="saveOrder(false)"
+                        title="Save order (Alt+S)"
                     >
                         <i class="fa fa-floppy-disk me-1"></i>Save <span class="restaurant-shortcut-hint d-inline-block text-nowrap">Alt+S</span>
                     </button>
@@ -591,6 +604,7 @@
                         [buttonBusy]="saving"
                         [disabled]="!hasKitchenSendableLines() || saving"
                         (click)="saveOrder(true)"
+                        title="Send KOT/BOT (Alt+K)"
                         [tooltip]="hasKitchenSendableLines() ? 'Send unsent kitchen/bar items' : 'No unsent kitchen/bar items'"
                     >
                         <i class="fa fa-fire-burner me-1"></i>{{ sendButtonLabel() }}
@@ -603,6 +617,7 @@
                         [buttonBusy]="saving"
                         [disabled]="!cart.length || saving"
                         (click)="openCheckout()"
+                        title="Checkout (Alt+B)"
                     >
                         <span><i class="fa fa-cash-register me-2"></i>Checkout</span>
                         <strong class="fs-base">{{ cartTotalAmount | number: '1.2-2' }}</strong>
@@ -954,6 +969,9 @@
                                 <i [class]="'fa ' + method.icon"></i>{{ method.label }}
                             </button>
                         </div>
+                        <div class="alert alert-warning mt-3 mb-0" *ngIf="billForm.paymentMethod === paymentMethodEnum.Card_Swipe || billForm.paymentMethod === paymentMethodEnum.QR">
+                            This payment is recorded by staff. Provider verification is not connected yet.
+                        </div>
 
                         <div class="row g-3 mt-1">
                             <div class="col-12 col-sm-4">
@@ -1047,7 +1065,7 @@
                         type="button"
                         class="btn btn-primary restaurant-pay-button align-items-center d-flex justify-content-between min-h-50px px-5"
                         [buttonBusy]="saving"
-                        [disabled]="!canFinalizePayment"
+                        [disabled]="!canFinalizePayment || !posOnline || !cashShift"
                         (click)="finalizeBill()"
                     >
                         <span><i class="fa fa-cash-register me-2"></i>Pay now</span>
@@ -1060,7 +1078,7 @@
 
     <div class="restaurant-modal-backdrop restaurant-switch-backdrop align-items-center bg-dark bg-opacity-50 bottom-0 d-flex end-0 justify-content-center p-4 position-fixed start-0 top-0" *ngIf="pendingOrderSwitch">
         <div class="restaurant-modal restaurant-switch-modal bg-white mw-450px rounded-3 shadow-lg w-100" role="dialog" aria-modal="true" aria-labelledby="switch-order-title">
-            <div class="restaurant-modal-header border-bottom border-gray-200 gap-3 p-4">
+            <div class="restaurant-modal-header align-items-start border-bottom border-gray-200 d-flex gap-3 justify-content-between p-4">
                 <div>
                     <div class="restaurant-label fs-9 fw-bold text-gray-600 text-uppercase">Unsaved order</div>
                     <h3 id="switch-order-title" class="restaurant-modal-title fs-5 mb-0 fw-bolder">Save before switching?</h3>
@@ -1082,7 +1100,7 @@
 
     <div class="restaurant-modal-backdrop align-items-center bg-dark bg-opacity-50 bottom-0 d-flex end-0 justify-content-center p-4 position-fixed start-0 top-0" *ngIf="pendingMenuItem">
         <div class="restaurant-modal bg-white mw-450px rounded-3 shadow-lg w-100" role="dialog" aria-modal="true" aria-labelledby="item-config-title">
-            <div class="restaurant-modal-header border-bottom border-gray-200 gap-3 p-4">
+            <div class="restaurant-modal-header align-items-start border-bottom border-gray-200 d-flex gap-3 justify-content-between p-4">
                 <div>
                     <div class="restaurant-label fs-9 fw-bold text-gray-600 text-uppercase">Customize item</div>
                     <h3 id="item-config-title" class="restaurant-modal-title fs-5 mb-0 fw-bolder">{{ pendingMenuItem.displayName }}</h3>
@@ -1135,7 +1153,7 @@
                 </section>
             </div>
 
-            <div class="restaurant-modal-footer align-items-center border-top border-gray-200 d-flex gap-3 justify-content-end p-4">
+            <div class="restaurant-modal-footer restaurant-item-config-footer align-items-center border-top border-gray-200 d-flex gap-3 justify-content-end p-4">
                 <div class="me-auto">
                     <span class="restaurant-label fs-9 fw-bold text-gray-600 d-block text-uppercase">Item total</span>
                     <strong class="restaurant-total fs-5 fw-bolder text-gray-900">{{ configuratorTotalAmount | number: '1.2-2' }}</strong>

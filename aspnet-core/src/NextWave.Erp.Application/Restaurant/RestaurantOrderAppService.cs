@@ -89,11 +89,30 @@ namespace NextWave.Erp.Restaurant
 
             if (!input.Id.HasValue || input.Id == Guid.Empty)
             {
+                var clientRequestId = input.ClientRequestId?.Trim();
+                var requestHash = string.IsNullOrWhiteSpace(clientRequestId) ? null : HashPosOrderRequest(input);
+                if (!string.IsNullOrWhiteSpace(clientRequestId))
+                {
+                    if (clientRequestId.Length > 100)
+                        throw new UserFriendlyException("Order request ID is too long");
+                    var priorOrder = await orderRepository.FirstOrDefaultAsync(x =>
+                        x.TenantId == tenantId && x.PosClientRequestId == clientRequestId);
+                    if (priorOrder != null)
+                    {
+                        if (!string.Equals(priorOrder.ClientPayloadHash, requestHash, StringComparison.Ordinal))
+                            throw new UserFriendlyException("This order request ID was already used for different order details");
+                        await uow.CompleteAsync();
+                        return priorOrder.Id;
+                    }
+                }
+
                 var session = await EnsureTableSession(input, tenantId);
                 order = new RestaurantOrder
                 {
                     TenantId = tenantId,
                     OrderNo = await GetNextOrderNo(),
+                    PosClientRequestId = string.IsNullOrWhiteSpace(clientRequestId) ? null : clientRequestId,
+                    ClientPayloadHash = requestHash,
                     CreatedAt = DateTime.Now,
                     TableSessionId = session?.Id
                 };
@@ -434,20 +453,29 @@ namespace NextWave.Erp.Restaurant
         public async Task<RestaurantTicketDto> GetTicketForPrint(EntityDto<Guid> input)
         {
             var ticket = await GetTicketEntity(input.Id);
-            return await MapTicket(ticket, ticket.PrintCount > 0);
+            var isReprint = ticket.PrintCount > 0;
+            await RegisterTicketPrint(ticket);
+            return await MapTicket(ticket, isReprint);
         }
 
         public async Task MarkTicketPrinted(EntityDto<Guid> input)
         {
             var ticket = await GetTicketEntity(input.Id);
-            await RegisterTicketPrint(ticket);
+            var now = DateTime.Now;
+            ticket.LastPrintConfirmedAt = now;
+            ticket.PrintedAt ??= now;
+            ticket.LastPrintedAt = now;
+            await ticketRepository.UpdateAsync(ticket);
         }
 
         [AbpAuthorize(AppPermissions.PagesRestaurantKotBotReprint)]
         public async Task<RestaurantTicketDto> ReprintTicket(ReprintRestaurantTicketDto input)
         {
+            if (string.IsNullOrWhiteSpace(input?.ApprovalNote))
+                throw new UserFriendlyException("A reason is required to reprint a ticket");
             await ValidateSensitiveActionApproval("Reprint ticket", input.ApprovalPin);
             var ticket = await GetTicketEntity(input.TicketId);
+            var isReprint = ticket.PrintCount > 0;
             await RegisterTicketPrint(ticket);
             await RecordSensitiveAction(
                 "ReprintTicket",
@@ -455,7 +483,7 @@ namespace NextWave.Erp.Restaurant
                 ticket.Id,
                 input.ApprovalNote,
                 new { ticket.TicketNo, ticket.OrderId, ticket.PrintCount });
-            return await MapTicket(ticket, true);
+            return await MapTicket(ticket, isReprint);
         }
 
         [AbpAuthorize(AppPermissions.PagesRestaurantPosTableTransfer)]
@@ -982,20 +1010,21 @@ namespace NextWave.Erp.Restaurant
             return item.Qty * item.Rate + item.ModifierTotal;
         }
 
-        private async Task<string> GetNextOrderNo()
+        private static string HashPosOrderRequest(CreateOrEditRestaurantOrderDto input)
         {
-            var count = await orderRepository.CountAsync(x => x.TenantId == AbpSession.TenantId);
-            return "RO-" + DateTime.Now.ToString("yyyyMMdd") + "-" + (count + 1).ToString("0000");
+            return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(
+                System.Text.Encoding.UTF8.GetBytes(JsonSerializer.Serialize(input))));
         }
 
-        private async Task<string> GetNextTicketNo(RestaurantTicketType ticketType)
+        private Task<string> GetNextOrderNo()
+        {
+            return Task.FromResult("RO-" + DateTime.Now.ToString("yyyyMMdd") + "-" + Guid.NewGuid().ToString("N")[..12].ToUpperInvariant());
+        }
+
+        private Task<string> GetNextTicketNo(RestaurantTicketType ticketType)
         {
             var prefix = ticketType + "-" + DateTime.Now.ToString("yyyyMMdd") + "-";
-            var count = await ticketRepository.CountAsync(x =>
-                x.TenantId == AbpSession.TenantId &&
-                x.TicketType == ticketType &&
-                x.TicketNo.StartsWith(prefix));
-            return prefix + (count + 1).ToString("0000");
+            return Task.FromResult(prefix + Guid.NewGuid().ToString("N")[..12].ToUpperInvariant());
         }
 
         private async Task<bool> HasOpenOrderOnTable(Guid tableId, Guid exceptOrderId)
@@ -1150,6 +1179,11 @@ namespace NextWave.Erp.Restaurant
                 CancelledAt = ticket.CancelledAt,
                 PrintedAt = ticket.PrintedAt,
                 LastPrintedAt = ticket.LastPrintedAt,
+                PrintStatus = ticket.PrintRequestedAt.HasValue &&
+                    (!ticket.LastPrintConfirmedAt.HasValue || ticket.PrintRequestedAt > ticket.LastPrintConfirmedAt)
+                    ? "Print requested"
+                    : ticket.LastPrintConfirmedAt.HasValue ? "Printed" : "Not printed",
+                LastPrintConfirmedAt = ticket.LastPrintConfirmedAt,
                 PrintCount = ticket.PrintCount,
                 IsReprint = isReprint,
                 OrderNotes = ticket.OrderFk?.Notes,
@@ -1162,8 +1196,7 @@ namespace NextWave.Erp.Restaurant
         {
             var now = DateTime.Now;
             ticket.PrintCount += 1;
-            ticket.PrintedAt ??= now;
-            ticket.LastPrintedAt = now;
+            ticket.PrintRequestedAt = now;
             await ticketRepository.UpdateAsync(ticket);
         }
 
@@ -1185,8 +1218,11 @@ namespace NextWave.Erp.Restaurant
             if (string.IsNullOrWhiteSpace(expectedPin))
                 throw new UserFriendlyException("Manager approval PIN is not configured");
 
-            if (!string.Equals(expectedPin.Trim(), approvalPin?.Trim(), StringComparison.Ordinal))
+            if (!RestaurantPinHasher.Verify(expectedPin, approvalPin, out var legacy))
                 throw new UserFriendlyException($"{actionName} requires manager approval");
+            if (legacy)
+                await SettingManager.ChangeSettingForTenantAsync(tenantId,
+                    AppSettings.ErpSettings.RestaurantManagerPin, RestaurantPinHasher.Hash(expectedPin.Trim()));
         }
 
         private async Task RecordSensitiveAction(

@@ -112,7 +112,7 @@ export class AccountGroupsComponent extends AppComponentBase implements OnInit, 
             flex: 3,
         },
         {
-            field: 'nature',
+            field: 'natureName',
             headerName: this.l('Nature'),
             sortable: true,
             filter: true,

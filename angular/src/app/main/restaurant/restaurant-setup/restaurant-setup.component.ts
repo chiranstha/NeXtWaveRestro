@@ -24,6 +24,8 @@ import {
     RestaurantTableDto,
 } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { ColDef, GridCellClickedEvent } from 'ag-grid-community';
 
 type RestaurantSetupSection = 'areas' | 'tables' | 'stations' | 'devices' | 'settings';
 
@@ -43,6 +45,7 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
     saving = false;
     loading = false;
     activeSection: RestaurantSetupSection = 'areas';
+    returnToMenu = false;
 
     areaForm!: FormGroup;
     tableForm!: FormGroup;
@@ -51,17 +54,39 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
     settingsForm!: FormGroup;
     readonly negativeStockOptions = ['Allow', 'Warn', 'Block'];
     readonly tableWorkflowOptions = ['TableSession', 'PerOrder'];
+    readonly defaultColDef: ColDef = {
+        sortable: true,
+        filter: true,
+        resizable: true,
+        minWidth: 100,
+    };
+    areaColumnDefs: ColDef<RestaurantAreaDto>[] = [];
+    tableColumnDefs: ColDef<RestaurantTableDto>[] = [];
+    stationColumnDefs: ColDef<RestaurantStationDto>[] = [];
+    deviceColumnDefs: ColDef<RestaurantDeviceDto>[] = [];
+    noRowsOverlayTemplate = '';
 
     private fb = inject(FormBuilder);
     private restaurantSetupService = inject(RestaurantSetupServiceProxy);
     private cdr = inject(ChangeDetectorRef);
+    private route = inject(ActivatedRoute);
 
     constructor() {
         super(inject(Injector));
         this.buildForms();
+        this.noRowsOverlayTemplate = `<span class="restaurant-grid-empty fw-bolder">${this.l('NoData')}</span>`;
+        this.areaColumnDefs = this.createAreaColumnDefs();
+        this.tableColumnDefs = this.createTableColumnDefs();
+        this.stationColumnDefs = this.createStationColumnDefs();
+        this.deviceColumnDefs = this.createDeviceColumnDefs();
     }
 
     ngOnInit(): void {
+        this.returnToMenu = this.route.snapshot.queryParamMap.get('returnToMenu') === 'true';
+        const requestedSection = this.route.snapshot.queryParamMap.get('section') as RestaurantSetupSection | null;
+        if (requestedSection && ['areas', 'tables', 'stations', 'devices', 'settings'].includes(requestedSection)) {
+            this.activeSection = requestedSection;
+        }
         this.refresh();
     }
 
@@ -195,6 +220,27 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
         this.tableForm.patchValue({ ...table });
     }
 
+    onSetupGridCellClicked(event: GridCellClickedEvent): void {
+        if (event.column.getColId() !== 'actions' || !event.data) {
+            return;
+        }
+
+        switch (this.activeSection) {
+            case 'areas':
+                this.editArea(event.data as RestaurantAreaDto);
+                break;
+            case 'tables':
+                this.editTable(event.data as RestaurantTableDto);
+                break;
+            case 'stations':
+                this.editStation(event.data as RestaurantStationDto);
+                break;
+            case 'devices':
+                this.editDevice(event.data as RestaurantDeviceDto);
+                break;
+        }
+    }
+
     editStation(station: RestaurantStationDto): void {
         this.activeSection = 'stations';
         this.stationForm.patchValue({ ...station });
@@ -311,5 +357,116 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
             channelAvailabilityEnabled: [true],
             tableWorkflow: ['TableSession', Validators.required],
         });
+    }
+
+    private createAreaColumnDefs(): ColDef<RestaurantAreaDto>[] {
+        return [
+            { headerName: this.l('Name'), field: 'name', flex: 1, minWidth: 140 },
+            { headerName: this.l('Description'), field: 'description', flex: 1, minWidth: 160 },
+            { headerName: this.l('Sort Order'), field: 'sortOrder', width: 130, filter: 'agNumberColumnFilter' },
+            {
+                headerName: this.l('Status'),
+                field: 'isActive',
+                width: 130,
+                cellRenderer: (params) => this.statusBadge(params.value ? this.l('Active') : this.l('Inactive'), params.value ? 'success' : 'muted'),
+            },
+            this.actionColumn(),
+        ];
+    }
+
+    private createTableColumnDefs(): ColDef<RestaurantTableDto>[] {
+        return [
+            { headerName: this.l('Table'), field: 'name', flex: 1, minWidth: 140 },
+            { headerName: this.l('Area'), field: 'areaName', flex: 1, minWidth: 130 },
+            { headerName: this.l('Capacity'), field: 'capacity', width: 120, filter: 'agNumberColumnFilter' },
+            {
+                headerName: this.l('Status'),
+                field: 'status',
+                width: 150,
+                cellRenderer: (params) => this.statusBadge(this.tableStatusText(Number(params.value)), 'primary'),
+            },
+            this.actionColumn(),
+        ];
+    }
+
+    private createStationColumnDefs(): ColDef<RestaurantStationDto>[] {
+        return [
+            { headerName: this.l('Station'), field: 'name', flex: 1, minWidth: 140 },
+            {
+                headerName: this.l('Type'),
+                field: 'stationType',
+                width: 150,
+                valueFormatter: (params) => this.stationTypeText(Number(params.value)),
+            },
+            {
+                headerName: this.l('Status'),
+                field: 'isActive',
+                width: 130,
+                cellRenderer: (params) => this.statusBadge(params.value ? this.l('Active') : this.l('Inactive'), params.value ? 'success' : 'muted'),
+            },
+            this.actionColumn(),
+        ];
+    }
+
+    private createDeviceColumnDefs(): ColDef<RestaurantDeviceDto>[] {
+        return [
+            { headerName: this.l('Device'), field: 'name', flex: 1, minWidth: 140 },
+            { headerName: this.l('Code'), field: 'deviceCode', minWidth: 130 },
+            { headerName: this.l('User'), field: 'userId', width: 100, valueFormatter: (params) => params.value || '-' },
+            {
+                headerName: this.l('Status'),
+                field: 'status',
+                width: 130,
+                cellRenderer: (params) => this.statusBadge(this.deviceStatusText(Number(params.value)), Number(params.value) === 1 ? 'danger' : 'success'),
+            },
+            {
+                headerName: this.l('Sync'),
+                colId: 'syncStatus',
+                width: 140,
+                valueGetter: (params) => params.data ? this.syncStatusText(params.data) : '',
+                cellRenderer: (params) => {
+                    const tone = params.value === 'Needs review' ? 'danger' : params.value === 'Healthy' ? 'success' : 'warning';
+                    return this.statusBadge(String(params.value || ''), tone);
+                },
+            },
+            {
+                headerName: this.l('Cursor'),
+                colId: 'cursor',
+                minWidth: 170,
+                valueGetter: (params) =>
+                    params.data
+                        ? `${this.l('Pulled')}: ${params.data.lastPulledSeq || 0} · ${this.l('Ack')}: ${params.data.lastAcknowledgedSeq || 0}`
+                        : '',
+            },
+            { headerName: this.l('Last Sync Error'), field: 'lastSyncError', minWidth: 180 },
+            this.actionColumn(),
+        ];
+    }
+
+    private actionColumn(): ColDef {
+        return {
+            colId: 'actions',
+            headerName: '',
+            width: 76,
+            minWidth: 76,
+            maxWidth: 76,
+            sortable: false,
+            filter: false,
+            resizable: false,
+            cellClass: 'text-end',
+            cellRenderer: () =>
+                `<button type="button" class="btn btn-xs btn-light-primary align-items-center d-inline-flex fs-9 justify-content-center" aria-label="${this.l('Edit')}" title="${this.l('Edit')}"><i class="fa fa-pencil"></i></button>`,
+        };
+    }
+
+    private statusBadge(label: string, tone: 'success' | 'warning' | 'danger' | 'primary' | 'muted'): string {
+        const classes: Record<typeof tone, string> = {
+            success: 'bg-light-success text-success',
+            warning: 'bg-light-warning text-warning',
+            danger: 'bg-light-danger text-danger',
+            primary: 'bg-light-primary text-primary',
+            muted: 'bg-light text-gray-600',
+        };
+        return `<span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap ${classes[tone]}">${label}</span>`;
     }
 }

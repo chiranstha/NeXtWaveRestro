@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="tr">
   <texts>
     <text name="HomePage">Ana sayfa</text>
@@ -852,17 +852,8 @@
     <text name="Item">Ürün</text>
     <text name="Theme_Default">Varsayılan</text>
     <text name="Theme_Theme1">Tema 1</text>
-    <text name="Theme_Theme2">Tema 2</text>
-    <text name="Theme_Theme3">Tema 3</text>
-    <text name="Theme_Theme4">Tema 4</text>
-    <text name="Theme_Theme5">Tema 5</text>
-    <text name="Theme_Theme6">Tema 6</text>
-    <text name="Theme_Theme7">Tema 7</text>
     <text name="Theme_Theme8">Tema 8</text>
-    <text name="Theme_Theme9">Tema 9</text>
-    <text name="Theme_Theme10">Tema 10</text>
     <text name="Theme_Theme11">Tema 11</text>
-    <text name="Theme_Theme12">Tema 12</text>
     <text name="SelectATheme">Tema Seçiniz</text>
     <text name="QuickThemeSelection">Hızlı tema seçimi</text>
     <text name="IsQuickThemeSelectEnabled">Hızlı tema seçimi etkin</text>
@@ -1154,7 +1145,6 @@
     <text name="YourPlan">Planınız</text>
     <text name="WebhookPageInfo">Web kancaları, belirli olaylar gerçekleştiğinde harici servislerin uyarılmasını sağlar. Belirtilen olaylar gerçekleştiğinde, sağlanan URL'lerin her birine bir POST isteği göndereceğiz.</text>
     <text name="UiCustomization_DarkMode">Siyah Mod</text>
-    <text name="Theme_Theme13">Tema 13</text>
     <text name="EnableCheckingLastXPasswordWhenPasswordChangeSettingLabel">Kullanıcının yeni şifresinin son x şifrelerden herhangi biriyle aynı olmasını engelle.</text>
     <text name="CheckingLastXPasswordCountSettingLabel">Kullanıcının yeni şifresi, son kaç şifresinden farklı olmalıdır?</text>
     <text name="NewPasswordMustBeDifferentThenLastXPassword">Yeni şifre son {0} şifreden farklı olmalıdır</text>

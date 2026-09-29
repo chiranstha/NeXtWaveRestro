@@ -37,6 +37,7 @@ import {
     UniversalDropdownDto,
 } from '@shared/service-proxies/service-proxies';
 import { DateTime } from 'luxon';
+import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
 type MenuRoute = 'kitchen' | 'stock';
@@ -128,12 +129,24 @@ interface RestaurantMenuItemTagForm {
 @Component({
     selector: 'restaurant-menu',
     templateUrl: './restaurant-menu.component.html',
+    styleUrls: ['./restaurant-menu.component.css'],
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class RestaurantMenuComponent extends AppComponentBase implements OnInit, AfterViewInit {
+    readonly wizardSteps = [
+        { number: 1, label: 'Item details' },
+        { number: 2, label: 'Recipe' },
+        { number: 3, label: 'Options & availability' },
+        { number: 4, label: 'Review' },
+    ];
+    wizardOpen = false;
+    wizardStep = 1;
+    categoriesExpanded = false;
+    showAdvancedFilters = false;
+    private pendingWizardDraft: any;
     categories: RestaurantMenuCategoryDto[] = [];
     menuItems: RestaurantMenuItemDto[] = [];
     products: UniversalDropdownDto[] = [];
@@ -164,14 +177,17 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
     private restaurantSetupService = inject(RestaurantSetupServiceProxy);
     private productService = inject(ProductServiceProxy);
     private cdr = inject(ChangeDetectorRef);
+    private router = inject(Router);
+    private route = inject(ActivatedRoute);
 
     constructor() {
         super(inject(Injector));
     }
 
     ngOnInit(): void {
+        const resumeItemId = this.restoreWizardDraftFromRoute();
         this.loadLookups();
-        this.refresh();
+        this.refresh(resumeItemId);
     }
 
     ngAfterViewInit(): void {
@@ -215,7 +231,8 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
                 if (selectMenuItemId) {
                     const item = this.menuItems.find((x) => x.id === selectMenuItemId);
                     if (item) {
-                        this.editMenuItem(item);
+                        this.editMenuItem(item, false, !!this.pendingWizardDraft);
+                        this.restoreDependentWizardDraft();
                     }
                 }
                 this.cdr.markForCheck();
@@ -306,7 +323,7 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
             });
     }
 
-    saveMenuItem(): void {
+    saveMenuItem(continueWorkflow = false): void {
         if (!this.itemForm.categoryId || !this.itemForm.productId || !this.itemForm.displayName) {
             this.notify.warn('Category, product, and display name are required');
             return;
@@ -344,16 +361,24 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
             .pipe(finalize(() => (this.saving = false)))
             .subscribe((id) => {
                 this.notify.success(this.l('SavedSuccessfully'));
+                if (continueWorkflow) {
+                    this.wizardOpen = true;
+                    this.wizardStep = 2;
+                }
                 this.refresh(id);
-            });
+            }, () => this.notify.error('Item details could not be saved. Your entries are still here. Retry this step.'));
     }
 
     editCategory(category: RestaurantMenuCategoryDto): void {
         this.categoryForm = { ...category };
     }
 
-    editMenuItem(item: RestaurantMenuItemDto): void {
+    editMenuItem(item: RestaurantMenuItemDto, openWizard = true, preserveRecipeDraft = false): void {
         this.selectedMenuItem = item;
+        if (openWizard) {
+            this.wizardOpen = true;
+            this.wizardStep = 1;
+        }
         this.itemForm = {
             id: item.id,
             categoryId: item.categoryId,
@@ -379,7 +404,14 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
         this.tagRows = (item.tags || []).map((tag) => ({ ...tag }));
         this.resetVariantForm();
         this.resetModifierForm();
-        this.loadRecipe(item);
+        if (preserveRecipeDraft) {
+            this.restaurantMenuService.getRecipeCost(item.productId).subscribe((result) => {
+                this.recipeCost = result;
+                this.cdr.markForCheck();
+            });
+        } else {
+            this.loadRecipe(item);
+        }
     }
 
     loadRecipe(item: RestaurantMenuItemDto): void {
@@ -393,6 +425,11 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
             this.recipeCost = result;
             this.cdr.markForCheck();
         });
+    }
+
+    openRecipe(item: RestaurantMenuItemDto): void {
+        this.editMenuItem(item);
+        this.wizardStep = 2;
     }
 
     addRecipeLine(): void {
@@ -410,7 +447,7 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
         this.recipeLines.splice(index, 1);
     }
 
-    saveRecipe(): void {
+    saveRecipe(continueWorkflow = false): void {
         if (!this.selectedMenuItem) {
             return;
         }
@@ -444,8 +481,11 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
             .pipe(finalize(() => (this.saving = false)))
             .subscribe(() => {
                 this.notify.success(this.l('SavedSuccessfully'));
+                if (continueWorkflow) {
+                    this.wizardStep = 3;
+                }
                 this.refresh(this.selectedMenuItem.id);
-            });
+            }, () => this.notify.error('Recipe could not be saved. Your entries are still here. Retry the recipe step.'));
     }
 
     saveVariant(): void {
@@ -477,7 +517,7 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
                 this.notify.success(this.l('SavedSuccessfully'));
                 this.resetVariantForm();
                 this.refresh(this.selectedMenuItem.id);
-            });
+            }, () => this.notify.error('Variant could not be saved. Your entries are still here. Retry the options step.'));
     }
 
     editVariant(variant: RestaurantMenuVariantDto): void {
@@ -515,7 +555,7 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
                 this.notify.success(this.l('SavedSuccessfully'));
                 this.resetModifierGroup();
                 this.refresh(this.selectedMenuItem?.id);
-            });
+            }, () => this.notify.error('Modifier group could not be saved. Your entries are still here. Retry the options step.'));
     }
 
     editModifierGroup(group: RestaurantModifierGroupDto): void {
@@ -546,7 +586,7 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
                 this.notify.success(this.l('SavedSuccessfully'));
                 this.resetModifierForm();
                 this.refresh(this.selectedMenuItem?.id);
-            });
+            }, () => this.notify.error('Modifier could not be saved. Your entries are still here. Retry the options step.'));
     }
 
     editModifier(group: RestaurantModifierGroupDto, modifier: RestaurantModifierDto): void {
@@ -570,7 +610,7 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
             .subscribe(() => {
                 this.notify.success(this.l('SavedSuccessfully'));
                 this.refresh(this.selectedMenuItem.id);
-            });
+            }, () => this.notify.error('Modifier assignments could not be saved. Your entries are still here. Retry the options step.'));
     }
 
     toggleModifierGroup(groupId: string, checked: boolean): void {
@@ -627,7 +667,7 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
             .subscribe(() => {
                 this.notify.success(this.l('SavedSuccessfully'));
                 this.refresh(this.selectedMenuItem.id);
-            });
+            }, () => this.notify.error('Tags could not be saved. Your entries are still here. Retry the options step.'));
     }
 
     setAvailability(item: RestaurantMenuItemDto, isAvailable: boolean): void {
@@ -714,6 +754,8 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
     }
 
     resetMenuItem(): void {
+        this.wizardOpen = true;
+        this.wizardStep = 1;
         this.itemForm = this.createEmptyItemForm();
         this.itemForm.categoryId = this.categories[0]?.id || '';
         this.selectedMenuItem = null;
@@ -722,6 +764,94 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
         this.recipeLines = [];
         this.recipeCost = null;
         this.resetVariantForm();
+    }
+
+    goToWizardStep(step: number): void {
+        if (step >= 1 && step <= this.wizardSteps.length && step < this.wizardStep) {
+            this.wizardStep = step;
+        }
+    }
+
+    continueFromRecipe(): void {
+        if (this.itemForm.itemRoute === 'stock' || !this.recipeLines.length) {
+            this.wizardStep = 3;
+            return;
+        }
+        this.saveRecipe(true);
+    }
+
+    finishWizard(): void {
+        this.wizardOpen = false;
+        this.wizardStep = 1;
+        sessionStorage.removeItem('restaurantMenuWizardDraft');
+    }
+
+    navigateToPrerequisite(path: string, queryParams?: Record<string, string>): void {
+        sessionStorage.setItem(
+            'restaurantMenuWizardDraft',
+            JSON.stringify({
+                itemForm: this.itemForm,
+                wizardStep: this.wizardStep,
+                categoryForm: this.categoryForm,
+                variantForm: this.variantForm,
+                modifierGroupForm: this.modifierGroupForm,
+                modifierForm: this.modifierForm,
+                recipeLines: this.recipeLines,
+                selectedModifierGroupIds: this.selectedModifierGroupIds,
+                tagRows: this.tagRows,
+                selectedMenuItemId: this.selectedMenuItem?.id,
+            }),
+        );
+        this.router.navigate([path], { queryParams: { ...queryParams, returnToMenu: 'true' } });
+    }
+
+    private restoreWizardDraftFromRoute(): string | undefined {
+        if (this.route.snapshot.queryParamMap.get('resumeWizard') !== 'true') {
+            return undefined;
+        }
+        const stored = sessionStorage.getItem('restaurantMenuWizardDraft');
+        if (!stored) {
+            return undefined;
+        }
+        try {
+            this.pendingWizardDraft = JSON.parse(stored);
+            const draft = this.pendingWizardDraft;
+            this.wizardOpen = true;
+            this.wizardStep = Number(draft.wizardStep || 1);
+            this.itemForm = { ...this.createEmptyItemForm(), ...draft.itemForm };
+            this.categoryForm = { ...this.createEmptyCategoryForm(), ...draft.categoryForm };
+            this.variantForm = { ...this.createEmptyVariantForm(), ...draft.variantForm };
+            this.modifierGroupForm = { ...this.createEmptyModifierGroupForm(), ...draft.modifierGroupForm };
+            this.modifierForm = { ...this.createEmptyModifierForm(), ...draft.modifierForm };
+            this.recipeLines = draft.recipeLines || [];
+            this.selectedModifierGroupIds = draft.selectedModifierGroupIds || [];
+            this.tagRows = draft.tagRows || [];
+            if (!draft.selectedMenuItemId) {
+                this.pendingWizardDraft = null;
+            }
+            return draft.selectedMenuItemId;
+        } catch {
+            sessionStorage.removeItem('restaurantMenuWizardDraft');
+            return undefined;
+        }
+    }
+
+    private restoreDependentWizardDraft(): void {
+        const draft = this.pendingWizardDraft;
+        if (!draft) {
+            return;
+        }
+        this.itemForm = { ...this.itemForm, ...draft.itemForm };
+        this.categoryForm = { ...this.categoryForm, ...draft.categoryForm };
+        this.variantForm = { ...this.variantForm, ...draft.variantForm };
+        this.modifierGroupForm = { ...this.modifierGroupForm, ...draft.modifierGroupForm };
+        this.modifierForm = { ...this.modifierForm, ...draft.modifierForm };
+        this.recipeLines = draft.recipeLines || this.recipeLines;
+        this.selectedModifierGroupIds = draft.selectedModifierGroupIds || this.selectedModifierGroupIds;
+        this.tagRows = draft.tagRows || this.tagRows;
+        this.wizardOpen = true;
+        this.wizardStep = Number(draft.wizardStep || 1);
+        this.pendingWizardDraft = null;
     }
 
     resetVariantForm(): void {
@@ -759,6 +889,10 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
 
     itemRouteText(item: RestaurantMenuRouteSource): string {
         return this.menuRoute(item) === 'kitchen' ? 'Kitchen Item' : 'Stock Item';
+    }
+
+    stationName(stationId?: string): string {
+        return this.stations.find((station) => station.id === stationId)?.name || 'Station missing';
     }
 
     itemRouteClass(item: RestaurantMenuRouteSource): string {

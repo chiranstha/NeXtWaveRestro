@@ -94,12 +94,6 @@ export abstract class AppComponentBase implements OnDestroy, OnInit {
             this.numberfillednull = false;
         }
     }
-    get theme2Width(): string {
-        if (this.currentTheme.baseSettings.theme === 'theme2') {
-            return 'theme2Width';
-        }
-        return '';
-    }
     checkTeaxtfilled(filename, form) {
         const data = form.get(filename).value;
         if (data === '') {
@@ -117,12 +111,6 @@ export abstract class AppComponentBase implements OnDestroy, OnInit {
     get defaultContainer(): string {
         if (this.currentTheme.baseSettings.theme === 'default') {
             return 'default-container';
-        }
-        return '';
-    }
-    get theme2TableMargin(): string {
-        if (this.currentTheme.baseSettings.theme === 'theme2') {
-            return 'theme2_main_div';
         }
         return '';
     }

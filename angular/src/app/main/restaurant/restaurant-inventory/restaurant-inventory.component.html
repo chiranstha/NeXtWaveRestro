@@ -120,44 +120,15 @@
                         </div>
                     </div>
                     <div class="card-body p-0 restaurant-table-wrap table-responsive">
-                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="lowStock.length; else noLowStock">
-                            <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
-                                <tr>
-                                    <th class="align-middle text-uppercase">{{ 'Raw Material' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Available' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Min / Max' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Pending PO' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Supplier' | localize }}</th>
-                                    <th class="text-end align-middle text-uppercase">{{ 'Suggested Qty' | localize }}</th>
-                                    <th class="text-end align-middle text-uppercase">{{ 'Amount' | localize }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let item of lowStock">
-                                    <td class="align-middle">
-                                        <div class="fw-bold">{{ item.productName }}</div>
-                                        <span
-                                            class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-danger text-danger align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
-                                            *ngIf="item.missingSupplierMapping"
-                                        >
-                                            {{ 'Mapping Missing' | localize }}
-                                        </span>
-                                    </td>
-                                    <td class="align-middle">{{ item.availableQty | number: '1.2-3' }} {{ item.unitName }}</td>
-                                    <td class="align-middle">
-                                        {{ item.minimumStock | number: '1.2-3' }} /
-                                        {{ item.maximumStock | number: '1.2-3' }}
-                                    </td>
-                                    <td class="align-middle">{{ item.pendingPurchaseQty | number: '1.2-3' }}</td>
-                                    <td class="align-middle">
-                                        <div class="fw-bold">{{ item.supplierName || '-' }}</div>
-                                        <div class="restaurant-muted text-gray-600">{{ item.supplierSku || '-' }}</div>
-                                    </td>
-                                    <td class="text-end fw-bold align-middle">{{ item.suggestedQty | number: '1.2-3' }}</td>
-                                    <td class="text-end align-middle">{{ item.amount | number: '1.2-2' }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <ag-grid-angular
+                            *ngIf="lowStock.length; else noLowStock"
+                            class="ag-theme-balham restaurant-inventory-grid w-100"
+                            [columnDefs]="lowStockColumnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [rowData]="lowStock"
+                            [enableCellTextSelection]="true"
+                            [suppressCellFocus]="true"
+                        ></ag-grid-angular>
                         <ng-template #noLowStock>
                             <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'No low-stock raw materials' | localize }}</div>
                         </ng-template>
@@ -189,46 +160,15 @@
                         </div>
                     </div>
                     <div class="card-body p-0 restaurant-table-wrap table-responsive">
-                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="consumptionLedger.length; else noConsumptionLedger">
-                            <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
-                                <tr>
-                                    <th class="align-middle text-uppercase">{{ 'Date' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Bill' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Order' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Menu Item' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Raw Material' | localize }}</th>
-                                    <th class="text-end align-middle text-uppercase">{{ 'Qty' | localize }}</th>
-                                    <th class="text-end align-middle text-uppercase">{{ 'Rate' | localize }}</th>
-                                    <th class="text-end align-middle text-uppercase">{{ 'Amount' | localize }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let row of consumptionLedger">
-                                    <td class="align-middle">
-                                        <div>{{ row.date | date: 'yyyy-MM-dd' }}</div>
-                                        <div class="restaurant-muted text-gray-600">{{ row.dateMiti }}</div>
-                                    </td>
-                                    <td class="align-middle">
-                                        <div class="fw-bold text-nowrap">{{ row.salesVoucherNo || row.voucherNo || '-' }}</div>
-                                        <div
-                                            class="restaurant-muted text-gray-600 text-nowrap"
-                                            *ngIf="row.salesVoucherNo && row.voucherNo"
-                                        >
-                                            {{ 'Consumption' | localize }}: {{ row.voucherNo || '-' }}
-                                        </div>
-                                    </td>
-                                    <td class="fw-bold align-middle">{{ row.orderNo }}</td>
-                                    <td class="align-middle">
-                                        <div class="fw-bold">{{ row.menuItemName || row.menuProductName }}</div>
-                                        <div class="restaurant-muted text-gray-600">{{ row.menuProductName }}</div>
-                                    </td>
-                                    <td class="fw-bold align-middle">{{ row.rawMaterialName }}</td>
-                                    <td class="text-end align-middle">{{ row.qty | number: '1.2-3' }} {{ row.unitName }}</td>
-                                    <td class="text-end align-middle">{{ row.rate | number: '1.2-2' }}</td>
-                                    <td class="text-end fw-bold align-middle">{{ row.amount | number: '1.2-2' }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <ag-grid-angular
+                            *ngIf="consumptionLedger.length; else noConsumptionLedger"
+                            class="ag-theme-balham restaurant-inventory-grid w-100"
+                            [columnDefs]="consumptionColumnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [rowData]="consumptionLedger"
+                            [enableCellTextSelection]="true"
+                            [suppressCellFocus]="true"
+                        ></ag-grid-angular>
                         <ng-template #noConsumptionLedger>
                             <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'No raw item consumption found' | localize }}</div>
                         </ng-template>
@@ -248,38 +188,15 @@
                         </div>
                     </div>
                     <div class="card-body p-0 restaurant-table-wrap table-responsive">
-                        <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="recipeCoverage.length; else noRecipeCoverage">
-                            <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
-                                <tr>
-                                    <th class="align-middle text-uppercase">{{ 'Menu Item' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Category' | localize }}</th>
-                                    <th class="align-middle text-uppercase">{{ 'Recipe' | localize }}</th>
-                                    <th class="text-end align-middle text-uppercase">{{ 'Lines' | localize }}</th>
-                                    <th class="text-end align-middle text-uppercase">{{ 'Recipe Cost' | localize }}</th>
-                                    <th class="text-end align-middle text-uppercase">{{ 'Menu Price' | localize }}</th>
-                                    <th class="text-end align-middle text-uppercase">{{ 'Food Cost %' | localize }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let row of recipeCoverage">
-                                    <td class="align-middle">
-                                        <div class="fw-bold">{{ row.productName }}</div>
-                                        <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-danger text-danger align-items-center d-inline-flex lh-1 mw-100 text-nowrap" *ngIf="row.missingRawMaterialSetup">
-                                            {{ 'Missing Recipe' | localize }}
-                                        </span>
-                                        <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-success text-success align-items-center d-inline-flex lh-1 mw-100 text-nowrap" *ngIf="!row.missingRawMaterialSetup">
-                                            {{ 'Ready' | localize }}
-                                        </span>
-                                    </td>
-                                    <td class="align-middle">{{ row.categoryName || '-' }}</td>
-                                    <td class="align-middle">{{ row.hasRecipe ? ('BOM active' | localize) : ('No BOM' | localize) }}</td>
-                                    <td class="text-end align-middle">{{ row.activeRecipeLineCount }}</td>
-                                    <td class="text-end align-middle">{{ row.estimatedRecipeCost | number: '1.2-2' }}</td>
-                                    <td class="text-end align-middle">{{ row.menuPrice | number: '1.2-2' }}</td>
-                                    <td class="text-end fw-bold align-middle">{{ row.foodCostPercent | number: '1.2-2' }}%</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <ag-grid-angular
+                            *ngIf="recipeCoverage.length; else noRecipeCoverage"
+                            class="ag-theme-balham restaurant-inventory-grid w-100"
+                            [columnDefs]="recipeCoverageColumnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [rowData]="recipeCoverage"
+                            [enableCellTextSelection]="true"
+                            [suppressCellFocus]="true"
+                        ></ag-grid-angular>
                         <ng-template #noRecipeCoverage>
                             <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'No menu items found' | localize }}</div>
                         </ng-template>
@@ -373,52 +290,16 @@
                             <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Supplier Item Mappings' | localize }}</div>
                         </div>
                         <div class="card-body p-0 restaurant-table-wrap table-responsive">
-                            <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="mappings.length; else noMappings">
-                                <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
-                                    <tr>
-                                        <th class="align-middle text-uppercase">{{ 'Raw Material' | localize }}</th>
-                                        <th class="align-middle text-uppercase">{{ 'Supplier' | localize }}</th>
-                                        <th class="align-middle text-uppercase">{{ 'Unit' | localize }}</th>
-                                        <th class="text-end align-middle text-uppercase">{{ 'Rate' | localize }}</th>
-                                        <th class="align-middle text-uppercase">{{ 'Status' | localize }}</th>
-                                        <th class="align-middle text-uppercase"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr *ngFor="let mapping of mappings">
-                                        <td class="align-middle">
-                                            <div class="fw-bold">{{ mapping.productName }}</div>
-                                            <div class="restaurant-muted text-gray-600">{{ mapping.supplierSku || '-' }}</div>
-                                        </td>
-                                        <td class="align-middle">{{ mapping.supplierName }}</td>
-                                        <td class="align-middle">{{ mapping.unitName }}</td>
-                                        <td class="text-end align-middle">{{ mapping.rate | number: '1.2-2' }}</td>
-                                        <td class="align-middle">
-                                            <span
-                                                class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-success text-success me-1 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
-                                                *ngIf="mapping.isPreferred"
-                                            >
-                                                {{ 'Preferred' | localize }}
-                                            </span>
-                                            <span
-                                                class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
-                                                [class.bg-light-primary]="mapping.isActive" [class.text-primary]="mapping.isActive"
-                                                [class.bg-light]="!mapping.isActive" [class.text-gray-600]="!mapping.isActive"
-                                            >
-                                                {{ mapping.isActive ? ('Active' | localize) : ('Inactive' | localize) }}
-                                            </span>
-                                        </td>
-                                        <td class="text-end align-middle">
-                                            <button class="btn btn-xs btn-light-primary me-1 align-items-center d-inline-flex fs-9 justify-content-center" (click)="editMapping(mapping)">
-                                                <i class="fa fa-pencil"></i>
-                                            </button>
-                                            <button class="btn btn-xs btn-light-danger align-items-center d-inline-flex fs-9 justify-content-center" (click)="deleteMapping(mapping)">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <ag-grid-angular
+                                *ngIf="mappings.length; else noMappings"
+                                class="ag-theme-balham restaurant-inventory-grid w-100"
+                                [columnDefs]="mappingColumnDefs"
+                                [defaultColDef]="defaultColDef"
+                                [rowData]="mappings"
+                                [enableCellTextSelection]="true"
+                                [suppressCellFocus]="true"
+                                (cellClicked)="onMappingGridCellClicked($event)"
+                            ></ag-grid-angular>
                             <ng-template #noMappings>
                                 <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'NoData' | localize }}</div>
                             </ng-template>
@@ -436,7 +317,7 @@
                         <div class="restaurant-filterbar align-items-end d-flex flex-wrap gap-3 mb-4">
                             <div class="w-100 w-sm-auto">
                                 <label class="form-label">{{ 'Type' | localize }}</label>
-                                <select class="form-select w-100 w-sm-175px" [(ngModel)]="adjustmentForm.adjustmentType">
+                                <select class="form-select w-100 w-sm-175px" [(ngModel)]="adjustmentForm.adjustmentType" (ngModelChange)="onAdjustmentTypeChanged($event)">
                                     <option [ngValue]="0">{{ 'Increase' | localize }}</option>
                                     <option [ngValue]="1">{{ 'Decrease' | localize }}</option>
                                     <option [ngValue]="2">{{ 'Physical Count' | localize }}</option>
@@ -452,66 +333,15 @@
                             </div>
                         </div>
 
-                        <div class="restaurant-table-wrap table-responsive">
-                            <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100">
-                                <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
-                                    <tr>
-                                        <th class="align-middle text-uppercase">{{ 'Raw Material' | localize }}</th>
-                                        <th class="align-middle text-uppercase">{{ 'Unit' | localize }}</th>
-                                        <th class="align-middle text-uppercase">{{ 'Qty' | localize }}</th>
-                                        <th *ngIf="adjustmentForm.adjustmentType === 2" class="align-middle text-uppercase">
-                                            {{ 'Counted Qty' | localize }}
-                                        </th>
-                                        <th class="align-middle text-uppercase">{{ 'Rate' | localize }}</th>
-                                        <th class="align-middle text-uppercase">{{ 'Reason' | localize }}</th>
-                                        <th class="align-middle text-uppercase"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr *ngFor="let line of adjustmentForm.lines; let i = index">
-                                        <td class="align-middle">
-                                            <ng-select
-                                                [items]="rawMaterials"
-                                                bindLabel="displayName"
-                                                bindValue="id"
-                                                [(ngModel)]="line.productId"
-                                                appendTo="body"
-                                            ></ng-select>
-                                        </td>
-                                        <td class="align-middle">
-                                            <ng-select
-                                                [items]="units"
-                                                bindLabel="displayName"
-                                                bindValue="id"
-                                                [(ngModel)]="line.unitId"
-                                                appendTo="body"
-                                            ></ng-select>
-                                        </td>
-                                        <td class="align-middle">
-                                            <input class="form-control w-100px" type="number" [(ngModel)]="line.qty" />
-                                        </td>
-                                        <td *ngIf="adjustmentForm.adjustmentType === 2" class="align-middle">
-                                            <input
-                                                class="form-control w-125px"
-                                                type="number"
-                                                [(ngModel)]="line.countedQty"
-                                            />
-                                        </td>
-                                        <td class="align-middle">
-                                            <input class="form-control w-100px" type="number" [(ngModel)]="line.rate" />
-                                        </td>
-                                        <td class="align-middle">
-                                            <input class="form-control" [(ngModel)]="line.reason" />
-                                        </td>
-                                        <td class="text-end align-middle">
-                                            <button class="btn btn-xs btn-light-danger align-items-center d-inline-flex fs-9 justify-content-center" (click)="removeAdjustmentLine(adjustmentForm, i)">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <ag-grid-angular
+                            class="ag-theme-balham w-100"
+                            style="height: 220px"
+                            [columnDefs]="adjustmentLineColumnDefs"
+                            [defaultColDef]="adjustmentLineDefaultColDef"
+                            [rowData]="adjustmentForm.lines"
+                            [stopEditingWhenCellsLoseFocus]="true"
+                            (cellClicked)="onAdjustmentLineGridCellClicked($event, adjustmentForm)"
+                        ></ag-grid-angular>
 
                         <div class="restaurant-actionbar gap-2 restaurant-actionbar-end mt-4 align-items-center d-flex flex-wrap justify-content-start justify-content-sm-end min-w-0">
                             <button class="btn btn-sm btn-light-primary w-100 w-sm-auto" (click)="addAdjustmentLine(adjustmentForm)">
@@ -544,56 +374,15 @@
                             </div>
                         </div>
 
-                        <div class="restaurant-table-wrap table-responsive">
-                            <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100">
-                                <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
-                                    <tr>
-                                        <th class="align-middle text-uppercase">{{ 'Raw Material' | localize }}</th>
-                                        <th class="align-middle text-uppercase">{{ 'Unit' | localize }}</th>
-                                        <th class="align-middle text-uppercase">{{ 'Qty' | localize }}</th>
-                                        <th class="align-middle text-uppercase">{{ 'Rate' | localize }}</th>
-                                        <th class="align-middle text-uppercase">{{ 'Reason' | localize }}</th>
-                                        <th class="align-middle text-uppercase"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr *ngFor="let line of wastageForm.lines; let i = index">
-                                        <td class="align-middle">
-                                            <ng-select
-                                                [items]="rawMaterials"
-                                                bindLabel="displayName"
-                                                bindValue="id"
-                                                [(ngModel)]="line.productId"
-                                                appendTo="body"
-                                            ></ng-select>
-                                        </td>
-                                        <td class="align-middle">
-                                            <ng-select
-                                                [items]="units"
-                                                bindLabel="displayName"
-                                                bindValue="id"
-                                                [(ngModel)]="line.unitId"
-                                                appendTo="body"
-                                            ></ng-select>
-                                        </td>
-                                        <td class="align-middle">
-                                            <input class="form-control w-100px" type="number" [(ngModel)]="line.qty" />
-                                        </td>
-                                        <td class="align-middle">
-                                            <input class="form-control w-100px" type="number" [(ngModel)]="line.rate" />
-                                        </td>
-                                        <td class="align-middle">
-                                            <input class="form-control" [(ngModel)]="line.reason" />
-                                        </td>
-                                        <td class="text-end align-middle">
-                                            <button class="btn btn-xs btn-light-danger align-items-center d-inline-flex fs-9 justify-content-center" (click)="removeAdjustmentLine(wastageForm, i)">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <ag-grid-angular
+                            class="ag-theme-balham w-100"
+                            style="height: 220px"
+                            [columnDefs]="wastageLineColumnDefs"
+                            [defaultColDef]="adjustmentLineDefaultColDef"
+                            [rowData]="wastageForm.lines"
+                            [stopEditingWhenCellsLoseFocus]="true"
+                            (cellClicked)="onAdjustmentLineGridCellClicked($event, wastageForm)"
+                        ></ag-grid-angular>
 
                         <div class="restaurant-actionbar gap-2 restaurant-actionbar-end mt-4 align-items-center d-flex flex-wrap justify-content-start justify-content-sm-end min-w-0">
                             <button class="btn btn-sm btn-light-primary w-100 w-sm-auto" (click)="addAdjustmentLine(wastageForm)">
@@ -621,28 +410,15 @@
                     </div>
                 </div>
                 <div class="card-body p-0 restaurant-table-wrap table-responsive">
-                    <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="adjustments.length; else noAdjustments">
-                        <thead class="align-middle fw-bold table-light text-gray-600 text-uppercase">
-                            <tr>
-                                <th class="align-middle text-uppercase">{{ 'Voucher' | localize }}</th>
-                                <th class="align-middle text-uppercase">{{ 'Date' | localize }}</th>
-                                <th class="align-middle text-uppercase">{{ 'Type' | localize }}</th>
-                                <th class="align-middle text-uppercase">{{ 'User' | localize }}</th>
-                                <th class="align-middle text-uppercase">{{ 'Lines' | localize }}</th>
-                                <th class="text-end align-middle text-uppercase">{{ 'Amount' | localize }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let adjustment of adjustments">
-                                <td class="fw-bold align-middle">{{ adjustment.voucherNo }}</td>
-                                <td class="align-middle">{{ adjustment.dateMiti || '-' }}</td>
-                                <td class="align-middle">{{ adjustmentTypeText(adjustment.adjustmentType) }}</td>
-                                <td class="align-middle">{{ adjustment.createUserName || '-' }}</td>
-                                <td class="align-middle">{{ adjustment.lines?.length || 0 }}</td>
-                                <td class="text-end align-middle">{{ adjustment.totalAmount | number: '1.2-2' }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <ag-grid-angular
+                        *ngIf="adjustments.length; else noAdjustments"
+                        class="ag-theme-balham restaurant-inventory-grid w-100"
+                        [columnDefs]="adjustmentColumnDefs"
+                        [defaultColDef]="defaultColDef"
+                        [rowData]="adjustments"
+                        [enableCellTextSelection]="true"
+                        [suppressCellFocus]="true"
+                    ></ag-grid-angular>
                     <ng-template #noAdjustments>
                         <div class="restaurant-empty border border-dashed border-gray-300 p-4 rounded-3 text-gray-600 m-5 text-center">{{ 'NoData' | localize }}</div>
                     </ng-template>

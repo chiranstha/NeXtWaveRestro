@@ -18,6 +18,8 @@ namespace NextWave.Erp.Restaurant
         public bool IsDeleted { get; set; }
         public Guid AreaId { get; set; }
         [ForeignKey("AreaId")] public RestaurantArea AreaFk { get; set; }
+        [StringLength(64)] public string QrTokenHash { get; set; }
+        public DateTime? QrTokenUpdatedAt { get; set; }
         public int? TenantId { get; set; }
     }
 }

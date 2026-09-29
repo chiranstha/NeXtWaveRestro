@@ -1,3 +1,62 @@
+@if (isLoginPage()) {
+    <div class="account-login-shell">
+        <aside class="account-story" aria-label="About Nextwave Restro">
+            <a href="/" class="account-brand">
+                <span class="brand-mark"><img src="/assets/common/images/applogo.png" alt="" /></span>
+                <span class="brand-name">Nextwave<span>RESTRO</span></span>
+            </a>
+
+            <div class="story-eyebrow"><span></span> RESTAURANT OPERATIONS, CONNECTED</div>
+
+            <div class="story-body">
+                <h1><span class="story-headline-line">Great service. Even better</span><em>experiences.</em></h1>
+                <p class="story-description">
+                    Bring orders, kitchen flow, staff, inventory and sales together. Make every shift easier to run.
+                </p>
+
+                <div class="restaurant-network" aria-hidden="true">
+                    <div class="network-trunk"></div>
+                    <div class="network-hub"><i class="fas fa-utensils"></i></div>
+                    <div class="network-feature feature-orders"><i class="fas fa-receipt"></i><span>Orders &amp; Billing</span></div>
+                    <div class="network-feature feature-kitchen"><i class="fas fa-fire-burner"></i><span>Kitchen Display</span></div>
+                    <div class="network-feature feature-tables"><i class="fas fa-chair"></i><span>Tables &amp; Service</span></div>
+                    <div class="network-feature feature-inventory"><i class="fas fa-boxes-stacked"></i><span>Stock &amp; Recipes</span></div>
+                    <div class="network-feature feature-staff"><i class="fas fa-users"></i><span>Staff &amp; Shifts</span></div>
+                    <div class="network-feature feature-reports"><i class="fas fa-chart-line"></i><span>Sales Insights</span></div>
+                    <div class="network-feature feature-customers"><i class="fas fa-user-group"></i><span>Guest Experience</span></div>
+                    <div class="network-feature feature-delivery"><i class="fas fa-motorcycle"></i><span>Takeaway &amp; Delivery</span></div>
+                </div>
+                <span class="visual-caption">ONE RESTAURANT. EVERY CONNECTION.</span>
+            </div>
+
+            <div class="story-footer">
+                <span class="story-footer-mark"><i class="fas fa-layer-group" aria-hidden="true"></i></span>
+                <span>Serve. Simplify. Grow.<small>Your next service starts here.</small></span>
+            </div>
+        </aside>
+
+        <main class="account-main">
+            <header class="account-topbar">
+                <a href="/" class="mobile-brand">
+                    <img src="/assets/common/images/applogo.png" alt="" />
+                    <span>Nextwave<span>RESTRO</span></span>
+                </a>
+            </header>
+
+            <div class="account-content account-content-login">
+                <div class="account-card account-card-login">
+                    <div class="account-language"><language-switch></language-switch></div>
+                    <router-outlet></router-outlet>
+                </div>
+            </div>
+
+            <footer class="account-footer">
+                <span>&copy; {{ currentYear }} Nextwave Restro</span>
+                <span>Built for better service.</span>
+            </footer>
+        </main>
+    </div>
+} @else {
 <div class="nextwave-login-register" id="main-wrapper">
     <div class="container-fluid px-0">
         <div class="row g-0 min-vh-100">
@@ -158,3 +217,4 @@
         </div>
     </div>
 </div>
+}

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="de">
   <texts>
     <text name="HomePage">Startseite</text>
@@ -856,17 +856,8 @@
     <text name="RecurringSubscriptionUpgradeNote">Die Preis-Differenz zwischen Ihrer aktuellen und der von Ihnen aktualisierten Edition wird von Ihrem Konto abgebucht.</text>
     <text name="Theme_Default">Standard</text>
     <text name="Theme_Theme1">Theme 1</text>
-    <text name="Theme_Theme2">Theme 2</text>
-    <text name="Theme_Theme3">Theme 3</text>
-    <text name="Theme_Theme4">Theme 4</text>
-    <text name="Theme_Theme5">Theme 5</text>
-    <text name="Theme_Theme6">Theme 6</text>
-    <text name="Theme_Theme7">Theme 7</text>
     <text name="Theme_Theme8">Theme 8</text>
-    <text name="Theme_Theme9">Theme 9</text>
-    <text name="Theme_Theme10">Theme 10</text>
     <text name="Theme_Theme11">Theme 11</text>
-    <text name="Theme_Theme12">Theme 12</text>
     <text name="SelectATheme">Wählen Sie ein Theme</text>
     <text name="QuickThemeSelection">Theme-Schnellwahl</text>
     <text name="IsQuickThemeSelectEnabled">Theme-Schnellwahl aktivieren</text>
@@ -1159,7 +1150,6 @@
     <text name="YourPlan">Ihr Plan</text>
     <text name="WebhookPageInfo">Webhooks ermöglichen es, externe Dienste zu benachrichtigen, wenn bestimmte Ereignisse eintreten. Wenn die angegebenen Ereignisse eintreten, senden wir eine POST-Anforderung an jede der von Ihnen angegebenen URLs.</text>
     <text name="UiCustomization_DarkMode">Dark Mode</text>
-    <text name="Theme_Theme13">Theme 13</text>
     <text name="EnableCheckingLastXPasswordWhenPasswordChangeSettingLabel">Verhindert, dass das neue Kennwort des Benutzers mit einem der letzten x Kennwörter identisch ist</text>
     <text name="CheckingLastXPasswordCountSettingLabel">Das neue Passwort des Benutzers muss sich von wie vielen letzten Passwörtern unterscheiden?</text>
     <text name="NewPasswordMustBeDifferentThenLastXPassword">Das neue Passwort muss anders sein als die letzten {0} Passwörter</text>

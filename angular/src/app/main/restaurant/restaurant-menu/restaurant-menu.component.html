@@ -2,7 +2,7 @@
     <restaurant-styles></restaurant-styles>
     <sub-header [title]="'Restaurant Menu' | localize">
         <div role="actions">
-            <button class="btn btn-sm btn-primary me-2" (click)="resetMenuItem()" tooltip="{{ 'New' | localize }}">
+            <button *ngIf="!wizardOpen" class="btn btn-sm btn-primary me-2" (click)="resetMenuItem()" tooltip="{{ 'New' | localize }}">
                 <i class="fa fa-plus"></i>
                 {{ 'New Item' | localize }}
             </button>
@@ -18,116 +18,29 @@
     </sub-header>
 
     <div [class]="containerClass">
-        <div class="restaurant-page overflow-x-hidden gap-5 mw-100 d-grid min-w-0">
-            <div class="restaurant-nav align-items-center bg-white border border-gray-300 d-flex gap-2 overflow-x-auto p-2 rounded-3">
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/pos" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-cash-register"></i>
-                    {{ 'POS' | localize }}
-                </a>
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/setup" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-sliders"></i>
-                    {{ 'Setup' | localize }}
-                </a>
-                <a class="restaurant-nav-link active bg-hover-light bg-light-primary flex-shrink-0 text-gray-600 text-hover-dark text-primary align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/menu">
-                    <i class="fa fa-utensils"></i>
-                    {{ 'Menu' | localize }}
-                </a>
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/inventory" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-boxes-stacked"></i>
-                    {{ 'Inventory' | localize }}
-                </a>
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/channels" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-store"></i>
-                    {{ 'Channels' | localize }}
-                </a>
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/kds" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-tv"></i>
-                    {{ 'KDS' | localize }}
-                </a>
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/reports" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-chart-line"></i>
-                    {{ 'Reports' | localize }}
-                </a>
-                <a *ngIf="isGranted('Pages.Restaurant.Payroll')" class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/payroll" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-money-check-dollar"></i>
-                    {{ 'Payroll' | localize }}
-                </a>
-            </div>
-
-            <div class="restaurant-metric-row d-grid gap-4">
-                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
-                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Categories' | localize }}</span>
-                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ categories.length }}</span>
-                </div>
-                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
-                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Menu Items' | localize }}</span>
-                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ menuItems.length }}</span>
-                </div>
-                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
-                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Kitchen Items' | localize }}</span>
-                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ kitchenItemCount }}</span>
-                </div>
-                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
-                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Stock Items' | localize }}</span>
-                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ stockItemCount }}</span>
-                </div>
-                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
-                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Visible' | localize }}</span>
-                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ visibleItemCount }}</span>
-                </div>
-                <div class="restaurant-metric bg-white border border-gray-300 min-w-0 px-5 py-4 rounded-3">
-                    <span class="restaurant-metric-label fs-9 d-block fw-bold lh-sm text-gray-600 text-uppercase">{{ 'Needs Attention' | localize }}</span>
-                    <span class="restaurant-metric-value fs-3 d-block fw-bolder lh-sm mt-1 text-gray-900">{{ soldOutCount + inactiveItemCount }}</span>
-                    <span class="restaurant-muted text-gray-600 small">
-                        {{ soldOutCount }} {{ 'Sold Out' | localize }} / {{ inactiveItemCount }} {{ 'Inactive' | localize }}
-                    </span>
-                </div>
-            </div>
-
-            <div class="restaurant-command-panel align-items-stretch align-items-lg-center bg-white border border-gray-300 d-flex flex-column flex-lg-row gap-3 justify-content-between min-w-0 p-3 rounded-3">
-                <div class="restaurant-command-main align-items-stretch align-items-lg-center d-grid d-lg-flex flex-grow-1 gap-4 justify-content-between min-w-0">
-                    <div class="min-w-0">
-                        <div class="restaurant-section-title fw-bolder text-gray-900 fs-7 lh-sm m-0">
-                            {{ selectedMenuItem?.displayName || ('Select or create a menu item' | localize) }}
-                        </div>
-                        <div class="restaurant-muted text-gray-600">
-                            {{ activeItemCount }} {{ 'active items' | localize }} / {{ featuredCount }} {{ 'featured' | localize }}
-                            <span *ngIf="selectedMenuItem">
-                                / {{ selectedMenuItem.categoryName }} / {{ itemRouteText(selectedMenuItem) | localize }}
-                            </span>
-                        </div>
+        <div class="restaurant-page restaurant-menu-page overflow-x-hidden gap-5 mw-100 d-grid min-w-0">
+            <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0 p-3" *ngIf="wizardOpen">
+                <div class="d-flex flex-column flex-lg-row gap-3 justify-content-between align-items-lg-center mb-3">
+                    <div>
+                        <div class="fw-bolder fs-5 text-gray-900">{{ itemForm.id ? ('Configure menu item' | localize) : ('Create menu item' | localize) }}</div>
+                        <div class="text-gray-600">{{ itemForm.displayName || ('Complete each step to configure this item' | localize) }}</div>
                     </div>
-                    <div class="restaurant-actionbar gap-2 align-items-center d-flex flex-wrap min-w-0">
-                        <span
-                            class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
-                            [ngClass]="selectedMenuItem?.isAvailable === false ? 'bg-light-danger text-danger' : 'bg-light-success text-success'"
-                            *ngIf="selectedMenuItem"
-                        >
-                            {{ selectedMenuItem.isAvailable === false ? ('Sold Out' | localize) : ('Available' | localize) }}
-                        </span>
-                        <span
-                            class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
-                            [ngClass]="selectedMenuItem?.isActive === false ? 'bg-light text-gray-600' : 'bg-light-primary text-primary'"
-                            *ngIf="selectedMenuItem"
-                        >
-                            {{ selectedMenuItem.isActive === false ? ('Inactive' | localize) : ('Active' | localize) }}
-                        </span>
-                    </div>
+                    <button class="btn btn-sm btn-light" (click)="finishWizard()"><i class="fa fa-arrow-left me-1"></i>{{ 'Back to menu' | localize }}</button>
                 </div>
-                <div class="restaurant-actionbar gap-2 restaurant-actionbar-end align-items-center d-flex flex-wrap justify-content-start justify-content-sm-end min-w-0">
-                    <button class="btn btn-sm btn-light" (click)="clearFilters()">
-                        <i class="fa fa-filter-circle-xmark"></i>
-                        {{ 'Clear Filters' | localize }}
-                    </button>
-                    <button class="btn btn-sm btn-light-primary" (click)="resetMenuItem()">
-                        <i class="fa fa-plus"></i>
-                        {{ 'New Item' | localize }}
+                <div class="d-flex flex-wrap gap-2" aria-label="Menu item setup steps">
+                    <button *ngFor="let step of wizardSteps" type="button" class="btn btn-sm"
+                        [class.btn-primary]="wizardStep === step.number"
+                        [class.btn-light-success]="wizardStep > step.number"
+                        [class.btn-light]="wizardStep < step.number"
+                        [disabled]="step.number > wizardStep"
+                        (click)="goToWizardStep(step.number)">
+                        <span class="me-1">{{ step.number }}.</span>{{ step.label }}
                     </button>
                 </div>
             </div>
 
-            <div class="restaurant-grid-3 d-grid gap-5">
-                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+            <div class="d-grid gap-5" [class.restaurant-grid-2]="!wizardOpen && categoriesExpanded" [style.grid-template-columns]="!wizardOpen && !categoriesExpanded ? 'minmax(0, 1fr)' : null">
+                <div class="card card-custom gutter-b restaurant-card restaurant-menu-categories bg-white border border-gray-300 rounded-3 shadow-sm min-w-0" *ngIf="!wizardOpen && categoriesExpanded">
                     <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
                         <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Categories' | localize }}</div>
                     </div>
@@ -220,19 +133,36 @@
                     </div>
                 </div>
 
-                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                <div class="card card-custom gutter-b restaurant-card restaurant-menu-list-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0" *ngIf="!wizardOpen">
                     <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
-                        <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Menu Items' | localize }}</div>
+                        <div class="restaurant-menu-list-heading d-flex align-items-center gap-3">
+                            <div class="restaurant-menu-heading-icon"><i class="fa fa-utensils"></i></div>
+                            <div>
+                                <div class="card-title fw-bolder text-gray-900 fs-6 lh-sm m-0">{{ 'Menu Items' | localize }}</div>
+                                <div class="restaurant-menu-list-count">{{ filteredMenuItems.length }} {{ 'of' | localize }} {{ menuItems.length }} {{ 'items' | localize }}</div>
+                            </div>
+                        </div>
+                        <div class="restaurant-menu-header-actions d-flex gap-2">
+                            <button class="btn btn-sm btn-light restaurant-menu-secondary-action" (click)="categoriesExpanded = !categoriesExpanded">
+                                <i class="fa fa-layer-group me-1"></i>{{ categoriesExpanded ? ('Hide categories' | localize) : ('Manage categories' | localize) }}
+                            </button>
+                            <button class="btn btn-sm btn-light restaurant-menu-secondary-action" (click)="clearFilters()" *ngIf="menuSearch || categoryFilterId || stationFilterId || routeFilter">
+                                <i class="fa fa-filter-circle-xmark me-1"></i>{{ 'Clear filters' | localize }}
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body p-2">
-                        <div class="restaurant-filterbar align-items-end d-flex flex-wrap gap-3 mb-4">
-                            <input
-                                class="form-control flex-grow-1 min-w-200px"
-                                [(ngModel)]="menuSearch"
-                                placeholder="{{ 'Search' | localize }}"
-                            />
+                        <div class="restaurant-filterbar restaurant-menu-filterbar align-items-end d-flex flex-wrap gap-3 mb-4">
+                            <div class="restaurant-menu-search-wrap flex-grow-1 min-w-200px">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                                <input
+                                    class="form-control restaurant-menu-search"
+                                    [(ngModel)]="menuSearch"
+                                    placeholder="{{ 'Search menu items' | localize }}"
+                                />
+                            </div>
                             <ng-select
-                                class="w-100 w-sm-175px"
+                                class="restaurant-menu-category-filter w-100 w-sm-175px"
                                 [items]="categories"
                                 bindLabel="name"
                                 bindValue="id"
@@ -241,21 +171,26 @@
                                 placeholder="{{ 'Category' | localize }}"
                                 appendTo="body"
                             ></ng-select>
-                            <ng-select
-                                class="w-100 w-sm-175px"
-                                [items]="stations"
-                                bindLabel="name"
-                                bindValue="id"
-                                [(ngModel)]="stationFilterId"
-                                [clearable]="true"
-                                placeholder="{{ 'Station' | localize }}"
-                                appendTo="body"
-                            ></ng-select>
-                            <select class="form-select w-100 w-sm-150px" [(ngModel)]="routeFilter">
-                                <option value="">{{ 'All Types' | localize }}</option>
-                                <option value="kitchen">{{ 'Kitchen Item' | localize }}</option>
-                                <option value="stock">{{ 'Stock Item' | localize }}</option>
-                            </select>
+                            <button class="btn btn-sm btn-light restaurant-menu-secondary-action" (click)="showAdvancedFilters = !showAdvancedFilters">
+                                <i class="fa fa-sliders me-1"></i>{{ showAdvancedFilters ? ('Fewer filters' | localize) : ('More filters' | localize) }}
+                            </button>
+                            <ng-container *ngIf="showAdvancedFilters">
+                                <ng-select
+                                    class="w-100 w-sm-175px"
+                                    [items]="stations"
+                                    bindLabel="name"
+                                    bindValue="id"
+                                    [(ngModel)]="stationFilterId"
+                                    [clearable]="true"
+                                    placeholder="{{ 'Station' | localize }}"
+                                    appendTo="body"
+                                ></ng-select>
+                                <select class="form-select w-100 w-sm-150px" [(ngModel)]="routeFilter">
+                                    <option value="">{{ 'All Types' | localize }}</option>
+                                    <option value="kitchen">{{ 'Kitchen Item' | localize }}</option>
+                                    <option value="stock">{{ 'Stock Item' | localize }}</option>
+                                </select>
+                            </ng-container>
                         </div>
 
                         <div class="restaurant-scroll mh-500px restaurant-table-wrap overflow-x-auto overflow-auto">
@@ -271,17 +206,17 @@
                                 </thead>
                                 <tbody>
                                     <tr
-                                        class="restaurant-click-row cursor-pointer"
+                                        class="restaurant-click-row restaurant-menu-row cursor-pointer"
                                         *ngFor="let item of filteredMenuItems"
                                         (click)="editMenuItem(item)"
                                     >
                                         <td class="align-middle">
-                                            <div class="fw-bold">{{ item.displayName }}</div>
+                                            <div class="restaurant-menu-item-name fw-bold">{{ item.displayName }}</div>
                                             <div class="restaurant-muted text-gray-600">
                                                 {{ item.shortCode || '-' }} / {{ item.categoryName }} /
                                                 {{ productTypeText(item.productType) }}
                                             </div>
-                                            <div class="restaurant-actionbar gap-2 mt-2 align-items-center d-flex flex-wrap min-w-0">
+                                            <div class="restaurant-actionbar restaurant-menu-tags gap-2 mt-2 align-items-center d-flex flex-wrap min-w-0">
                                                 <span
                                                     class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 bg-light-danger text-danger align-items-center d-inline-flex lh-1 mw-100 text-nowrap"
                                                     *ngIf="!item.isAvailable"
@@ -322,7 +257,7 @@
                                             </span>
                                         </td>
                                         <td class="text-end fw-bold align-middle">{{ item.price | number: '1.2-2' }}</td>
-                                        <td class="text-end align-middle">
+                                        <td class="restaurant-menu-actions text-end align-middle">
                                             <button
                                                 class="btn btn-xs me-1 align-items-center d-inline-flex fs-9 justify-content-center"
                                                 [class.btn-light-success]="!item.isAvailable"
@@ -366,7 +301,7 @@
                                             </button>
                                             <button
                                                 class="btn btn-xs btn-light-success align-items-center d-inline-flex fs-9 justify-content-center"
-                                                (click)="$event.stopPropagation(); loadRecipe(item)"
+                                                (click)="$event.stopPropagation(); openRecipe(item)"
                                                 tooltip="{{ 'Recipe' | localize }}"
                                             >
                                                 <i class="fa fa-list"></i>
@@ -382,7 +317,7 @@
                     </div>
                 </div>
 
-                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0" *ngIf="wizardOpen" [style.grid-column]="wizardOpen ? '1 / -1' : null">
                     <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
                         <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">
                             {{ itemForm.id ? ('Edit Menu Item' | localize) : ('New Menu Item' | localize) }}
@@ -478,6 +413,7 @@
                             ></ng-select>
                             <div class="alert alert-warning py-2 mt-2 mb-0" *ngIf="!itemForm.stationId">
                                 {{ 'Station required for KOT/BOT' | localize }}
+                                <button type="button" class="btn btn-sm btn-link p-0 ms-2" (click)="navigateToPrerequisite('/app/main/restaurant/setup', { section: 'stations' })">{{ 'Set up a station' | localize }}</button>
                             </div>
                         </div>
                         <div class="alert alert-success py-2 mb-3" *ngIf="itemForm.itemRoute === 'stock'">
@@ -553,19 +489,31 @@
                             </label>
                         </div>
                         <div class="restaurant-actionbar gap-2 restaurant-actionbar-end align-items-center d-flex flex-wrap justify-content-start justify-content-sm-end min-w-0">
-                            <button class="btn btn-sm btn-light" (click)="resetMenuItem()">
-                                {{ 'Clear' | localize }}
+                            <div class="alert alert-warning w-100 py-2 mb-0" *ngIf="!itemForm.categoryId || !itemForm.productId || !itemForm.displayName">
+                                {{ 'Choose a category and product, then enter a display name before continuing.' | localize }}
+                            </div>
+                            <button class="btn btn-sm btn-light" (click)="finishWizard()">
+                                {{ 'Cancel' | localize }}
                             </button>
-                            <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="saveMenuItem()">
-                                <i class="fa fa-save"></i>
-                                {{ itemForm.id ? ('Update' | localize) : ('Save' | localize) }}
+                            <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="saveMenuItem(true)">
+                                <i class="fa fa-arrow-right"></i>
+                                {{ 'Save & continue' | localize }}
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="restaurant-grid-3 d-grid gap-5" *ngIf="selectedMenuItem">
+            <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0 p-4" *ngIf="selectedMenuItem && wizardOpen && wizardStep === 2 && itemForm.itemRoute === 'stock'">
+                <div class="fw-bolder fs-5 mb-2">{{ 'Recipe not needed for stock items' | localize }}</div>
+                <div class="text-gray-600 mb-4">{{ 'Stock items are sold directly and do not use a kitchen recipe.' | localize }}</div>
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-sm btn-light" (click)="goToWizardStep(1)">{{ 'Back' | localize }}</button>
+                    <button class="btn btn-sm btn-primary" (click)="continueFromRecipe()">{{ 'Continue' | localize }} <i class="fa fa-arrow-right ms-1"></i></button>
+                </div>
+            </div>
+
+            <div class="restaurant-grid-3 d-grid gap-5" *ngIf="selectedMenuItem && wizardOpen && wizardStep === 3">
                 <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
                     <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
                         <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Variants' | localize }}</div>
@@ -838,9 +786,16 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0 p-3" style="grid-column: 1 / -1">
+                    <div class="d-flex flex-wrap gap-2 justify-content-between">
+                        <button class="btn btn-sm btn-light" (click)="goToWizardStep(2)">{{ 'Back' | localize }}</button>
+                        <button class="btn btn-sm btn-primary" (click)="wizardStep = 4">{{ 'Review item' | localize }} <i class="fa fa-arrow-right ms-1"></i></button>
+                    </div>
+                </div>
             </div>
 
-            <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0" *ngIf="selectedMenuItem">
+            <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0" *ngIf="selectedMenuItem && wizardOpen && wizardStep === 2 && itemForm.itemRoute === 'kitchen'">
                 <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
                     <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">
                         {{ selectedMenuItem.displayName }} {{ 'Recipe' | localize }}
@@ -872,6 +827,10 @@
                             <i class="fa fa-plus"></i>
                         </button>
                     </div>
+                </div>
+                <div class="alert alert-info mx-3 mt-3 mb-0" *ngIf="!rawMaterials.length">
+                    {{ 'No raw materials are available for recipes yet.' | localize }}
+                    <button type="button" class="btn btn-sm btn-link p-0 ms-2" (click)="navigateToPrerequisite('/app/main/inventory/products/add', { productType: 'rawMaterial' })">{{ 'Add raw materials' | localize }}</button>
                 </div>
                 <div class="restaurant-cost-strip bg-light border-bottom border-gray-200 d-flex flex-wrap gap-2 p-3" *ngIf="recipeCost">
                     <div class="bg-white border border-gray-200 d-grid flex-fill gap-1 min-w-125px px-3 py-2 rounded-3">
@@ -957,10 +916,32 @@
                         <i class="fa fa-plus"></i>
                         {{ 'Add' | localize }}
                     </button>
-                    <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="saveRecipe()">
+                    <button class="btn btn-sm btn-light" (click)="goToWizardStep(1)">{{ 'Back' | localize }}</button>
+                    <button class="btn btn-sm btn-light" (click)="wizardStep = 3">{{ 'Skip recipe' | localize }}</button>
+                    <button class="btn btn-sm btn-primary" [buttonBusy]="saving" (click)="continueFromRecipe()">
                         <i class="fa fa-save"></i>
-                        {{ 'Save' | localize }}
+                        {{ recipeLines.length ? ('Save & continue' | localize) : ('Continue' | localize) }}
                     </button>
+                </div>
+            </div>
+
+            <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0 p-4" *ngIf="selectedMenuItem && wizardOpen && wizardStep === 4">
+                <div class="fw-bolder fs-5 text-gray-900 mb-3">{{ 'Review menu item' | localize }}</div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6"><strong>{{ 'Item' | localize }}</strong><div>{{ itemForm.displayName }} <span class="text-gray-600">/ {{ selectedMenuItem.categoryName }}</span></div></div>
+                    <div class="col-md-6"><strong>{{ 'Selling price' | localize }}</strong><div>{{ itemForm.price | number: '1.2-2' }}</div></div>
+                    <div class="col-md-6"><strong>{{ 'Route' | localize }}</strong><div>{{ itemRouteText(itemForm) | localize }}<span *ngIf="itemForm.itemRoute === 'kitchen'"> / {{ stationName(itemForm.stationId) | localize }}</span></div></div>
+                    <div class="col-md-6"><strong>{{ 'Recipe' | localize }}</strong><div>{{ itemForm.itemRoute === 'stock' ? ('Not needed for stock items' | localize) : (recipeLines.length ? recipeLines.length + ' ' + ('ingredients' | localize) : ('No recipe configured' | localize)) }}</div></div>
+                    <div class="col-md-6"><strong>{{ 'Options' | localize }}</strong><div>{{ (selectedMenuItem.variants?.length || 0) }} {{ 'variants' | localize }} / {{ assignedModifierGroupCount }} {{ 'modifier groups' | localize }}</div></div>
+                    <div class="col-md-6"><strong>{{ 'Availability' | localize }}</strong><div>{{ selectedMenuItem.isAvailable ? ('Available' | localize) : ('Sold Out' | localize) }} / {{ selectedMenuItem.isActive ? ('Active' | localize) : ('Inactive' | localize) }}</div></div>
+                </div>
+                <div class="alert alert-info d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <span>{{ 'Channel-specific prices and online availability are managed in Channels.' | localize }}</span>
+                    <button class="btn btn-sm btn-light-primary" (click)="navigateToPrerequisite('/app/main/restaurant/channels', { tab: 'mapping', menuItemId: selectedMenuItem.id })"><i class="fa fa-store me-1"></i>{{ 'Configure sales channels' | localize }}</button>
+                </div>
+                <div class="d-flex flex-wrap justify-content-between">
+                    <button class="btn btn-sm btn-light" (click)="goToWizardStep(3)">{{ 'Back' | localize }}</button>
+                    <button class="btn btn-sm btn-primary" (click)="finishWizard()"><i class="fa fa-check me-1"></i>{{ 'Finish' | localize }}</button>
                 </div>
             </div>
         </div>

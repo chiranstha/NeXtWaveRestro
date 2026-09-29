@@ -37,7 +37,6 @@
     }
 
     toggleLeftMenuHideMode($('#DefaultMenu').find('form'));
-    toggleLeftMenuHideMode($('#Theme12Menu').find('form'));
 
     $('#SaveSettingsButton').click(function () {
       var activeThemeTab = $('#metronicThemes').find('.tab-pane.theme-selection.active')[0];

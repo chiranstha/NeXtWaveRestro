@@ -17,7 +17,10 @@ export class ThemeSelectionPanelComponent extends AppComponentBase implements On
     currentThemeName = '';
 
     ngOnInit() {
-        this.currentThemeName = this.currentTheme.baseSettings.theme;
+        const configuredTheme = this.currentTheme.baseSettings.theme;
+        this.currentThemeName = ['default', 'theme8', 'theme11'].includes(configuredTheme)
+            ? configuredTheme
+            : 'default';
     }
     getLocalizedThemeName(str: string): string {
         return this.l(`Theme_${abp.utils.toPascalCase(str)}`);

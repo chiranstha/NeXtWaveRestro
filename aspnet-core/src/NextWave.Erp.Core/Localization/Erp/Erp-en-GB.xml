@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en-GB">
   <texts>
     <text name="HomePage">Home page</text>
@@ -840,17 +840,8 @@
     <text name="RecurringSubscriptionUpgradeNote">The price difference between your current edition and the one you are upgrading will be charged from your account.</text>
     <text name="Theme_Default">Default</text>
     <text name="Theme_Theme1">Theme 1</text>
-    <text name="Theme_Theme2">Theme 2</text>
-    <text name="Theme_Theme3">Theme 3</text>
-    <text name="Theme_Theme4">Theme 4</text>
-    <text name="Theme_Theme5">Theme 5</text>
-    <text name="Theme_Theme6">Theme 6</text>
-    <text name="Theme_Theme7">Theme 7</text>
     <text name="Theme_Theme8">Theme 8</text>
-    <text name="Theme_Theme9">Theme 9</text>
-    <text name="Theme_Theme10">Theme 10</text>
     <text name="Theme_Theme11">Theme 11</text>
-    <text name="Theme_Theme12">Theme 12</text>
     <text name="SelectATheme">Select a Theme</text>
     <text name="QuickThemeSelection">Quick theme selection</text>
     <text name="IsQuickThemeSelectEnabled">Is quick theme select enabled</text>

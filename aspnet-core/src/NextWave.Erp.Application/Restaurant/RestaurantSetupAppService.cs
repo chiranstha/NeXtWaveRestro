@@ -260,9 +260,7 @@ namespace NextWave.Erp.Restaurant
                 RequireManagerPinForSensitiveActions = await GetBoolSetting(
                     AppSettings.ErpSettings.RestaurantRequireManagerPinForSensitiveActions,
                     tenantId),
-                ManagerPin = await SettingManager.GetSettingValueForTenantAsync(
-                    AppSettings.ErpSettings.RestaurantManagerPin,
-                    tenantId),
+                ManagerPin = string.Empty,
                 NegativeStockStatus = await SettingManager.GetSettingValueForTenantAsync(
                     AppSettings.ErpSettings.NegativeStockStatus,
                     tenantId),
@@ -300,10 +298,17 @@ namespace NextWave.Erp.Restaurant
                 tenantId,
                 AppSettings.ErpSettings.RestaurantRequireManagerPinForSensitiveActions,
                 input.RequireManagerPinForSensitiveActions.ToString().ToLowerInvariant());
-            await SettingManager.ChangeSettingForTenantAsync(
-                tenantId,
-                AppSettings.ErpSettings.RestaurantManagerPin,
-                input.ManagerPin?.Trim() ?? "");
+            if (!string.IsNullOrWhiteSpace(input.ManagerPin))
+            {
+                var pin = input.ManagerPin.Trim();
+                if (pin.Length is < 4 or > 12 || pin.Any(character => !char.IsDigit(character)))
+                    throw new UserFriendlyException("Manager PIN must contain 4 to 12 digits");
+
+                await SettingManager.ChangeSettingForTenantAsync(
+                    tenantId,
+                    AppSettings.ErpSettings.RestaurantManagerPin,
+                    RestaurantPinHasher.Hash(pin));
+            }
             await SettingManager.ChangeSettingForTenantAsync(
                 tenantId,
                 AppSettings.ErpSettings.NegativeStockStatus,

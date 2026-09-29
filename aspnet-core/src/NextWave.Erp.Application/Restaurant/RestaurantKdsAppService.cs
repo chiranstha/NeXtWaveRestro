@@ -127,6 +127,76 @@ namespace NextWave.Erp.Restaurant
                 (RestaurantSyncEntityType.OrderItem, ticketItem.OrderItemId, new { ticketItem.TicketFk.OrderId, ticketItem.Status }, RestaurantSyncOperation.Upsert));
         }
 
+        public async Task<BulkUpdateRestaurantTicketItemStatusResultDto> UpdateTicketItemStatuses(BulkUpdateRestaurantTicketItemStatusDto input)
+        {
+            if (input.Status is not (RestaurantOrderItemStatus.Preparing or RestaurantOrderItemStatus.Ready or RestaurantOrderItemStatus.Served))
+                throw new UserFriendlyException("Only Start, Ready, and Served bulk updates are supported");
+
+            var requestedIds = (input.TicketItemIds ?? new List<Guid>()).Where(id => id != Guid.Empty).Distinct().ToList();
+            if (requestedIds.Count == 0)
+                return new BulkUpdateRestaurantTicketItemStatusResultDto();
+
+            var ticketItems = await ticketItemRepository.GetAll()
+                .Include(x => x.TicketFk)
+                .Where(x => x.TenantId == AbpSession.TenantId && requestedIds.Contains(x.Id))
+                .ToListAsync();
+
+            var updatedItems = new List<RestaurantTicketItem>();
+            var changes = new List<(RestaurantSyncEntityType EntityType, Guid EntityId, object Payload, RestaurantSyncOperation Operation)>();
+            var orderIds = new HashSet<Guid>();
+            var ticketIds = new HashSet<Guid>();
+
+            foreach (var ticketItem in ticketItems)
+            {
+                if (ticketItem.TicketFk.Purpose == RestaurantTicketPurpose.Cancellation ||
+                    !CanBulkTransition(ticketItem.Status, input.Status))
+                    continue;
+
+                ticketItem.Status = input.Status;
+                await ticketItemRepository.UpdateAsync(ticketItem);
+
+                var orderItem = await orderItemRepository.FirstOrDefaultAsync(ticketItem.OrderItemId);
+                if (orderItem != null)
+                {
+                    orderItem.Status = input.Status;
+                    await orderItemRepository.UpdateAsync(orderItem);
+                }
+
+                updatedItems.Add(ticketItem);
+                ticketIds.Add(ticketItem.TicketId);
+                orderIds.Add(ticketItem.TicketFk.OrderId);
+                changes.Add((RestaurantSyncEntityType.TicketItem, ticketItem.Id,
+                    new { ticketItem.TicketId, ticketItem.OrderItemId, ticketItem.Status }, RestaurantSyncOperation.Upsert));
+                changes.Add((RestaurantSyncEntityType.OrderItem, ticketItem.OrderItemId,
+                    new { ticketItem.TicketFk.OrderId, ticketItem.Status }, RestaurantSyncOperation.Upsert));
+            }
+
+            foreach (var ticketId in ticketIds)
+                await RefreshTicketStatus(ticketId);
+            foreach (var orderId in orderIds)
+                await RefreshOrderStatus(orderId);
+
+            if (changes.Count > 0)
+                await RecordSyncChanges(changes.ToArray());
+
+            return new BulkUpdateRestaurantTicketItemStatusResultDto
+            {
+                UpdatedCount = updatedItems.Count,
+                SkippedCount = requestedIds.Count - updatedItems.Count
+            };
+        }
+
+        private static bool CanBulkTransition(RestaurantOrderItemStatus currentStatus, RestaurantOrderItemStatus nextStatus)
+        {
+            return nextStatus switch
+            {
+                RestaurantOrderItemStatus.Preparing => currentStatus == RestaurantOrderItemStatus.Sent,
+                RestaurantOrderItemStatus.Ready => currentStatus is RestaurantOrderItemStatus.Sent or RestaurantOrderItemStatus.Preparing,
+                RestaurantOrderItemStatus.Served => currentStatus == RestaurantOrderItemStatus.Ready,
+                _ => false
+            };
+        }
+
         private async Task RefreshTicketStatus(Guid ticketId)
         {
             var ticket = await ticketRepository.FirstOrDefaultAsync(ticketId);

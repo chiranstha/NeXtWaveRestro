@@ -93,6 +93,55 @@ namespace NextWave.Erp.Restaurant.Dtos
         public string TableWorkflow { get; set; }
     }
 
+    public class RestaurantCashShiftDto : EntityDto<Guid>
+    {
+        public string RegisterName { get; set; }
+        public long OpenedByUserId { get; set; }
+        public DateTime OpenedAt { get; set; }
+        public decimal OpeningCash { get; set; }
+        public decimal ExpectedClosingCash { get; set; }
+        public decimal CashSales { get; set; }
+        public decimal CashIn { get; set; }
+        public decimal CashOut { get; set; }
+        public bool IsClosed { get; set; }
+        public long? ClosedByUserId { get; set; }
+        public DateTime? ClosedAt { get; set; }
+        public decimal? CountedClosingCash { get; set; }
+        public decimal? CashVariance { get; set; }
+        public string CloseNote { get; set; }
+    }
+
+    public class OpenRestaurantCashShiftDto
+    {
+        public string RegisterName { get; set; }
+        public decimal OpeningCash { get; set; }
+    }
+
+    public class MoveRestaurantCashDto
+    {
+        public Guid ShiftId { get; set; }
+        public bool IsCashIn { get; set; }
+        public decimal Amount { get; set; }
+        public string Reason { get; set; }
+    }
+
+    public class CloseRestaurantCashShiftDto
+    {
+        public Guid ShiftId { get; set; }
+        public decimal CountedCash { get; set; }
+        public string Note { get; set; }
+        public string ManagerPin { get; set; }
+    }
+
+    public class RestaurantBillTenderDto
+    {
+        public PaymentMethod PaymentMethod { get; set; }
+        public Guid? PaymentLedgerId { get; set; }
+        public decimal Amount { get; set; }
+        public decimal ReceivedAmount { get; set; }
+        public string Reference { get; set; }
+    }
+
     public class RestaurantMenuCategoryDto : EntityDto<Guid>
     {
         public string Name { get; set; }
@@ -433,6 +482,8 @@ namespace NextWave.Erp.Restaurant.Dtos
         public DateTime? CancelledAt { get; set; }
         public DateTime? PrintedAt { get; set; }
         public DateTime? LastPrintedAt { get; set; }
+        public string PrintStatus { get; set; }
+        public DateTime? LastPrintConfirmedAt { get; set; }
         public int PrintCount { get; set; }
         public bool IsReprint { get; set; }
         public string OrderNotes { get; set; }
@@ -466,6 +517,18 @@ namespace NextWave.Erp.Restaurant.Dtos
         public Guid TicketItemId { get; set; }
         public RestaurantOrderItemStatus Status { get; set; }
         public string CancelReason { get; set; }
+    }
+
+    public class BulkUpdateRestaurantTicketItemStatusDto
+    {
+        public List<Guid> TicketItemIds { get; set; } = new();
+        public RestaurantOrderItemStatus Status { get; set; }
+    }
+
+    public class BulkUpdateRestaurantTicketItemStatusResultDto
+    {
+        public int UpdatedCount { get; set; }
+        public int SkippedCount { get; set; }
     }
 
     public class RestaurantMaterialRequirementDto
@@ -506,6 +569,9 @@ namespace NextWave.Erp.Restaurant.Dtos
         public bool ConfirmNegativeStock { get; set; }
         public decimal? TipAmount { get; set; }
         public decimal? CustomerPaidAmount { get; set; }
+        public Guid? CashShiftId { get; set; }
+        public string ClientRequestId { get; set; }
+        public List<RestaurantBillTenderDto> Tenders { get; set; } = new();
         public List<FinalizeRestaurantBillLineDto> BillLines { get; set; } = new();
     }
 

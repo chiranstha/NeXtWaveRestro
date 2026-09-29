@@ -84,6 +84,32 @@
                 </button>
             </div>
 
+            <div class="restaurant-kds-view-tabs align-items-center bg-white border d-flex gap-2 min-w-0 p-2 rounded-3" role="tablist" aria-label="Kitchen display views">
+                <button
+                    class="btn btn-sm restaurant-kds-view-tab align-items-center d-inline-flex fs-8 fw-bolder gap-2 justify-content-center px-3 py-2 rounded-2"
+                    [class.btn-primary]="activeView === 'tickets'"
+                    [class.btn-light]="activeView !== 'tickets'"
+                    role="tab"
+                    [attr.aria-selected]="activeView === 'tickets'"
+                    (click)="setActiveView('tickets')"
+                >
+                    {{ 'Tickets' | localize }}
+                    <span class="badge" [ngClass]="activeView === 'tickets' ? 'bg-white text-primary' : 'bg-gray-200 text-gray-700'">{{ filteredTickets.length }}</span>
+                </button>
+                <button
+                    class="btn btn-sm restaurant-kds-view-tab align-items-center d-inline-flex fs-8 fw-bolder gap-2 justify-content-center px-3 py-2 rounded-2"
+                    [class.btn-primary]="activeView === 'items'"
+                    [class.btn-light]="activeView !== 'items'"
+                    role="tab"
+                    [attr.aria-selected]="activeView === 'items'"
+                    (click)="setActiveView('items')"
+                >
+                    {{ 'Items' | localize }}
+                    <span class="badge" [ngClass]="activeView === 'items' ? 'bg-white text-primary' : 'bg-gray-200 text-gray-700'">{{ itemTotals.length }}</span>
+                </button>
+            </div>
+
+            <ng-container *ngIf="activeView === 'tickets'">
             <div class="restaurant-kds-board d-grid align-items-start gap-2" *ngIf="filteredTickets.length; else noTickets">
                 <section
                     class="restaurant-kds-card bg-white border border-gray-300 d-flex flex-column min-h-0 overflow-hidden min-w-0 rounded-3 shadow-sm"
@@ -254,6 +280,60 @@
                     <span>{{ 'No kitchen/stock items' | localize }}</span>
                 </div>
             </ng-template>
+            </ng-container>
+
+            <section class="restaurant-kds-item-summary d-grid gap-2" *ngIf="activeView === 'items'">
+                <article class="restaurant-kds-total bg-white border border-gray-300 overflow-hidden rounded-3 shadow-sm" *ngFor="let total of itemTotals; trackBy: trackItemTotal">
+                    <button
+                        class="restaurant-kds-total-toggle align-items-center bg-white border-0 d-grid gap-2 min-w-0 p-3 text-start w-100"
+                        type="button"
+                        [attr.aria-expanded]="isItemExpanded(total.key)"
+                        (click)="toggleItemExpanded(total.key)"
+                    >
+                        <span class="restaurant-kds-total-name fs-7 fw-bolder lh-sm min-w-0 text-break text-gray-900">{{ total.name }}</span>
+                        <span class="restaurant-kds-total-qty align-items-center bg-dark d-inline-flex fs-7 fw-bolder justify-content-center lh-1 min-h-35px min-w-70px px-3 rounded-2 text-white">× {{ total.qty | number:'1.0-3' }}</span>
+                        <span class="restaurant-kds-total-detail d-flex flex-wrap fs-9 fw-bold gap-2 min-w-0 text-gray-600">
+                            <span *ngIf="total.unitName">{{ total.unitName }}</span>
+                            <span *ngIf="total.variantName">{{ total.variantName }}</span>
+                            <span *ngIf="total.modifierSummary">{{ total.modifierSummary }}</span>
+                            <span class="text-danger" *ngIf="total.notes">{{ total.notes }}</span>
+                        </span>
+                        <span class="restaurant-kds-total-orders fs-9 fw-bold text-gray-600">{{ total.entries.length }} {{ (total.entries.length === 1 ? 'ticket line' : 'ticket lines') | localize }}</span>
+                        <i class="fa text-gray-500" [ngClass]="isItemExpanded(total.key) ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    </button>
+                    <div class="restaurant-kds-total-progress d-flex flex-wrap gap-2 px-3 pb-2">
+                        <span class="restaurant-status fs-9 min-h-20px fw-bold px-2 py-1 rounded-2 bg-light-primary text-primary">{{ 'Sent' | localize }} {{ total.sentCount }} · ×{{ total.sentQty | number:'1.0-3' }}</span>
+                        <span class="restaurant-status fs-9 min-h-20px fw-bold px-2 py-1 rounded-2 bg-light-warning text-warning">{{ 'Preparing' | localize }} {{ total.preparingCount }} · ×{{ total.preparingQty | number:'1.0-3' }}</span>
+                        <span class="restaurant-status fs-9 min-h-20px fw-bold px-2 py-1 rounded-2 bg-light-success text-success">{{ 'Ready' | localize }} {{ total.readyCount }} · ×{{ total.readyQty | number:'1.0-3' }}</span>
+                    </div>
+                    <div class="restaurant-kds-total-actions d-grid gap-2 px-3 pb-3">
+                        <button class="btn btn-sm btn-warning" type="button" (click)="bulkUpdateItemStatus(total, 2)" [disabled]="!eligibleItemEntries(total, 2).length || !!bulkActionKey">
+                            <i class="fa fa-fire"></i>
+                            {{ 'Start' | localize }} ({{ eligibleItemEntries(total, 2).length }})
+                        </button>
+                        <button class="btn btn-sm btn-success" type="button" (click)="bulkUpdateItemStatus(total, 3)" [disabled]="!eligibleItemEntries(total, 3).length || !!bulkActionKey">
+                            <i class="fa fa-check"></i>
+                            {{ 'Ready' | localize }} ({{ eligibleItemEntries(total, 3).length }})
+                        </button>
+                        <button class="btn btn-sm btn-primary" type="button" (click)="bulkUpdateItemStatus(total, 4)" [disabled]="!eligibleItemEntries(total, 4).length || !!bulkActionKey">
+                            <i class="fa fa-bell-concierge"></i>
+                            {{ 'Served' | localize }} ({{ eligibleItemEntries(total, 4).length }})
+                        </button>
+                    </div>
+                    <div class="restaurant-kds-total-breakdown border-top border-gray-200 d-grid gap-2 p-2" *ngIf="isItemExpanded(total.key)">
+                        <div class="restaurant-kds-total-entry align-items-center bg-gray-100 d-grid gap-2 min-w-0 p-2 rounded-2" *ngFor="let entry of total.entries; trackBy: trackItemEntry">
+                            <strong class="fs-8 fw-bolder text-gray-900">{{ entry.ticket.ticketNo }}</strong>
+                            <span class="fs-9 fw-bold min-w-0 text-break text-gray-700">{{ entry.ticket.orderNo }} · {{ entry.ticket.tableName || entry.ticket.orderType }}</span>
+                            <span class="restaurant-status fs-9 min-h-20px fw-bold gap-1 px-2 py-1 rounded-2 align-items-center d-inline-flex lh-1 mw-100 text-nowrap min-h-20px" [ngClass]="itemStatusClass(entry.item.status)">{{ itemStatusText(entry.item.status) }}</span>
+                            <strong class="restaurant-kds-total-entry-qty fs-8 fw-bolder text-gray-900">× {{ entry.item.qty | number:'1.0-3' }}</strong>
+                        </div>
+                    </div>
+                </article>
+                <div class="restaurant-kds-empty align-items-center bg-white border border-dashed border-gray-300 d-flex fs-8 fw-bolder gap-2 justify-content-center min-h-125px p-4 rounded-3 text-gray-700" *ngIf="!itemTotals.length">
+                    <i class="fa fa-circle-check"></i>
+                    <span>{{ 'No items waiting to be prepared' | localize }}</span>
+                </div>
+            </section>
         </div>
     </div>
 </div>

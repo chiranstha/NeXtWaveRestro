@@ -43,6 +43,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuestPDF", "src\QuestPDF\Qu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NextWave.Erp.Web.Mvc", "src\NextWave.Erp.Web.Mvc\NextWave.Erp.Web.Mvc.csproj", "{670B6EEB-DF62-B85F-B156-37628A02808A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NextWave.Erp.GraphQL", "src\NextWave.Erp.GraphQL\NextWave.Erp.GraphQL.csproj", "{AD23BD00-C91B-45F1-963A-7FB73C958B98}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,10 @@ Global
 		{670B6EEB-DF62-B85F-B156-37628A02808A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{670B6EEB-DF62-B85F-B156-37628A02808A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{670B6EEB-DF62-B85F-B156-37628A02808A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD23BD00-C91B-45F1-963A-7FB73C958B98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD23BD00-C91B-45F1-963A-7FB73C958B98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD23BD00-C91B-45F1-963A-7FB73C958B98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD23BD00-C91B-45F1-963A-7FB73C958B98}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -124,6 +130,7 @@ Global
 		{FCFD0CB1-2161-558D-583B-DEFBB135BB5C} = {AFAA0841-BD93-466F-B8F4-FB4EEC86F1FC}
 		{F0FBAEE1-1C51-2965-4167-5A0A84E5F7DD} = {AFAA0841-BD93-466F-B8F4-FB4EEC86F1FC}
 		{670B6EEB-DF62-B85F-B156-37628A02808A} = {AFAA0841-BD93-466F-B8F4-FB4EEC86F1FC}
+		{AD23BD00-C91B-45F1-963A-7FB73C958B98} = {AFAA0841-BD93-466F-B8F4-FB4EEC86F1FC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {23CD4D4B-B131-473D-9ECB-5DD96E739671}

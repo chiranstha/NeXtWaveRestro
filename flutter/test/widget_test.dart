@@ -1,67 +1,259 @@
-import 'dart:ui';
-
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:restaurant_erp/main.dart';
 
 void main() {
-  testWidgets('restaurant ERP shell renders primary modules', (tester) async {
-    tester.view.physicalSize = const Size(1440, 1000);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
+  testWidgets('NextWave sign-in shows tenant name but never a server URL', (
+    tester,
+  ) async {
+    final controller = RestaurantAppController.live(
+      sessionStore: MemorySessionStore(),
+    );
 
-    await tester.pumpWidget(const RestaurantErpApp());
+    await tester.pumpWidget(RestaurantErpApp(controller: controller));
+    await tester.pumpAndSettle();
+
+    expect(find.text('NextWave'), findsOneWidget);
+    expect(find.text('Tenant name'), findsOneWidget);
+    expect(find.text('Server URL'), findsNothing);
+    expect(find.textContaining('https://'), findsNothing);
+  });
+
+  testWidgets('tenant-branded sign-in hides tenant selection', (tester) async {
+    const brand = AppBrand(
+      key: 'restaurant-one',
+      displayName: 'Restaurant One',
+      productName: 'Staff App',
+      tenantId: 42,
+    );
+    final controller = RestaurantAppController.live(
+      brand: brand,
+      sessionStore: MemorySessionStore(),
+    );
+
+    await tester.pumpWidget(RestaurantErpApp(controller: controller));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Restaurant One'), findsOneWidget);
+    expect(find.text('Tenant name'), findsNothing);
+    expect(find.text('Server URL'), findsNothing);
+    expect(find.textContaining('Restaurant One staff account'), findsOneWidget);
+  });
+
+  testWidgets('restaurant shell renders permission-aware live modules', (
+    tester,
+  ) async {
+    await _setDesktopViewport(tester);
+    final controller = RestaurantAppController.demo();
+
+    await tester.pumpWidget(RestaurantErpApp(controller: controller));
+    await tester.pumpAndSettle();
 
     expect(find.text('NextWave'), findsOneWidget);
     expect(find.text('Command Center'), findsWidgets);
     expect(find.text('POS Billing'), findsWidgets);
     expect(find.text('KDS'), findsWidgets);
     expect(find.text('Restaurant Inventory'), findsWidgets);
+    expect(find.textContaining('Welcome, Demo Manager'), findsOneWidget);
   });
 
-  testWidgets('POS item entry sends tickets to KDS', (tester) async {
-    tester.view.physicalSize = const Size(1440, 1000);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
+  testWidgets('manager navigation adapts when report permissions change', (
+    tester,
+  ) async {
+    await _setDesktopViewport(tester);
+    final controller = RestaurantAppController.demo(
+      grantedPermissions: const {
+        'Pages.Restaurant',
+        'Pages.Restaurant.Reports',
+        'Pages.Restaurant.Reports.Sales',
+      },
+    );
 
-    await tester.pumpWidget(const RestaurantErpApp());
+    await tester.pumpWidget(RestaurantErpApp(controller: controller));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Restaurant Reports'), findsWidgets);
+    expect(find.text('POS Billing'), findsNothing);
+    expect(find.text('Sales today'), findsOneWidget);
+
+    await tester.tap(find.text('Restaurant Reports').first);
+    await tester.pumpAndSettle();
+    expect(find.text('Sales'), findsOneWidget);
+    expect(find.text('Inventory & Cost'), findsNothing);
+
+    controller.setGrantedPermissionsForTesting(const {'Pages.Restaurant'});
+    await tester.pumpAndSettle();
+
+    expect(find.text('Restaurant Reports'), findsNothing);
+    expect(find.text('Command Center'), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('finance manager dashboard shows only finance report cards', (
+    tester,
+  ) async {
+    await _setDesktopViewport(tester);
+    final controller = RestaurantAppController.demo(
+      grantedPermissions: const {
+        'Pages.Restaurant',
+        'Pages.Restaurant.Reports',
+        'Pages.Restaurant.Reports.AuditFinance',
+      },
+    );
+
+    await tester.pumpWidget(RestaurantErpApp(controller: controller));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Settled sales'), findsOneWidget);
+    expect(find.text('Discount exposure'), findsOneWidget);
+    expect(find.text('Sales today'), findsNothing);
+    expect(find.text('Pending KOT / BOT'), findsNothing);
+    expect(find.text('Active employees'), findsNothing);
+  });
+
+  testWidgets('POS order sends KOT to the kitchen board', (tester) async {
+    await _setDesktopViewport(tester);
+    final controller = RestaurantAppController.demo();
+
+    await tester.pumpWidget(RestaurantErpApp(controller: controller));
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text('POS Billing').first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Chicken Momo').first);
     await tester.pumpAndSettle();
 
-    expect(find.text('Current Bill'), findsOneWidget);
-    expect(find.text('1'), findsWidgets);
+    expect(find.text('Current order'), findsOneWidget);
+    expect(controller.cart, hasLength(1));
 
-    await tester.tap(find.text('Send KOT/BOT'));
+    final sendButton = find.text('Send KOT');
+    await tester.ensureVisible(sendButton);
+    await tester.tap(sendButton);
     await tester.pumpAndSettle();
 
+    expect(controller.cart, isEmpty);
+    expect(
+      controller.tickets.any((ticket) => ticket.id.startsWith('KOT-')),
+      isTrue,
+    );
+
+    await tester.tap(find.text('KDS').first);
+    await tester.pumpAndSettle();
     expect(find.text('Kitchen Display System'), findsOneWidget);
     expect(find.textContaining('KOT-'), findsWidgets);
-    expect(find.textContaining('Sent 1 KOT/BOT ticket'), findsOneWidget);
   });
 
-  testWidgets('generic ERP module quick entry creates a draft row', (
+  testWidgets('demo POS settles through the backend-shaped checkout', (
     tester,
   ) async {
-    tester.view.physicalSize = const Size(1440, 1000);
+    await _setDesktopViewport(tester);
+    final controller = RestaurantAppController.demo();
+
+    await tester.pumpWidget(RestaurantErpApp(controller: controller));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('POS Billing').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Veg Chowmein').first);
+    await tester.pumpAndSettle();
+
+    final settleButton = find.text('Settle');
+    await tester.ensureVisible(settleButton);
+    await tester.tap(settleButton);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Bill DEMO-'), findsOneWidget);
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+    expect(controller.cart, isEmpty);
+  });
+
+  testWidgets('phone layout opens the POS without render overflows', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
+    final controller = RestaurantAppController.demo();
 
-    await tester.pumpWidget(const RestaurantErpApp());
-
-    await tester.tap(find.text('Account Ledgers').first);
+    await tester.pumpWidget(RestaurantErpApp(controller: controller));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Save Ledger').first);
+    expect(tester.takeException(), isNull);
+
+    await tester.tap(find.byTooltip('Menu'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('POS Billing').last);
     await tester.pumpAndSettle();
 
-    expect(find.text('ACC-2005'), findsOneWidget);
+    expect(find.text('Current order'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('restaurant payroll renders role-aware shift and pay-run views', (
+    tester,
+  ) async {
+    await _setDesktopViewport(tester);
+    final controller = RestaurantAppController.demo();
+
+    await tester.pumpWidget(RestaurantErpApp(controller: controller));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Staff & Payroll').first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('My shift today'), findsOneWidget);
+    expect(find.text('Active staff'), findsOneWidget);
+    expect(find.text('Pay runs'), findsWidgets);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('phone layout opens payroll overview without render overflows', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final controller = RestaurantAppController.demo();
+
+    await tester.pumpWidget(RestaurantErpApp(controller: controller));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Menu'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Staff & Payroll').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('My shift today'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('staff onboarding combines employee, login and role assignment', (
+    tester,
+  ) async {
+    await _setDesktopViewport(tester);
+    final controller = RestaurantAppController.demo();
+
+    await tester.pumpWidget(RestaurantErpApp(controller: controller));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Staff & Payroll').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Staff'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Add staff'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('App login & access'), findsOneWidget);
+    expect(find.text('Login setup'), findsOneWidget);
     expect(
-      find.text('Save Ledger created in Account Ledgers.'),
+      find.textContaining('app role controls permissions'),
       findsOneWidget,
     );
+    expect(tester.takeException(), isNull);
   });
+}
+
+Future<void> _setDesktopViewport(WidgetTester tester) async {
+  tester.view.physicalSize = const Size(1440, 1200);
+  tester.view.devicePixelRatio = 1;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
 }

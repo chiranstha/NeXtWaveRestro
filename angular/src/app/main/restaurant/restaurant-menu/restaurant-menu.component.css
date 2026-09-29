@@ -1,0 +1,111 @@
+.restaurant-menu-page {
+    --menu-ink: #172554;
+    --menu-muted: #64748b;
+    --menu-border: #e5eaf2;
+    --menu-accent: #1479e9;
+    gap: 1.25rem !important;
+}
+
+.restaurant-menu-page .restaurant-menu-list-card,
+.restaurant-menu-page .restaurant-menu-categories {
+    overflow: hidden;
+    border: 1px solid var(--menu-border) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 28px rgba(15, 23, 42, .06) !important;
+}
+
+.restaurant-menu-page .restaurant-menu-list-card > .card-header,
+.restaurant-menu-page .restaurant-menu-categories > .card-header {
+    min-height: 76px !important;
+    padding: 1rem 1.25rem !important;
+    background: linear-gradient(180deg, #fff 0%, #fbfcff 100%);
+    border-bottom: 1px solid #edf0f5 !important;
+}
+
+.restaurant-menu-list-heading { min-width: 0; }
+.restaurant-menu-heading-icon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    place-items: center;
+    color: var(--menu-accent);
+    font-size: 1rem;
+    background: #eaf3ff;
+    border: 1px solid #d7e9ff;
+    border-radius: 12px;
+}
+.restaurant-menu-list-card .card-title { color: var(--menu-ink) !important; letter-spacing: -.01em; }
+.restaurant-menu-list-count { margin-top: .25rem; color: var(--menu-muted); font-size: .78rem; }
+.restaurant-menu-header-actions { align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.restaurant-menu-secondary-action { min-height: 38px; padding-inline: .85rem; border: 1px solid #e2e8f0 !important; border-radius: 9px !important; color: #334155; font-weight: 600; }
+.restaurant-menu-secondary-action:hover { color: var(--menu-accent); background: #f1f7ff !important; border-color: #bfdbfe !important; }
+
+.restaurant-menu-list-card > .card-body { padding: 1.1rem 1.25rem 1.25rem !important; }
+.restaurant-menu-filterbar { align-items: center !important; gap: .75rem !important; margin-bottom: 1rem !important; }
+.restaurant-menu-search-wrap { position: relative; min-width: 240px; }
+.restaurant-menu-search-wrap > .fa-search {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 1rem;
+    color: #94a3b8;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+.restaurant-menu-search-wrap .restaurant-menu-search {
+    height: 44px;
+    padding-left: 2.7rem;
+    border: 1px solid #dbe3ee;
+    border-radius: 10px;
+    background: #fbfcfe;
+    font-size: .9rem;
+    transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.restaurant-menu-search-wrap .restaurant-menu-search:focus { background: #fff; border-color: #80b8fa; box-shadow: 0 0 0 3px rgba(20, 121, 233, .12); }
+.restaurant-menu-category-filter .ng-select-container,
+.restaurant-menu-filterbar > .ng-select .ng-select-container,
+.restaurant-menu-filterbar > .form-select { min-height: 44px; border-color: #dbe3ee; border-radius: 10px; }
+
+.restaurant-menu-list-card .restaurant-table-wrap { border: 1px solid #edf0f5; border-radius: 12px; }
+.restaurant-menu-list-card .restaurant-table { min-width: 760px; }
+.restaurant-menu-list-card .restaurant-table thead th {
+    position: sticky;
+    z-index: 1;
+    top: 0;
+    padding: .85rem 1rem;
+    color: #64748b;
+    background: #f8fafc;
+    border-bottom: 1px solid #e8edf4;
+    font-size: .7rem;
+    letter-spacing: .055em;
+}
+.restaurant-menu-list-card .restaurant-table tbody td { padding: .9rem 1rem; border-color: #eef2f6; vertical-align: middle; }
+.restaurant-menu-list-card .restaurant-table tbody tr { transition: background .15s ease; }
+.restaurant-menu-list-card .restaurant-table tbody tr:hover { background: #f8fbff; }
+.restaurant-menu-item-name { color: var(--menu-ink); font-size: .92rem; letter-spacing: -.01em; }
+.restaurant-menu-list-card .restaurant-muted { color: #718096 !important; font-size: .78rem; }
+.restaurant-menu-tags { row-gap: .35rem !important; }
+.restaurant-menu-list-card .restaurant-status { border-radius: 999px !important; padding: .3rem .55rem !important; }
+.restaurant-menu-actions { white-space: nowrap; }
+.restaurant-menu-actions > button {
+    width: 34px;
+    height: 34px;
+    margin: 0 0 0 .3rem !important;
+    border: 1px solid #e6ebf2;
+    border-radius: 9px !important;
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.restaurant-menu-actions > button:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(15, 23, 42, .10); }
+.restaurant-menu-categories .card-body { padding: 1rem !important; }
+.restaurant-menu-categories .restaurant-touch-button { padding: .9rem !important; border-color: #e7ebf1 !important; border-radius: 12px !important; }
+.restaurant-menu-categories .restaurant-touch-button:hover { border-color: #bfdbfe !important; box-shadow: 0 4px 14px rgba(20, 121, 233, .08); }
+
+@media (max-width: 767.98px) {
+    .restaurant-menu-page .restaurant-menu-list-card > .card-header { align-items: flex-start !important; flex-direction: column; }
+    .restaurant-menu-header-actions { width: 100%; justify-content: flex-start; }
+    .restaurant-menu-search-wrap { flex-basis: 100%; }
+    .restaurant-menu-filterbar > .ng-select,
+    .restaurant-menu-filterbar > .btn { flex: 1 1 auto; }
+    .restaurant-menu-list-card > .card-body { padding: .8rem !important; }
+}
