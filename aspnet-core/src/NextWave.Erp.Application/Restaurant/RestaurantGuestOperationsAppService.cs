@@ -328,7 +328,7 @@ namespace NextWave.Erp.Restaurant
             if (job == null) return null;
             job.Status = RestaurantPrintJobStatus.Leased;
             job.LeaseOwner = input.AgentId.Trim();
-            job.LeaseUntilUtc = now.AddMinutes(1);
+            job.LeaseUntilUtc = now.AddMinutes(5);
             job.Attempts++;
             await printJobRepository.UpdateAsync(job);
             return MapPrintJob(job);

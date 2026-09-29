@@ -124,6 +124,15 @@ class _ErpShellState extends State<ErpShell> {
       ModuleKind.restaurantPayroll => RestaurantPayrollScreen(
         controller: controller,
       ),
+      ModuleKind.guestOrders => RestaurantGuestOrdersScreen(
+        controller: controller,
+      ),
+      ModuleKind.reservations => RestaurantReservationsScreen(
+        controller: controller,
+      ),
+      ModuleKind.printQueue => RestaurantPrintQueueScreen(
+        controller: controller,
+      ),
       _ => const SizedBox.shrink(),
     };
   }

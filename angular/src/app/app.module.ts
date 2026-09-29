@@ -84,7 +84,12 @@ import { ServiceWorkerService } from './shared/services/service-worker.service';
 import { environment } from 'environments/environment';
 
 @NgModule({
-    declarations: [],
+    declarations: [
+        Theme2LayoutComponent,
+        Theme3LayoutComponent,
+        Theme2BrandComponent,
+        Theme3BrandComponent,
+    ],
     providers: [
         ImpersonationService,
         LinkedAccountService,
@@ -170,12 +175,6 @@ import { environment } from 'environments/environment';
         ActiveDelegatedUsersComboComponent,
         DefaultLogoComponent,
         ToggleDarkModeComponent,
-    ],
-    declarations: [
-        Theme2LayoutComponent,
-        Theme3LayoutComponent,
-        Theme2BrandComponent,
-        Theme3BrandComponent,
     ],
 })
 export class AppModule {}

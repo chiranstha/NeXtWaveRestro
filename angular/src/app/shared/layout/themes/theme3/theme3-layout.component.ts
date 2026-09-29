@@ -9,7 +9,7 @@ import { AppConsts } from '@shared/AppConsts';
     standalone: false,
     templateUrl: './theme3-layout.component.html',
     selector: 'theme3-layout',
-    animations: [appModuleAnimation()],
+    animations: [appModuleAnimation],
 })
 export class Theme3LayoutComponent extends ThemesLayoutBaseComponent implements OnInit {
     remoteServiceBaseUrl: string = AppConsts.remoteServiceBaseUrl;

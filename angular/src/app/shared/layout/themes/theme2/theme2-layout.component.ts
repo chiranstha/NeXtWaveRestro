@@ -15,7 +15,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     templateUrl: './theme2-layout.component.html',
     styleUrls: ['./theme2-layout.component.less'],
     selector: 'theme2-layout',
-    animations: [appModuleAnimation()],
+    animations: [appModuleAnimation],
 })
 export class Theme2LayoutComponent extends ThemesLayoutBaseComponent implements OnInit, AfterViewInit {
     @ViewChild('ktHeader', { static: true }) ktHeader: ElementRef;

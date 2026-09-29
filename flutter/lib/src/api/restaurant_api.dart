@@ -483,6 +483,7 @@ class RestaurantApi {
     String ticketId,
     List<MenuProduct> products, {
     String? approvalPin,
+    required String reason,
   }) async {
     return _ticketFromJson(
       _map(
@@ -491,7 +492,7 @@ class RestaurantApi {
           body: {
             'ticketId': ticketId,
             'approvalPin': approvalPin,
-            'approvalNote': 'Flutter POS reprint',
+            'approvalNote': reason,
           },
         ),
       ),
@@ -1145,6 +1146,143 @@ class RestaurantApi {
       payrollRuns: _mapRows(payroll['runs']),
       payrollEmployeeCosts: _mapRows(payroll['employeeCosts']),
       payrollAttendance: _mapRows(payroll['attendance']),
+    );
+  }
+
+  Future<List<GuestOrderModel>> getPendingGuestOrders() async {
+    return _list(
+      await client.get(
+        '/api/services/app/RestaurantGuestOperations/GetPendingGuestOrders',
+      ),
+    ).map((value) {
+      final item = _map(value);
+      return GuestOrderModel(
+        id: _string(item['orderId']),
+        orderNo: _string(item['orderNo']),
+        tableId: _string(item['tableId']),
+        tableName: _string(item['tableName'], fallback: 'Table'),
+        createdAt: DateTime.tryParse(_string(item['createdAt']))?.toLocal() ??
+            DateTime.now(),
+        total: _number(item['grandTotal']),
+        lines: _list(item['lines']).map((lineValue) {
+          final line = _map(lineValue);
+          return GuestOrderLineModel(
+            name: _string(line['itemName'], fallback: 'Menu item'),
+            variant: _string(line['variantName']),
+            qty: _number(line['qty']),
+            amount: _number(line['amount']),
+          );
+        }).toList(),
+      );
+    }).toList();
+  }
+
+  Future<void> reviewGuestOrder({
+    required String orderId,
+    required bool approve,
+    String rejectionReason = '',
+  }) async {
+    await client.post(
+      '/api/services/app/RestaurantGuestOperations/ReviewGuestOrder',
+      body: {
+        'orderId': orderId,
+        'approve': approve,
+        'rejectionReason': rejectionReason,
+      },
+    );
+  }
+
+  Future<List<RestaurantReservationRecord>> getReservations({
+    required DateTime from,
+    required DateTime to,
+  }) async {
+    return _list(
+      await client.get(
+        '/api/services/app/RestaurantGuestOperations/GetReservations',
+        query: {
+          'from': from.toUtc().toIso8601String(),
+          'to': to.toUtc().toIso8601String(),
+        },
+      ),
+    ).map((value) {
+      final item = _map(value);
+      return RestaurantReservationRecord(
+        id: _string(item['id']),
+        status: _integer(item['status']),
+        isWalkIn: _boolean(item['isWalkIn']),
+        guestName: _string(item['guestName'], fallback: 'Guest'),
+        phoneNumber: _string(item['phoneNumber']),
+        notes: _string(item['notes']),
+        partySize: _integer(item['partySize']),
+        startsAt: DateTime.tryParse(_string(item['startsAt']))?.toLocal() ??
+            DateTime.now(),
+        endsAt: DateTime.tryParse(_string(item['endsAt']))?.toLocal() ??
+            DateTime.now().add(const Duration(minutes: 90)),
+        tableId: _nullableString(item['tableId']),
+        tableName: _nullableString(item['tableName']),
+        smsStatus: _string(item['smsStatus'], fallback: 'No message'),
+      );
+    }).toList();
+  }
+
+  Future<void> addWalkIn({
+    required String guestName,
+    required String phoneNumber,
+    required int partySize,
+    String notes = '',
+  }) async {
+    await client.post(
+      '/api/services/app/RestaurantGuestOperations/AddWalkIn',
+      body: {
+        'guestName': guestName,
+        'phoneNumber': phoneNumber,
+        'partySize': partySize,
+        'notes': notes,
+      },
+    );
+  }
+
+  Future<void> updateReservation({
+    required String id,
+    required int status,
+    String? tableId,
+    required DateTime endsAt,
+  }) async {
+    await client.post(
+      '/api/services/app/RestaurantGuestOperations/UpdateReservation',
+      body: {
+        'id': id,
+        'status': status,
+        'tableId': tableId,
+        'endsAt': endsAt.toUtc().toIso8601String(),
+      },
+    );
+  }
+
+  Future<List<RestaurantPrintJobRecord>> getPrintJobs() async {
+    return _list(
+      await client.get(
+        '/api/services/app/RestaurantGuestOperations/GetPrintJobs',
+      ),
+    ).map((value) {
+      final item = _map(value);
+      return RestaurantPrintJobRecord(
+        id: _string(item['id']),
+        externalJobId: _string(item['externalJobId']),
+        type: _integer(item['type']),
+        routeName: _string(item['routeName'], fallback: 'Unconfigured'),
+        status: _integer(item['status']),
+        lastError: _nullableString(item['lastError']),
+        attempts: _integer(item['attempts']),
+        reprintReason: _nullableString(item['reprintReason']),
+      );
+    }).toList();
+  }
+
+  Future<void> retryPrintJob(String jobId) async {
+    await client.post(
+      '/api/services/app/RestaurantGuestOperations/RetryPrintJob',
+      body: {'jobId': jobId},
     );
   }
 

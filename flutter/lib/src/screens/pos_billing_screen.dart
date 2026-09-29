@@ -905,6 +905,13 @@ class _PosBillingScreenState extends State<PosBillingScreen> {
                           ? IconButton(
                               tooltip: 'Reprint ticket',
                               onPressed: () async {
+                                final reason = await _requestText(
+                                  title: 'Ticket reprint',
+                                  label: 'Reason',
+                                );
+                                if (reason == null || reason.trim().isEmpty) {
+                                  return;
+                                }
                                 final pin = _requiresManagerPin
                                     ? await _requestPin('Ticket reprint')
                                     : null;
@@ -912,6 +919,7 @@ class _PosBillingScreenState extends State<PosBillingScreen> {
                                 try {
                                   await controller.reprintTicket(
                                     ticket,
+                                    reason: reason.trim(),
                                     approvalPin: pin,
                                   );
                                   if (mounted) {
@@ -920,7 +928,7 @@ class _PosBillingScreenState extends State<PosBillingScreen> {
                                     ).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                          '${ticket.id} reprint recorded.',
+                                          '${ticket.id} reprint queued.',
                                         ),
                                       ),
                                     );

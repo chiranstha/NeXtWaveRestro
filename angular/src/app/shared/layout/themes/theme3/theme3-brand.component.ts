@@ -6,7 +6,7 @@ import { AppComponentBase } from '@shared/common/app-component-base';
 
 @Component({
     
-    animations: [appModuleAnimation()],
+    animations: [appModuleAnimation],
 
     standalone: false,
     templateUrl: './theme3-brand.component.html',

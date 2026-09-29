@@ -97,8 +97,6 @@
                         ></menu-search-bar>
                     </div>
 
-                    <tenant-header-identity class="mx-2"></tenant-header-identity>
-
                     <div class="theme2-header-chip d-none d-xl-flex" aria-label="Current module">
                         <span class="theme2-header-chip-dot"></span>
                         <strong>{{ selectedTheme2Module ? (selectedTheme2Module.name | localize) : ('Dashboard' | localize) }}</strong>
@@ -114,9 +112,6 @@
                         <quick-theme-selection
                             [customStyle]="'theme2-action-button position-relative'"
                         ></quick-theme-selection>
-                        <branch-dropdown></branch-dropdown>
-                        <godown-dropdown></godown-dropdown>
-                        <financial-year-dropdown></financial-year-dropdown>
                         <language-switch-dropdown
                             [customStyle]="'theme2-action-button position-relative'"
                         ></language-switch-dropdown>

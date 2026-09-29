@@ -67,6 +67,9 @@ class RestaurantAppController extends ChangeNotifier {
       ..selectedPosContext = 'table-1'
       ..accountLedgers = const [LedgerOption(id: 'cash', name: 'Cash')]
       ..salesLedgers = const [LedgerOption(id: 'sales', name: 'Sales Account')]
+      ..guestOrders = const []
+      ..reservations = const []
+      ..printJobs = const []
       ..report = const ReportSummary(
         orderCount: 24,
         grossAmount: 42850,
@@ -149,6 +152,9 @@ class RestaurantAppController extends ChangeNotifier {
   List<PayrollAttendance> payrollAttendance = [];
   List<PayrollRun> payrollRuns = [];
   List<PayrollLine> myPayslips = [];
+  List<GuestOrderModel> guestOrders = [];
+  List<RestaurantReservationRecord> reservations = [];
+  List<RestaurantPrintJobRecord> printJobs = [];
 
   String selectedPosContext = 'mode:takeaway';
   String selectedCategory = 'All';
@@ -172,6 +178,8 @@ class RestaurantAppController extends ChangeNotifier {
     'Pages.Restaurant.Pos.Void',
     'Pages.Restaurant.Pos.TableTransfer',
     'Pages.Restaurant.Pos.SplitMerge',
+    'Pages.Restaurant.Reservations',
+    'Pages.Restaurant.PrinterSetup',
     'Pages.Restaurant.Billing',
     'Pages.Restaurant.KotBot',
     'Pages.Restaurant.KotBot.Reprint',
@@ -516,6 +524,13 @@ class RestaurantAppController extends ChangeNotifier {
         ),
         ModuleKind.restaurantPayroll => hasPermission(
           'Pages.Restaurant.Payroll',
+        ),
+        ModuleKind.guestOrders => hasPermission('Pages.Restaurant.Pos'),
+        ModuleKind.reservations => hasPermission(
+          'Pages.Restaurant.Reservations',
+        ),
+        ModuleKind.printQueue => hasPermission(
+          'Pages.Restaurant.PrinterSetup',
         ),
         _ => false,
       };
@@ -972,6 +987,7 @@ class RestaurantAppController extends ChangeNotifier {
 
   Future<KdsTicket> reprintTicket(
     KdsTicket ticket, {
+    required String reason,
     String? approvalPin,
   }) async {
     if (_demoMode) return ticket;
@@ -985,13 +1001,13 @@ class RestaurantAppController extends ChangeNotifier {
         ticketId,
         products,
         approvalPin: approvalPin,
+        reason: reason,
       );
-      await _api!.markTicketPrinted(ticketId);
       currentOrderTickets = await _api!.getTicketsForOrder(
         currentOrderId!,
         products,
       );
-      noticeMessage = 'Ticket ${ticket.id} marked as reprinted.';
+      noticeMessage = 'Ticket ${ticket.id} queued for reprint.';
     });
     return printable;
   }
@@ -1773,6 +1789,9 @@ class RestaurantAppController extends ChangeNotifier {
     payrollAttendance = [attendance];
     payrollRuns = [run];
     myPayslips = [];
+    guestOrders = [];
+    reservations = [];
+    printJobs = [];
     payrollDashboard = PayrollDashboard(
       activeEmployeeCount: 6,
       presentToday: 5,
@@ -1871,6 +1890,9 @@ class RestaurantAppController extends ChangeNotifier {
       payrollRuns = [];
       myPayslips = [];
     }
+    if (!hasPermission('Pages.Restaurant.Pos')) guestOrders = [];
+    if (!hasPermission('Pages.Restaurant.Reservations')) reservations = [];
+    if (!hasPermission('Pages.Restaurant.PrinterSetup')) printJobs = [];
   }
 
   Future<void> _loadRestaurantData() async {
@@ -1988,7 +2010,124 @@ class RestaurantAppController extends ChangeNotifier {
     if (hasPermission('Pages.Restaurant.Payroll')) {
       await load('Payroll', _loadPayrollData);
     }
+    if (hasPermission('Pages.Restaurant.Pos')) {
+      await load('Guest QR orders', () async {
+        guestOrders = await api.getPendingGuestOrders();
+      });
+    }
+    if (hasPermission('Pages.Restaurant.Reservations')) {
+      await load('Reservations', () async {
+        final now = DateTime.now();
+        reservations = await api.getReservations(
+          from: now.subtract(const Duration(days: 1)),
+          to: now.add(const Duration(days: 90)),
+        );
+      });
+    }
+    if (hasPermission('Pages.Restaurant.PrinterSetup')) {
+      await load('Print queue', () async {
+        printJobs = await api.getPrintJobs();
+      });
+    }
     errorMessage = warnings.isEmpty ? null : warnings.join('\n');
+  }
+
+  Future<void> reviewGuestOrder({
+    required GuestOrderModel order,
+    required bool approve,
+    String rejectionReason = '',
+  }) async {
+    if (_demoMode) {
+      guestOrders = guestOrders.where((item) => item.id != order.id).toList();
+      noticeMessage = approve
+          ? 'Guest order approved and sent to the kitchen.'
+          : 'Guest order rejected.';
+      notifyListeners();
+      return;
+    }
+    await _runBusy(() async {
+      await _api!.reviewGuestOrder(
+        orderId: order.id,
+        approve: approve,
+        rejectionReason: rejectionReason,
+      );
+      guestOrders = await _api!.getPendingGuestOrders();
+      noticeMessage = approve
+          ? 'Guest order approved and sent to the kitchen.'
+          : 'Guest order rejected.';
+    });
+  }
+
+  Future<void> addWalkIn({
+    required String guestName,
+    required String phoneNumber,
+    required int partySize,
+    String notes = '',
+  }) async {
+    if (_demoMode) {
+      noticeMessage = 'Walk-in added to the waitlist.';
+      notifyListeners();
+      return;
+    }
+    await _runBusy(() async {
+      await _api!.addWalkIn(
+        guestName: guestName,
+        phoneNumber: phoneNumber,
+        partySize: partySize,
+        notes: notes,
+      );
+      await _reloadReservations();
+      noticeMessage = 'Walk-in added to the waitlist.';
+    });
+  }
+
+  Future<void> updateReservation({
+    required RestaurantReservationRecord reservation,
+    required int status,
+    String? tableId,
+    DateTime? endsAt,
+  }) async {
+    if (_demoMode) {
+      noticeMessage = status == 4
+          ? 'Guest seated. The table session is open.'
+          : 'Reservation updated.';
+      notifyListeners();
+      return;
+    }
+    await _runBusy(() async {
+      await _api!.updateReservation(
+        id: reservation.id,
+        status: status,
+        tableId: tableId ?? reservation.tableId,
+        endsAt: endsAt ?? reservation.endsAt,
+      );
+      await _reloadReservations();
+      if (status == 4) await _refreshOrdersAndTickets();
+      noticeMessage = status == 4
+          ? 'Guest seated and table session opened.'
+          : 'Reservation updated.';
+    });
+  }
+
+  Future<void> retryPrintJob(RestaurantPrintJobRecord job) async {
+    if (_demoMode) {
+      noticeMessage = 'Print job added back to the ERP queue.';
+      notifyListeners();
+      return;
+    }
+    await _runBusy(() async {
+      await _api!.retryPrintJob(job.id);
+      printJobs = await _api!.getPrintJobs();
+      noticeMessage = 'Print job added back to the ERP queue.';
+    });
+  }
+
+  Future<void> _reloadReservations() async {
+    final now = DateTime.now();
+    reservations = await _api!.getReservations(
+      from: now.subtract(const Duration(days: 1)),
+      to: now.add(const Duration(days: 90)),
+    );
   }
 
   Future<String> _saveCurrentOrder({
@@ -2146,11 +2285,27 @@ class RestaurantAppController extends ChangeNotifier {
 
   void _startKdsRefresh() {
     _kdsTimer?.cancel();
-    if (!hasPermission('Pages.Restaurant.Kds')) return;
+    if (!hasPermission('Pages.Restaurant.Kds') &&
+        !hasPermission('Pages.Restaurant.Pos') &&
+        !hasPermission('Pages.Restaurant.PrinterSetup') &&
+        !hasPermission('Pages.Restaurant.Reservations')) {
+      return;
+    }
     _kdsTimer = Timer.periodic(const Duration(seconds: 15), (_) async {
       if (_api == null || busy || refreshing) return;
       try {
-        tickets = await _api!.getOpenTickets(products);
+        if (hasPermission('Pages.Restaurant.Kds')) {
+          tickets = await _api!.getOpenTickets(products);
+        }
+        if (hasPermission('Pages.Restaurant.Pos')) {
+          guestOrders = await _api!.getPendingGuestOrders();
+        }
+        if (hasPermission('Pages.Restaurant.Reservations')) {
+          await _reloadReservations();
+        }
+        if (hasPermission('Pages.Restaurant.PrinterSetup')) {
+          printJobs = await _api!.getPrintJobs();
+        }
         notifyListeners();
       } catch (_) {
         // The visible manual refresh reports connectivity errors. A background

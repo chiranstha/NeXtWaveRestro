@@ -10,6 +10,9 @@ enum ModuleKind {
   restaurantSetup,
   restaurantReports,
   restaurantPayroll,
+  guestOrders,
+  reservations,
+  printQueue,
   accountGroups,
   accountLedgers,
   units,
@@ -443,6 +446,92 @@ class RestaurantStationModel {
   final String name;
   final int type;
   final bool isActive;
+}
+
+class GuestOrderLineModel {
+  const GuestOrderLineModel({
+    required this.name,
+    required this.variant,
+    required this.qty,
+    required this.amount,
+  });
+
+  final String name;
+  final String variant;
+  final double qty;
+  final double amount;
+}
+
+class GuestOrderModel {
+  const GuestOrderModel({
+    required this.id,
+    required this.orderNo,
+    required this.tableId,
+    required this.tableName,
+    required this.createdAt,
+    required this.total,
+    required this.lines,
+  });
+
+  final String id;
+  final String orderNo;
+  final String tableId;
+  final String tableName;
+  final DateTime createdAt;
+  final double total;
+  final List<GuestOrderLineModel> lines;
+}
+
+class RestaurantReservationRecord {
+  const RestaurantReservationRecord({
+    required this.id,
+    required this.status,
+    required this.isWalkIn,
+    required this.guestName,
+    required this.phoneNumber,
+    required this.notes,
+    required this.partySize,
+    required this.startsAt,
+    required this.endsAt,
+    required this.tableId,
+    required this.tableName,
+    required this.smsStatus,
+  });
+
+  final String id;
+  final int status;
+  final bool isWalkIn;
+  final String guestName;
+  final String phoneNumber;
+  final String notes;
+  final int partySize;
+  final DateTime startsAt;
+  final DateTime endsAt;
+  final String? tableId;
+  final String? tableName;
+  final String smsStatus;
+}
+
+class RestaurantPrintJobRecord {
+  const RestaurantPrintJobRecord({
+    required this.id,
+    required this.externalJobId,
+    required this.type,
+    required this.routeName,
+    required this.status,
+    required this.lastError,
+    required this.attempts,
+    required this.reprintReason,
+  });
+
+  final String id;
+  final String externalJobId;
+  final int type;
+  final String routeName;
+  final int status;
+  final String? lastError;
+  final int attempts;
+  final String? reprintReason;
 }
 
 class RestaurantOrderModel {

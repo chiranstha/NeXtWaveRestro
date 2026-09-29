@@ -7,7 +7,7 @@
             <p>Print this permanent table sticker. Regenerating the code revokes the previous sticker.</p>
             <img [src]="'data:image/png;base64,' + qrResult.pngBase64" [alt]="qrResult.tableName + ' QR code'" />
             <a class="d-block text-break" [href]="qrResult.url" target="_blank" rel="noopener">{{ qrResult.url }}</a>
-            <a class="btn btn-primary mt-3" [href]="'data:image/png;base64,' + qrResult.pngBase64" [download]="qrResult.tableName + '-guest-qr.png">Download QR image</a>
+            <a class="btn btn-primary mt-3" [href]="'data:image/png;base64,' + qrResult.pngBase64" [download]="qrResult.tableName + '-guest-qr.png'">Download QR image</a>
         </section>
     </div>
     <sub-header [title]="'Restaurant Setup' | localize">

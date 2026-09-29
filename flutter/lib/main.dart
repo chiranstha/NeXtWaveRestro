@@ -31,6 +31,7 @@ part 'src/screens/channels_screen.dart';
 part 'src/screens/restaurant_setup_screen.dart';
 part 'src/screens/restaurant_reports_screen.dart';
 part 'src/screens/restaurant_payroll_screen.dart';
+part 'src/screens/restaurant_guest_operations_screen.dart';
 part 'src/screens/generic_module_screen.dart';
 part 'src/widgets/erp_widgets.dart';
 part 'src/logic/erp_helpers.dart';

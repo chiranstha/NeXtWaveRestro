@@ -2459,16 +2459,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         receipt: PosBillReceiptSnapshot,
         result: FinalizeRestaurantBillResultDto,
     ): void {
-        const html = this.buildPosBillHtml(receipt, result);
-        const popup = window.open('', '_blank', 'width=380,height=720');
-        if (!popup) {
-            this.downloadPosBillHtml(html, result.orderNo || receipt.orderNo || result.salesMasterId);
-            this.notify.warn('Print popup blocked. POS bill downloaded instead.');
-            return;
-        }
-
-        popup.document.write(html);
-        popup.document.close();
+        this.notify.info(`Receipt ${result.orderNo || result.salesMasterId} with ${receipt.lines.length} line(s) queued for the configured Print Agent route.`);
     }
 
     private buildPosBillHtml(receipt: PosBillReceiptSnapshot, result: FinalizeRestaurantBillResultDto): string {
@@ -2733,82 +2724,6 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
 
     private padDatePart(value: number | string | undefined | null): string {
         return String(Number(value || 0)).padStart(2, '0');
-    }
-
-    private openTicketPrint(ticket: RestaurantTicketDto): boolean {
-        const popup = window.open('', '_blank', 'width=420,height=640');
-        if (!popup) {
-            this.notify.warn('Allow popups to print KOT/BOT');
-            return false;
-        }
-
-        const rows = (ticket.items || [])
-            .map((item) => {
-                const name = item.itemNameSnapshot || item.productName || '';
-                const variant = item.variantNameSnapshot
-                    ? `<div class="muted">${this.escapeHtml(item.variantNameSnapshot)}</div>`
-                    : '';
-                const modifiers = item.modifierSummary
-                    ? `<div class="muted">${this.escapeHtml(item.modifierSummary)}</div>`
-                    : '';
-                const notes =
-                    item.notes || item.cancelReason
-                        ? `<div class="muted">${this.escapeHtml(item.notes || item.cancelReason || '')}</div>`
-                        : '';
-                return `
-                    <tr>
-                        <td>
-                            <strong>${this.escapeHtml(name)}</strong>
-                            ${variant}
-                            ${modifiers}
-                            ${notes}
-                        </td>
-                        <td>${item.qty}</td>
-                        <td>${this.escapeHtml(item.unitName || '')}</td>
-                    </tr>`;
-            })
-            .join('');
-        const ticketType = ticket.ticketType === 1 ? 'BOT' : 'KOT';
-        const purpose = this.ticketPurposeText(ticket.purpose).toUpperCase();
-        const reprint = ticket.isReprint ? '<div class="stamp">REPRINT</div>' : '';
-
-        popup.document.write(`
-            <html>
-                <head>
-                    <title>${ticket.ticketNo}</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; width: 280px; margin: 0 auto; padding: 12px; color: #111; }
-                        h1, h2, p { margin: 0; text-align: center; }
-                        h1 { font-size: 18px; }
-                        h2 { font-size: 16px; margin-top: 6px; }
-                        .meta { margin: 12px 0; font-size: 12px; }
-                        .meta div { display: flex; justify-content: space-between; gap: 10px; }
-                        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-                        td { border-top: 1px dashed #999; padding: 6px 0; vertical-align: top; }
-                        td:nth-child(2), td:nth-child(3) { text-align: right; white-space: nowrap; }
-                        .muted { color: #555; font-size: 11px; margin-top: 2px; }
-                        .stamp { border: 1px solid #111; display: inline-block; padding: 2px 8px; margin-top: 6px; font-weight: bold; }
-                        @media print { body { width: auto; } }
-                    </style>
-                </head>
-                <body>
-                    <h1>${this.escapeHtml(ticket.restaurantName || 'Restaurant')}</h1>
-                    <h2>${ticketType} - ${purpose}</h2>
-                    ${reprint}
-                    <div class="meta">
-                        <div><span>No</span><strong>${this.escapeHtml(ticket.ticketNo || '')}</strong></div>
-                        <div><span>Order</span><strong>${this.escapeHtml(ticket.orderNo || '')}</strong></div>
-                        <div><span>Table</span><strong>${this.escapeHtml(ticket.tableName || '-')}</strong></div>
-                        <div><span>Station</span><strong>${this.escapeHtml(ticket.stationName || '')}</strong></div>
-                        <div><span>Waiter</span><strong>${this.escapeHtml(ticket.waiterName || '-')}</strong></div>
-                        <div><span>Sent</span><strong>${this.escapeHtml(this.formatNepaliDateTime(ticket.sentAt))}</strong></div>
-                    </div>
-                    <table>${rows}</table>
-                    <script>window.onload = function () { window.print(); };</script>
-                </body>
-            </html>`);
-        popup.document.close();
-        return true;
     }
 
     private escapeHtml(value: string): string {
