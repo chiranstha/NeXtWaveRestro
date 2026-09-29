@@ -227,6 +227,10 @@ public static class AppPermissions
     public const string PagesRestaurantPosTableTransfer = "Pages.Restaurant.Pos.TableTransfer";
     public const string PagesRestaurantPosSplitMerge = "Pages.Restaurant.Pos.SplitMerge";
     public const string PagesRestaurantBilling = "Pages.Restaurant.Billing";
+    public const string PagesRestaurantRefundApprove = "Pages.Restaurant.Billing.Refund.Approve";
+    public const string PagesRestaurantRefundSettle = "Pages.Restaurant.Billing.Refund.Settle";
+    public const string PagesRestaurantSetupReadiness = "Pages.Restaurant.Setup.Readiness";
+    public const string PagesRestaurantReleaseFeatures = "Pages.Restaurant.ReleaseFeatures";
     public const string PagesRestaurantKotBot = "Pages.Restaurant.KotBot";
     public const string PagesRestaurantKotBotReprint = "Pages.Restaurant.KotBot.Reprint";
     public const string PagesRestaurantKds = "Pages.Restaurant.Kds";

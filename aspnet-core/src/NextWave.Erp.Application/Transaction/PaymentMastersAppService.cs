@@ -202,6 +202,25 @@ namespace NextWave.Erp.Transaction
             }
         }
 
+        [AbpAuthorize(AppPermissions.PagesRestaurantRefundSettle)]
+        public async Task<Guid> CreateRestaurantRefundPayment(CreateOrEditPaymentMasterDto input)
+        {
+            if (input == null || input.TotalAmount <= 0 || input.LedgerId == Guid.Empty ||
+                input.PaymentDetails == null || input.PaymentDetails.Count != 1 ||
+                input.PaymentDetails[0].Amount != input.TotalAmount)
+                throw new UserFriendlyException("Invalid restaurant refund payout voucher");
+
+            var tenantId = AbpSession.GetTenantId();
+            if (await accountLedgerRepository.CountAsync(x => x.TenantId == tenantId && x.Id == input.LedgerId) == 0 ||
+                await accountLedgerRepository.CountAsync(x => x.TenantId == tenantId && x.Id == input.PaymentDetails[0].LedgerId) == 0)
+                throw new UserFriendlyException("Refund payout ledger is not configured for this restaurant");
+            var date = DateConverter.ConvertToEnglish(input.DateMiti);
+            if (FinancialYear.FromDate > date || FinancialYear.ToDate < date)
+                throw new UserFriendlyException("Refund payout date is outside the active financial year");
+
+            return await Create(input);
+        }
+
         public async Task<Guid> CreateOrEdit(CreateOrEditPaymentMasterDto input)
         {
             var date = DateConverter.ConvertToEnglish(input.DateMiti);

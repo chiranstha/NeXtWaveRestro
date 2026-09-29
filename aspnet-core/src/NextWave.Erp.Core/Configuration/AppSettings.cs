@@ -204,6 +204,11 @@ public static class AppSettings
         public const string RestaurantTipLedgerId = "App.Nextwave.Restaurant.TipLedgerId";
         public const string RestaurantCardLedgerId = "App.Nextwave.Restaurant.CardLedgerId";
         public const string RestaurantQrLedgerId = "App.Nextwave.Restaurant.QrLedgerId";
+        public const string RestaurantRefundPayableLedgerId = "App.Nextwave.Restaurant.RefundPayableLedgerId";
+        public const string RestaurantMixedTenderEnabled = "App.Nextwave.Restaurant.MixedTenderEnabled";
+        public const string RestaurantRefundsEnabled = "App.Nextwave.Restaurant.RefundsEnabled";
+        public const string RestaurantOrderVersionChecksEnabled = "App.Nextwave.Restaurant.OrderVersionChecksEnabled";
+        public const string RestaurantAndroidDraftRecoveryEnabled = "App.Nextwave.Restaurant.AndroidDraftRecoveryEnabled";
         public const string RestaurantRequireManagerPinForSensitiveActions = "App.Nextwave.Restaurant.RequireManagerPinForSensitiveActions";
         public const string RestaurantManagerPin = "App.Nextwave.Restaurant.ManagerPin";
         public const string RestaurantTicketPrintingEnabled = "App.Nextwave.Restaurant.TicketPrintingEnabled";

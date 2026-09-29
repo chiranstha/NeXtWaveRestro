@@ -36,7 +36,7 @@ namespace NextWave.Erp.Tests.Authorization.Roles
             var output = await _roleAppService.GetRoles(new GetRolesInput());
 
             //Assert
-            output.Items.Count.ShouldBe(7);
+            output.Items.Count.ShouldBe(13);
         }
     }
 }

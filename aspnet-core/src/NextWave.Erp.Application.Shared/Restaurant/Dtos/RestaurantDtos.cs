@@ -102,6 +102,12 @@ namespace NextWave.Erp.Restaurant.Dtos
         public bool ReservationBookingEnabled { get; set; }
         public int DefaultReservationDurationMinutes { get; set; } = 90;
         public string ReceiptPrintRouteName { get; set; }
+        public Guid? RefundPayableLedgerId { get; set; }
+        public bool MixedTenderEnabled { get; set; }
+        public bool RefundsEnabled { get; set; }
+        public bool OrderVersionChecksEnabled { get; set; }
+        public bool AndroidDraftRecoveryEnabled { get; set; }
+        public bool ClientCompatibilityConfirmed { get; set; }
     }
 
     public class RestaurantCashShiftDto : EntityDto<Guid>
@@ -350,6 +356,7 @@ namespace NextWave.Erp.Restaurant.Dtos
         public Guid? DeviceId { get; set; }
         public string Source { get; set; }
         public string ClientRequestId { get; set; }
+        public string ExpectedOrderVersion { get; set; }
         public long? WaiterUserId { get; set; }
         public int GuestCount { get; set; }
         public string CustomerName { get; set; }
@@ -381,6 +388,7 @@ namespace NextWave.Erp.Restaurant.Dtos
 
     public class RestaurantOrderDto : EntityDto<Guid>
     {
+        public string RowVersion { get; set; }
         public string OrderNo { get; set; }
         public RestaurantOrderType OrderType { get; set; }
         public RestaurantOrderStatus Status { get; set; }
@@ -582,6 +590,7 @@ namespace NextWave.Erp.Restaurant.Dtos
         public decimal? CustomerPaidAmount { get; set; }
         public Guid? CashShiftId { get; set; }
         public string ClientRequestId { get; set; }
+        public string ExpectedOrderVersion { get; set; }
         public List<RestaurantBillTenderDto> Tenders { get; set; } = new();
         public List<FinalizeRestaurantBillLineDto> BillLines { get; set; } = new();
     }
@@ -613,18 +622,24 @@ namespace NextWave.Erp.Restaurant.Dtos
         public decimal DiscountAmount { get; set; }
         public string ApprovalPin { get; set; }
         public string ApprovalNote { get; set; }
+        public string ClientRequestId { get; set; }
+        public string ExpectedOrderVersion { get; set; }
     }
 
     public class TransferRestaurantTableDto
     {
         public Guid OrderId { get; set; }
         public Guid NewTableId { get; set; }
+        public string ClientRequestId { get; set; }
+        public string ExpectedOrderVersion { get; set; }
     }
 
     public class MergeRestaurantOrdersDto
     {
         public Guid TargetOrderId { get; set; }
         public List<Guid> SourceOrderIds { get; set; } = new();
+        public string ClientRequestId { get; set; }
+        public Dictionary<Guid, string> ExpectedOrderVersions { get; set; } = new();
     }
 
     public class SplitRestaurantOrderDto
@@ -632,6 +647,8 @@ namespace NextWave.Erp.Restaurant.Dtos
         public Guid SourceOrderId { get; set; }
         public Guid? NewTableId { get; set; }
         public List<Guid> OrderItemIds { get; set; } = new();
+        public string ClientRequestId { get; set; }
+        public string ExpectedOrderVersion { get; set; }
     }
 
     public class UploadRestaurantOrderDto
@@ -820,5 +837,156 @@ namespace NextWave.Erp.Restaurant.Dtos
         public decimal TipAmount { get; set; }
         public decimal CashReceivedAmount { get; set; }
         public decimal ChangeAmount { get; set; }
+    }
+
+    public class CreateRestaurantRefundDto
+    {
+        public Guid SalesMasterId { get; set; }
+        public string ClientRequestId { get; set; }
+        public string Reason { get; set; }
+        public string ManagerPin { get; set; }
+        public decimal TipRefundAmount { get; set; }
+        public List<CreateRestaurantRefundLineDto> Lines { get; set; } = new();
+    }
+
+    public class CreateRestaurantRefundLineDto
+    {
+        public Guid SalesDetailId { get; set; }
+        public decimal Quantity { get; set; }
+        public decimal RestockQuantity { get; set; }
+        public bool ReturnedUnopenedPackagedItem { get; set; }
+    }
+
+    public class SettleRestaurantRefundDto
+    {
+        public Guid RefundId { get; set; }
+        public string ClientRequestId { get; set; }
+        public Guid? CashShiftId { get; set; }
+        public string ManagerPin { get; set; }
+        public List<RestaurantRefundPayoutDto> Payouts { get; set; } = new();
+    }
+
+    public class RestaurantRefundPayoutDto
+    {
+        public Guid RefundTenderId { get; set; }
+        public decimal Amount { get; set; }
+        public string Reference { get; set; }
+    }
+
+    public class RestaurantRefundDto
+    {
+        public Guid Id { get; set; }
+        public Guid SalesMasterId { get; set; }
+        public Guid? SalesReturnMasterId { get; set; }
+        public Guid? TipSalesReturnMasterId { get; set; }
+        public Guid? CreditNoteSalesReturnMasterId { get; set; }
+        public string Status { get; set; }
+        public string Reason { get; set; }
+        public decimal ItemRefundAmount { get; set; }
+        public decimal TipRefundAmount { get; set; }
+        public decimal CreditNoteAmount { get; set; }
+        public decimal PayoutAmount { get; set; }
+        public decimal SettledAmount { get; set; }
+        public DateTime ApprovedAt { get; set; }
+        public DateTime? SettledAt { get; set; }
+        public List<RestaurantRefundTenderDto> Tenders { get; set; } = new();
+    }
+
+    public class RestaurantRefundTenderDto
+    {
+        public Guid Id { get; set; }
+        public NextWave.Erp.Enums.PaymentMethod PaymentMethod { get; set; }
+        public Guid PaymentLedgerId { get; set; }
+        public decimal AllocatedAmount { get; set; }
+        public decimal SettledAmount { get; set; }
+    }
+
+    public class RestaurantOperationStatusDto
+    {
+        public string OperationType { get; set; }
+        public string ClientRequestId { get; set; }
+        public string Status { get; set; }
+        public Guid? EntityId { get; set; }
+        public string ResultJson { get; set; }
+    }
+
+    public class RestaurantReleaseCapabilitiesDto
+    {
+        public bool MixedTenderEnabled { get; set; }
+        public bool RefundsEnabled { get; set; }
+        public bool OrderVersionChecksEnabled { get; set; }
+        public bool AndroidDraftRecoveryEnabled { get; set; }
+        public bool SupportsRefundSettlement { get; set; } = true;
+        public bool SupportsOrderVersioning { get; set; } = true;
+        public Guid? RefundPayableLedgerId { get; set; }
+        public Guid? CardLedgerId { get; set; }
+        public Guid? QrLedgerId { get; set; }
+        public List<RestaurantEnabledPaymentMethodDto> PaymentMethods { get; set; } = new();
+    }
+
+    public class RestaurantEnabledPaymentMethodDto
+    {
+        public NextWave.Erp.Enums.PaymentMethod Method { get; set; }
+        public bool Enabled { get; set; }
+        public Guid? LedgerId { get; set; }
+    }
+
+    public class RestaurantSetupReadinessDto
+    {
+        public bool IsReady { get; set; }
+        public List<RestaurantSetupCheckDto> Checks { get; set; } = new();
+    }
+
+    public class RestaurantSetupCheckDto
+    {
+        public string Key { get; set; }
+        public string Label { get; set; }
+        public bool IsReady { get; set; }
+        public string Details { get; set; }
+        public long? CompletedByUserId { get; set; }
+        public DateTime? CompletedAt { get; set; }
+    }
+
+    public class AcknowledgeRestaurantSetupCheckDto
+    {
+        public RestaurantSetupCheckKey CheckKey { get; set; }
+        public string Note { get; set; }
+    }
+
+    public class RestaurantDailyClosingDto
+    {
+        public DateTime BusinessDate { get; set; }
+        public DateTime PeriodStartUtc { get; set; }
+        public DateTime PeriodEndUtc { get; set; }
+        public decimal Sales { get; set; }
+        public decimal Collected { get; set; }
+        public decimal UnpaidBalance { get; set; }
+        public decimal Discounts { get; set; }
+        public decimal Voids { get; set; }
+        public decimal Wastage { get; set; }
+        public decimal Refunds { get; set; }
+        public decimal Tips { get; set; }
+        public List<RestaurantDailyTenderTotalDto> CollectionsByTender { get; set; } = new();
+        public List<RestaurantDailyShiftCloseDto> Shifts { get; set; } = new();
+    }
+
+    public class RestaurantDailyTenderTotalDto
+    {
+        public NextWave.Erp.Enums.PaymentMethod PaymentMethod { get; set; }
+        public decimal Amount { get; set; }
+    }
+
+    public class RestaurantDailyShiftCloseDto
+    {
+        public Guid ShiftId { get; set; }
+        public string RegisterName { get; set; }
+        public long CashierUserId { get; set; }
+        public decimal OpeningCash { get; set; }
+        public decimal CashSales { get; set; }
+        public decimal CashIn { get; set; }
+        public decimal CashOut { get; set; }
+        public decimal ExpectedCash { get; set; }
+        public decimal? CountedCash { get; set; }
+        public decimal? Difference { get; set; }
     }
 }

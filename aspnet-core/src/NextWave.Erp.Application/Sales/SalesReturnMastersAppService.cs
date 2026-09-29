@@ -302,6 +302,23 @@ namespace NextWave.Erp.Sales
             return await Update(input);
         }
 
+        [AbpAuthorize(AppPermissions.PagesRestaurantRefundApprove)]
+        public async Task<Guid> CreateRestaurantRefundReturn(CreateOrEditSalesReturnMasterDto input)
+        {
+            if (input == null || input.SalesMasterId == null || input.SalesMasterId == Guid.Empty)
+                throw new UserFriendlyException("The refund must reference its original restaurant invoice");
+
+            var tenantId = AbpSession.GetTenantId();
+            var original = await salesMasterRepository.FirstOrDefaultAsync(x =>
+                x.Id == input.SalesMasterId && x.TenantId == tenantId && x.SourceModule == "Restaurant");
+            if (original == null)
+                throw new UserFriendlyException("Original restaurant invoice not found");
+            if (input.ReturnType != ReturnType.RateDifference)
+                throw new UserFriendlyException("Restaurant refunds must not automatically restore stock");
+
+            return await Create(input);
+        }
+
         [AbpAuthorize(AppPermissions.PagesSalesReturnMastersDelete)]
         public async Task Delete(EntityDto<Guid> input)
         {

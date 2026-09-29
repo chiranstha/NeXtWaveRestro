@@ -35,6 +35,7 @@ namespace NextWave.Erp.Restaurant
         IRepository<RestaurantOrderItemModifier, Guid> orderItemModifierRepository,
         IRepository<RestaurantBillLine, Guid> billLineRepository,
         IRepository<RestaurantPrintJob, Guid> printJobRepository,
+        IRepository<RestaurantClientOperation, Guid> operationRepository,
         IRepository<Product, Guid> productRepository,
         IRepository<Unit, Guid> unitRepository,
         IUnitOfWorkManager unitOfWorkManager)
@@ -88,6 +89,9 @@ namespace NextWave.Erp.Restaurant
             using var uow = unitOfWorkManager.Begin(new UnitOfWorkOptions { IsTransactional = true });
             var tenantId = AbpSession.GetTenantId();
             RestaurantOrder order;
+            var versionChecksEnabled = await IsOrderVersionChecksEnabled(tenantId);
+            if (versionChecksEnabled && string.IsNullOrWhiteSpace(input.ClientRequestId))
+                throw new UserFriendlyException("A unique request ID is required for this order update");
 
             if (!input.Id.HasValue || input.Id == Guid.Empty)
             {
@@ -124,6 +128,14 @@ namespace NextWave.Erp.Restaurant
             {
                 order = await orderRepository.FirstOrDefaultAsync(x => x.Id == input.Id && x.TenantId == tenantId);
                 if (order == null) throw new UserFriendlyException("Restaurant order not found");
+                await EnsureOrderVersion(order, input.ExpectedOrderVersion, versionChecksEnabled);
+                var existingOperation = await FindOperation(tenantId, "OrderUpsert", input.ClientRequestId);
+                if (existingOperation != null)
+                {
+                    EnsureOperationHash(existingOperation, HashPosOrderRequest(input));
+                    await uow.CompleteAsync();
+                    return existingOperation.EntityId ?? order.Id;
+                }
                 if (order.Status is RestaurantOrderStatus.Billed or RestaurantOrderStatus.Closed or RestaurantOrderStatus.Cancelled)
                     throw new UserFriendlyException("Billed or closed orders cannot be edited");
 
@@ -186,6 +198,8 @@ namespace NextWave.Erp.Restaurant
                 order.Id,
                 null,
                 new { order.OrderNo, order.OrderType, order.Status, ItemCount = input.Items.Count });
+            if (input.Id.HasValue && !string.IsNullOrWhiteSpace(input.ClientRequestId))
+                await RecordOperation(tenantId, "OrderUpsert", input.ClientRequestId, HashPosOrderRequest(input), order.Id);
             await uow.CompleteAsync();
             return order.Id;
         }
@@ -197,11 +211,24 @@ namespace NextWave.Erp.Restaurant
                 throw new UserFriendlyException("Discount cannot be negative");
 
             var tenantId = AbpSession.GetTenantId();
+            var versionChecksEnabled = await IsOrderVersionChecksEnabled(tenantId);
+            if (versionChecksEnabled && string.IsNullOrWhiteSpace(input.ClientRequestId))
+                throw new UserFriendlyException("A unique request ID is required for this discount update");
+            using var uow = unitOfWorkManager.Begin(new UnitOfWorkOptions { IsTransactional = true });
             var order = await orderRepository.FirstOrDefaultAsync(x => x.Id == input.OrderId && x.TenantId == tenantId);
             if (order == null)
                 throw new UserFriendlyException("Restaurant order not found");
             if (order.Status is RestaurantOrderStatus.Billed or RestaurantOrderStatus.Closed or RestaurantOrderStatus.Cancelled)
                 throw new UserFriendlyException("Billed or closed orders cannot be discounted");
+            await EnsureOrderVersion(order, input.ExpectedOrderVersion, versionChecksEnabled);
+            var operationHash = HashOrderMutation(input);
+            var priorOperation = await FindOperation(tenantId, "OrderDiscount", input.ClientRequestId);
+            if (priorOperation != null)
+            {
+                EnsureOperationHash(priorOperation, operationHash);
+                await uow.CompleteAsync();
+                return;
+            }
 
             var items = await orderItemRepository.GetAll()
                 .Where(x => x.TenantId == tenantId &&
@@ -243,6 +270,9 @@ namespace NextWave.Erp.Restaurant
                 order.Id,
                 input.ApprovalNote,
                 new { order.OrderNo, input.DiscountAmount });
+            if (!string.IsNullOrWhiteSpace(input.ClientRequestId))
+                await RecordOperation(tenantId, "OrderDiscount", input.ClientRequestId, operationHash, order.Id);
+            await uow.CompleteAsync();
         }
 
         [AbpAuthorize(AppPermissions.PagesRestaurantKotBot)]
@@ -512,8 +542,20 @@ namespace NextWave.Erp.Restaurant
         {
             var tenantId = AbpSession.GetTenantId();
             using var uow = unitOfWorkManager.Begin(new UnitOfWorkOptions { IsTransactional = true });
+            var versionChecksEnabled = await IsOrderVersionChecksEnabled(tenantId);
+            if (versionChecksEnabled && string.IsNullOrWhiteSpace(input.ClientRequestId))
+                throw new UserFriendlyException("A unique request ID is required for this table transfer");
             var order = await orderRepository.FirstOrDefaultAsync(x => x.Id == input.OrderId && x.TenantId == tenantId);
             if (order == null) throw new UserFriendlyException("Restaurant order not found");
+            await EnsureOrderVersion(order, input.ExpectedOrderVersion, versionChecksEnabled);
+            var transferHash = HashOrderMutation(input);
+            var existingTransfer = await FindOperation(tenantId, "TransferTable", input.ClientRequestId);
+            if (existingTransfer != null)
+            {
+                EnsureOperationHash(existingTransfer, transferHash);
+                await uow.CompleteAsync();
+                return;
+            }
             if (order.Status is RestaurantOrderStatus.Billed or RestaurantOrderStatus.Closed or RestaurantOrderStatus.Cancelled)
                 throw new UserFriendlyException("Billed, closed, or cancelled orders cannot be transferred");
             if (order.TableId == input.NewTableId)
@@ -563,6 +605,8 @@ namespace NextWave.Erp.Restaurant
                 order.Id,
                 null,
                 new { order.OrderNo, OldTableId = oldTableId, NewTableId = input.NewTableId });
+            if (!string.IsNullOrWhiteSpace(input.ClientRequestId))
+                await RecordOperation(tenantId, "TransferTable", input.ClientRequestId, transferHash, order.Id);
             await uow.CompleteAsync();
         }
 
@@ -574,8 +618,20 @@ namespace NextWave.Erp.Restaurant
 
             var tenantId = AbpSession.GetTenantId();
             using var uow = unitOfWorkManager.Begin(new UnitOfWorkOptions { IsTransactional = true });
+            var versionChecksEnabled = await IsOrderVersionChecksEnabled(tenantId);
+            if (versionChecksEnabled && string.IsNullOrWhiteSpace(input.ClientRequestId))
+                throw new UserFriendlyException("A unique request ID is required for this split");
             var source = await orderRepository.FirstOrDefaultAsync(x => x.Id == input.SourceOrderId && x.TenantId == tenantId);
             if (source == null) throw new UserFriendlyException("Source order not found");
+            await EnsureOrderVersion(source, input.ExpectedOrderVersion, versionChecksEnabled);
+            var splitHash = HashOrderMutation(input);
+            var priorSplit = await FindOperation(tenantId, "SplitOrder", input.ClientRequestId);
+            if (priorSplit != null)
+            {
+                EnsureOperationHash(priorSplit, splitHash);
+                await uow.CompleteAsync();
+                return priorSplit.EntityId ?? Guid.Empty;
+            }
             if (source.Status is RestaurantOrderStatus.Billed or RestaurantOrderStatus.Closed or RestaurantOrderStatus.Cancelled)
                 throw new UserFriendlyException("Billed, closed, or cancelled orders cannot be split");
             if (input.NewTableId.HasValue &&
@@ -645,6 +701,8 @@ namespace NextWave.Erp.Restaurant
                 newOrderId,
                 null,
                 new { SourceOrderId = source.Id, ItemIds = input.OrderItemIds });
+            if (!string.IsNullOrWhiteSpace(input.ClientRequestId))
+                await RecordOperation(tenantId, "SplitOrder", input.ClientRequestId, splitHash, newOrderId);
             await uow.CompleteAsync();
             return newOrderId;
         }
@@ -657,12 +715,24 @@ namespace NextWave.Erp.Restaurant
 
             var tenantId = AbpSession.GetTenantId();
             using var uow = unitOfWorkManager.Begin(new UnitOfWorkOptions { IsTransactional = true });
+            var versionChecksEnabled = await IsOrderVersionChecksEnabled(tenantId);
+            if (versionChecksEnabled && string.IsNullOrWhiteSpace(input.ClientRequestId))
+                throw new UserFriendlyException("A unique request ID is required for this merge");
+            var mergeHash = HashOrderMutation(input);
+            var priorMerge = await FindOperation(tenantId, "MergeOrders", input.ClientRequestId);
+            if (priorMerge != null)
+            {
+                EnsureOperationHash(priorMerge, mergeHash);
+                await uow.CompleteAsync();
+                return;
+            }
             var sourceOrderIds = input.SourceOrderIds.Where(x => x != Guid.Empty && x != input.TargetOrderId).Distinct().ToList();
             if (sourceOrderIds.Count == 0)
                 return;
 
             var target = await orderRepository.FirstOrDefaultAsync(x => x.Id == input.TargetOrderId && x.TenantId == tenantId);
             if (target == null) throw new UserFriendlyException("Target order not found");
+            await EnsureOrderVersion(target, input.ExpectedOrderVersions?.GetValueOrDefault(target.Id), versionChecksEnabled);
             if (target.Status is RestaurantOrderStatus.Billed or RestaurantOrderStatus.Closed or RestaurantOrderStatus.Cancelled)
                 throw new UserFriendlyException("Billed, closed, or cancelled orders cannot be merged");
 
@@ -683,6 +753,8 @@ namespace NextWave.Erp.Restaurant
                 throw new UserFriendlyException("One or more source orders were not found");
             if (sources.Any(x => x.Status is RestaurantOrderStatus.Billed or RestaurantOrderStatus.Closed or RestaurantOrderStatus.Cancelled))
                 throw new UserFriendlyException("Billed, closed, or cancelled source orders cannot be merged");
+            foreach (var source in sources)
+                await EnsureOrderVersion(source, input.ExpectedOrderVersions?.GetValueOrDefault(source.Id), versionChecksEnabled);
 
             foreach (var source in sources)
             {
@@ -708,6 +780,8 @@ namespace NextWave.Erp.Restaurant
                 target.Id,
                 null,
                 new { target.OrderNo, SourceOrderIds = sourceOrderIds });
+            if (!string.IsNullOrWhiteSpace(input.ClientRequestId))
+                await RecordOperation(tenantId, "MergeOrders", input.ClientRequestId, mergeHash, target.Id);
             await uow.CompleteAsync();
         }
 

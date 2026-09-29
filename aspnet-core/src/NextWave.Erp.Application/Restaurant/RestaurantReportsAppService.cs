@@ -41,6 +41,9 @@ namespace NextWave.Erp.Restaurant
         IRepository<RestaurantPayrollAttendance, Guid> payrollAttendanceRepository,
         IRepository<RestaurantBillPayment, Guid> billPaymentRepository,
         IRepository<RestaurantBillTender, Guid> billTenderRepository,
+        IRepository<RestaurantCashShift, Guid> cashShiftRepository,
+        IRepository<RestaurantCashMovement, Guid> cashMovementRepository,
+        IRepository<RestaurantRefund, Guid> refundRepository,
         RestaurantReorderService reorderService)
         : ErpAppServiceBase, IRestaurantReportsAppService
     {
@@ -52,6 +55,118 @@ namespace NextWave.Erp.Restaurant
             AppPermissions.PagesRestaurantReportsPayroll,
             AppPermissions.PagesRestaurantReportsAuditFinance
         };
+
+        public async Task<RestaurantDailyClosingDto> GetDailyClosing(DateTime businessDate)
+        {
+            await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsAuditFinance);
+            var tenantId = AbpSession.GetTenantId();
+            var date = DateTime.SpecifyKind(businessDate.Date, DateTimeKind.Unspecified);
+            var nextDate = date.AddDays(1);
+            var sales = await salesMasterRepository.GetAll()
+                .Where(x => x.TenantId == tenantId && x.SourceModule == "Restaurant" && !x.IsDelete &&
+                            x.Date >= date && x.Date < nextDate)
+                .ToListAsync();
+            var salesIds = sales.Select(x => x.Id).ToList();
+
+            var transactions = await billPaymentRepository.GetAll()
+                .Where(x => x.TenantId == tenantId && x.PaidAt >= date && x.PaidAt < nextDate)
+                .ToListAsync();
+            var transactionIds = transactions.Select(x => x.Id).ToList();
+            var tenderRows = await billTenderRepository.GetAll()
+                .Where(x => x.TenantId == tenantId && transactionIds.Contains(x.BillPaymentId))
+                .ToListAsync();
+            var dailyTenderTotals = tenderRows.GroupBy(x => x.PaymentMethod)
+                .Select(x => new RestaurantDailyTenderTotalDto { PaymentMethod = x.Key, Amount = x.Sum(v => v.Amount) })
+                .ToList();
+            foreach (var payment in transactions.Where(x => tenderRows.All(t => t.BillPaymentId != x.Id) && x.PayableAmount > 0))
+            {
+                var row = dailyTenderTotals.FirstOrDefault(x => x.PaymentMethod == payment.PaymentMethod);
+                if (row == null)
+                {
+                    row = new RestaurantDailyTenderTotalDto { PaymentMethod = payment.PaymentMethod };
+                    dailyTenderTotals.Add(row);
+                }
+                row.Amount += payment.PayableAmount;
+            }
+
+            var invoicesWithPayments = salesIds.Count == 0 ? new List<RestaurantBillPayment>() :
+                await billPaymentRepository.GetAll().Where(x => x.TenantId == tenantId && salesIds.Contains(x.SalesMasterId)).ToListAsync();
+            var collectedByInvoice = invoicesWithPayments.GroupBy(x => x.SalesMasterId)
+                .ToDictionary(x => x.Key, x => x.Sum(v => v.BillAmount));
+            var refunds = await refundRepository.GetAll()
+                .Where(x => x.TenantId == tenantId && x.ApprovedAt >= date && x.ApprovedAt < nextDate &&
+                            x.Status != RestaurantRefundStatus.Cancelled)
+                .ToListAsync();
+
+            var cancelledItems = await orderItemRepository.GetAll()
+                .Where(x => x.TenantId == tenantId && x.Status == RestaurantOrderItemStatus.Cancelled &&
+                            x.CreatedAt >= date && x.CreatedAt < nextDate)
+                .SumAsync(x => (decimal?)x.Amount) ?? 0;
+            var wastageHeaderIds = await stockAdjustmentRepository.GetAll()
+                .Where(x => x.TenantId == tenantId && !x.IsDeleted && x.AdjustmentType == RestaurantStockAdjustmentType.Wastage &&
+                            x.Date >= date && x.Date < nextDate)
+                .Select(x => x.Id).ToListAsync();
+            var wastage = wastageHeaderIds.Count == 0 ? 0 :
+                await stockAdjustmentLineRepository.GetAll()
+                    .Where(x => x.TenantId == tenantId && !x.IsDeleted && wastageHeaderIds.Contains(x.StockAdjustmentId))
+                    .SumAsync(x => (decimal?)x.Amount) ?? 0;
+
+            var shifts = await cashShiftRepository.GetAll()
+                .Where(x => x.TenantId == tenantId && x.OpenedAt < nextDate && (!x.ClosedAt.HasValue || x.ClosedAt >= date))
+                .OrderBy(x => x.OpenedAt).ToListAsync();
+            var shiftIds = shifts.Select(x => x.Id).ToList();
+            var allShiftTenders = shiftIds.Count == 0 ? new List<RestaurantBillTender>() :
+                await billTenderRepository.GetAll().Where(x => x.TenantId == tenantId && shiftIds.Contains(x.CashShiftId ?? Guid.Empty) &&
+                                                               x.PaymentMethod == PaymentMethod.Cash).ToListAsync();
+            var allShiftMovements = shiftIds.Count == 0 ? new List<RestaurantCashMovement>() :
+                await cashMovementRepository.GetAll().Where(x => x.TenantId == tenantId && shiftIds.Contains(x.CashShiftId)).ToListAsync();
+            var shiftCloses = shifts.Select(shift =>
+            {
+                var cashSales = allShiftTenders.Where(x => x.CashShiftId == shift.Id).Sum(x => x.Amount);
+                var movements = allShiftMovements.Where(x => x.CashShiftId == shift.Id).ToList();
+                var cashIn = movements.Where(x => x.IsCashIn).Sum(x => x.Amount);
+                var cashOut = movements.Where(x => !x.IsCashIn).Sum(x => x.Amount);
+                var expected = shift.OpeningCash + cashSales + cashIn - cashOut;
+                return new RestaurantDailyShiftCloseDto
+                {
+                    ShiftId = shift.Id,
+                    RegisterName = shift.RegisterName,
+                    CashierUserId = shift.OpenedByUserId,
+                    OpeningCash = shift.OpeningCash,
+                    CashSales = cashSales,
+                    CashIn = cashIn,
+                    CashOut = cashOut,
+                    ExpectedCash = expected,
+                    CountedCash = shift.CountedClosingCash,
+                    Difference = shift.CountedClosingCash.HasValue ? shift.CountedClosingCash.Value - expected : null
+                };
+            }).ToList();
+
+            var startUtc = TimeZoneInfo.ConvertTimeToUtc(date, GetNepalTimeZone());
+            var endUtc = TimeZoneInfo.ConvertTimeToUtc(nextDate, GetNepalTimeZone());
+            return new RestaurantDailyClosingDto
+            {
+                BusinessDate = date,
+                PeriodStartUtc = startUtc,
+                PeriodEndUtc = endUtc,
+                Sales = sales.Sum(x => x.GrandTotal),
+                Collected = dailyTenderTotals.Sum(x => x.Amount),
+                UnpaidBalance = sales.Sum(x => Math.Max(0, x.GrandTotal - collectedByInvoice.GetValueOrDefault(x.Id))),
+                Discounts = sales.Sum(x => x.BillDiscount),
+                Voids = cancelledItems,
+                Wastage = wastage,
+                Refunds = refunds.Sum(x => x.ItemRefundAmount + x.TipRefundAmount),
+                Tips = transactions.Sum(x => x.TipAmount),
+                CollectionsByTender = dailyTenderTotals.OrderBy(x => x.PaymentMethod).ToList(),
+                Shifts = shiftCloses
+            };
+        }
+
+        private static TimeZoneInfo GetNepalTimeZone()
+        {
+            try { return TimeZoneInfo.FindSystemTimeZoneById("Asia/Kathmandu"); }
+            catch (TimeZoneNotFoundException) { return TimeZoneInfo.FindSystemTimeZoneById("Nepal Standard Time"); }
+        }
 
         public async Task<RestaurantPosSalesSummaryDto> GetPosSalesSummary(RestaurantReportFilterDto input)
         {

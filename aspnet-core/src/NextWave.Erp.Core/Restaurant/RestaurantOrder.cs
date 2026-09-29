@@ -2,8 +2,8 @@ using Abp.Domain.Entities;
 using NextWave.Erp.Enums;
 using NextWave.Erp.Sales;
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace NextWave.Erp.Restaurant
 {
@@ -41,5 +41,8 @@ namespace NextWave.Erp.Restaurant
         public DateTime? SentAt { get; set; }
         public DateTime? BilledAt { get; set; }
         public int? TenantId { get; set; }
+
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
     }
 }

@@ -288,6 +288,11 @@ namespace NextWave.Erp.Restaurant
                 ReservationBookingEnabled = await GetBoolSetting(AppSettings.ErpSettings.RestaurantReservationBookingEnabled, tenantId),
                 DefaultReservationDurationMinutes = int.TryParse(await SettingManager.GetSettingValueForTenantAsync(AppSettings.ErpSettings.RestaurantDefaultReservationDurationMinutes, tenantId), out var bookingDuration) ? bookingDuration : 90,
                 ReceiptPrintRouteName = await SettingManager.GetSettingValueForTenantAsync(AppSettings.ErpSettings.RestaurantReceiptPrintRouteName, tenantId)
+                ,RefundPayableLedgerId = Guid.TryParse(await SettingManager.GetSettingValueForTenantAsync(AppSettings.ErpSettings.RestaurantRefundPayableLedgerId, tenantId), out var refundLedgerId) ? refundLedgerId : null
+                ,MixedTenderEnabled = await GetBoolSetting(AppSettings.ErpSettings.RestaurantMixedTenderEnabled, tenantId)
+                ,RefundsEnabled = await GetBoolSetting(AppSettings.ErpSettings.RestaurantRefundsEnabled, tenantId)
+                ,OrderVersionChecksEnabled = await GetBoolSetting(AppSettings.ErpSettings.RestaurantOrderVersionChecksEnabled, tenantId)
+                ,AndroidDraftRecoveryEnabled = await GetBoolSetting(AppSettings.ErpSettings.RestaurantAndroidDraftRecoveryEnabled, tenantId)
             };
         }
 

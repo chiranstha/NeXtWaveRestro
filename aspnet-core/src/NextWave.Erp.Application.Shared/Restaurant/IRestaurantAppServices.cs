@@ -73,6 +73,22 @@ namespace NextWave.Erp.Restaurant
         Task<FinalizeRestaurantBillResultDto> FinalizeBill(FinalizeRestaurantBillDto input);
     }
 
+    public interface IRestaurantRefundAppService : IApplicationService
+    {
+        Task<RestaurantRefundDto> Create(CreateRestaurantRefundDto input);
+        Task<RestaurantRefundDto> Settle(SettleRestaurantRefundDto input);
+        Task<RestaurantRefundDto> Get(EntityDto<Guid> input);
+        Task<RestaurantOperationStatusDto> GetOperationStatus(string operationType, string clientRequestId);
+    }
+
+    public interface IRestaurantReleaseAppService : IApplicationService
+    {
+        Task<RestaurantReleaseCapabilitiesDto> GetCapabilities();
+        Task<RestaurantSetupReadinessDto> GetSetupReadiness();
+        Task AcknowledgeSetupCheck(AcknowledgeRestaurantSetupCheckDto input);
+        Task UpdateReleaseFeatures(RestaurantOperationalSettingsDto input);
+    }
+
     public interface IRestaurantCashShiftAppService : IApplicationService
     {
         Task<RestaurantCashShiftDto> GetCurrent(string registerName = "Main");
@@ -165,6 +181,7 @@ namespace NextWave.Erp.Restaurant
 
     public interface IRestaurantReportsAppService : IApplicationService
     {
+        Task<RestaurantDailyClosingDto> GetDailyClosing(DateTime businessDate);
         Task<RestaurantPosSalesSummaryDto> GetPosSalesSummary(RestaurantReportFilterDto input);
         Task<List<RestaurantMaterialConsumptionReportDto>> GetMaterialConsumption(RestaurantReportFilterDto input);
         Task<List<RestaurantItemSalesReportDto>> GetItemSales(RestaurantReportFilterDto input);

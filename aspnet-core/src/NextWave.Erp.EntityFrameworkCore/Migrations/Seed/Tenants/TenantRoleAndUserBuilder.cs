@@ -150,6 +150,8 @@ public class TenantRoleAndUserBuilder
                 AppPermissions.PagesRestaurantPosTableTransfer,
                 AppPermissions.PagesRestaurantPosSplitMerge,
                 AppPermissions.PagesRestaurantBilling,
+                AppPermissions.PagesRestaurantRefundSettle,
+                AppPermissions.PagesRestaurantSetupReadiness,
                 AppPermissions.PagesRestaurantKotBot,
                 AppPermissions.PagesRestaurantKotBotReprint,
                 AppPermissions.PagesRestaurantKds,
@@ -295,6 +297,7 @@ public class TenantRoleAndUserBuilder
         return new[]
         {
             AppPermissions.PagesRestaurant,
+            AppPermissions.PagesRestaurantRefundApprove,
             AppPermissions.PagesRestaurantReports,
             AppPermissions.PagesRestaurantReportsSales,
             AppPermissions.PagesRestaurantReportsOperations,
@@ -357,6 +360,10 @@ public class TenantRoleAndUserBuilder
             AppPermissions.PagesRestaurantPosTableTransfer,
             AppPermissions.PagesRestaurantPosSplitMerge,
             AppPermissions.PagesRestaurantBilling,
+            AppPermissions.PagesRestaurantRefundApprove,
+            AppPermissions.PagesRestaurantRefundSettle,
+            AppPermissions.PagesRestaurantSetupReadiness,
+            AppPermissions.PagesRestaurantReleaseFeatures,
             AppPermissions.PagesRestaurantKotBot,
             AppPermissions.PagesRestaurantKotBotReprint,
             AppPermissions.PagesRestaurantKds,

@@ -14,6 +14,7 @@ namespace NextWave.Erp.Transaction
         Task<CreateOrEditPaymentMasterDto> GetPaymentMasterForEdit(Guid id);
 
         Task<Guid> CreateOrEdit(CreateOrEditPaymentMasterDto input);
+        Task<Guid> CreateRestaurantRefundPayment(CreateOrEditPaymentMasterDto input);
 
         Task Delete(EntityDto<Guid> input);
 

@@ -316,7 +316,15 @@ public class AppAuthorizationProvider : AuthorizationProvider
             multiTenancySides: MultiTenancySides.Tenant);
         restaurantPos.CreateChildPermission(AppPermissions.PagesRestaurantPosSplitMerge, L("RestaurantPOSSplitMerge"),
             multiTenancySides: MultiTenancySides.Tenant);
-        restaurant.CreateChildPermission(AppPermissions.PagesRestaurantBilling, L("RestaurantBilling"),
+        var restaurantBilling = restaurant.CreateChildPermission(AppPermissions.PagesRestaurantBilling, L("RestaurantBilling"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        restaurantBilling.CreateChildPermission(AppPermissions.PagesRestaurantRefundApprove, L("RestaurantRefundApprove"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        restaurantBilling.CreateChildPermission(AppPermissions.PagesRestaurantRefundSettle, L("RestaurantRefundSettle"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        restaurant.CreateChildPermission(AppPermissions.PagesRestaurantSetupReadiness, L("RestaurantSetupReadiness"),
+            multiTenancySides: MultiTenancySides.Tenant);
+        restaurant.CreateChildPermission(AppPermissions.PagesRestaurantReleaseFeatures, L("RestaurantReleaseFeatures"),
             multiTenancySides: MultiTenancySides.Tenant);
         var restaurantKotBot = restaurant.CreateChildPermission(AppPermissions.PagesRestaurantKotBot, L("RestaurantKOTBOT"),
             multiTenancySides: MultiTenancySides.Tenant);

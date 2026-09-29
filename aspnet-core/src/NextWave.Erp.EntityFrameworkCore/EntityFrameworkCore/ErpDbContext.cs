@@ -161,6 +161,13 @@ public class ErpDbContext : AbpZeroDbContext<Tenant, Role, User, ErpDbContext>, 
     public virtual DbSet<RestaurantBillTender> RestaurantBillTenders { get; set; }
     public virtual DbSet<RestaurantCashShift> RestaurantCashShifts { get; set; }
     public virtual DbSet<RestaurantCashMovement> RestaurantCashMovements { get; set; }
+    public virtual DbSet<RestaurantRefund> RestaurantRefunds { get; set; }
+    public virtual DbSet<RestaurantRefundLine> RestaurantRefundLines { get; set; }
+    public virtual DbSet<RestaurantRefundTender> RestaurantRefundTenders { get; set; }
+    public virtual DbSet<RestaurantRefundSettlement> RestaurantRefundSettlements { get; set; }
+    public virtual DbSet<RestaurantRefundSettlementTender> RestaurantRefundSettlementTenders { get; set; }
+    public virtual DbSet<RestaurantClientOperation> RestaurantClientOperations { get; set; }
+    public virtual DbSet<RestaurantSetupAcknowledgement> RestaurantSetupAcknowledgements { get; set; }
     public virtual DbSet<RestaurantSupplierItemMapping> RestaurantSupplierItemMappings { get; set; }
     public virtual DbSet<RestaurantStockAdjustment> RestaurantStockAdjustments { get; set; }
     public virtual DbSet<RestaurantStockAdjustmentLine> RestaurantStockAdjustmentLines { get; set; }
@@ -292,12 +299,62 @@ public class ErpDbContext : AbpZeroDbContext<Tenant, Role, User, ErpDbContext>, 
 
         modelBuilder.Entity<RestaurantOrder>(b =>
         {
+            b.Property(e => e.RowVersion).IsRowVersion();
             b.HasIndex(e => new { e.TenantId, e.GuestClientRequestId })
                 .HasFilter("[GuestClientRequestId] IS NOT NULL")
                 .IsUnique();
             b.HasIndex(e => new { e.TenantId, e.PosClientRequestId })
                 .HasFilter("[PosClientRequestId] IS NOT NULL")
                 .IsUnique();
+        });
+
+        modelBuilder.Entity<RestaurantRefund>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.ClientRequestId }).IsUnique();
+            b.HasIndex(e => new { e.TenantId, e.SalesMasterId, e.Status });
+            b.HasOne(e => e.OrderFk).WithMany().HasForeignKey(e => e.RestaurantOrderId).OnDelete(DeleteBehavior.Restrict);
+            b.HasOne(e => e.SalesMasterFk).WithMany().HasForeignKey(e => e.SalesMasterId).OnDelete(DeleteBehavior.Restrict);
+            b.HasOne(e => e.SalesReturnMasterFk).WithMany().HasForeignKey(e => e.SalesReturnMasterId).OnDelete(DeleteBehavior.Restrict);
+            b.HasOne(e => e.TipSalesReturnMasterFk).WithMany().HasForeignKey(e => e.TipSalesReturnMasterId).OnDelete(DeleteBehavior.Restrict);
+            b.HasOne(e => e.CreditNoteSalesReturnMasterFk).WithMany().HasForeignKey(e => e.CreditNoteSalesReturnMasterId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<RestaurantRefundLine>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.RefundId });
+            b.HasIndex(e => new { e.TenantId, e.SalesDetailId });
+            b.HasOne(e => e.RefundFk).WithMany().HasForeignKey(e => e.RefundId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<RestaurantRefundTender>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.RefundId });
+            b.HasOne(e => e.RefundFk).WithMany().HasForeignKey(e => e.RefundId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<RestaurantRefundSettlement>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.ClientRequestId }).IsUnique();
+            b.HasOne(e => e.RefundFk).WithMany().HasForeignKey(e => e.RefundId).OnDelete(DeleteBehavior.Restrict);
+            b.HasOne(e => e.CashShiftFk).WithMany().HasForeignKey(e => e.CashShiftId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<RestaurantRefundSettlementTender>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.SettlementId });
+            b.HasOne(e => e.SettlementFk).WithMany().HasForeignKey(e => e.SettlementId).OnDelete(DeleteBehavior.Restrict);
+            b.HasOne(e => e.RefundTenderFk).WithMany().HasForeignKey(e => e.RefundTenderId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<RestaurantClientOperation>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.UserId, e.ClientRequestId }).IsUnique();
+            b.HasIndex(e => new { e.TenantId, e.OperationType, e.CreatedAt });
+        });
+
+        modelBuilder.Entity<RestaurantSetupAcknowledgement>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.CheckKey }).IsUnique();
         });
 
         modelBuilder.Entity<RestaurantStockAdjustment>(b =>

@@ -166,6 +166,27 @@ namespace NextWave.Erp.Enums
         Cancelled = 4
     }
 
+    public enum RestaurantRefundStatus
+    {
+        PendingSettlement = 0,
+        PartiallySettled = 1,
+        Settled = 2,
+        CreditApplied = 3,
+        Cancelled = 4
+    }
+
+    public enum RestaurantRefundStockDisposition
+    {
+        Discard = 0,
+        RestockSealedPackagedItem = 1
+    }
+
+    public enum RestaurantSetupCheckKey
+    {
+        TestReceipt = 0,
+        TestKitchenTicket = 1
+    }
+
     public enum RestaurantSmsOutboxStatus
     {
         Pending = 0,

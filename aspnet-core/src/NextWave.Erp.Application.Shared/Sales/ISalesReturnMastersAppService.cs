@@ -17,6 +17,7 @@ namespace NextWave.Erp.Sales
         Task<GetSalesReturnMasterForEditOutput> GetSalesReturnMasterForEdit(EntityDto<Guid> input);
 
         Task<Guid> CreateOrEdit(CreateOrEditSalesReturnMasterDto input);
+        Task<Guid> CreateRestaurantRefundReturn(CreateOrEditSalesReturnMasterDto input);
 
         Task Delete(EntityDto<Guid> input);
 
