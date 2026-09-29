@@ -20,11 +20,13 @@ import { RestaurantMenuComponent } from './restaurant-menu/restaurant-menu.compo
 import { RestaurantNavigationComponent } from './restaurant-navigation.component';
 import { RestaurantPayrollApiService } from './restaurant-payroll/restaurant-payroll-api.service';
 import { RestaurantCashShiftApiService } from './restaurant-cash-shift-api.service';
+import { RestaurantReleaseApiService } from './restaurant-release-api.service';
 import { RestaurantPayrollComponent } from './restaurant-payroll/restaurant-payroll.component';
 import { RestaurantPosComponent } from './restaurant-pos/restaurant-pos.component';
 import { RestaurantReportsComponent } from './restaurant-reports/restaurant-reports.component';
 import { RestaurantRoutingModule } from './restaurant-routing.module';
 import { RestaurantSetupComponent } from './restaurant-setup/restaurant-setup.component';
+import { RestaurantRefundsComponent } from './restaurant-refunds/restaurant-refunds.component';
 import { RestaurantStylesComponent } from './restaurant-styles.component';
 
 @NgModule({
@@ -49,6 +51,7 @@ import { RestaurantStylesComponent } from './restaurant-styles.component';
     ],
     declarations: [
         RestaurantSetupComponent,
+        RestaurantRefundsComponent,
         RestaurantMenuComponent,
         RestaurantNavigationComponent,
         RestaurantInventoryComponent,
@@ -58,7 +61,7 @@ import { RestaurantStylesComponent } from './restaurant-styles.component';
         RestaurantReportsComponent,
         RestaurantPayrollComponent,
     ],
-    providers: [RestaurantPayrollApiService, RestaurantCashShiftApiService],
+    providers: [RestaurantPayrollApiService, RestaurantCashShiftApiService, RestaurantReleaseApiService],
     schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
 })
 export class RestaurantModule {}

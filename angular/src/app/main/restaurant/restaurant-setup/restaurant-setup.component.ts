@@ -29,6 +29,7 @@ import { finalize } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { CellClickedEvent, ColDef } from 'ag-grid-community';
 import { RestaurantGuestApiService } from '../restaurant-guest-api.service';
+import { RestaurantReleaseApiService, RestaurantSetupReadiness } from '../restaurant-release-api.service';
 
 type RestaurantSetupSection = 'areas' | 'tables' | 'stations' | 'devices' | 'settings';
 
@@ -72,11 +73,14 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
     noRowsOverlayTemplate = '';
     qrResult: any;
     qrBusyTableId = '';
+    setupReadiness: RestaurantSetupReadiness | null = null;
+    savingReleaseFeatures = false;
 
     private fb = inject(FormBuilder);
     private restaurantSetupService = inject(RestaurantSetupServiceProxy);
     private salesMastersService = inject(SalesMastersServiceProxy);
     private guestApi = inject(RestaurantGuestApiService);
+    private releaseApi = inject(RestaurantReleaseApiService);
     private cdr = inject(ChangeDetectorRef);
     private route = inject(ActivatedRoute);
 
@@ -126,6 +130,10 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
             }
             this.cdr.markForCheck();
         });
+        this.releaseApi.readiness().subscribe((result) => {
+            this.setupReadiness = result;
+            this.cdr.markForCheck();
+        });
         this.salesMastersService.getAllAccountLedgerForTableDropdown().subscribe((result) => {
             this.tipLedgerOptions = result || [];
             this.cdr.markForCheck();
@@ -170,6 +178,45 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
                 this.notify.success(this.l('SavedSuccessfully'));
                 this.refresh();
             });
+    }
+
+    acknowledgePhysicalCheck(key: string): void {
+        const checkKey = key === 'TestReceipt' ? 0 : key === 'TestKitchenTicket' ? 1 : null;
+        if (checkKey === null) return;
+        const note = (window.prompt('Confirm that you physically printed and checked this test:') || '').trim();
+        if (!note) return;
+        this.saving = true;
+        this.releaseApi.acknowledgeSetupCheck(checkKey, note)
+            .pipe(finalize(() => this.finishSaving()))
+            .subscribe(() => {
+                this.notify.success('Setup check recorded');
+                this.refreshReadiness();
+            });
+    }
+
+    saveReleaseFeatures(): void {
+        const values = this.settingsForm.getRawValue();
+        this.savingReleaseFeatures = true;
+        this.releaseApi.updateFeatures({
+            mixedTenderEnabled: !!values.mixedTenderEnabled,
+            refundsEnabled: !!values.refundsEnabled,
+            orderVersionChecksEnabled: !!values.orderVersionChecksEnabled,
+            androidDraftRecoveryEnabled: !!values.androidDraftRecoveryEnabled,
+            clientCompatibilityConfirmed: !!values.clientCompatibilityConfirmed,
+        }).pipe(finalize(() => {
+            this.savingReleaseFeatures = false;
+            this.cdr.markForCheck();
+        })).subscribe(() => {
+            this.notify.success('Release features updated');
+            this.refresh();
+        });
+    }
+
+    private refreshReadiness(): void {
+        this.releaseApi.readiness().subscribe((result) => {
+            this.setupReadiness = result;
+            this.cdr.markForCheck();
+        });
     }
 
     saveTable(): void {
@@ -390,6 +437,7 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
             tipLedgerId: [null],
             cardLedgerId: [null],
             qrLedgerId: [null],
+            refundPayableLedgerId: [null],
             requireManagerPinForSensitiveActions: [false],
             managerPin: [''],
             negativeStockStatus: ['Warn', Validators.required],
@@ -400,6 +448,11 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
             reservationBookingEnabled: [false],
             defaultReservationDurationMinutes: [90, [Validators.required, Validators.min(30), Validators.max(240)]],
             receiptPrintRouteName: [''],
+            mixedTenderEnabled: [false],
+            refundsEnabled: [false],
+            orderVersionChecksEnabled: [false],
+            androidDraftRecoveryEnabled: [false],
+            clientCompatibilityConfirmed: [false],
         });
     }
 

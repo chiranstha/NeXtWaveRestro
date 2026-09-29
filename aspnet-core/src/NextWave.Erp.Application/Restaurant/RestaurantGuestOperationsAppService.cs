@@ -138,7 +138,12 @@ namespace NextWave.Erp.Restaurant
                 order.GuestApprovalStatus = RestaurantGuestOrderApprovalStatus.Approved;
                 await orderRepository.UpdateAsync(order);
                 await CurrentUnitOfWork.SaveChangesAsync();
-                await orderAppService.SendToKitchen(new EntityDto<Guid>(order.Id));
+                await orderAppService.SendToKitchen(new RestaurantOrderMutationDto
+                {
+                    OrderId = order.Id,
+                    ClientRequestId = "guest-kitchen-" + order.Id.ToString("N"),
+                    ExpectedOrderVersion = order.RowVersion == null ? null : Convert.ToBase64String(order.RowVersion)
+                });
                 return;
             }
 

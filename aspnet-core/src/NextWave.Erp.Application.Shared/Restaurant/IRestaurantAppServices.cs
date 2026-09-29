@@ -51,9 +51,10 @@ namespace NextWave.Erp.Restaurant
         Task<RestaurantOrderDto> GetOrderForPos(Guid id);
         Task<List<RestaurantOrderDto>> GetOpenOrders();
         Task<List<RestaurantOrderDto>> GetOpenOrdersForPos();
+        Task<RestaurantOperationStatusDto> GetOperationStatus(string operationType, string clientRequestId);
         Task<Guid> CreateOrEditOrder(CreateOrEditRestaurantOrderDto input);
         Task ApplyOrderDiscount(ApplyRestaurantOrderDiscountDto input);
-        Task SendToKitchen(EntityDto<Guid> input);
+        Task SendToKitchen(RestaurantOrderMutationDto input);
         Task CancelItem(EntityDto<Guid> input);
         Task CancelTicket(CancelRestaurantTicketDto input);
         Task VoidOrderItem(VoidRestaurantOrderItemDto input);

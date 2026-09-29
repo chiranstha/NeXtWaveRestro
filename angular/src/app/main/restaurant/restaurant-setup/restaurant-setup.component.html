@@ -453,6 +453,14 @@
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
+                                <label class="form-label">Refund clearing ledger</label>
+                                <select class="form-select" formControlName="refundPayableLedgerId">
+                                    <option [ngValue]="null">Not configured</option>
+                                    <option *ngFor="let ledger of tipLedgerOptions" [ngValue]="ledger.id">{{ ledger.displayName }}</option>
+                                </select>
+                                <small class="form-text text-muted">Required before enabling restaurant refunds.</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
                                 <label class="required form-label">{{ 'Negative Stock' | localize }}</label>
                                 <select class="form-select" formControlName="negativeStockStatus">
                                     <option *ngFor="let option of negativeStockOptions" [ngValue]="option">{{ option }}</option>
@@ -524,6 +532,55 @@
                             </button>
                         </div>
                     </form>
+                </div>
+                <div class="card card-custom gutter-b restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0" [formGroup]="settingsForm">
+                    <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between">
+                        <div>
+                            <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">Launch readiness</div>
+                            <small class="text-muted">Complete every check before turning on release features.</small>
+                        </div>
+                        <span class="badge" [ngClass]="setupReadiness?.isReady ? 'badge-light-success' : 'badge-light-warning'">
+                            {{ setupReadiness?.isReady ? 'Ready' : 'Checks needed' }}
+                        </span>
+                    </div>
+                    <div class="card-body p-3">
+                        <div class="d-grid gap-2" *ngIf="setupReadiness as readiness; else loadingReadiness">
+                            <div class="border rounded p-2 d-flex flex-wrap justify-content-between align-items-center gap-2" *ngFor="let check of readiness.checks">
+                                <div class="min-w-0">
+                                    <div class="fw-bold" [class.text-success]="check.isReady" [class.text-danger]="!check.isReady">
+                                        <i class="fa me-1" [ngClass]="check.isReady ? 'fa-circle-check' : 'fa-circle-exclamation'"></i>{{ check.label }}
+                                    </div>
+                                    <small class="text-muted">{{ check.details }}</small>
+                                    <small class="text-muted d-block" *ngIf="check.completedAt">Recorded {{ check.completedAt | date:'medium' }} by user {{ check.completedByUserId }}</small>
+                                </div>
+                                <button *ngIf="check.key === 'TestReceipt' || check.key === 'TestKitchenTicket'" type="button" class="btn btn-sm btn-light-primary" (click)="acknowledgePhysicalCheck(check.key)">
+                                    {{ check.isReady ? 'Record test again' : 'Confirm physical test' }}
+                                </button>
+                            </div>
+                        </div>
+                        <ng-template #loadingReadiness><div class="text-muted">Loading setup checks…</div></ng-template>
+                        <hr />
+                        <div class="row">
+                            <div class="col-md-6 mb-2" *ngFor="let item of [
+                                { key: 'mixedTenderEnabled', label: 'Mixed tender payments' },
+                                { key: 'refundsEnabled', label: 'Restaurant refunds' },
+                                { key: 'orderVersionChecksEnabled', label: 'Order conflict protection' },
+                                { key: 'androidDraftRecoveryEnabled', label: 'Android draft recovery' }
+                            ]">
+                                <label class="form-check form-switch form-check-custom form-check-solid">
+                                    <input class="form-check-input" type="checkbox" [formControlName]="item.key" />
+                                    <span class="form-check-label">{{ item.label }}</span>
+                                </label>
+                            </div>
+                        </div>
+                        <label class="form-check form-check-sm form-check-custom form-check-solid mb-3">
+                            <input class="form-check-input" type="checkbox" formControlName="clientCompatibilityConfirmed" />
+                            <span class="form-check-label">I confirmed the browser and Android apps are on a compatible release.</span>
+                        </label>
+                        <button type="button" class="btn btn-sm btn-primary" [buttonBusy]="savingReleaseFeatures" (click)="saveReleaseFeatures()">
+                            <i class="fa fa-toggle-on"></i> Save release features
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,0 +1,87 @@
+<div>
+    <restaurant-styles></restaurant-styles>
+    <sub-header [title]="'Restaurant Refunds'"></sub-header>
+    <div [class]="containerClass">
+        <div class="restaurant-page d-grid gap-5 mw-100 min-w-0">
+            <div class="card card-custom restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm">
+                <div class="card-header px-3 py-2 d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="fw-bolder">Find original invoice</div>
+                        <small class="text-muted">Refunds are tied to the original restaurant sale.</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <input class="form-control form-control-sm min-w-250px" [(ngModel)]="invoiceId" placeholder="Invoice ID" (keyup.enter)="loadInvoice()" />
+                        <button class="btn btn-sm btn-primary" [buttonBusy]="loading" (click)="loadInvoice()">Load</button>
+                    </div>
+                </div>
+                <div class="card-body" *ngIf="invoice as sale">
+                    <div class="d-flex flex-wrap gap-4 mb-3">
+                        <span><strong>Invoice:</strong> {{ sale.voucherNo || sale.id }}</span>
+                        <span><strong>Customer:</strong> {{ sale.customerName || 'Walk-in' }}</span>
+                        <span><strong>Total:</strong> {{ sale.grandTotal | number:'1.2-2' }}</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-row-bordered align-middle">
+                            <thead><tr><th>Item</th><th>Sold qty</th><th>Rate</th><th>Discount</th><th>Tax</th><th>Refund qty</th><th>Amount</th><th>Packaged item returned unopened</th></tr></thead>
+                            <tbody>
+                                <tr *ngFor="let line of sale.salesDetails || []">
+                                    <td>{{ productName(line) }}</td>
+                                    <td>{{ line.qty | number:'1.0-3' }}</td>
+                                    <td>{{ line.rate | number:'1.2-2' }}</td>
+                                    <td>{{ line.discount || 0 | number:'1.2-2' }}</td>
+                                    <td>{{ line.taxAmount || 0 | number:'1.2-2' }}</td>
+                                    <td><input class="form-control form-control-sm w-100px" type="number" min="0" [max]="line.qty" step="0.001" [(ngModel)]="lineSelections[line.id!].quantity" /></td>
+                                    <td>{{ lineTotal(line) | number:'1.2-2' }}</td>
+                                    <td><label class="form-check form-check-sm"><input class="form-check-input" type="checkbox" [disabled]="!(lineSelections[line.id!].quantity > 0)" [(ngModel)]="lineSelections[line.id!].restock" /> Restock only if sealed/resellable</label></td>
+                                </tr>
+                                <tr *ngIf="!sale.salesDetails?.length"><td colspan="8" class="text-muted">This invoice has no refundable detail lines.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4"><label class="form-label required">Reason</label><input class="form-control" maxlength="500" [(ngModel)]="reason" /></div>
+                        <div class="col-md-3"><label class="form-label">Separate tip refund</label><input class="form-control" type="number" min="0" step="0.01" [(ngModel)]="tipRefundAmount" /></div>
+                        <div class="col-md-3"><label class="form-label required">Manager PIN</label><input class="form-control" type="password" autocomplete="off" [(ngModel)]="managerPin" /></div>
+                        <div class="col-md-2"><button type="button" class="btn btn-primary w-100" [buttonBusy]="saving" (click)="approveRefund()">Approve refund</button></div>
+                    </div>
+                    <small class="text-muted d-block mt-2">Food and ingredients are never restocked automatically. Only mark unopened packaged items when staff physically confirmed they can be resold.</small>
+                </div>
+            </div>
+
+            <div class="card card-custom restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm" *ngIf="refund as approved">
+                <div class="card-header px-3 py-2 d-flex align-items-center justify-content-between">
+                    <div><div class="fw-bolder">Refund {{ approved.id }}</div><small class="text-muted">Approval and payout are separate records.</small></div>
+                    <span class="badge badge-light-primary">{{ approved.status }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="row row-cols-2 row-cols-lg-4 g-2 mb-3">
+                        <div class="col"><div class="border rounded p-2"><small class="d-block text-muted">Items</small><strong>{{ approved.itemRefundAmount | number:'1.2-2' }}</strong></div></div>
+                        <div class="col"><div class="border rounded p-2"><small class="d-block text-muted">Tip adjustment</small><strong>{{ approved.tipRefundAmount | number:'1.2-2' }}</strong></div></div>
+                        <div class="col"><div class="border rounded p-2"><small class="d-block text-muted">Cash/card/QR payout</small><strong>{{ approved.payoutAmount | number:'1.2-2' }}</strong></div></div>
+                        <div class="col"><div class="border rounded p-2"><small class="d-block text-muted">Credit note</small><strong>{{ approved.creditNoteAmount | number:'1.2-2' }}</strong></div></div>
+                    </div>
+                    <div class="alert alert-light-warning" *ngIf="approved.payoutAmount > approved.settledAmount && (!currentShift || currentShift.isClosed)">
+                        Open a cashier shift before paying any cash portion. Card/QR payouts require the cashier verification reference.
+                    </div>
+                    <div class="table-responsive" *ngIf="approved.tenders?.length">
+                        <table class="table table-sm table-row-bordered align-middle mb-3">
+                            <thead><tr><th>Original tender</th><th>Refund allocation</th><th>Already paid</th><th>Manual card/QR reference</th></tr></thead>
+                            <tbody><tr *ngFor="let tender of approved.tenders">
+                                <td>{{ tenderName(tender.paymentMethod) }}</td>
+                                <td>{{ tender.allocatedAmount | number:'1.2-2' }}</td>
+                                <td>{{ tender.settledAmount | number:'1.2-2' }}</td>
+                                <td><input *ngIf="tender.paymentMethod !== 0" class="form-control form-control-sm" [(ngModel)]="payoutReferences[tender.id]" placeholder="Provider/reference no." /></td>
+                            </tr></tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <span *ngIf="currentShift && !currentShift.isClosed" class="text-success">Open cash shift: {{ currentShift.registerName }}</span>
+                        <span *ngIf="!currentShift || currentShift.isClosed" class="text-muted">No open cash shift</span>
+                        <button type="button" class="btn btn-sm btn-primary" [buttonBusy]="settling" [disabled]="approved.payoutAmount <= approved.settledAmount" (click)="settlePayout()">Record payout</button>
+                        <span class="text-muted">Payouts cannot exceed money collected; any unpaid balance remains a linked credit note.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

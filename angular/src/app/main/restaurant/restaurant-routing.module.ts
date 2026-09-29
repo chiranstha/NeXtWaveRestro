@@ -8,6 +8,7 @@ import { RestaurantPayrollComponent } from './restaurant-payroll/restaurant-payr
 import { RestaurantPosComponent } from './restaurant-pos/restaurant-pos.component';
 import { RestaurantReportsComponent } from './restaurant-reports/restaurant-reports.component';
 import { RestaurantSetupComponent } from './restaurant-setup/restaurant-setup.component';
+import { RestaurantRefundsComponent } from './restaurant-refunds/restaurant-refunds.component';
 
 @NgModule({
     imports: [
@@ -28,6 +29,7 @@ import { RestaurantSetupComponent } from './restaurant-setup/restaurant-setup.co
                         data: { permission: 'Pages.Restaurant.Channels' },
                     },
                     { path: 'pos', component: RestaurantPosComponent, data: { permission: 'Pages.Restaurant.Pos' } },
+                    { path: 'refunds', component: RestaurantRefundsComponent, data: { permission: 'Pages.Restaurant.Pos' } },
                     { path: 'guest-orders', loadComponent: () => import('./restaurant-guest-orders.component').then((m) => m.RestaurantGuestOrdersComponent), data: { permission: 'Pages.Restaurant.Pos' } },
                     { path: 'reservations', loadComponent: () => import('./restaurant-reservations.component').then((m) => m.RestaurantReservationsComponent), data: { permission: 'Pages.Restaurant.Reservations' } },
                     { path: 'print-station', loadComponent: () => import('./restaurant-print-station.component').then((m) => m.RestaurantPrintStationComponent), data: { permission: 'Pages.Restaurant.PrinterSetup' } },

@@ -282,7 +282,7 @@ class _PosBillingScreenState extends State<PosBillingScreen> {
             ),
           ),
           const Divider(height: 22),
-          _AmountRow(label: 'Menu subtotal', value: money(subtotal)),
+          _AmountRow(label: 'Menu subtotal', value: money(subtotal), strong: false),
           const Padding(
             padding: EdgeInsets.only(top: 4, bottom: 10),
             child: Text(

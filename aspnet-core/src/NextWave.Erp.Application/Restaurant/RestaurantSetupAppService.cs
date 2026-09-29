@@ -287,12 +287,12 @@ namespace NextWave.Erp.Restaurant
                 QrOrderingEnabled = await GetBoolSetting(AppSettings.ErpSettings.RestaurantQrOrderingEnabled, tenantId),
                 ReservationBookingEnabled = await GetBoolSetting(AppSettings.ErpSettings.RestaurantReservationBookingEnabled, tenantId),
                 DefaultReservationDurationMinutes = int.TryParse(await SettingManager.GetSettingValueForTenantAsync(AppSettings.ErpSettings.RestaurantDefaultReservationDurationMinutes, tenantId), out var bookingDuration) ? bookingDuration : 90,
-                ReceiptPrintRouteName = await SettingManager.GetSettingValueForTenantAsync(AppSettings.ErpSettings.RestaurantReceiptPrintRouteName, tenantId)
-                ,RefundPayableLedgerId = Guid.TryParse(await SettingManager.GetSettingValueForTenantAsync(AppSettings.ErpSettings.RestaurantRefundPayableLedgerId, tenantId), out var refundLedgerId) ? refundLedgerId : null
-                ,MixedTenderEnabled = await GetBoolSetting(AppSettings.ErpSettings.RestaurantMixedTenderEnabled, tenantId)
-                ,RefundsEnabled = await GetBoolSetting(AppSettings.ErpSettings.RestaurantRefundsEnabled, tenantId)
-                ,OrderVersionChecksEnabled = await GetBoolSetting(AppSettings.ErpSettings.RestaurantOrderVersionChecksEnabled, tenantId)
-                ,AndroidDraftRecoveryEnabled = await GetBoolSetting(AppSettings.ErpSettings.RestaurantAndroidDraftRecoveryEnabled, tenantId)
+                ReceiptPrintRouteName = await SettingManager.GetSettingValueForTenantAsync(AppSettings.ErpSettings.RestaurantReceiptPrintRouteName, tenantId),
+                RefundPayableLedgerId = Guid.TryParse(await SettingManager.GetSettingValueForTenantAsync(AppSettings.ErpSettings.RestaurantRefundPayableLedgerId, tenantId), out var refundLedgerId) ? refundLedgerId : null,
+                MixedTenderEnabled = await GetBoolSetting(AppSettings.ErpSettings.RestaurantMixedTenderEnabled, tenantId),
+                RefundsEnabled = await GetBoolSetting(AppSettings.ErpSettings.RestaurantRefundsEnabled, tenantId),
+                OrderVersionChecksEnabled = await GetBoolSetting(AppSettings.ErpSettings.RestaurantOrderVersionChecksEnabled, tenantId),
+                AndroidDraftRecoveryEnabled = await GetBoolSetting(AppSettings.ErpSettings.RestaurantAndroidDraftRecoveryEnabled, tenantId)
             };
         }
 
@@ -315,6 +315,9 @@ namespace NextWave.Erp.Restaurant
             if (input.QrLedgerId.HasValue && await accountLedgerRepository.CountAsync(x =>
                     x.Id == input.QrLedgerId.Value && x.TenantId == tenantId) == 0)
                 throw new UserFriendlyException("Select a valid tenant QR settlement ledger");
+            if (input.RefundPayableLedgerId.HasValue && await accountLedgerRepository.CountAsync(x =>
+                    x.Id == input.RefundPayableLedgerId.Value && x.TenantId == tenantId) == 0)
+                throw new UserFriendlyException("Select a valid tenant refund clearing ledger");
 
             await SettingManager.ChangeSettingForTenantAsync(
                 tenantId,
@@ -336,6 +339,10 @@ namespace NextWave.Erp.Restaurant
                 tenantId,
                 AppSettings.ErpSettings.RestaurantQrLedgerId,
                 input.QrLedgerId?.ToString() ?? string.Empty);
+            await SettingManager.ChangeSettingForTenantAsync(
+                tenantId,
+                AppSettings.ErpSettings.RestaurantRefundPayableLedgerId,
+                input.RefundPayableLedgerId?.ToString() ?? string.Empty);
             await SettingManager.ChangeSettingForTenantAsync(
                 tenantId,
                 AppSettings.ErpSettings.RestaurantRequireManagerPinForSensitiveActions,

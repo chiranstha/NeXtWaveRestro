@@ -547,6 +547,7 @@ class RestaurantOrderModel {
     required this.grandTotal,
     required this.remainingGrandTotal,
     required this.items,
+    this.rowVersion,
   });
 
   final String id;
@@ -560,6 +561,36 @@ class RestaurantOrderModel {
   final double grandTotal;
   final double remainingGrandTotal;
   final List<CartLine> items;
+  final String? rowVersion;
+}
+
+class RestaurantReleaseCapabilities {
+  const RestaurantReleaseCapabilities({
+    this.mixedTenderEnabled = false,
+    this.refundsEnabled = false,
+    this.orderVersionChecksEnabled = false,
+    this.androidDraftRecoveryEnabled = false,
+    this.supportsRefundSettlement = false,
+    this.supportsOrderVersioning = false,
+  });
+
+  factory RestaurantReleaseCapabilities.fromJson(Map<String, dynamic> json) {
+    return RestaurantReleaseCapabilities(
+      mixedTenderEnabled: json['mixedTenderEnabled'] == true,
+      refundsEnabled: json['refundsEnabled'] == true,
+      orderVersionChecksEnabled: json['orderVersionChecksEnabled'] == true,
+      androidDraftRecoveryEnabled: json['androidDraftRecoveryEnabled'] == true,
+      supportsRefundSettlement: json['supportsRefundSettlement'] == true,
+      supportsOrderVersioning: json['supportsOrderVersioning'] == true,
+    );
+  }
+
+  final bool mixedTenderEnabled;
+  final bool refundsEnabled;
+  final bool orderVersionChecksEnabled;
+  final bool androidDraftRecoveryEnabled;
+  final bool supportsRefundSettlement;
+  final bool supportsOrderVersioning;
 }
 
 class LedgerOption {

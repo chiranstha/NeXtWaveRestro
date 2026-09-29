@@ -72,7 +72,7 @@ namespace NextWave.Erp.Restaurant
                 RegisterName = registerName,
                 OpenedByUserId = userId,
                 OpeningCash = input.OpeningCash,
-                OpenedAt = DateTime.Now
+                OpenedAt = GetNepalNow()
             };
             await _shiftRepository.InsertAsync(shift);
             await uow.CompleteAsync();
@@ -96,7 +96,7 @@ namespace NextWave.Erp.Restaurant
                 Amount = input.Amount,
                 Reason = reason,
                 CreatedByUserId = RequireUserId(),
-                CreatedAt = DateTime.Now
+                CreatedAt = GetNepalNow()
             });
             await CurrentUnitOfWork.SaveChangesAsync();
             return await Map(shift);
@@ -118,7 +118,7 @@ namespace NextWave.Erp.Restaurant
 
             shift.IsClosed = true;
             shift.ClosedByUserId = RequireUserId();
-            shift.ClosedAt = DateTime.Now;
+            shift.ClosedAt = GetNepalNow();
             shift.CountedClosingCash = input.CountedCash;
             shift.ExpectedClosingCash = current.ExpectedClosingCash;
             shift.CashVariance = variance;
@@ -190,6 +190,14 @@ namespace NextWave.Erp.Restaurant
             if (legacy)
                 await SettingManager.ChangeSettingForTenantAsync(AbpSession.GetTenantId(),
                     AppSettings.ErpSettings.RestaurantManagerPin, RestaurantPinHasher.Hash(expected.Trim()));
+        }
+
+        private static DateTime GetNepalNow()
+        {
+            TimeZoneInfo zone;
+            try { zone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Kathmandu"); }
+            catch (TimeZoneNotFoundException) { zone = TimeZoneInfo.FindSystemTimeZoneById("Nepal Standard Time"); }
+            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zone);
         }
 
         private long RequireUserId()

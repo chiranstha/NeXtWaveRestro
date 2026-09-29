@@ -204,6 +204,16 @@ class RestaurantApi {
     );
   }
 
+  Future<RestaurantReleaseCapabilities> getReleaseCapabilities() async {
+    return RestaurantReleaseCapabilities.fromJson(
+      _map(
+        await client.get(
+          '/api/services/app/RestaurantRelease/GetCapabilities',
+        ),
+      ),
+    );
+  }
+
   Future<void> saveArea({
     String? id,
     required String name,
@@ -374,6 +384,7 @@ class RestaurantApi {
     required String customerPhone,
     required List<CartLine> items,
     String? clientRequestId,
+    String? expectedOrderVersion,
   }) async {
     final result = await client.post(
       '/api/services/app/RestaurantOrder/CreateOrEditOrder',
@@ -384,6 +395,7 @@ class RestaurantApi {
         'deviceId': null,
         'source': 'Flutter POS',
         'clientRequestId': clientRequestId,
+        'expectedOrderVersion': expectedOrderVersion,
         'waiterUserId': userId == 0 ? null : userId,
         'guestCount': 0,
         'customerName': customerName,
@@ -395,10 +407,18 @@ class RestaurantApi {
     return _string(result);
   }
 
-  Future<void> sendToKitchen(String orderId) async {
+  Future<void> sendToKitchen(
+    String orderId, {
+    String? clientRequestId,
+    String? expectedOrderVersion,
+  }) async {
     await client.post(
       '/api/services/app/RestaurantOrder/SendToKitchen',
-      body: {'id': orderId},
+      body: {
+        'orderId': orderId,
+        'clientRequestId': clientRequestId,
+        'expectedOrderVersion': expectedOrderVersion,
+      },
     );
   }
 
@@ -1416,6 +1436,7 @@ RestaurantOrderModel _orderFromJson(
 ) {
   return RestaurantOrderModel(
     id: _string(item['id']),
+    rowVersion: _nullableString(item['rowVersion']),
     orderNo: _string(item['orderNo']),
     orderType: _integer(item['orderType']),
     status: _integer(item['status']),

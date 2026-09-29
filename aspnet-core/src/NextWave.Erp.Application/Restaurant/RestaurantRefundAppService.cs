@@ -219,8 +219,8 @@ namespace NextWave.Erp.Restaurant
                 PayoutAmount = payoutAmount,
                 Status = payoutAmount > 0 ? RestaurantRefundStatus.PendingSettlement : RestaurantRefundStatus.CreditApplied,
                 ApprovedByUserId = AbpSession.GetUserId(),
-                ApprovedAt = DateTime.UtcNow,
-                CreatedAt = DateTime.UtcNow
+                ApprovedAt = GetNepalNow(),
+                CreatedAt = GetNepalNow()
             };
             refund.Id = await refundRepository.InsertAndGetIdAsync(refund);
 
@@ -395,7 +395,7 @@ namespace NextWave.Erp.Restaurant
                 RequestHash = requestHash,
                 Amount = settlementAmount,
                 SettledByUserId = AbpSession.GetUserId(),
-                SettledAt = DateTime.UtcNow,
+                SettledAt = GetNepalNow(),
                 CashShiftId = cashShift?.Id
             };
             settlement.Id = await settlementRepository.InsertAndGetIdAsync(settlement);
@@ -437,11 +437,11 @@ namespace NextWave.Erp.Restaurant
                     Amount = cashAmount,
                     Reason = "Restaurant refund " + refund.Id.ToString("N"),
                     CreatedByUserId = AbpSession.GetUserId(),
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = GetNepalNow()
                 });
 
             refund.SettledAmount += settlementAmount;
-            refund.SettledAt = DateTime.UtcNow;
+            refund.SettledAt = GetNepalNow();
             refund.Status = refund.SettledAmount >= refund.PayoutAmount
                 ? RestaurantRefundStatus.Settled
                 : RestaurantRefundStatus.PartiallySettled;

@@ -86,6 +86,42 @@ void main() {
     client.close();
   });
 
+  test('Android reads restaurant release capabilities before draft recovery', () async {
+    late http.Request captured;
+    final httpClient = MockClient((request) async {
+      captured = request;
+      return http.Response(
+        jsonEncode({
+          'success': true,
+          'result': {
+            'mixedTenderEnabled': false,
+            'refundsEnabled': true,
+            'orderVersionChecksEnabled': true,
+            'androidDraftRecoveryEnabled': true,
+            'supportsRefundSettlement': true,
+            'supportsOrderVersioning': true,
+          },
+        }),
+        200,
+        headers: {'content-type': 'application/json'},
+      );
+    });
+    final client = AbpApiClient(
+      baseUrl: 'https://restaurant.example',
+      accessToken: 'staff-token',
+      tenantId: 42,
+      httpClient: httpClient,
+    );
+
+    final capabilities = await RestaurantApi(client).getReleaseCapabilities();
+
+    expect(captured.url.path, '/api/services/app/RestaurantRelease/GetCapabilities');
+    expect(capabilities.androidDraftRecoveryEnabled, isTrue);
+    expect(capabilities.orderVersionChecksEnabled, isTrue);
+    expect(capabilities.refundsEnabled, isTrue);
+    client.close();
+  });
+
   test('two-factor delivery uses the existing TokenAuth contract', () async {
     late http.Request captured;
     final httpClient = MockClient((request) async {

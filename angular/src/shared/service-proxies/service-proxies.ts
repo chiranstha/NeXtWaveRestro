@@ -36366,7 +36366,7 @@ export class RestaurantOrderServiceProxy {
      * @param body (optional) 
      * @return OK
      */
-    sendToKitchen(body: EntityDtoOfGuid | undefined): Observable<void> {
+    sendToKitchen(body: { orderId: string; clientRequestId: string; expectedOrderVersion: string } | undefined): Observable<void> {
         let url_ = this.baseUrl + "/api/services/app/RestaurantOrder/SendToKitchen";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -55793,6 +55793,8 @@ export class ApplyRestaurantOrderDiscountDto implements IApplyRestaurantOrderDis
     discountAmount!: number;
     approvalPin!: string | undefined;
     approvalNote!: string | undefined;
+    clientRequestId!: string | undefined;
+    expectedOrderVersion!: string | undefined;
 
     constructor(data?: IApplyRestaurantOrderDiscountDto) {
         if (data) {
@@ -55809,6 +55811,8 @@ export class ApplyRestaurantOrderDiscountDto implements IApplyRestaurantOrderDis
             this.discountAmount = _data["discountAmount"];
             this.approvalPin = _data["approvalPin"];
             this.approvalNote = _data["approvalNote"];
+            this.clientRequestId = _data["clientRequestId"];
+            this.expectedOrderVersion = _data["expectedOrderVersion"];
         }
     }
 
@@ -55825,6 +55829,8 @@ export class ApplyRestaurantOrderDiscountDto implements IApplyRestaurantOrderDis
         data["discountAmount"] = this.discountAmount;
         data["approvalPin"] = this.approvalPin;
         data["approvalNote"] = this.approvalNote;
+        data["clientRequestId"] = this.clientRequestId;
+        data["expectedOrderVersion"] = this.expectedOrderVersion;
         return data;
     }
 }
@@ -55834,6 +55840,8 @@ export interface IApplyRestaurantOrderDiscountDto {
     discountAmount: number;
     approvalPin: string | undefined;
     approvalNote: string | undefined;
+    clientRequestId?: string | undefined;
+    expectedOrderVersion?: string | undefined;
 }
 
 export class AuditLogListDto implements IAuditLogListDto {
@@ -59612,6 +59620,7 @@ export class CreateOrEditRestaurantOrderDto implements ICreateOrEditRestaurantOr
     deviceId!: string | undefined;
     source!: string | undefined;
     clientRequestId!: string | undefined;
+    expectedOrderVersion!: string | undefined;
     waiterUserId!: number | undefined;
     guestCount!: number;
     customerName!: string | undefined;
@@ -59636,6 +59645,7 @@ export class CreateOrEditRestaurantOrderDto implements ICreateOrEditRestaurantOr
             this.deviceId = _data["deviceId"];
             this.source = _data["source"];
             this.clientRequestId = _data["clientRequestId"];
+            this.expectedOrderVersion = _data["expectedOrderVersion"];
             this.waiterUserId = _data["waiterUserId"];
             this.guestCount = _data["guestCount"];
             this.customerName = _data["customerName"];
@@ -59664,6 +59674,7 @@ export class CreateOrEditRestaurantOrderDto implements ICreateOrEditRestaurantOr
         data["deviceId"] = this.deviceId;
         data["source"] = this.source;
         data["clientRequestId"] = this.clientRequestId;
+        data["expectedOrderVersion"] = this.expectedOrderVersion;
         data["waiterUserId"] = this.waiterUserId;
         data["guestCount"] = this.guestCount;
         data["customerName"] = this.customerName;
@@ -59685,6 +59696,7 @@ export interface ICreateOrEditRestaurantOrderDto {
     deviceId: string | undefined;
     source: string | undefined;
     clientRequestId: string | undefined;
+    expectedOrderVersion?: string | undefined;
     waiterUserId: number | undefined;
     guestCount: number;
     customerName: string | undefined;
@@ -63360,6 +63372,7 @@ export class FinalizeRestaurantBillDto implements IFinalizeRestaurantBillDto {
     customerPaidAmount!: number | undefined;
     cashShiftId!: string | undefined;
     clientRequestId!: string | undefined;
+    expectedOrderVersion!: string | undefined;
     tenders!: any[] | undefined;
     billLines!: FinalizeRestaurantBillLineDto[] | undefined;
 
@@ -63390,6 +63403,7 @@ export class FinalizeRestaurantBillDto implements IFinalizeRestaurantBillDto {
             this.customerPaidAmount = _data["customerPaidAmount"];
             this.cashShiftId = _data["cashShiftId"];
             this.clientRequestId = _data["clientRequestId"];
+            this.expectedOrderVersion = _data["expectedOrderVersion"];
             this.tenders = _data["tenders"];
             if (Array.isArray(_data["billLines"])) {
                 this.billLines = [] as any;
@@ -63424,6 +63438,7 @@ export class FinalizeRestaurantBillDto implements IFinalizeRestaurantBillDto {
         data["customerPaidAmount"] = this.customerPaidAmount;
         data["cashShiftId"] = this.cashShiftId;
         data["clientRequestId"] = this.clientRequestId;
+        data["expectedOrderVersion"] = this.expectedOrderVersion;
         data["tenders"] = this.tenders;
         if (Array.isArray(this.billLines)) {
             data["billLines"] = [];
@@ -63451,6 +63466,7 @@ export interface IFinalizeRestaurantBillDto {
     customerPaidAmount: number | undefined;
     cashShiftId?: string | undefined;
     clientRequestId?: string | undefined;
+    expectedOrderVersion?: string | undefined;
     tenders?: any[] | undefined;
     billLines: FinalizeRestaurantBillLineDto[] | undefined;
 }
@@ -74271,6 +74287,8 @@ export interface IMemberActivity {
 export class MergeRestaurantOrdersDto implements IMergeRestaurantOrdersDto {
     targetOrderId!: string;
     sourceOrderIds!: string[] | undefined;
+    clientRequestId!: string | undefined;
+    expectedOrderVersions!: { [key: string]: string } | undefined;
 
     constructor(data?: IMergeRestaurantOrdersDto) {
         if (data) {
@@ -74284,6 +74302,8 @@ export class MergeRestaurantOrdersDto implements IMergeRestaurantOrdersDto {
     init(_data?: any) {
         if (_data) {
             this.targetOrderId = _data["targetOrderId"];
+            this.clientRequestId = _data["clientRequestId"];
+            this.expectedOrderVersions = _data["expectedOrderVersions"];
             if (Array.isArray(_data["sourceOrderIds"])) {
                 this.sourceOrderIds = [] as any;
                 for (let item of _data["sourceOrderIds"])
@@ -74302,6 +74322,8 @@ export class MergeRestaurantOrdersDto implements IMergeRestaurantOrdersDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["targetOrderId"] = this.targetOrderId;
+        data["clientRequestId"] = this.clientRequestId;
+        data["expectedOrderVersions"] = this.expectedOrderVersions;
         if (Array.isArray(this.sourceOrderIds)) {
             data["sourceOrderIds"] = [];
             for (let item of this.sourceOrderIds)
@@ -74314,6 +74336,8 @@ export class MergeRestaurantOrdersDto implements IMergeRestaurantOrdersDto {
 export interface IMergeRestaurantOrdersDto {
     targetOrderId: string;
     sourceOrderIds: string[] | undefined;
+    clientRequestId?: string | undefined;
+    expectedOrderVersions?: { [key: string]: string } | undefined;
 }
 
 export class MicrosoftExternalLoginProviderSettings implements IMicrosoftExternalLoginProviderSettings {
@@ -85423,6 +85447,12 @@ export class RestaurantOperationalSettingsDto implements IRestaurantOperationalS
     reservationBookingEnabled!: boolean;
     defaultReservationDurationMinutes!: number;
     receiptPrintRouteName!: string | undefined;
+    refundPayableLedgerId!: string | undefined;
+    mixedTenderEnabled!: boolean;
+    refundsEnabled!: boolean;
+    orderVersionChecksEnabled!: boolean;
+    androidDraftRecoveryEnabled!: boolean;
+    clientCompatibilityConfirmed!: boolean;
 
     constructor(data?: IRestaurantOperationalSettingsDto) {
         if (data) {
@@ -85450,6 +85480,12 @@ export class RestaurantOperationalSettingsDto implements IRestaurantOperationalS
             this.reservationBookingEnabled = _data["reservationBookingEnabled"];
             this.defaultReservationDurationMinutes = _data["defaultReservationDurationMinutes"];
             this.receiptPrintRouteName = _data["receiptPrintRouteName"];
+            this.refundPayableLedgerId = _data["refundPayableLedgerId"];
+            this.mixedTenderEnabled = _data["mixedTenderEnabled"];
+            this.refundsEnabled = _data["refundsEnabled"];
+            this.orderVersionChecksEnabled = _data["orderVersionChecksEnabled"];
+            this.androidDraftRecoveryEnabled = _data["androidDraftRecoveryEnabled"];
+            this.clientCompatibilityConfirmed = _data["clientCompatibilityConfirmed"];
         }
     }
 
@@ -85477,6 +85513,12 @@ export class RestaurantOperationalSettingsDto implements IRestaurantOperationalS
         data["reservationBookingEnabled"] = this.reservationBookingEnabled;
         data["defaultReservationDurationMinutes"] = this.defaultReservationDurationMinutes;
         data["receiptPrintRouteName"] = this.receiptPrintRouteName;
+        data["refundPayableLedgerId"] = this.refundPayableLedgerId;
+        data["mixedTenderEnabled"] = this.mixedTenderEnabled;
+        data["refundsEnabled"] = this.refundsEnabled;
+        data["orderVersionChecksEnabled"] = this.orderVersionChecksEnabled;
+        data["androidDraftRecoveryEnabled"] = this.androidDraftRecoveryEnabled;
+        data["clientCompatibilityConfirmed"] = this.clientCompatibilityConfirmed;
         return data;
     }
 }
@@ -85497,10 +85539,17 @@ export interface IRestaurantOperationalSettingsDto {
     reservationBookingEnabled: boolean;
     defaultReservationDurationMinutes: number;
     receiptPrintRouteName: string | undefined;
+    refundPayableLedgerId: string | undefined;
+    mixedTenderEnabled: boolean;
+    refundsEnabled: boolean;
+    orderVersionChecksEnabled: boolean;
+    androidDraftRecoveryEnabled: boolean;
+    clientCompatibilityConfirmed: boolean;
 }
 
 export class RestaurantOrderDto implements IRestaurantOrderDto {
     id!: string;
+    rowVersion!: string | undefined;
     orderNo!: string | undefined;
     orderType!: RestaurantOrderType;
     status!: RestaurantOrderStatus;
@@ -85541,6 +85590,7 @@ export class RestaurantOrderDto implements IRestaurantOrderDto {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.rowVersion = _data["rowVersion"];
             this.orderNo = _data["orderNo"];
             this.orderType = _data["orderType"];
             this.status = _data["status"];
@@ -85585,6 +85635,7 @@ export class RestaurantOrderDto implements IRestaurantOrderDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["rowVersion"] = this.rowVersion;
         data["orderNo"] = this.orderNo;
         data["orderType"] = this.orderType;
         data["status"] = this.status;
@@ -85622,6 +85673,7 @@ export class RestaurantOrderDto implements IRestaurantOrderDto {
 
 export interface IRestaurantOrderDto {
     id: string;
+    rowVersion: string | undefined;
     orderNo: string | undefined;
     orderType: RestaurantOrderType;
     status: RestaurantOrderStatus;
@@ -89457,6 +89509,8 @@ export class SplitRestaurantOrderDto implements ISplitRestaurantOrderDto {
     sourceOrderId!: string;
     newTableId!: string | undefined;
     orderItemIds!: string[] | undefined;
+    clientRequestId!: string | undefined;
+    expectedOrderVersion!: string | undefined;
 
     constructor(data?: ISplitRestaurantOrderDto) {
         if (data) {
@@ -89471,6 +89525,8 @@ export class SplitRestaurantOrderDto implements ISplitRestaurantOrderDto {
         if (_data) {
             this.sourceOrderId = _data["sourceOrderId"];
             this.newTableId = _data["newTableId"];
+            this.clientRequestId = _data["clientRequestId"];
+            this.expectedOrderVersion = _data["expectedOrderVersion"];
             if (Array.isArray(_data["orderItemIds"])) {
                 this.orderItemIds = [] as any;
                 for (let item of _data["orderItemIds"])
@@ -89490,6 +89546,8 @@ export class SplitRestaurantOrderDto implements ISplitRestaurantOrderDto {
         data = typeof data === 'object' ? data : {};
         data["sourceOrderId"] = this.sourceOrderId;
         data["newTableId"] = this.newTableId;
+        data["clientRequestId"] = this.clientRequestId;
+        data["expectedOrderVersion"] = this.expectedOrderVersion;
         if (Array.isArray(this.orderItemIds)) {
             data["orderItemIds"] = [];
             for (let item of this.orderItemIds)
@@ -89503,6 +89561,8 @@ export interface ISplitRestaurantOrderDto {
     sourceOrderId: string;
     newTableId: string | undefined;
     orderItemIds: string[] | undefined;
+    clientRequestId?: string | undefined;
+    expectedOrderVersion?: string | undefined;
 }
 
 export class StartExtendSubscriptionInput implements IStartExtendSubscriptionInput {
@@ -92260,6 +92320,8 @@ export enum TrailBalanceGroupEnum {
 export class TransferRestaurantTableDto implements ITransferRestaurantTableDto {
     orderId!: string;
     newTableId!: string;
+    clientRequestId!: string | undefined;
+    expectedOrderVersion!: string | undefined;
 
     constructor(data?: ITransferRestaurantTableDto) {
         if (data) {
@@ -92274,6 +92336,8 @@ export class TransferRestaurantTableDto implements ITransferRestaurantTableDto {
         if (_data) {
             this.orderId = _data["orderId"];
             this.newTableId = _data["newTableId"];
+            this.clientRequestId = _data["clientRequestId"];
+            this.expectedOrderVersion = _data["expectedOrderVersion"];
         }
     }
 
@@ -92288,6 +92352,8 @@ export class TransferRestaurantTableDto implements ITransferRestaurantTableDto {
         data = typeof data === 'object' ? data : {};
         data["orderId"] = this.orderId;
         data["newTableId"] = this.newTableId;
+        data["clientRequestId"] = this.clientRequestId;
+        data["expectedOrderVersion"] = this.expectedOrderVersion;
         return data;
     }
 }
@@ -92295,6 +92361,8 @@ export class TransferRestaurantTableDto implements ITransferRestaurantTableDto {
 export interface ITransferRestaurantTableDto {
     orderId: string;
     newTableId: string;
+    clientRequestId?: string | undefined;
+    expectedOrderVersion?: string | undefined;
 }
 
 export class TwitterExternalLoginProviderSettings implements ITwitterExternalLoginProviderSettings {

@@ -32,7 +32,7 @@ namespace NextWave.Erp.Restaurant
         IRepository<RestaurantSetupAcknowledgement, Guid> acknowledgementRepository)
         : ErpAppServiceBase, IRestaurantReleaseAppService
     {
-        [AbpAuthorize(AppPermissions.PagesRestaurantBilling)]
+        [AbpAuthorize(AppPermissions.PagesRestaurantPos)]
         public async Task<RestaurantReleaseCapabilitiesDto> GetCapabilities()
         {
             var tenantId = AbpSession.GetTenantId();

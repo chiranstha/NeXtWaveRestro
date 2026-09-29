@@ -41,6 +41,7 @@ namespace NextWave.Erp.Restaurant
         IRepository<UnitConversion, Guid> unitConversionRepository,
         MaterialStockPostingService materialStockPostingService,
         RestaurantReorderService reorderService,
+        IRestaurantOrderAppService restaurantOrderAppService,
         ISalesMastersAppService salesMastersAppService,
         IUnitOfWorkManager unitOfWorkManager)
         : ErpAppServiceBase, IRestaurantBillingAppService
@@ -128,6 +129,20 @@ namespace NextWave.Erp.Restaurant
 
             var order = await orderRepository.FirstOrDefaultAsync(x => x.Id == input.OrderId && x.TenantId == tenantId);
             if (order == null) throw new UserFriendlyException("Restaurant order not found");
+            var versionChecksEnabled = string.Equals(await SettingManager.GetSettingValueForTenantAsync(
+                AppSettings.ErpSettings.RestaurantOrderVersionChecksEnabled, tenantId), "true", StringComparison.OrdinalIgnoreCase);
+            if (versionChecksEnabled)
+            {
+                var currentVersion = order.RowVersion == null ? null : Convert.ToBase64String(order.RowVersion);
+                if (string.IsNullOrWhiteSpace(input.ExpectedOrderVersion) ||
+                    !string.Equals(input.ExpectedOrderVersion, currentVersion, StringComparison.Ordinal))
+                {
+                    var latest = await restaurantOrderAppService.GetOrderForPos(order.Id);
+                    throw new UserFriendlyException(
+                        "This order changed on another device. Reload the latest order before billing.",
+                        JsonSerializer.Serialize(new { Code = "Restaurant.OrderConflict", LatestOrder = latest }));
+                }
+            }
             if (order.Status is RestaurantOrderStatus.Billed or RestaurantOrderStatus.Closed)
                 throw new UserFriendlyException("Restaurant order is already billed");
 
@@ -161,6 +176,10 @@ namespace NextWave.Erp.Restaurant
             var netAmount = billableLines.Sum(x => x.NetAmount);
             var grandTotal = billableLines.Sum(x => x.Amount);
             var tenders = input.Tenders?.ToList() ?? new List<RestaurantBillTenderDto>();
+            var mixedTenderEnabled = string.Equals(await SettingManager.GetSettingValueForTenantAsync(
+                AppSettings.ErpSettings.RestaurantMixedTenderEnabled, tenantId), "true", StringComparison.OrdinalIgnoreCase);
+            if (tenders.Count > 1 && !mixedTenderEnabled)
+                throw new UserFriendlyException("Mixed tender has not been enabled for this restaurant");
             var payment = BuildPaymentAmounts(grandTotal, input, tenders);
 
             if (tenders.Count > 0 && !input.CashShiftId.HasValue)
@@ -291,7 +310,7 @@ namespace NextWave.Erp.Restaurant
                 CashShiftId = input.CashShiftId,
                 ClientRequestId = requestId,
                 RequestHash = requestHash,
-                PaidAt = DateTime.Now
+                PaidAt = GetNepalNow()
             };
             var billPaymentId = await billPaymentRepository.InsertAndGetIdAsync(billPayment);
 
@@ -328,7 +347,7 @@ namespace NextWave.Erp.Restaurant
                     TaxAmount = line.TaxAmount,
                     NetAmount = line.NetAmount,
                     Amount = line.Amount,
-                    BilledAt = DateTime.Now
+                    BilledAt = GetNepalNow()
                 });
             }
 
@@ -361,7 +380,7 @@ namespace NextWave.Erp.Restaurant
             {
                 order.SalesMasterId = salesMasterId;
                 order.Status = RestaurantOrderStatus.Billed;
-                order.BilledAt = DateTime.Now;
+                order.BilledAt = GetNepalNow();
                 await orderRepository.UpdateAsync(order);
             }
 

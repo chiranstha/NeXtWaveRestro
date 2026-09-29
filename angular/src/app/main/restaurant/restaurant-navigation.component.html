@@ -2,6 +2,9 @@
     <a *ngIf="isGranted('Pages.Restaurant.Pos')" class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/pos" routerLinkActive="active bg-light-primary text-primary">
         <i class="fa fa-cash-register"></i> {{ 'POS' | localize }}
     </a>
+    <a *ngIf="isGranted('Pages.Restaurant.Pos')" class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/refunds" routerLinkActive="active bg-light-primary text-primary">
+        <i class="fa fa-rotate-left"></i> Refunds
+    </a>
     <a *ngIf="isGranted('Pages.Restaurant.Setup')" class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/setup" routerLinkActive="active bg-light-primary text-primary">
         <i class="fa fa-sliders"></i> {{ 'Setup' | localize }}
     </a>

@@ -80,6 +80,49 @@ namespace NextWave.Erp.Restaurant
             return await GetOpenOrders();
         }
 
+        public async Task<RestaurantOperationStatusDto> GetOperationStatus(string operationType, string clientRequestId)
+        {
+            if (string.IsNullOrWhiteSpace(operationType) || operationType.Trim().Length > 80 ||
+                string.IsNullOrWhiteSpace(clientRequestId) || clientRequestId.Trim().Length > 100)
+                throw new UserFriendlyException("A valid operation type and request ID are required");
+            var tenantId = AbpSession.GetTenantId();
+            var requestId = clientRequestId.Trim();
+            var type = operationType.Trim();
+            var operation = await FindOperation(tenantId, type, requestId);
+            if (operation != null)
+                return new RestaurantOperationStatusDto
+                {
+                    OperationType = type,
+                    ClientRequestId = requestId,
+                    Status = "Completed",
+                    EntityId = operation.EntityId,
+                    ResultJson = operation.ResultJson
+                };
+
+            if (string.Equals(type, "OrderUpsert", StringComparison.OrdinalIgnoreCase))
+            {
+                var createdOrder = await orderRepository.FirstOrDefaultAsync(x =>
+                    x.TenantId == tenantId && x.PosClientRequestId == requestId &&
+                    x.WaiterUserId == AbpSession.GetUserId());
+                if (createdOrder != null)
+                    return new RestaurantOperationStatusDto
+                    {
+                        OperationType = type,
+                        ClientRequestId = requestId,
+                        Status = "Completed",
+                        EntityId = createdOrder.Id,
+                        ResultJson = JsonSerializer.Serialize(new { EntityId = createdOrder.Id })
+                    };
+            }
+
+            return new RestaurantOperationStatusDto
+            {
+                OperationType = type,
+                ClientRequestId = requestId,
+                Status = "NotFound"
+            };
+        }
+
         [AbpAuthorize(AppPermissions.PagesRestaurantPos)]
         public async Task<Guid> CreateOrEditOrder(CreateOrEditRestaurantOrderDto input)
         {
@@ -128,7 +171,6 @@ namespace NextWave.Erp.Restaurant
             {
                 order = await orderRepository.FirstOrDefaultAsync(x => x.Id == input.Id && x.TenantId == tenantId);
                 if (order == null) throw new UserFriendlyException("Restaurant order not found");
-                await EnsureOrderVersion(order, input.ExpectedOrderVersion, versionChecksEnabled);
                 var existingOperation = await FindOperation(tenantId, "OrderUpsert", input.ClientRequestId);
                 if (existingOperation != null)
                 {
@@ -136,6 +178,7 @@ namespace NextWave.Erp.Restaurant
                     await uow.CompleteAsync();
                     return existingOperation.EntityId ?? order.Id;
                 }
+                await EnsureOrderVersion(order, input.ExpectedOrderVersion, versionChecksEnabled);
                 if (order.Status is RestaurantOrderStatus.Billed or RestaurantOrderStatus.Closed or RestaurantOrderStatus.Cancelled)
                     throw new UserFriendlyException("Billed or closed orders cannot be edited");
 
@@ -220,7 +263,6 @@ namespace NextWave.Erp.Restaurant
                 throw new UserFriendlyException("Restaurant order not found");
             if (order.Status is RestaurantOrderStatus.Billed or RestaurantOrderStatus.Closed or RestaurantOrderStatus.Cancelled)
                 throw new UserFriendlyException("Billed or closed orders cannot be discounted");
-            await EnsureOrderVersion(order, input.ExpectedOrderVersion, versionChecksEnabled);
             var operationHash = HashOrderMutation(input);
             var priorOperation = await FindOperation(tenantId, "OrderDiscount", input.ClientRequestId);
             if (priorOperation != null)
@@ -229,6 +271,7 @@ namespace NextWave.Erp.Restaurant
                 await uow.CompleteAsync();
                 return;
             }
+            await EnsureOrderVersion(order, input.ExpectedOrderVersion, versionChecksEnabled);
 
             var items = await orderItemRepository.GetAll()
                 .Where(x => x.TenantId == tenantId &&
@@ -276,12 +319,30 @@ namespace NextWave.Erp.Restaurant
         }
 
         [AbpAuthorize(AppPermissions.PagesRestaurantKotBot)]
-        public async Task SendToKitchen(EntityDto<Guid> input)
+        public async Task SendToKitchen(RestaurantOrderMutationDto input)
         {
+            if (input == null || input.OrderId == Guid.Empty)
+                throw new UserFriendlyException("Restaurant order not found");
             var tenantId = AbpSession.GetTenantId();
             using var uow = unitOfWorkManager.Begin(new UnitOfWorkOptions { IsTransactional = true });
-            var order = await orderRepository.FirstOrDefaultAsync(x => x.Id == input.Id && x.TenantId == tenantId);
+            var versionChecksEnabled = await IsOrderVersionChecksEnabled(tenantId);
+            if (versionChecksEnabled && string.IsNullOrWhiteSpace(input.ClientRequestId))
+                throw new UserFriendlyException("A unique request ID is required when sending an order to kitchen");
+            if (!string.IsNullOrWhiteSpace(input.ClientRequestId) && input.ClientRequestId.Trim().Length > 100)
+                throw new UserFriendlyException("Order request ID is too long");
+
+            var requestHash = HashOrderMutation(new { input.OrderId, input.ExpectedOrderVersion });
+            var priorOperation = await FindOperation(tenantId, "OrderKitchenSend", input.ClientRequestId);
+            if (priorOperation != null)
+            {
+                EnsureOperationHash(priorOperation, requestHash);
+                await uow.CompleteAsync();
+                return;
+            }
+
+            var order = await orderRepository.FirstOrDefaultAsync(x => x.Id == input.OrderId && x.TenantId == tenantId);
             if (order == null) throw new UserFriendlyException("Restaurant order not found");
+            await EnsureOrderVersion(order, input.ExpectedOrderVersion, versionChecksEnabled);
             if (order.Status is RestaurantOrderStatus.Billed or RestaurantOrderStatus.Closed or RestaurantOrderStatus.Cancelled)
                 throw new UserFriendlyException("This order cannot be sent to kitchen/bar");
 
@@ -292,11 +353,19 @@ namespace NextWave.Erp.Restaurant
                 .ToListAsync();
 
             if (items.Count == 0)
+            {
+                await RecordOperation(tenantId, "OrderKitchenSend", input.ClientRequestId, requestHash, order.Id);
+                await uow.CompleteAsync();
                 return;
+            }
 
             var kitchenItems = items.Where(x => x.StationId.HasValue).ToList();
             if (kitchenItems.Count == 0)
+            {
+                await RecordOperation(tenantId, "OrderKitchenSend", input.ClientRequestId, requestHash, order.Id);
+                await uow.CompleteAsync();
                 return;
+            }
 
             var hasPriorTickets = await ticketRepository.CountAsync(x =>
                 x.TenantId == tenantId &&
@@ -371,6 +440,7 @@ namespace NextWave.Erp.Restaurant
                 order.Id,
                 null,
                 new { order.OrderNo, order.Status, purpose, TicketCount = grouped.Count });
+            await RecordOperation(tenantId, "OrderKitchenSend", input.ClientRequestId, requestHash, order.Id);
             await uow.CompleteAsync();
         }
 
@@ -547,7 +617,6 @@ namespace NextWave.Erp.Restaurant
                 throw new UserFriendlyException("A unique request ID is required for this table transfer");
             var order = await orderRepository.FirstOrDefaultAsync(x => x.Id == input.OrderId && x.TenantId == tenantId);
             if (order == null) throw new UserFriendlyException("Restaurant order not found");
-            await EnsureOrderVersion(order, input.ExpectedOrderVersion, versionChecksEnabled);
             var transferHash = HashOrderMutation(input);
             var existingTransfer = await FindOperation(tenantId, "TransferTable", input.ClientRequestId);
             if (existingTransfer != null)
@@ -556,6 +625,7 @@ namespace NextWave.Erp.Restaurant
                 await uow.CompleteAsync();
                 return;
             }
+            await EnsureOrderVersion(order, input.ExpectedOrderVersion, versionChecksEnabled);
             if (order.Status is RestaurantOrderStatus.Billed or RestaurantOrderStatus.Closed or RestaurantOrderStatus.Cancelled)
                 throw new UserFriendlyException("Billed, closed, or cancelled orders cannot be transferred");
             if (order.TableId == input.NewTableId)
@@ -623,7 +693,6 @@ namespace NextWave.Erp.Restaurant
                 throw new UserFriendlyException("A unique request ID is required for this split");
             var source = await orderRepository.FirstOrDefaultAsync(x => x.Id == input.SourceOrderId && x.TenantId == tenantId);
             if (source == null) throw new UserFriendlyException("Source order not found");
-            await EnsureOrderVersion(source, input.ExpectedOrderVersion, versionChecksEnabled);
             var splitHash = HashOrderMutation(input);
             var priorSplit = await FindOperation(tenantId, "SplitOrder", input.ClientRequestId);
             if (priorSplit != null)
@@ -632,6 +701,7 @@ namespace NextWave.Erp.Restaurant
                 await uow.CompleteAsync();
                 return priorSplit.EntityId ?? Guid.Empty;
             }
+            await EnsureOrderVersion(source, input.ExpectedOrderVersion, versionChecksEnabled);
             if (source.Status is RestaurantOrderStatus.Billed or RestaurantOrderStatus.Closed or RestaurantOrderStatus.Cancelled)
                 throw new UserFriendlyException("Billed, closed, or cancelled orders cannot be split");
             if (input.NewTableId.HasValue &&
@@ -1013,6 +1083,7 @@ namespace NextWave.Erp.Restaurant
             return new RestaurantOrderDto
             {
                 Id = order.Id,
+                RowVersion = order.RowVersion == null ? null : Convert.ToBase64String(order.RowVersion),
                 OrderNo = order.OrderNo,
                 OrderType = order.OrderType,
                 Status = order.Status,
@@ -1131,6 +1202,64 @@ namespace NextWave.Erp.Restaurant
                 x.Status != RestaurantOrderStatus.Billed &&
                 x.Status != RestaurantOrderStatus.Closed &&
                 x.Status != RestaurantOrderStatus.Cancelled) > 0;
+        }
+
+        private async Task<bool> IsOrderVersionChecksEnabled(int tenantId) =>
+            string.Equals(await SettingManager.GetSettingValueForTenantAsync(
+                AppSettings.ErpSettings.RestaurantOrderVersionChecksEnabled, tenantId), "true", StringComparison.OrdinalIgnoreCase);
+
+        private async Task EnsureOrderVersion(RestaurantOrder order, string expectedVersion, bool enabled)
+        {
+            if (!enabled) return;
+            var latest = await MapOrder(order);
+            var current = order.RowVersion == null ? null : Convert.ToBase64String(order.RowVersion);
+            if (string.IsNullOrWhiteSpace(expectedVersion) || !string.Equals(current, expectedVersion, StringComparison.Ordinal))
+            {
+                var error = JsonSerializer.Serialize(new
+                {
+                    Code = "Restaurant.OrderConflict",
+                    LatestOrder = latest
+                });
+                throw new UserFriendlyException(
+                    "This order changed on another device. Reload the latest order or reapply your changes.", error);
+            }
+        }
+
+        private Task<RestaurantClientOperation> FindOperation(int tenantId, string type, string requestId)
+        {
+            if (string.IsNullOrWhiteSpace(requestId)) return Task.FromResult<RestaurantClientOperation>(null);
+            return operationRepository.FirstOrDefaultAsync(x => x.TenantId == tenantId &&
+                x.UserId == AbpSession.GetUserId() && x.ClientRequestId == requestId.Trim() && x.OperationType == type);
+        }
+
+        private async Task RecordOperation(int tenantId, string type, string requestId, string hash, Guid entityId)
+        {
+            if (string.IsNullOrWhiteSpace(requestId)) return;
+            if (requestId.Trim().Length > 100)
+                throw new UserFriendlyException("Order request ID is too long");
+            await operationRepository.InsertAsync(new RestaurantClientOperation
+            {
+                TenantId = tenantId,
+                UserId = AbpSession.GetUserId(),
+                ClientRequestId = requestId.Trim(),
+                OperationType = type,
+                RequestHash = hash,
+                EntityId = entityId,
+                ResultJson = JsonSerializer.Serialize(new { EntityId = entityId }),
+                CreatedAt = DateTime.UtcNow
+            });
+        }
+
+        private static void EnsureOperationHash(RestaurantClientOperation previous, string hash)
+        {
+            if (!string.Equals(previous.RequestHash, hash, StringComparison.Ordinal))
+                throw new UserFriendlyException("This order request ID was already used for different changes");
+        }
+
+        private static string HashOrderMutation<T>(T input)
+        {
+            var bytes = System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(input)));
+            return Convert.ToHexString(bytes).ToLowerInvariant();
         }
 
         private static byte[] BuildKitchenTicketPayload(RestaurantOrder order, RestaurantTicket ticket, RestaurantStation station, List<RestaurantOrderItem> items)

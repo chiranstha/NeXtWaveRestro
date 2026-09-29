@@ -43,6 +43,7 @@ import {
     RestaurantWastageReportDto,
     RestaurantWaiterPerformanceReportDto,
 } from './restaurant-reports-api.service';
+import { RestaurantDailyClosing, RestaurantReleaseApiService } from '../restaurant-release-api.service';
 
 interface RestaurantReportFilter {
     fromDate: string;
@@ -72,7 +73,7 @@ type RestaurantReportType = 'sales' | 'operations' | 'inventory' | 'payroll' | '
     templateUrl: './restaurant-reports.component.html',
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation],
-    providers: [RestaurantReportsApiService],
+    providers: [RestaurantReportsApiService, RestaurantReleaseApiService],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
@@ -128,6 +129,9 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
     tables: RestaurantTableDto[] = [];
     categories: RestaurantMenuCategoryDto[] = [];
     waiters: GetUserDropdownDto[] = [];
+    closingDate = DateTime.now().setZone('Asia/Kathmandu').toISODate() || DateTime.now().toISODate() || '';
+    dailyClosing: RestaurantDailyClosing | null = null;
+    loadingClosing = false;
 
     get canUseTableFilter(): boolean {
         return this.isGranted('Pages.Restaurant.Setup');
@@ -191,6 +195,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
 
     private restaurantReportsService = inject(RestaurantReportsServiceProxy);
     private restaurantReportsApiService = inject(RestaurantReportsApiService);
+    private restaurantReleaseApiService = inject(RestaurantReleaseApiService);
     private restaurantSetupService = inject(RestaurantSetupServiceProxy);
     private restaurantMenuService = inject(RestaurantMenuServiceProxy);
     private reportingServiceProxy = inject(ReportingServiceProxy);
@@ -206,6 +211,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
         this.activeReportType = this.visibleReportTypes[0]?.key || 'sales';
         this.loadLookups();
         this.refresh();
+        if (this.canViewReportType('audit')) this.loadDailyClosing();
     }
 
     ngAfterViewInit(): void {
@@ -395,6 +401,17 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                 this.updateCharts();
                 this.cdr.markForCheck();
             });
+    }
+
+    loadDailyClosing(): void {
+        if (!this.closingDate) return;
+        this.loadingClosing = true;
+        this.restaurantReleaseApiService.dailyClosing(this.closingDate).pipe(finalize(() => {
+            this.loadingClosing = false;
+            this.cdr.markForCheck();
+        })).subscribe((result) => {
+            this.dailyClosing = result;
+        });
     }
 
     clearFilters(): void {

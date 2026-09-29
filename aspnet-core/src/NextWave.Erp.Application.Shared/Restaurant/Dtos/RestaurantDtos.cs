@@ -365,6 +365,13 @@ namespace NextWave.Erp.Restaurant.Dtos
         public List<CreateOrEditRestaurantOrderItemDto> Items { get; set; } = new();
     }
 
+    public class RestaurantOrderMutationDto
+    {
+        public Guid OrderId { get; set; }
+        public string ClientRequestId { get; set; }
+        public string ExpectedOrderVersion { get; set; }
+    }
+
     public class CreateOrEditRestaurantOrderItemDto : EntityDto<Guid?>
     {
         public Guid? MenuItemId { get; set; }

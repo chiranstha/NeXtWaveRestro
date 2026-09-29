@@ -105,6 +105,9 @@ class RestaurantAppController extends ChangeNotifier {
   bool isAuthenticated = false;
   bool serverReachable = false;
   bool draftSynced = false;
+  bool androidDraftRecoveryEnabled = false;
+  RestaurantReleaseCapabilities releaseCapabilities =
+      const RestaurantReleaseCapabilities();
   bool draftNeedsReview = false;
   String draftReviewMessage = '';
   DateTime? draftSavedAt;
@@ -165,6 +168,7 @@ class RestaurantAppController extends ChangeNotifier {
   String selectedCategory = 'All';
   String selectedKdsStation = 'All';
   String? currentOrderId;
+  String? currentOrderVersion;
   List<CartLine> cart = [];
   bool orderDirty = false;
   String? draftOrderRequestId;
@@ -627,11 +631,13 @@ class RestaurantAppController extends ChangeNotifier {
     });
     if (matchingOrder.isEmpty) {
       currentOrderId = null;
+      currentOrderVersion = null;
       cart = [];
       currentOrderTickets = [];
     } else {
       final order = matchingOrder.first;
       currentOrderId = order.id;
+      currentOrderVersion = order.rowVersion;
       cart = List<CartLine>.from(order.items);
       currentOrderTickets = tickets
           .where((ticket) => ticket.orderId == order.id)
@@ -644,6 +650,7 @@ class RestaurantAppController extends ChangeNotifier {
 
   void loadOpenOrder(RestaurantOrderModel order) {
     currentOrderId = order.id;
+    currentOrderVersion = order.rowVersion;
     selectedPosContext =
         order.tableId ??
         switch (order.orderType) {
@@ -731,12 +738,22 @@ class RestaurantAppController extends ChangeNotifier {
         customerName: customerName,
         customerPhone: customerPhone,
       );
-      await _api!.sendToKitchen(id);
+      final kitchenRequestId = await _stableOperationRequestId(
+        'kitchen-send',
+        jsonEncode({'orderId': id, 'expectedOrderVersion': currentOrderVersion}),
+      );
+      await _api!.sendToKitchen(
+        id,
+        clientRequestId: kitchenRequestId,
+        expectedOrderVersion: currentOrderVersion,
+      );
+      await _sessionStore.deleteValue(_orderOperationKey('kitchen-send'));
       noticeMessage = 'KOT/BOT sent to the kitchen.';
       await _refreshOrdersAndTickets();
       final updated = openOrders.where((order) => order.id == id);
       if (updated.isNotEmpty) {
         currentOrderId = id;
+        currentOrderVersion = updated.first.rowVersion;
         cart = List<CartLine>.from(updated.first.items);
       }
       orderDirty = false;
@@ -1993,6 +2010,15 @@ class RestaurantAppController extends ChangeNotifier {
               : tables.first.id;
         }
       });
+      if (hasPermission('Pages.Restaurant.Pos')) {
+        await load('Release capabilities', () async {
+          releaseCapabilities = await api.getReleaseCapabilities();
+          androidDraftRecoveryEnabled =
+              releaseCapabilities.androidDraftRecoveryEnabled;
+        });
+      } else {
+        androidDraftRecoveryEnabled = false;
+      }
       if (hasPermission('Pages.Restaurant.Setup.Edit')) {
         await load('Restaurant devices', () async {
           devices = await api.getDevices();
@@ -2014,6 +2040,7 @@ class RestaurantAppController extends ChangeNotifier {
         });
         if (selected.isNotEmpty && cart.isEmpty) {
           currentOrderId = selected.first.id;
+          currentOrderVersion = selected.first.rowVersion;
           cart = List<CartLine>.from(selected.first.items);
         }
       });
@@ -2106,6 +2133,7 @@ class RestaurantAppController extends ChangeNotifier {
   String _permissionCacheKey() => '${_cartDraftKey()}:pos-permission';
 
   Future<void> _persistLocalCartDraft({bool synced = false}) async {
+    if (!androidDraftRecoveryEnabled) return;
     final active = session;
     final userId = profile?.userId ?? active?.userId ?? 0;
     if (active == null || userId <= 0) return;
@@ -2126,6 +2154,7 @@ class RestaurantAppController extends ChangeNotifier {
         'synced': synced,
         'orderDirty': orderDirty,
         'currentOrderId': currentOrderId,
+        'currentOrderVersion': currentOrderVersion,
         'orderRequestId': draftOrderRequestId,
         'selectedPosContext': selectedPosContext,
         'lines': cart.map(_serializeCartLine).toList(),
@@ -2134,6 +2163,7 @@ class RestaurantAppController extends ChangeNotifier {
   }
 
   Future<void> _restoreLocalCartDraft() async {
+    if (!androidDraftRecoveryEnabled) return;
     final active = session;
     final userId = profile?.userId ?? active?.userId ?? 0;
     if (active == null || userId <= 0) return;
@@ -2149,6 +2179,7 @@ class RestaurantAppController extends ChangeNotifier {
     if (raw == null) return;
     final data = jsonDecode(raw) as Map<String, dynamic>;
     final orderId = data['currentOrderId'] as String?;
+    currentOrderVersion = data['currentOrderVersion'] as String?;
     final hasCurrentServerOrder =
         orderId != null && openOrders.any((order) => order.id == orderId);
     if (data['synced'] == true &&
@@ -2488,10 +2519,20 @@ class RestaurantAppController extends ChangeNotifier {
     required String customerName,
     required String customerPhone,
   }) async {
-    final clientRequestId = currentOrderId == null
+    final isCreate = currentOrderId == null;
+    final requestSignature = jsonEncode({
+      'orderId': currentOrderId,
+      'orderType': currentOrderType,
+      'tableId': currentTableId,
+      'customerName': customerName,
+      'customerPhone': customerPhone,
+      'expectedOrderVersion': currentOrderVersion,
+      'lines': cart.map(_serializeCartLine).toList(),
+    });
+    final clientRequestId = isCreate
         ? (draftOrderRequestId ?? _newClientRequestId())
-        : null;
-    if (clientRequestId != null) {
+        : await _stableOperationRequestId('order-edit', requestSignature);
+    if (isCreate) {
       draftOrderRequestId = clientRequestId;
       await _persistLocalCartDraft(synced: false);
     }
@@ -2504,6 +2545,7 @@ class RestaurantAppController extends ChangeNotifier {
       customerPhone: customerPhone,
       items: cart,
       clientRequestId: clientRequestId,
+      expectedOrderVersion: currentOrderVersion,
     );
     currentOrderId = id;
     draftOrderRequestId = null;
@@ -2511,6 +2553,37 @@ class RestaurantAppController extends ChangeNotifier {
     draftSynced = true;
     draftNeedsReview = false;
     await _persistLocalCartDraft(synced: true);
+    final latest = await _api!.getOrder(id, products);
+    currentOrderVersion = latest.rowVersion;
+    if (!isCreate) {
+      await _sessionStore.deleteValue(_orderOperationKey('order-edit'));
+    }
+    return id;
+  }
+
+  String _orderOperationKey(String operation) {
+    final active = session;
+    final userId = profile?.userId ?? active?.userId ?? 0;
+    return 'restaurant-order-op:${active?.tenantId ?? 'host'}:$userId:$operation';
+  }
+
+  Future<String> _stableOperationRequestId(
+    String operation,
+    String signature,
+  ) async {
+    final key = _orderOperationKey(operation);
+    final raw = await _sessionStore.readValue(key);
+    if (raw != null) {
+      final stored = jsonDecode(raw) as Map<String, dynamic>;
+      if (stored['signature'] == signature && stored['id'] is String) {
+        return stored['id'] as String;
+      }
+    }
+    final id = _newClientRequestId();
+    await _sessionStore.writeValue(
+      key,
+      jsonEncode({'signature': signature, 'id': id}),
+    );
     return id;
   }
 
@@ -2523,6 +2596,7 @@ class RestaurantAppController extends ChangeNotifier {
     final id = currentOrderId;
     if (id == null || _api == null) return;
     final order = await _api!.getOrder(id, products);
+    currentOrderVersion = order.rowVersion;
     cart = List<CartLine>.from(order.items);
     final index = openOrders.indexWhere((item) => item.id == id);
     if (index >= 0) {

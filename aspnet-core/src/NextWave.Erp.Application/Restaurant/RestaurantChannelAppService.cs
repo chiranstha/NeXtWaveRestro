@@ -350,7 +350,15 @@ namespace NextWave.Erp.Restaurant
             await aggregatorOrderRepository.UpdateAsync(aggregatorOrder);
 
             if (input.SendToKitchen)
-                await orderAppService.SendToKitchen(new Abp.Application.Services.Dto.EntityDto<Guid> { Id = result.OrderId });
+            {
+                var kitchenOrder = await orderAppService.GetOrder(result.OrderId);
+                await orderAppService.SendToKitchen(new RestaurantOrderMutationDto
+                {
+                    OrderId = result.OrderId,
+                    ClientRequestId = "aggregator-kitchen-" + aggregatorOrder.Id.ToString("N"),
+                    ExpectedOrderVersion = kitchenOrder.RowVersion
+                });
+            }
 
             await CurrentUnitOfWork.SaveChangesAsync();
             return await MapAggregatorOrder(aggregatorOrder.Id);
