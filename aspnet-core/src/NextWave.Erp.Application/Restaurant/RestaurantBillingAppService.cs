@@ -33,6 +33,7 @@ namespace NextWave.Erp.Restaurant
         IRepository<RestaurantCashShift, Guid> cashShiftRepository,
         IRepository<RestaurantTable, Guid> tableRepository,
         IRepository<RestaurantTableSession, Guid> tableSessionRepository,
+        IRepository<RestaurantPrintJob, Guid> printJobRepository,
         IRepository<Product, Guid> productRepository,
         IRepository<Bom, Guid> bomRepository,
         IRepository<UnitConversion, Guid> unitConversionRepository,
@@ -275,6 +276,26 @@ namespace NextWave.Erp.Restaurant
             billPayment.IsOrderFullyBilled = isFullyBilled;
             billPayment.RemainingGrandTotal = await GetRemainingGrandTotal(order.Id, tenantId);
 
+            var printingEnabled = string.Equals(await SettingManager.GetSettingValueForTenantAsync(
+                AppSettings.ErpSettings.RestaurantTicketPrintingEnabled, tenantId), "true", StringComparison.OrdinalIgnoreCase);
+            if (printingEnabled)
+            {
+                var receiptRoute = (await SettingManager.GetSettingValueForTenantAsync(
+                    AppSettings.ErpSettings.RestaurantReceiptPrintRouteName, tenantId))?.Trim();
+                await printJobRepository.InsertAsync(new RestaurantPrintJob
+                {
+                    TenantId = tenantId,
+                    ExternalJobId = "RECEIPT-" + billPaymentId.ToString("N"),
+                    Type = RestaurantPrintJobType.BillReceipt,
+                    Status = string.IsNullOrWhiteSpace(receiptRoute) ? RestaurantPrintJobStatus.Failed : RestaurantPrintJobStatus.Pending,
+                    OrderId = order.Id,
+                    RouteName = string.IsNullOrWhiteSpace(receiptRoute) ? "unconfigured" : receiptRoute,
+                    Payload = BuildReceiptPayload(order, billableLines, payment, input, billPayment.PaidAt),
+                    LastError = string.IsNullOrWhiteSpace(receiptRoute) ? "No receipt printer route is configured." : null,
+                    CreatedAtUtc = DateTime.UtcNow
+                });
+            }
+
             if (isFullyBilled)
             {
                 order.SalesMasterId = salesMasterId;
@@ -283,37 +304,8 @@ namespace NextWave.Erp.Restaurant
                 await orderRepository.UpdateAsync(order);
             }
 
-            if (isFullyBilled && order.TableSessionId.HasValue)
-            {
-                var session = await tableSessionRepository.FirstOrDefaultAsync(order.TableSessionId.Value);
-                if (session != null)
-                {
-                    session.Status = RestaurantOrderStatus.Closed;
-                    session.ClosedAt = DateTime.Now;
-                    await tableSessionRepository.UpdateAsync(session);
-                }
-            }
-
-            if (isFullyBilled && order.TableId.HasValue)
-            {
-                var hasOpenOrder = await orderRepository.CountAsync(x =>
-                    x.TenantId == tenantId &&
-                    x.Id != order.Id &&
-                    x.TableId == order.TableId &&
-                    x.Status != RestaurantOrderStatus.Billed &&
-                    x.Status != RestaurantOrderStatus.Closed &&
-                    x.Status != RestaurantOrderStatus.Cancelled) > 0;
-
-                if (!hasOpenOrder)
-                {
-                    var table = await tableRepository.FirstOrDefaultAsync(order.TableId.Value);
-                    if (table != null)
-                    {
-                        table.Status = RestaurantTableStatus.Available;
-                        await tableRepository.UpdateAsync(table);
-                    }
-                }
-            }
+            // A bill settles an order. Staff close the table session after the party leaves,
+            // which allows guests to place additional QR orders on the same session.
 
             var affectedProductIds = validation.Requirements
                 .Select(x => x.ProductId)
@@ -341,6 +333,41 @@ namespace NextWave.Erp.Restaurant
                 ReturnAmount = payment.ReturnAmount,
                 StockWarnings = stockWarnings
             };
+        }
+
+        private static byte[] BuildReceiptPayload(
+            RestaurantOrder order,
+            List<RestaurantBillableLine> lines,
+            RestaurantBillPaymentAmounts payment,
+            FinalizeRestaurantBillDto input,
+            DateTime paidAt)
+        {
+            var text = new StringBuilder("\u001b@\u001ba\u0001");
+            text.AppendLine("NEXTWAVE ERP");
+            text.AppendLine("RESTAURANT RECEIPT");
+            text.AppendLine(new string('-', 32));
+            text.AppendLine($"Order: {order.OrderNo}");
+            text.AppendLine($"Date: {paidAt:yyyy-MM-dd HH:mm}");
+            if (!string.IsNullOrWhiteSpace(input.CustomerName ?? order.CustomerName))
+                text.AppendLine($"Guest: {input.CustomerName ?? order.CustomerName}");
+            text.AppendLine(new string('-', 32));
+            foreach (var line in lines)
+            {
+                text.AppendLine($"{line.Qty:0.##} x {line.Item.ItemNameSnapshot}");
+                text.AppendLine($"  {line.Amount:0.00}");
+            }
+            text.AppendLine(new string('-', 32));
+            text.AppendLine($"Bill: {payment.BillAmount:0.00}");
+            if (payment.TipAmount > 0) text.AppendLine($"Tip: {payment.TipAmount:0.00}");
+            text.AppendLine($"Payable: {payment.PayableAmount:0.00}");
+            text.AppendLine($"Paid: {payment.CustomerPaidAmount:0.00}");
+            if (payment.ReturnAmount > 0) text.AppendLine($"Change: {payment.ReturnAmount:0.00}");
+            text.AppendLine($"Method: {input.PaymentMethod}");
+            text.AppendLine();
+            text.AppendLine("Thank you");
+            text.AppendLine();
+            text.Append("\u001dV\u0000");
+            return Encoding.UTF8.GetBytes(text.ToString());
         }
 
         private static RestaurantBillPaymentAmounts BuildPaymentAmounts(decimal billAmount, FinalizeRestaurantBillDto input)

@@ -12,7 +12,7 @@
                             <ng-template tabHeading>
                                 <div class="theme-select-box">
                                     <img
-                                        [src]="'/assets/common/images/metronic-themes/' + themeSetting.theme + '.png'"
+                    [src]="'/assets/common/images/metronic-themes/' + themeSetting.theme + (['theme3', 'theme4'].includes(themeSetting.theme) ? '.svg' : '.png')"
                                         alt="theme{{ themeSetting.theme }}"
                                         width="150"
                                     />
@@ -27,6 +27,12 @@
                             }
                             @if (themeSetting.theme == 'theme11') {
                                 <theme11-theme-ui-settings [settings]="themeSetting"></theme11-theme-ui-settings>
+                            }
+                            @if (themeSetting.theme == 'theme2') {
+                                <theme2-theme-ui-settings [settings]="themeSetting"></theme2-theme-ui-settings>
+                            }
+                            @if (themeSetting.theme == 'theme3') {
+                                <theme3-theme-ui-settings [settings]="themeSetting"></theme3-theme-ui-settings>
                             }
                         </tab>
                     }

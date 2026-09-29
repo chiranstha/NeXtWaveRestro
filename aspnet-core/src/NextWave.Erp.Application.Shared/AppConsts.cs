@@ -31,8 +31,19 @@ public class AppConsts
     public static string UserIdentifier = "user_identifier";
 
     public const string ThemeDefault = "default";
+    public const string Theme2 = "theme2";
+    public const string Theme3 = "theme3";
     public const string Theme8 = "theme8";
     public const string Theme11 = "theme11";
+
+    public static string NormalizeTheme(string? theme) => theme?.Trim().ToLowerInvariant() switch
+    {
+        Theme2 => Theme2,
+        Theme3 => Theme3,
+        Theme8 => Theme8,
+        Theme11 => Theme11,
+        _ => ThemeDefault
+    };
 
     public static TimeSpan AccessTokenExpiration = TimeSpan.FromDays(1);
     public static TimeSpan RefreshTokenExpiration = TimeSpan.FromDays(365);

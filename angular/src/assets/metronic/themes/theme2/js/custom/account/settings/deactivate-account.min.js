@@ -51,7 +51,7 @@ var KTAccountSettingsDeactivateAccount = function () {
                         confirmButtonText: "Yes",
                         denyButtonText: 'No',
                         customClass: {
-                            confirmButton: "btn btn-sm btn-light-primary",
+                            confirmButton: "btn btn-xs btn-light-primary",
                             denyButton: "btn btn-danger"
                         }
                     }).then((result) => {
@@ -62,7 +62,7 @@ var KTAccountSettingsDeactivateAccount = function () {
                                 confirmButtonText: "Ok",
                                 buttonsStyling: false,
                                 customClass: {
-                                    confirmButton: "btn btn-sm btn-light-primary"
+                                    confirmButton: "btn btn-xs btn-light-primary"
                                 }
                             })
                         } else if (result.isDenied) {
@@ -72,7 +72,7 @@ var KTAccountSettingsDeactivateAccount = function () {
                                 confirmButtonText: "Ok",
                                 buttonsStyling: false,
                                 customClass: {
-                                    confirmButton: "btn btn-sm btn-light-primary"
+                                    confirmButton: "btn btn-xs btn-light-primary"
                                 }
                             })
                         }
@@ -85,7 +85,7 @@ var KTAccountSettingsDeactivateAccount = function () {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-light-primary"
+                            confirmButton: "btn btn-xs btn-light-primary"
                         }
                     });
                 }

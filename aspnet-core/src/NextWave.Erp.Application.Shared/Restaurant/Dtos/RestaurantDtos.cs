@@ -31,6 +31,8 @@ namespace NextWave.Erp.Restaurant.Dtos
         public bool IsActive { get; set; }
         public Guid AreaId { get; set; }
         public string AreaName { get; set; }
+        public bool HasQrCode { get; set; }
+        public DateTime? QrTokenUpdatedAt { get; set; }
     }
 
     public class CreateOrEditRestaurantTableDto : EntityDto<Guid?>
@@ -49,6 +51,7 @@ namespace NextWave.Erp.Restaurant.Dtos
         public string Name { get; set; }
         public RestaurantStationType StationType { get; set; }
         public bool IsActive { get; set; }
+        public string PrintRouteName { get; set; }
     }
 
     public class CreateOrEditRestaurantStationDto : EntityDto<Guid?>
@@ -56,6 +59,7 @@ namespace NextWave.Erp.Restaurant.Dtos
         public string Name { get; set; }
         public RestaurantStationType StationType { get; set; }
         public bool IsActive { get; set; } = true;
+        public string PrintRouteName { get; set; }
     }
 
     public class RestaurantDeviceDto : EntityDto<Guid>
@@ -91,6 +95,10 @@ namespace NextWave.Erp.Restaurant.Dtos
         public bool TicketPrintingEnabled { get; set; }
         public bool ChannelAvailabilityEnabled { get; set; }
         public string TableWorkflow { get; set; }
+        public bool QrOrderingEnabled { get; set; }
+        public bool ReservationBookingEnabled { get; set; }
+        public int DefaultReservationDurationMinutes { get; set; } = 90;
+        public string ReceiptPrintRouteName { get; set; }
     }
 
     public class RestaurantCashShiftDto : EntityDto<Guid>

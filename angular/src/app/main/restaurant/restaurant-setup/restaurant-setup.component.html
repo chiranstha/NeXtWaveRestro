@@ -1,5 +1,15 @@
 <div [@routerTransition]>
     <restaurant-styles></restaurant-styles>
+    <div class="restaurant-qr-overlay" *ngIf="qrResult" (click)="qrResult = undefined">
+        <section class="restaurant-qr-dialog" (click)="$event.stopPropagation()">
+            <button class="btn btn-sm btn-light float-end" type="button" (click)="qrResult = undefined">Close</button>
+            <h3>{{ qrResult.tableName }} · Guest QR</h3>
+            <p>Print this permanent table sticker. Regenerating the code revokes the previous sticker.</p>
+            <img [src]="'data:image/png;base64,' + qrResult.pngBase64" [alt]="qrResult.tableName + ' QR code'" />
+            <a class="d-block text-break" [href]="qrResult.url" target="_blank" rel="noopener">{{ qrResult.url }}</a>
+            <a class="btn btn-primary mt-3" [href]="'data:image/png;base64,' + qrResult.pngBase64" [download]="qrResult.tableName + '-guest-qr.png">Download QR image</a>
+        </section>
+    </div>
     <sub-header [title]="'Restaurant Setup' | localize">
         <div role="actions">
             <button
@@ -281,6 +291,11 @@
                             </select>
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Print Agent route</label>
+                            <input class="form-control" formControlName="printRouteName" placeholder="Example: kitchen or bar" />
+                            <small class="form-text text-muted">Use a route alias configured in Nextwave ERP PrintAgent Tray.</small>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-check form-check-sm">
                                 <input class="form-check-input" type="checkbox" formControlName="isActive" />
                                 <span class="form-check-label">{{ 'Active' | localize }}</span>
@@ -456,6 +471,23 @@
                                     <input class="form-check-input" type="checkbox" formControlName="channelAvailabilityEnabled" />
                                     <span class="form-check-label">{{ 'Online ordering/channel availability enabled' | localize }}</span>
                                 </label>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label d-block">Table QR ordering</label>
+                                <label class="form-check form-switch form-check-custom form-check-solid"><input class="form-check-input" type="checkbox" formControlName="qrOrderingEnabled" /><span class="form-check-label">Enable guest ordering from table QR codes</span></label>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label d-block">Online reservation requests</label>
+                                <label class="form-check form-switch form-check-custom form-check-solid"><input class="form-check-input" type="checkbox" formControlName="reservationBookingEnabled" /><span class="form-check-label">Enable phone-verified guest booking requests</span></label>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Default reservation duration (minutes)</label>
+                                <input class="form-control" type="number" min="30" max="240" formControlName="defaultReservationDurationMinutes" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Receipt Print Agent route</label>
+                                <input class="form-control" formControlName="receiptPrintRouteName" placeholder="Example: receipt" />
+                                <small class="form-text text-muted">Configure the same route alias in the paired Windows station.</small>
                             </div>
                         </div>
                         <div class="restaurant-actionbar gap-2 restaurant-actionbar-end align-items-center d-flex flex-wrap justify-content-start justify-content-sm-end min-w-0">

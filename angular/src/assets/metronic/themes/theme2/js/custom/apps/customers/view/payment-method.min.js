@@ -26,7 +26,7 @@ var KTCustomerViewPaymentMethod = function () {
                     confirmButtonText: "Yes, delete it!",
                     cancelButtonText: "No, return",
                     customClass: {
-                        confirmButton: "btn btn-sm btn-primary",
+                        confirmButton: "btn btn-xs btn-primary",
                         cancelButton: "btn btn-active-light"
                     }
                 }).then(function (result) {
@@ -40,7 +40,7 @@ var KTCustomerViewPaymentMethod = function () {
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
                             customClass: {
-                                confirmButton: "btn btn-sm btn-primary",
+                                confirmButton: "btn btn-xs btn-primary",
                             }
                         });
                     }
@@ -66,7 +66,7 @@ var KTCustomerViewPaymentMethod = function () {
                 confirmButtonText: "Yes, set it!",
                 cancelButtonText: "No, return",
                 customClass: {
-                    confirmButton: "btn btn-sm btn-primary",
+                    confirmButton: "btn btn-xs btn-primary",
                     cancelButton: "btn btn-active-light"
                 }
             }).then(function (result) {
@@ -77,7 +77,7 @@ var KTCustomerViewPaymentMethod = function () {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-primary",
+                            confirmButton: "btn btn-xs btn-primary",
                         }
                     });
                 } else if (result.dismiss === 'cancel') {
@@ -87,7 +87,7 @@ var KTCustomerViewPaymentMethod = function () {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-primary",
+                            confirmButton: "btn btn-xs btn-primary",
                         }
                     });
                 }

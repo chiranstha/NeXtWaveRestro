@@ -1,0 +1,124 @@
+/* Theme 3: compact, light dashboard shell. */
+.app-theme3 {
+    --bs-primary: #0869e9;
+    --bs-primary-rgb: 8, 105, 233;
+    --erp-shadow-sm: 0 1px 3px rgba(32, 52, 78, .05);
+    --erp-shadow-md: 0 2px 6px rgba(32, 52, 78, .07);
+    background: #f7f9fc;
+    color: #273244;
+}
+.app-theme3 .theme3-header {
+    height: 56px;
+    min-height: 56px;
+    background: #fff;
+    border-bottom: 1px solid #e8edf5;
+    box-shadow: 0 1px 3px rgba(32, 52, 78, .05);
+}
+.app-theme3 .theme3-header-inner {
+    min-height: 56px;
+    width: 100%;
+    max-width: none;
+    flex-wrap: nowrap;
+    gap: 12px;
+    padding-inline: 18px;
+    padding-top: 4px;
+}
+.app-theme3 .theme3-brand-area { flex: 0 0 auto; }
+.app-theme3 .theme3-brand-area img { max-width: 95px; object-fit: contain; }
+.app-theme3 .theme3-menu-area {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #b9c9df transparent;
+}
+.app-theme3 .theme3-menu-area .header-menu,
+.app-theme3 .theme3-menu-area top-bar-menu,
+.app-theme3 #kt_header_menu { min-width: max-content; }
+.app-theme3 .theme3-menu-area::-webkit-scrollbar { height: 5px; }
+.app-theme3 .theme3-menu-area::-webkit-scrollbar-thumb {
+    background: #b9c9df;
+    border-radius: 5px;
+}
+.app-theme3 .theme3-header-actions { gap: 2px; }
+.app-theme3 .theme3-icon-action {
+    color: #526174;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+.app-theme3 .theme3-icon-action:hover,
+.app-theme3 .theme3-icon-action:focus-visible { color: #0869e9; }
+.app-theme3 .theme3-icon-action i { font-size: 18px; }
+.app-theme3 .theme3-icon-action svg { width: 20px; height: 20px; }
+.app-theme3 #kt_header_menu { flex-wrap: nowrap; }
+.app-theme3 #kt_header_menu > .menu-item { flex: 0 0 auto; }
+.app-theme3 #kt_header_menu > .menu-item > .menu-link {
+    white-space: nowrap;
+    padding-inline: 8px;
+}
+.app-theme3 #kt_header_menu > .menu-item > .menu-link .menu-title { white-space: nowrap; }
+.app-theme3 .header-menu .menu-item .menu-link { color: #586779; }
+.app-theme3 .header-menu .menu-item .menu-link.active,
+.app-theme3 .header-menu .menu-item .menu-link:hover { color: #0869e9; background: #edf5ff; }
+/* Draw submenu chevrons without relying on the optional Line Awesome font. */
+.app-theme3 #kt_header_menu .menu-link > .la-angle-down,
+.app-theme3 #kt_header_menu .menu-link > .la-angle-right {
+    display: inline-block;
+    flex: 0 0 7px;
+    width: 7px;
+    height: 7px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    font-size: 0;
+    opacity: .75;
+}
+.app-theme3 #kt_header_menu .menu-link > .la-angle-down::before,
+.app-theme3 #kt_header_menu .menu-link > .la-angle-right::before { content: none; }
+.app-theme3 #kt_header_menu .menu-link > .la-angle-down { transform: rotate(45deg) translateY(-2px); }
+.app-theme3 #kt_header_menu .menu-link > .la-angle-right {
+    margin-left: auto;
+    border-color: #0869e9;
+    border-width: 2px;
+    opacity: 1;
+    transform: rotate(-45deg);
+}
+.app-theme3 .btn-outline { border-color: transparent; }
+.app-theme3 .btn-outline:hover { background: #edf5ff; }
+.app-theme3 .wrapper { background: #f7f9fc; }
+.app-theme3 .card,
+.app-theme3 .card.card-custom {
+    background: #fff;
+    border: 1px solid #e1e7f0;
+    border-radius: 12px;
+    box-shadow: var(--erp-shadow-sm);
+}
+.app-theme3 .card .card-header { border-bottom-color: #edf1f6; }
+.app-theme3 .toolbar { background: #fff; border-bottom: 1px solid #edf1f6; }
+.app-theme3 sub-header .app-subheader-shell {
+    min-height: 44px;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    box-shadow: var(--erp-shadow-sm);
+}
+.app-theme3 sub-header .app-subheader-layout { min-height: 44px; }
+.app-theme3 .footer { background: #fff; border-top: 1px solid #edf1f6; }
+@media (max-width: 1199.98px) {
+    .app-theme3 .theme3-header-inner { gap: 8px; }
+    .app-theme3 .theme3-brand-area img { max-width: 75px; }
+}
+@media (min-width: 992px) {
+    .app-theme3.header-fixed[data-kt-sticky-header=on] .theme3-header { height: 56px; }
+    .app-theme3.header-fixed[data-kt-sticky-header=on] .theme3-header .header-menu-container {
+        display: flex !important;
+    }
+}
+@media (max-width: 991.98px) {
+    .app-theme3 .theme3-menu-area { flex: 0 0 0; width: 0 !important; }
+    .app-theme3 #kt_header { z-index: 99; }
+}

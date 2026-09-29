@@ -102,7 +102,7 @@ var KTAuthNewPassword = function() {
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
                             customClass: {
-                                confirmButton: "btn btn-sm btn-primary"
+                                confirmButton: "btn btn-xs btn-primary"
                             }
                         }).then(function (result) {
                             if (result.isConfirmed) {
@@ -126,7 +126,7 @@ var KTAuthNewPassword = function() {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-primary"
+                            confirmButton: "btn btn-xs btn-primary"
                         }
                     });
                 }
@@ -170,7 +170,7 @@ var KTAuthNewPassword = function() {
                                 buttonsStyling: false,
                                 confirmButtonText: "Ok, got it!",
                                 customClass: {
-                                    confirmButton: "btn btn-sm btn-primary"
+                                    confirmButton: "btn btn-xs btn-primary"
                                 }
                             });
                         }
@@ -181,7 +181,7 @@ var KTAuthNewPassword = function() {
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
                             customClass: {
-                                confirmButton: "btn btn-sm btn-primary"
+                                confirmButton: "btn btn-xs btn-primary"
                             }
                         });
                     }).then(() => {
@@ -199,7 +199,7 @@ var KTAuthNewPassword = function() {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-primary"
+                            confirmButton: "btn btn-xs btn-primary"
                         }
                     });
                 }

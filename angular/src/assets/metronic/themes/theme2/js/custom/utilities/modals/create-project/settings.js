@@ -136,7 +136,7 @@ var KTModalCreateProjectSettings = function () {
 							buttonsStyling: false,
 							confirmButtonText: "Ok, got it!",
 							customClass: {
-								confirmButton: "btn btn-sm btn-primary"
+								confirmButton: "btn btn-xs btn-primary"
 							}
 						});
 					}

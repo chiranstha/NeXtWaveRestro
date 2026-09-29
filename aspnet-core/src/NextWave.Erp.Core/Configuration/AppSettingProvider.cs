@@ -42,6 +42,8 @@ public class AppSettingProvider : SettingProvider
             // theme settings
             .Union(GetDefaultThemeSettings())
             .Union(GetTheme8Settings())
+            .Union(GetTheme2Settings())
+            .Union(GetTheme3Settings())
             .Union(GetTheme11Settings())
             .Union(GetDashboardSettings())
             .Union(GetExternalLoginProviderSettings())
@@ -325,6 +327,10 @@ public class AppSettingProvider : SettingProvider
                 new SettingDefinition(AppSettings.ErpSettings.RestaurantTableWorkflow,
                     GetFromAppSettings(AppSettings.ErpSettings.RestaurantTableWorkflow, "TableSession"),
                     scopes: SettingScopes.Tenant),
+                new SettingDefinition(AppSettings.ErpSettings.RestaurantQrOrderingEnabled, "false", scopes: SettingScopes.Tenant),
+                new SettingDefinition(AppSettings.ErpSettings.RestaurantReservationBookingEnabled, "false", scopes: SettingScopes.Tenant),
+                new SettingDefinition(AppSettings.ErpSettings.RestaurantDefaultReservationDurationMinutes, "90", scopes: SettingScopes.Tenant),
+                new SettingDefinition(AppSettings.ErpSettings.RestaurantReceiptPrintRouteName, "", scopes: SettingScopes.Tenant),
 
                 new SettingDefinition(AppSettings.ErpSettings.SalesBillFormat,
                     GetFromAppSettings(AppSettings.ErpSettings.SalesBillFormat, "Vat-2"), scopes: SettingScopes.Tenant),
@@ -1154,5 +1160,62 @@ public class AppSettingProvider : SettingProvider
     {
         return new LocalizableString(name, ErpConsts.LocalizationSourceName);
     }
+    private IEnumerable<SettingDefinition> GetTheme2Settings()
+    {
+        var themeName = "theme2";
+
+        return
+        [
+            new SettingDefinition(themeName + "." + AppSettings.UiManagement.DarkMode,
+                GetFromAppSettings(themeName + "." + AppSettings.UiManagement.DarkMode, "false"),
+                clientVisibilityProvider: _visibleSettingClientVisibilityProvider, scopes: SettingScopes.All),
+            new SettingDefinition(themeName + "." + AppSettings.UiManagement.LayoutType,
+                GetFromAppSettings(themeName + "." + AppSettings.UiManagement.LayoutType, "fluid"),
+                clientVisibilityProvider: _visibleSettingClientVisibilityProvider, scopes: SettingScopes.All),
+            new SettingDefinition(themeName + "." + AppSettings.UiManagement.Header.DesktopFixedHeader,
+                GetFromAppSettings(themeName + "." + AppSettings.UiManagement.Header.DesktopFixedHeader, "true"),
+                clientVisibilityProvider: _visibleSettingClientVisibilityProvider, scopes: SettingScopes.All),
+            new SettingDefinition(themeName + "." + AppSettings.UiManagement.Header.MobileFixedHeader,
+                GetFromAppSettings(themeName + "." + AppSettings.UiManagement.Header.MobileFixedHeader, "false"),
+                clientVisibilityProvider: _visibleSettingClientVisibilityProvider, scopes: SettingScopes.All),
+            new SettingDefinition(themeName + "." + AppSettings.UiManagement.Footer.FooterWidthType,
+                GetFromAppSettings(themeName + "." + AppSettings.UiManagement.Footer.FooterWidthType, "fixed"),
+                clientVisibilityProvider: _visibleSettingClientVisibilityProvider, scopes: SettingScopes.All),
+            new SettingDefinition(themeName + "." + AppSettings.UiManagement.SearchActive,
+                GetFromAppSettings(themeName + "." + AppSettings.UiManagement.SearchActive, "true"),
+                clientVisibilityProvider: _visibleSettingClientVisibilityProvider, scopes: SettingScopes.All)
+        ];
+    }
+
+
+    private IEnumerable<SettingDefinition> GetTheme3Settings()
+    {
+        var themeName = "theme3";
+
+        return
+        [
+            new SettingDefinition(themeName + "." + AppSettings.UiManagement.DarkMode,
+                GetFromAppSettings(themeName + "." + AppSettings.UiManagement.DarkMode, "false"),
+                clientVisibilityProvider: _visibleSettingClientVisibilityProvider, scopes: SettingScopes.All),
+            new SettingDefinition(themeName + "." + AppSettings.UiManagement.LayoutType,
+                GetFromAppSettings(themeName + "." + AppSettings.UiManagement.LayoutType, "fluid"),
+                clientVisibilityProvider: _visibleSettingClientVisibilityProvider, scopes: SettingScopes.All),
+            new SettingDefinition(themeName + "." + AppSettings.UiManagement.Header.MobileFixedHeader,
+                GetFromAppSettings(themeName + "." + AppSettings.UiManagement.Header.MobileFixedHeader, "false"),
+                clientVisibilityProvider: _visibleSettingClientVisibilityProvider, scopes: SettingScopes.All),
+            new SettingDefinition(themeName + "." + AppSettings.UiManagement.LeftAside.FixedAside,
+                GetFromAppSettings(themeName + "." + AppSettings.UiManagement.LeftAside.FixedAside, "true"),
+                clientVisibilityProvider: _visibleSettingClientVisibilityProvider, scopes: SettingScopes.All),
+
+            new SettingDefinition(themeName + "." + AppSettings.UiManagement.Footer.FooterWidthType,
+                GetFromAppSettings(themeName + "." + AppSettings.UiManagement.Footer.FooterWidthType, "fluid"),
+                clientVisibilityProvider: _visibleSettingClientVisibilityProvider, scopes: SettingScopes.All),
+            new SettingDefinition(themeName + "." + AppSettings.UiManagement.SearchActive,
+                GetFromAppSettings(themeName + "." + AppSettings.UiManagement.SearchActive, "false"),
+                clientVisibilityProvider: _visibleSettingClientVisibilityProvider, scopes: SettingScopes.All)
+        ];
+    }
+
+
 }
 

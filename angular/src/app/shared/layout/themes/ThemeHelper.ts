@@ -4,7 +4,7 @@ export class ThemeHelper {
             return 'default';
         }
         const theme = (abp.setting?.get ? abp.setting.get('App.UiManagement.Theme') : 'default')?.toLowerCase() || 'default';
-        return ['default', 'theme8', 'theme11'].includes(theme) ? theme : 'default';
+        return ['default', 'theme2', 'theme3', 'theme8', 'theme11'].includes(theme) ? theme : 'default';
     }
     public static darkMode(): boolean {
         return abp.setting?.get

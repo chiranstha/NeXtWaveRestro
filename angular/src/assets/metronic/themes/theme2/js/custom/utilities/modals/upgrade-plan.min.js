@@ -78,7 +78,7 @@ var KTModalUpgradePlan = function () {
                             confirmButtonText: "Ok",
                             buttonsStyling: false,
                             customClass: {
-                                confirmButton: "btn btn-sm btn-light-primary"
+                                confirmButton: "btn btn-xs btn-light-primary"
                             }
                         }).then((result) => {
                             bootstrap.Modal.getInstance(modal).hide();

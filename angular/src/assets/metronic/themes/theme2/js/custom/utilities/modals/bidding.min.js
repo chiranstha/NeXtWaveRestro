@@ -92,7 +92,7 @@ var KTModalBidding = function () {
                                 buttonsStyling: false,
                                 confirmButtonText: "Ok, got it!",
                                 customClass: {
-                                    confirmButton: "btn btn-sm btn-primary"
+                                    confirmButton: "btn btn-xs btn-primary"
                                 }
                             }).then(function () {
                                 //form.submit(); // Submit form
@@ -108,7 +108,7 @@ var KTModalBidding = function () {
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
                             customClass: {
-                                confirmButton: "btn btn-sm btn-primary"
+                                confirmButton: "btn btn-xs btn-primary"
                             }
                         });
                     }
@@ -214,7 +214,7 @@ var KTModalBidding = function () {
                 confirmButtonText: "Yes, cancel it!",
                 cancelButtonText: "No, return",
                 customClass: {
-                    confirmButton: "btn btn-sm btn-primary",
+                    confirmButton: "btn btn-xs btn-primary",
                     cancelButton: "btn btn-active-light"
                 }
             }).then(function (result) {
@@ -228,7 +228,7 @@ var KTModalBidding = function () {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-primary",
+                            confirmButton: "btn btn-xs btn-primary",
                         }
                     });
                 }

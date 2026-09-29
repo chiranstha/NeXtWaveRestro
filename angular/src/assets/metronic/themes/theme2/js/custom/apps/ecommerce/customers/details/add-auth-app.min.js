@@ -22,7 +22,7 @@ var KTUsersAddAuthApp = function () {
                 confirmButtonText: "Yes, close it!",
                 cancelButtonText: "No, return",
                 customClass: {
-                    confirmButton: "btn btn-sm btn-primary",
+                    confirmButton: "btn btn-xs btn-primary",
                     cancelButton: "btn btn-active-light"
                 }
             }).then(function (result) {

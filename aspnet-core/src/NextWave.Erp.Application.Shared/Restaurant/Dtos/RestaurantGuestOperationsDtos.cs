@@ -83,6 +83,7 @@ namespace NextWave.Erp.Restaurant.Dtos
         public RestaurantReservationStatus Status { get; set; }
         public DateTime StartsAt { get; set; }
         public DateTime EndsAt { get; set; }
+        public string Error { get; set; }
     }
 
     public class CreateRestaurantWalkInDto
@@ -131,6 +132,8 @@ namespace NextWave.Erp.Restaurant.Dtos
         public string AgentJobId { get; set; }
         public RestaurantPrintJobStatus Status { get; set; }
         public string LastError { get; set; }
+        public int Attempts { get; set; }
+        public string ReprintReason { get; set; }
     }
 
     public class ReportRestaurantPrintJobDto
@@ -140,5 +143,10 @@ namespace NextWave.Erp.Restaurant.Dtos
         public string AgentJobId { get; set; }
         public RestaurantPrintJobStatus Status { get; set; }
         public string Error { get; set; }
+    }
+
+    public class RetryRestaurantPrintJobDto
+    {
+        public Guid JobId { get; set; }
     }
 }

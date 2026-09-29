@@ -1,0 +1,45 @@
+:host { display: block; min-height: 100vh; background: #f5f7f5; color: #18231d; font-family: inherit; }
+.guest-shell { width: min(100% - 24px, 680px); margin: 0 auto; padding: 28px 0 48px; }
+.guest-header { padding: 22px 20px; margin-bottom: 18px; border-radius: 18px; color: #fff; background: linear-gradient(135deg, #123d2b, #287447); box-shadow: 0 12px 30px #123d2b20; }
+.guest-header h1 { margin: 6px 0; font-size: clamp(1.8rem, 8vw, 2.6rem); font-weight: 800; }
+.guest-header p { margin: 0; color: #e6f1e9; }
+.guest-eyebrow,.guest-category-label { font-size: .72rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; opacity: .78; }
+.guest-menu-section,.guest-cart,.guest-panel { padding: 16px; margin: 14px 0; border: 1px solid #e1e8e3; border-radius: 16px; background: #fff; box-shadow: 0 5px 18px #122b1a0a; }
+.guest-search-row,.guest-menu-title-row,.guest-add-row,.guest-total,.guest-cart-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.guest-search-row { margin-bottom: 12px; }
+.guest-input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #cfd9d1; border-radius: 10px; background: #fff; color: inherit; }
+.guest-categories { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 12px; }
+.guest-chip { flex: 0 0 auto; padding: 8px 13px; border: 1px solid #dce5de; border-radius: 999px; color: #3c5144; background: #fff; }
+.guest-chip.selected { border-color: #287447; color: #fff; background: #287447; }
+.guest-menu-card { padding: 16px 0; border-top: 1px solid #edf1ee; }
+.guest-menu-card h2,.guest-cart h2 { margin: 3px 0; font-size: 1.12rem; font-weight: 800; }
+.guest-menu-card p { margin: 5px 0; color: #627067; }
+.guest-price { flex: 0 0 auto; color: #20633b; font-size: 1.05rem; }
+.guest-field { display: block; margin: 12px 0; font-weight: 700; }
+.guest-field span,.guest-qty span { display: block; margin-bottom: 5px; }
+.guest-modifiers { display: grid; gap: 7px; margin: 12px 0; }
+.guest-modifiers > span { font-weight: 700; }
+.guest-modifiers label { display: flex; align-items: center; gap: 8px; color: #526158; }
+.guest-qty { width: 100px; color: #526158; }
+.guest-qty input { width: 100%; min-height: 42px; padding: 8px; border: 1px solid #cfd9d1; border-radius: 9px; }
+.guest-button { min-height: 44px; padding: 10px 16px; border: 0; border-radius: 10px; color: #fff; background: #247047; font-weight: 800; }
+.guest-button:disabled { opacity: .6; }
+.guest-button-light { color: #28543a; background: #e9f1eb; }
+.guest-button-wide { width: 100%; margin-top: 12px; }
+.guest-cart { position: sticky; bottom: 8px; z-index: 2; border-color: #c8dbcd; }
+.guest-cart h2 { display: flex; align-items: center; justify-content: space-between; }
+.guest-cart h2 span,.guest-note,.guest-empty,.guest-loading { color: #68766d; font-size: .9rem; }
+.guest-cart-line { justify-content: flex-start; padding: 8px 0; border-bottom: 1px solid #edf1ee; }
+.guest-link-button { margin-left: auto; padding: 4px 8px; border: 0; color: #8c352d; background: transparent; }
+.guest-total { margin-top: 12px; padding-top: 10px; border-top: 1px solid #edf1ee; }
+.guest-total strong { font-size: 1.25rem; }
+.guest-alert { padding: 13px 15px; margin: 12px 0; border-radius: 12px; }
+.guest-alert-error { border: 1px solid #f0c7c2; color: #842b22; background: #fff1ef; }
+.guest-alert-success { border: 1px solid #c8dfce; color: #1e5630; background: #edf8ef; }
+.guest-alert-success a { display: block; margin-top: 6px; font-weight: 800; }
+.guest-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.guest-form-grid .full { grid-column: 1 / -1; }
+.guest-field label { display: block; margin-bottom: 5px; font-weight: 700; }
+.guest-status-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 13px 0; border-bottom: 1px solid #edf1ee; }
+.guest-status-badge { padding: 6px 10px; border-radius: 999px; color: #1f5e36; background: #e8f4eb; font-weight: 800; }
+@media (max-width: 520px) { .guest-shell { width: min(100% - 18px, 680px); padding-top: 10px; } .guest-menu-section,.guest-cart,.guest-panel { padding: 13px; } .guest-search-row { align-items: stretch; flex-direction: column; } .guest-button-light { width: 100%; } }

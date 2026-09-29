@@ -76,7 +76,6 @@ namespace NextWave.Erp.Restaurant.Dtos
         public RestaurantCustomerPaymentMode PaymentMode { get; set; } = RestaurantCustomerPaymentMode.CounterSettlement;
         public string ClientRequestId { get; set; }
         public string StatusAccessToken { get; set; }
-        public string TableToken { get; set; }
     }
 
     public class RestaurantCustomerOrderLineDto

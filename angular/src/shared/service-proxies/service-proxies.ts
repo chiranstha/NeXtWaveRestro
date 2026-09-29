@@ -59813,6 +59813,7 @@ export class CreateOrEditRestaurantStationDto implements ICreateOrEditRestaurant
     name!: string | undefined;
     stationType!: RestaurantStationType;
     isActive!: boolean;
+    printRouteName!: string | undefined;
 
     constructor(data?: ICreateOrEditRestaurantStationDto) {
         if (data) {
@@ -59829,6 +59830,7 @@ export class CreateOrEditRestaurantStationDto implements ICreateOrEditRestaurant
             this.name = _data["name"];
             this.stationType = _data["stationType"];
             this.isActive = _data["isActive"];
+            this.printRouteName = _data["printRouteName"];
         }
     }
 
@@ -59845,6 +59847,7 @@ export class CreateOrEditRestaurantStationDto implements ICreateOrEditRestaurant
         data["name"] = this.name;
         data["stationType"] = this.stationType;
         data["isActive"] = this.isActive;
+        data["printRouteName"] = this.printRouteName;
         return data;
     }
 }
@@ -59854,6 +59857,7 @@ export interface ICreateOrEditRestaurantStationDto {
     name: string | undefined;
     stationType: RestaurantStationType;
     isActive: boolean;
+    printRouteName: string | undefined;
 }
 
 export class CreateOrEditRestaurantSupplierItemMappingDto implements ICreateOrEditRestaurantSupplierItemMappingDto {
@@ -85395,6 +85399,10 @@ export class RestaurantOperationalSettingsDto implements IRestaurantOperationalS
     ticketPrintingEnabled!: boolean;
     channelAvailabilityEnabled!: boolean;
     tableWorkflow!: string | undefined;
+    qrOrderingEnabled!: boolean;
+    reservationBookingEnabled!: boolean;
+    defaultReservationDurationMinutes!: number;
+    receiptPrintRouteName!: string | undefined;
 
     constructor(data?: IRestaurantOperationalSettingsDto) {
         if (data) {
@@ -85415,6 +85423,10 @@ export class RestaurantOperationalSettingsDto implements IRestaurantOperationalS
             this.ticketPrintingEnabled = _data["ticketPrintingEnabled"];
             this.channelAvailabilityEnabled = _data["channelAvailabilityEnabled"];
             this.tableWorkflow = _data["tableWorkflow"];
+            this.qrOrderingEnabled = _data["qrOrderingEnabled"];
+            this.reservationBookingEnabled = _data["reservationBookingEnabled"];
+            this.defaultReservationDurationMinutes = _data["defaultReservationDurationMinutes"];
+            this.receiptPrintRouteName = _data["receiptPrintRouteName"];
         }
     }
 
@@ -85435,6 +85447,10 @@ export class RestaurantOperationalSettingsDto implements IRestaurantOperationalS
         data["ticketPrintingEnabled"] = this.ticketPrintingEnabled;
         data["channelAvailabilityEnabled"] = this.channelAvailabilityEnabled;
         data["tableWorkflow"] = this.tableWorkflow;
+        data["qrOrderingEnabled"] = this.qrOrderingEnabled;
+        data["reservationBookingEnabled"] = this.reservationBookingEnabled;
+        data["defaultReservationDurationMinutes"] = this.defaultReservationDurationMinutes;
+        data["receiptPrintRouteName"] = this.receiptPrintRouteName;
         return data;
     }
 }
@@ -85448,6 +85464,10 @@ export interface IRestaurantOperationalSettingsDto {
     ticketPrintingEnabled: boolean;
     channelAvailabilityEnabled: boolean;
     tableWorkflow: string | undefined;
+    qrOrderingEnabled: boolean;
+    reservationBookingEnabled: boolean;
+    defaultReservationDurationMinutes: number;
+    receiptPrintRouteName: string | undefined;
 }
 
 export class RestaurantOrderDto implements IRestaurantOrderDto {
@@ -86314,6 +86334,7 @@ export class RestaurantStationDto implements IRestaurantStationDto {
     name!: string | undefined;
     stationType!: RestaurantStationType;
     isActive!: boolean;
+    printRouteName!: string | undefined;
 
     constructor(data?: IRestaurantStationDto) {
         if (data) {
@@ -86330,6 +86351,7 @@ export class RestaurantStationDto implements IRestaurantStationDto {
             this.name = _data["name"];
             this.stationType = _data["stationType"];
             this.isActive = _data["isActive"];
+            this.printRouteName = _data["printRouteName"];
         }
     }
 
@@ -86346,6 +86368,7 @@ export class RestaurantStationDto implements IRestaurantStationDto {
         data["name"] = this.name;
         data["stationType"] = this.stationType;
         data["isActive"] = this.isActive;
+        data["printRouteName"] = this.printRouteName;
         return data;
     }
 }
@@ -86355,6 +86378,7 @@ export interface IRestaurantStationDto {
     name: string | undefined;
     stationType: RestaurantStationType;
     isActive: boolean;
+    printRouteName: string | undefined;
 }
 
 export enum RestaurantStationType {

@@ -7,6 +7,18 @@ import { NetworkAwarePreloadingStrategy } from './network-aware-preloading.strat
     imports: [
         RouterModule.forChild([
             {
+                path: 'guest/table/:token',
+                loadComponent: () => import('./guest/guest-table-order.component').then((m) => m.GuestTableOrderComponent),
+            },
+            {
+                path: 'guest/order/:orderId',
+                loadComponent: () => import('./guest/guest-order-status.component').then((m) => m.GuestOrderStatusComponent),
+            },
+            {
+                path: 'guest/:tenant/reserve',
+                loadComponent: () => import('./guest/guest-reservation.component').then((m) => m.GuestReservationComponent),
+            },
+            {
                 path: 'app',
                 loadComponent: () => import('./app.component').then((m) => m.AppComponent),
                 canActivate: [AppRouteGuard],

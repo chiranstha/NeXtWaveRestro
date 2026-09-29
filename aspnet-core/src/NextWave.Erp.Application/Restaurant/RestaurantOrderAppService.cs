@@ -13,6 +13,7 @@ using NextWave.Erp.Restaurant.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -33,6 +34,7 @@ namespace NextWave.Erp.Restaurant
         IRepository<RestaurantModifier, Guid> modifierRepository,
         IRepository<RestaurantOrderItemModifier, Guid> orderItemModifierRepository,
         IRepository<RestaurantBillLine, Guid> billLineRepository,
+        IRepository<RestaurantPrintJob, Guid> printJobRepository,
         IRepository<Product, Guid> productRepository,
         IRepository<Unit, Guid> unitRepository,
         IUnitOfWorkManager unitOfWorkManager)
@@ -310,6 +312,24 @@ namespace NextWave.Erp.Restaurant
                         Status = RestaurantOrderItemStatus.Sent
                     });
                 }
+
+                var ticketItems = group.ToList();
+                var routeName = string.IsNullOrWhiteSpace(station.PrintRouteName) ? "unconfigured" : station.PrintRouteName.Trim();
+                var payload = BuildKitchenTicketPayload(order, ticket, station, ticketItems);
+                await printJobRepository.InsertAsync(new RestaurantPrintJob
+                {
+                    TenantId = tenantId,
+                    ExternalJobId = "KOT-" + ticketId.ToString("N"),
+                    Type = RestaurantPrintJobType.KitchenTicket,
+                    Status = string.IsNullOrWhiteSpace(station.PrintRouteName) ? RestaurantPrintJobStatus.Failed : RestaurantPrintJobStatus.Pending,
+                    TicketId = ticketId,
+                    OrderId = order.Id,
+                    StationId = station.Id,
+                    RouteName = routeName,
+                    Payload = payload,
+                    LastError = string.IsNullOrWhiteSpace(station.PrintRouteName) ? "No print route is configured for this station." : null,
+                    CreatedAtUtc = DateTime.UtcNow
+                });
             }
 
             order.Status = RestaurantOrderStatus.SentToKitchen;
@@ -477,6 +497,7 @@ namespace NextWave.Erp.Restaurant
             var ticket = await GetTicketEntity(input.TicketId);
             var isReprint = ticket.PrintCount > 0;
             await RegisterTicketPrint(ticket);
+            await QueueAuditedTicketReprint(ticket, input.ApprovalNote.Trim());
             await RecordSensitiveAction(
                 "ReprintTicket",
                 RestaurantSyncEntityType.Ticket,
@@ -1036,6 +1057,62 @@ namespace NextWave.Erp.Restaurant
                 x.Status != RestaurantOrderStatus.Billed &&
                 x.Status != RestaurantOrderStatus.Closed &&
                 x.Status != RestaurantOrderStatus.Cancelled) > 0;
+        }
+
+        private static byte[] BuildKitchenTicketPayload(RestaurantOrder order, RestaurantTicket ticket, RestaurantStation station, List<RestaurantOrderItem> items)
+        {
+            var text = new StringBuilder("\u001b@\u001ba\u0001");
+            text.AppendLine("NEXTWAVE ERP");
+            text.AppendLine(station.Name ?? station.StationType.ToString());
+            text.AppendLine(new string('-', 32));
+            text.AppendLine($"{ticket.TicketNo}  {ticket.Purpose}");
+            text.AppendLine($"Order: {order.OrderNo}");
+            text.AppendLine($"Time: {ticket.SentAt:yyyy-MM-dd HH:mm}");
+            text.AppendLine(new string('-', 32));
+            foreach (var item in items)
+            {
+                text.AppendLine($"{item.Qty:0.##} x {item.ItemNameSnapshot}");
+                if (!string.IsNullOrWhiteSpace(item.VariantNameSnapshot)) text.AppendLine("  " + item.VariantNameSnapshot);
+                if (!string.IsNullOrWhiteSpace(item.Notes)) text.AppendLine("  NOTE: " + item.Notes);
+            }
+            text.AppendLine();
+            text.Append("\u001dV\u0000");
+            return Encoding.UTF8.GetBytes(text.ToString());
+        }
+
+        private async Task QueueAuditedTicketReprint(RestaurantTicket ticket, string reason)
+        {
+            var station = await stationRepository.FirstOrDefaultAsync(x => x.Id == ticket.StationId && x.TenantId == AbpSession.TenantId);
+            var order = await orderRepository.FirstOrDefaultAsync(x => x.Id == ticket.OrderId && x.TenantId == AbpSession.TenantId);
+            if (station == null || order == null) throw new UserFriendlyException("Ticket printer route could not be resolved");
+            var ticketLines = await ticketItemRepository.GetAll()
+                .Where(x => x.TenantId == AbpSession.TenantId && x.TicketId == ticket.Id)
+                .Join(orderItemRepository.GetAll(), line => line.OrderItemId, item => item.Id,
+                    (line, item) => new RestaurantOrderItem
+                    {
+                        Qty = line.Qty,
+                        ItemNameSnapshot = item.ItemNameSnapshot,
+                        VariantNameSnapshot = item.VariantNameSnapshot,
+                        Notes = item.Notes
+                    })
+                .ToListAsync();
+            var routeName = string.IsNullOrWhiteSpace(station.PrintRouteName) ? "unconfigured" : station.PrintRouteName.Trim();
+            await printJobRepository.InsertAsync(new RestaurantPrintJob
+            {
+                TenantId = AbpSession.TenantId,
+                ExternalJobId = $"REPRINT-{ticket.Id:N}-{ticket.PrintCount}",
+                Type = RestaurantPrintJobType.KitchenTicket,
+                Status = string.IsNullOrWhiteSpace(station.PrintRouteName) ? RestaurantPrintJobStatus.Failed : RestaurantPrintJobStatus.Pending,
+                TicketId = ticket.Id,
+                OrderId = order.Id,
+                StationId = station.Id,
+                RouteName = routeName,
+                Payload = BuildKitchenTicketPayload(order, ticket, station, ticketLines),
+                IsDeliberateReprint = true,
+                ReprintReason = reason.Length > 500 ? reason[..500] : reason,
+                LastError = string.IsNullOrWhiteSpace(station.PrintRouteName) ? "No print route is configured for this station." : null,
+                CreatedAtUtc = DateTime.UtcNow
+            });
         }
 
         private static RestaurantTicketType GetTicketType(RestaurantStation station)

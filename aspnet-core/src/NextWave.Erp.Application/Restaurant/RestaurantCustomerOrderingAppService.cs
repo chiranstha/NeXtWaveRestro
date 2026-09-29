@@ -39,6 +39,7 @@ namespace NextWave.Erp.Restaurant
                 ? await ResolveTableQrToken(input.TableToken, input.TenantId)
                 : null;
             var tenantId = table?.TenantId ?? ResolveTenantId(input?.TenantId);
+            if (table != null) await EnsureQrOrderingAvailable(tenantId);
             await EnsurePublicOrderingAvailable(tenantId);
             var now = DateTime.Now;
             var search = input?.Search?.Trim();
@@ -110,6 +111,7 @@ namespace NextWave.Erp.Restaurant
                 ? await ResolveTableQrToken(input.TableToken, input.TenantId)
                 : null;
             var tenantId = table?.TenantId ?? ResolveTenantId(input?.TenantId);
+            if (table != null) await EnsureQrOrderingAvailable(tenantId);
             await EnsurePublicOrderingAvailable(tenantId);
             if (input?.Lines == null || input.Lines.All(x => x.Qty <= 0))
                 throw new UserFriendlyException("At least one order item is required");
@@ -141,6 +143,7 @@ namespace NextWave.Erp.Restaurant
                 throw new UserFriendlyException("A valid table QR code is required for dine-in guest orders");
 
             var tenantId = qrTable?.TenantId ?? ResolveTenantId(input.TenantId);
+            if (tableQrOrder) await EnsureQrOrderingAvailable(tenantId);
             await EnsurePublicOrderingAvailable(tenantId);
             if (!Guid.TryParse(input.ClientRequestId, out _))
                 throw new UserFriendlyException("A unique client request ID is required");
@@ -159,7 +162,7 @@ namespace NextWave.Erp.Restaurant
                 var existing = await orderRepository.FirstOrDefaultAsync(x =>
                     x.TenantId == tenantId &&
                     x.GuestClientRequestId == input.ClientRequestId);
-                if (existing != null && existing.Source == "CustomerApp")
+                if (existing != null && (existing.Source == "CustomerApp" || existing.Source == "TableQr"))
                 {
                     var requestHash = HashCustomerRequest(input);
                     if (!string.Equals(existing.ClientPayloadHash, requestHash, StringComparison.Ordinal))
@@ -567,6 +570,15 @@ namespace NextWave.Erp.Restaurant
                 !x.IsDeleted) > 0;
             if (!ownOnlineIsOpen)
                 throw new UserFriendlyException("Own online ordering channel is currently offline");
+        }
+
+        private async Task EnsureQrOrderingAvailable(int tenantId)
+        {
+            var enabled = string.Equals(
+                await SettingManager.GetSettingValueForTenantAsync(AppSettings.ErpSettings.RestaurantQrOrderingEnabled, tenantId),
+                "true",
+                StringComparison.OrdinalIgnoreCase);
+            if (!enabled) throw new UserFriendlyException("Table QR ordering is not enabled for this restaurant");
         }
 
         private Task<string> GetNextOrderNo()

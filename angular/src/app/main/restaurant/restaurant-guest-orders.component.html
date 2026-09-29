@@ -1,0 +1,11 @@
+<section class="restaurant-staff-page">
+    <header class="restaurant-staff-header"><div><span class="staff-kicker">RESTAURANT</span><h1>Guest order requests</h1><p>Review table QR orders. Approved orders are sent to the kitchen.</p></div><button class="btn btn-light-primary" (click)="load()"><i class="fa fa-rotate"></i> Refresh</button></header>
+    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+    <div class="alert alert-info" *ngIf="!orders.length">There are no pending table orders.</div>
+    <article class="guest-request-card" *ngFor="let order of orders">
+        <div class="request-heading"><div><span class="staff-kicker">{{ order.tableName }}</span><h2>{{ order.orderNo }}</h2></div><time>{{ order.createdAt | date:'short' }}</time></div>
+        <div class="request-line" *ngFor="let line of order.lines"><strong>{{ line.qty }} × {{ line.itemName }}</strong><span *ngIf="line.variantName">{{ line.variantName }}</span></div>
+        <div class="request-total"><span>Estimated total</span><strong>{{ order.grandTotal | number:'1.2-2' }}</strong></div>
+        <div class="request-actions"><button class="btn btn-success" [disabled]="busyId === order.orderId" (click)="approve(order)"><i class="fa fa-check"></i> Approve and send to kitchen</button><button class="btn btn-light-danger" [disabled]="busyId === order.orderId" (click)="reject(order)">Reject</button></div>
+    </article>
+</section>

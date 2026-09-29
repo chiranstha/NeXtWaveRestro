@@ -501,7 +501,7 @@ var KTApp = function () {
                     confirmButtonText: "Confirm",
                     denyButtonText: "Cancel",
                     customClass: {
-                        confirmButton: "btn btn-sm btn-primary",
+                        confirmButton: "btn btn-xs btn-primary",
                         denyButton: "btn btn-danger"
                     }
                 }).then(function (result) {

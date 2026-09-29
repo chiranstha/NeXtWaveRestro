@@ -361,7 +361,7 @@ var KTAppEcommerceSaveProduct = function () {
                                 buttonsStyling: false,
                                 confirmButtonText: "Ok, got it!",
                                 customClass: {
-                                    confirmButton: "btn btn-sm btn-primary"
+                                    confirmButton: "btn btn-xs btn-primary"
                                 }
                             }).then(function (result) {
                                 if (result.isConfirmed) {
@@ -380,7 +380,7 @@ var KTAppEcommerceSaveProduct = function () {
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
                             customClass: {
-                                confirmButton: "btn btn-sm btn-primary"
+                                confirmButton: "btn btn-xs btn-primary"
                             }
                         });
                     }

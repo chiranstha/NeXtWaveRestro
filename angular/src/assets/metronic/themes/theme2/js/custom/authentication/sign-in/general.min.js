@@ -76,7 +76,7 @@ var KTSigninGeneral = function () {
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
                             customClass: {
-                                confirmButton: "btn btn-sm btn-primary"
+                                confirmButton: "btn btn-xs btn-primary"
                             }
                         }).then(function (result) {
                             if (result.isConfirmed) {
@@ -99,7 +99,7 @@ var KTSigninGeneral = function () {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-primary"
+                            confirmButton: "btn btn-xs btn-primary"
                         }
                     });
                 }
@@ -134,7 +134,7 @@ var KTSigninGeneral = function () {
                                 buttonsStyling: false,
                                 confirmButtonText: "Ok, got it!",
                                 customClass: {
-                                    confirmButton: "btn btn-sm btn-primary"
+                                    confirmButton: "btn btn-xs btn-primary"
                                 }
                             });
 
@@ -151,7 +151,7 @@ var KTSigninGeneral = function () {
                                 buttonsStyling: false,
                                 confirmButtonText: "Ok, got it!",
                                 customClass: {
-                                    confirmButton: "btn btn-sm btn-primary"
+                                    confirmButton: "btn btn-xs btn-primary"
                                 }
                             });
                         }
@@ -162,7 +162,7 @@ var KTSigninGeneral = function () {
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
                             customClass: {
-                                confirmButton: "btn btn-sm btn-primary"
+                                confirmButton: "btn btn-xs btn-primary"
                             }
                         });
                     }).then(() => {
@@ -180,7 +180,7 @@ var KTSigninGeneral = function () {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-primary"
+                            confirmButton: "btn btn-xs btn-primary"
                         }
                     });
                 }

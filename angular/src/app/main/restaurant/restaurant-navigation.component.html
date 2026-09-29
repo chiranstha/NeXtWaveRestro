@@ -17,6 +17,15 @@
     <a *ngIf="isGranted('Pages.Restaurant.Kds')" class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/kds" routerLinkActive="active bg-light-primary text-primary">
         <i class="fa fa-tv"></i> {{ 'KDS' | localize }}
     </a>
+    <a *ngIf="isGranted('Pages.Restaurant.Pos')" class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/guest-orders" routerLinkActive="active bg-light-primary text-primary">
+        <i class="fa fa-qrcode"></i> Guest orders
+    </a>
+    <a *ngIf="isGranted('Pages.Restaurant.Reservations')" class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/reservations" routerLinkActive="active bg-light-primary text-primary">
+        <i class="fa fa-calendar-check"></i> Reservations
+    </a>
+    <a *ngIf="isGranted('Pages.Restaurant.PrinterSetup')" class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/print-station" routerLinkActive="active bg-light-primary text-primary">
+        <i class="fa fa-print"></i> Print station
+    </a>
     <a *ngIf="isGranted('Pages.Restaurant.Reports')" class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/reports" routerLinkActive="active bg-light-primary text-primary">
         <i class="fa fa-chart-line"></i> {{ 'Reports' | localize }}
     </a>

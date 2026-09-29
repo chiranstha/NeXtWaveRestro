@@ -18,7 +18,7 @@ var KTUsersViewMain = function () {
                 confirmButtonText: "Yes, sign out!",
                 cancelButtonText: "No, return",
                 customClass: {
-                    confirmButton: "btn btn-sm btn-primary",
+                    confirmButton: "btn btn-xs btn-primary",
                     cancelButton: "btn btn-active-light"
                 }
             }).then(function (result) {
@@ -29,7 +29,7 @@ var KTUsersViewMain = function () {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-primary",
+                            confirmButton: "btn btn-xs btn-primary",
                         }
                     });
                 } else if (result.dismiss === 'cancel') {
@@ -39,7 +39,7 @@ var KTUsersViewMain = function () {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-primary",
+                            confirmButton: "btn btn-xs btn-primary",
                         }
                     });
                 }
@@ -66,7 +66,7 @@ var KTUsersViewMain = function () {
                     confirmButtonText: "Yes, sign out!",
                     cancelButtonText: "No, return",
                     customClass: {
-                        confirmButton: "btn btn-sm btn-primary",
+                        confirmButton: "btn btn-xs btn-primary",
                         cancelButton: "btn btn-active-light"
                     }
                 }).then(function (result) {
@@ -77,7 +77,7 @@ var KTUsersViewMain = function () {
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
                             customClass: {
-                                confirmButton: "btn btn-sm btn-primary",
+                                confirmButton: "btn btn-xs btn-primary",
                             }
                         }).then(function(){
                             button.closest('tr').remove();
@@ -89,7 +89,7 @@ var KTUsersViewMain = function () {
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
                             customClass: {
-                                confirmButton: "btn btn-sm btn-primary",
+                                confirmButton: "btn btn-xs btn-primary",
                             }
                         });
                     }
@@ -115,7 +115,7 @@ var KTUsersViewMain = function () {
                 confirmButtonText: "Yes, remove it!",
                 cancelButtonText: "No, return",
                 customClass: {
-                    confirmButton: "btn btn-sm btn-primary",
+                    confirmButton: "btn btn-xs btn-primary",
                     cancelButton: "btn btn-active-light"
                 }
             }).then(function (result) {
@@ -126,7 +126,7 @@ var KTUsersViewMain = function () {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-primary",
+                            confirmButton: "btn btn-xs btn-primary",
                         }
                     });
                 } else if (result.dismiss === 'cancel') {
@@ -136,7 +136,7 @@ var KTUsersViewMain = function () {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-primary",
+                            confirmButton: "btn btn-xs btn-primary",
                         }
                     });
                 }
@@ -176,7 +176,7 @@ var KTUsersViewMain = function () {
                     buttonsStyling: false,
                     confirmButtonText: "Ok, got it!",
                     customClass: {
-                        confirmButton: "btn btn-sm btn-primary"
+                        confirmButton: "btn btn-xs btn-primary"
                     }
                 });
 
@@ -195,7 +195,7 @@ var KTUsersViewMain = function () {
                 confirmButtonText: "Yes, cancel it!",
                 cancelButtonText: "No, return",
                 customClass: {
-                    confirmButton: "btn btn-sm btn-primary",
+                    confirmButton: "btn btn-xs btn-primary",
                     cancelButton: "btn btn-active-light"
                 }
             }).then(function (result) {
@@ -208,7 +208,7 @@ var KTUsersViewMain = function () {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-primary",
+                            confirmButton: "btn btn-xs btn-primary",
                         }
                     });
                 }

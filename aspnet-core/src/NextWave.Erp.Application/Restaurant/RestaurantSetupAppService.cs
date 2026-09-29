@@ -99,7 +99,9 @@ namespace NextWave.Erp.Restaurant
                     Status = x.Status,
                     IsActive = x.IsActive,
                     AreaId = x.AreaId,
-                    AreaName = x.AreaFk.Name
+                    AreaName = x.AreaFk.Name,
+                    HasQrCode = x.QrTokenHash != null,
+                    QrTokenUpdatedAt = x.QrTokenUpdatedAt
                 }).ToListAsync();
         }
 
@@ -148,7 +150,8 @@ namespace NextWave.Erp.Restaurant
                     Id = x.Id,
                     Name = x.Name,
                     StationType = x.StationType,
-                    IsActive = x.IsActive
+                    IsActive = x.IsActive,
+                    PrintRouteName = x.PrintRouteName
                 }).ToListAsync();
         }
 
@@ -174,6 +177,7 @@ namespace NextWave.Erp.Restaurant
             station.Name = input.Name.Trim();
             station.StationType = input.StationType;
             station.IsActive = input.IsActive;
+            station.PrintRouteName = string.IsNullOrWhiteSpace(input.PrintRouteName) ? null : input.PrintRouteName.Trim();
 
             await CurrentUnitOfWork.SaveChangesAsync();
             await RecordSyncChange(RestaurantSyncEntityType.DiningTable, station.Id, new { Entity = "Station", station.Name, station.StationType, station.IsActive });
@@ -272,7 +276,11 @@ namespace NextWave.Erp.Restaurant
                     tenantId),
                 TableWorkflow = await SettingManager.GetSettingValueForTenantAsync(
                     AppSettings.ErpSettings.RestaurantTableWorkflow,
-                    tenantId)
+                    tenantId),
+                QrOrderingEnabled = await GetBoolSetting(AppSettings.ErpSettings.RestaurantQrOrderingEnabled, tenantId),
+                ReservationBookingEnabled = await GetBoolSetting(AppSettings.ErpSettings.RestaurantReservationBookingEnabled, tenantId),
+                DefaultReservationDurationMinutes = int.TryParse(await SettingManager.GetSettingValueForTenantAsync(AppSettings.ErpSettings.RestaurantDefaultReservationDurationMinutes, tenantId), out var bookingDuration) ? bookingDuration : 90,
+                ReceiptPrintRouteName = await SettingManager.GetSettingValueForTenantAsync(AppSettings.ErpSettings.RestaurantReceiptPrintRouteName, tenantId)
             };
         }
 
@@ -325,6 +333,10 @@ namespace NextWave.Erp.Restaurant
                 tenantId,
                 AppSettings.ErpSettings.RestaurantTableWorkflow,
                 tableWorkflow);
+            await SettingManager.ChangeSettingForTenantAsync(tenantId, AppSettings.ErpSettings.RestaurantQrOrderingEnabled, input.QrOrderingEnabled.ToString().ToLowerInvariant());
+            await SettingManager.ChangeSettingForTenantAsync(tenantId, AppSettings.ErpSettings.RestaurantReservationBookingEnabled, input.ReservationBookingEnabled.ToString().ToLowerInvariant());
+            await SettingManager.ChangeSettingForTenantAsync(tenantId, AppSettings.ErpSettings.RestaurantDefaultReservationDurationMinutes, Math.Clamp(input.DefaultReservationDurationMinutes, 30, 240).ToString(System.Globalization.CultureInfo.InvariantCulture));
+            await SettingManager.ChangeSettingForTenantAsync(tenantId, AppSettings.ErpSettings.RestaurantReceiptPrintRouteName, (input.ReceiptPrintRouteName ?? string.Empty).Trim());
         }
 
         private async Task RecordSyncChange(

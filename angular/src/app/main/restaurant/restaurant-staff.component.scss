@@ -1,0 +1,27 @@
+:host { display: block; }
+.restaurant-staff-page { padding: 16px; }
+.restaurant-staff-header { display:flex; align-items:center; justify-content:space-between; gap:16px; margin: 0 0 18px; }
+.restaurant-staff-header h1 { margin: 4px 0; font-size: 1.6rem; font-weight: 800; }
+.restaurant-staff-header p { margin:0; color:#69766d; }
+.staff-kicker { color:#758279; font-size:.72rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
+.guest-request-card,.reservation-card,.station-panel { margin:12px 0; padding:18px; border:1px solid #e1e8e3; border-radius:14px; background:#fff; box-shadow:0 3px 14px #10291a09; }
+.request-heading,.request-total,.request-actions,.reservation-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.request-heading h2,.reservation-heading h2 { margin:3px 0 12px; font-size:1.1rem; font-weight:800; }
+.request-line { display:flex; gap:12px; justify-content:space-between; padding:8px 0; border-top:1px solid #edf1ee; }
+.request-line span { color:#66736a; }
+.request-total { margin-top:10px; padding-top:12px; border-top:1px solid #dfe7e1; }
+.request-total strong { font-size:1.15rem; }
+.request-actions { justify-content:flex-start; margin-top:14px; flex-wrap:wrap; }
+.reservation-grid { width:100%; border-collapse:collapse; background:#fff; }
+.reservation-grid th,.reservation-grid td { padding:10px; border-bottom:1px solid #e5ebe6; vertical-align:middle; }
+.reservation-grid th { text-align:left; color:#5e6d63; font-size:.78rem; text-transform:uppercase; }
+.reservation-grid select,.reservation-grid input { min-width:120px; padding:7px; border:1px solid #ccd8cf; border-radius:8px; }
+.reservation-actions { display:flex; flex-wrap:wrap; gap:6px; min-width:190px; }
+.staff-form-row { display:flex; flex-wrap:wrap; align-items:end; gap:10px; }
+.staff-form-row label { min-width:150px; flex:1; }
+.staff-form-row input,.staff-form-row select { width:100%; min-height:40px; padding:7px 9px; border:1px solid #ccd8cf; border-radius:8px; }
+.print-pair-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; align-items:end; }
+.print-pair-grid label { display:block; font-weight:700; }
+.print-pair-grid input { display:block; width:100%; min-height:40px; margin-top:5px; padding:7px 9px; border:1px solid #ccd8cf; border-radius:8px; }
+.status-bad { color:#9c3429; }
+@media(max-width:700px) { .restaurant-staff-page { padding:10px; } .restaurant-staff-header { align-items:flex-start; flex-direction:column; } .table-wrap { overflow-x:auto; } .reservation-grid { min-width:900px; } .request-actions .btn { flex:1; } }

@@ -141,6 +141,7 @@ namespace NextWave.Erp.Restaurant
     public interface IRestaurantGuestOperationsAppService : IApplicationService
     {
         Task<RestaurantTableQrDto> GenerateTableQr(EntityDto<Guid> input);
+        Task RevokeTableQr(EntityDto<Guid> input);
         Task<List<RestaurantGuestOrderQueueDto>> GetPendingGuestOrders();
         Task ReviewGuestOrder(ReviewRestaurantGuestOrderDto input);
         Task OpenTableSession(EntityDto<Guid> input);
@@ -149,8 +150,9 @@ namespace NextWave.Erp.Restaurant
         Task<Guid> AddWalkIn(CreateRestaurantWalkInDto input);
         Task UpdateReservation(UpdateRestaurantReservationDto input);
         Task<RestaurantPrintJobDto> ClaimPrintJob(ClaimRestaurantPrintJobDto input);
+        Task<List<RestaurantPrintJobDto>> GetPrintJobs();
         Task<RestaurantPrintJobDto> ReportPrintJob(ReportRestaurantPrintJobDto input);
-        Task RetryPrintJob(EntityDto<Guid> input);
+        Task RetryPrintJob(RetryRestaurantPrintJobDto input);
     }
 
     public interface IRestaurantReservationPublicAppService : IApplicationService

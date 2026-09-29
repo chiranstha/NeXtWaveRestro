@@ -11,7 +11,7 @@
 </div>
 <!-- </div> -->
 <ng-template #menuListTemplate>
-    <ng-container *ngFor="let child of menu.items">
+    <ng-container *ngFor="let child of menuItems">
         <ng-container
             *ngIf="showMenuItem(child)"
             [ngTemplateOutletContext]="{ item: child, parentItem: null }"

@@ -1,0 +1,150 @@
+<div [@routerTransition] class="theme2-shell d-flex flex-column flex-root">
+    <div class="page d-flex flex-row flex-column-fluid">
+        <aside
+            id="kt_aside"
+            class="aside aside-responsive aside-fixed theme2-sidebar"
+            data-kt-drawer="true"
+            data-kt-drawer-name="aside"
+            data-kt-drawer-activate="{default: true, lg: false}"
+            data-kt-drawer-overlay="true"
+            data-kt-drawer-width="{default:'300px', '400px': '320px'}"
+            data-kt-drawer-direction="start"
+            data-kt-drawer-toggle="#kt_aside_mobile_toggle"
+            [class.theme2-mobile-open]="isMobileMenuOpen"
+        >
+            <nav class="theme2-icon-rail" aria-label="Quick navigation">
+                <a class="theme2-rail-logo" routerLink="/app/main/dashboard" aria-label="Dashboard">
+                    <img class="theme2-logo-mark" src="/assets/common/images/logo.svg" alt="Nextwave" />
+                </a>
+
+                <div class="theme2-rail-actions">
+                    @for (item of theme2ModuleItems; track item.name) {
+                        <button
+                            type="button"
+                            class="theme2-rail-button"
+                            [class.active]="item === selectedTheme2Module"
+                            [attr.title]="l(item.name)"
+                            [attr.aria-label]="l(item.name)"
+                            (click)="selectTheme2Module(item)"
+                        >
+                            <i [ngClass]="item.icon"></i>
+                        </button>
+                    }
+                </div>
+            </nav>
+
+            <div class="theme2-nav-panel d-flex flex-column">
+                <div class="theme2-nav-brand">
+                    <theme2-brand></theme2-brand>
+                </div>
+                <div class="theme2-nav-label">
+                    {{ selectedTheme2Module ? (selectedTheme2Module.name | localize) : 'Navigation' }}
+                </div>
+                <div class="theme2-nav-scroll flex-column-fluid">
+                    <side-bar-menu
+                        [rootMenuItem]="selectedTheme2Module"
+                        [expandRootItem]="true"
+                        [menuClass]="
+                            'menu menu-column menu-title-gray-800 menu-state-title-primary menu-state-icon-primary menu-state-bullet-primary menu-arrow-gray-500'
+                        "
+                    ></side-bar-menu>
+                </div>
+            </div>
+        </aside>
+        @if (isMobileMenuOpen) {
+            <button
+                type="button"
+                class="theme2-mobile-overlay d-lg-none"
+                aria-label="Close navigation"
+                (click)="toggleMobileMenu()"
+            ></button>
+        }
+
+        <div class="wrapper d-flex flex-column flex-row-fluid position-relative" id="kt_wrapper">
+            <header id="kt_header" class="header theme2-header">
+                <div class="theme2-mobile-brand d-lg-none">
+                    <button
+                        type="button"
+                        class="theme2-header-button"
+                        id="kt_aside_mobile_toggle"
+                        aria-label="Show navigation"
+                        (click)="toggleMobileMenu()"
+                    >
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    <theme2-brand></theme2-brand>
+                </div>
+
+                <div class="theme2-header-main">
+                    <button
+                        type="button"
+                        id="kt_aside_toggle"
+                        class="theme2-header-button d-none d-lg-flex"
+                        data-kt-toggle="true"
+                        data-kt-toggle-state="active"
+                        data-kt-toggle-target="body"
+                        data-kt-toggle-name="aside-minimize"
+                        aria-label="Collapse navigation"
+                    >
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <div class="theme2-header-search">
+                        <i class="fa fa-search theme2-search-icon"></i>
+                        <menu-search-bar
+                            [alwaysActive]="true"
+                            [searchPlaceholder]="'Search anything'"
+                        ></menu-search-bar>
+                    </div>
+
+                    <tenant-header-identity class="mx-2"></tenant-header-identity>
+
+                    <div class="theme2-header-chip d-none d-xl-flex" aria-label="Current module">
+                        <span class="theme2-header-chip-dot"></span>
+                        <strong>{{ selectedTheme2Module ? (selectedTheme2Module.name | localize) : ('Dashboard' | localize) }}</strong>
+                    </div>
+
+                    <div class="theme2-header-actions">
+                        <active-delegated-users-combo
+                            [customStyle]="'theme2-action-button'"
+                        ></active-delegated-users-combo>
+                        <subscription-notification-bar
+                            [customStyle]="'theme2-action-button position-relative'"
+                        ></subscription-notification-bar>
+                        <quick-theme-selection
+                            [customStyle]="'theme2-action-button position-relative'"
+                        ></quick-theme-selection>
+                        <branch-dropdown></branch-dropdown>
+                        <godown-dropdown></godown-dropdown>
+                        <financial-year-dropdown></financial-year-dropdown>
+                        <language-switch-dropdown
+                            [customStyle]="'theme2-action-button position-relative'"
+                        ></language-switch-dropdown>
+                        <header-notifications
+                            [customStyle]="'theme2-action-button position-relative'"
+                        ></header-notifications>
+                        <chat-toggle-button
+                            [customStyle]="'theme2-action-button position-relative'"
+                        ></chat-toggle-button>
+                        <toggle-dark-mode
+                            [customStyle]="'theme2-action-button position-relative'"
+                            [isDarkModeActive]="isDarkModeActive()"
+                        ></toggle-dark-mode>
+                        <user-menu
+                            [togglerCssClass]="'theme2-user-menu symbol symbol-42px cursor-pointer'"
+                        ></user-menu>
+                    </div>
+                </div>
+            </header>
+
+            <main id="kt_content" class="theme2-content">
+                <router-outlet></router-outlet>
+            </main>
+
+            <footer class="footer theme2-footer">
+                <span>© 2026 Nextwave ERP</span>
+                <span class="theme2-footer-links">Home · Support</span>
+            </footer>
+        </div>
+    </div>
+</div>

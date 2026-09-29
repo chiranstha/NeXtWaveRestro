@@ -35,6 +35,16 @@ public class UiThemeCustomizerFactory : IUiThemeCustomizerFactory
 
     private IUiCustomizer GetUiCustomizerInternal(string theme)
     {
+        if (theme.Equals(AppConsts.Theme2, StringComparison.InvariantCultureIgnoreCase))
+        {
+            return _serviceProvider.GetService<Theme2UiCustomizer>();
+        }
+
+        if (theme.Equals(AppConsts.Theme3, StringComparison.InvariantCultureIgnoreCase))
+        {
+            return _serviceProvider.GetService<Theme3UiCustomizer>();
+        }
+
         if (theme.Equals(AppConsts.Theme8, StringComparison.InvariantCultureIgnoreCase))
         {
             return _serviceProvider.GetService<Theme8UiCustomizer>();

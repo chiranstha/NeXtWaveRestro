@@ -1,0 +1,35 @@
+<main class="guest-shell">
+    <header class="guest-header">
+        <span class="guest-eyebrow">TABLE RESERVATIONS</span>
+        <h1>Book a table</h1>
+        <p>Send a request to the restaurant. Your booking is confirmed after staff review.</p>
+    </header>
+
+    <div class="guest-alert guest-alert-error" *ngIf="error">{{ error }}</div>
+    <div class="guest-alert guest-alert-success" *ngIf="message">
+        {{ message }}
+        <a *ngIf="statusLink" [href]="statusLink">Save your private status link</a>
+    </div>
+
+    <section class="guest-panel" *ngIf="!statusId">
+        <div class="guest-form-grid">
+            <div class="guest-field full"><label for="guest-name">Your name</label><input id="guest-name" class="guest-input" maxlength="200" [(ngModel)]="guestName" /></div>
+            <div class="guest-field full"><label for="guest-phone">Phone number</label><div class="guest-search-row"><input id="guest-phone" class="guest-input" autocomplete="tel" placeholder="98XXXXXXXX or +977…" [(ngModel)]="phoneNumber" /><button class="guest-button guest-button-light" type="button" [disabled]="loading" (click)="requestCode()">{{ challengeId ? 'Send new code' : 'Send code' }}</button></div></div>
+            <div class="guest-field"><label for="guest-code">Verification code</label><input id="guest-code" class="guest-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6" [(ngModel)]="code" /></div>
+            <div class="guest-field"><label for="party-size">Party size</label><input id="party-size" class="guest-input" type="number" min="1" max="30" [(ngModel)]="partySize" /></div>
+            <div class="guest-field full"><label for="booking-time">Date and time</label><input id="booking-time" class="guest-input" type="datetime-local" [(ngModel)]="startsAt" /></div>
+            <div class="guest-field full"><label for="booking-notes">Notes (optional)</label><textarea id="booking-notes" class="guest-input" rows="3" maxlength="500" [(ngModel)]="notes"></textarea></div>
+        </div>
+        <p class="guest-note">The restaurant will confirm your request by text. Table assignment and seating are handled by staff.</p>
+        <button class="guest-button guest-button-wide" type="button" [disabled]="loading" (click)="createReservation()">{{ loading ? 'Submitting…' : 'Request reservation' }}</button>
+    </section>
+
+    <section class="guest-panel" *ngIf="statusId">
+        <h2>Reservation status</h2>
+        <div class="guest-status-row"><span>Status</span><span class="guest-status-badge">{{ statusLabel }}</span></div>
+        <div class="guest-status-row" *ngIf="status"><span>Time</span><strong>{{ status.startsAt | date:'medium' }}</strong></div>
+        <div class="guest-status-row" *ngIf="status?.tableName"><span>Table</span><strong>{{ status.tableName }}</strong></div>
+        <p class="guest-note">Status refreshes automatically. Keep this private link to check again later.</p>
+        <button class="guest-button guest-button-light" type="button" (click)="refreshStatus()">Refresh status</button>
+    </section>
+</main>

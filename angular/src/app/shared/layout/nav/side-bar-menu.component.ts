@@ -53,10 +53,24 @@ export class SideBarMenuComponent extends AppComponentBase implements OnInit, Af
     private render = inject(Renderer2);
     @Input() iconMenu = false;
     @Input() menuClass = 'menu menu-column menu-rounded menu-sub-indention px-3';
+    @Input() rootMenuItem: AppMenuItem | null = null;
+    @Input() expandRootItem = false;
     menu: AppMenu = null;
     currentRouteUrl = '';
     insideTm: any;
     outsideTm: any;
+
+    get menuItems(): AppMenuItem[] {
+        if (!this.menu) {
+            return [];
+        }
+
+        if (!this.rootMenuItem) {
+            return this.menu.items;
+        }
+
+        return this.expandRootItem ? [this.rootMenuItem] : this.rootMenuItem.items;
+    }
 
     ngOnInit() {
         this.menu = this._appNavigationService.getMenu();

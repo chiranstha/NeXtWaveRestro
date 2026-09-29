@@ -378,7 +378,7 @@ var KTAppCalendar = function () {
                                 buttonsStyling: false,
                                 confirmButtonText: "Ok, got it!",
                                 customClass: {
-                                    confirmButton: "btn btn-sm btn-primary"
+                                    confirmButton: "btn btn-xs btn-primary"
                                 }
                             }).then(function (result) {
                                 if (result.isConfirmed) {
@@ -432,7 +432,7 @@ var KTAppCalendar = function () {
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
                             customClass: {
-                                confirmButton: "btn btn-sm btn-primary"
+                                confirmButton: "btn btn-xs btn-primary"
                             }
                         });
                     }
@@ -497,7 +497,7 @@ var KTAppCalendar = function () {
                                 buttonsStyling: false,
                                 confirmButtonText: "Ok, got it!",
                                 customClass: {
-                                    confirmButton: "btn btn-sm btn-primary"
+                                    confirmButton: "btn btn-xs btn-primary"
                                 }
                             }).then(function (result) {
                                 if (result.isConfirmed) {
@@ -554,7 +554,7 @@ var KTAppCalendar = function () {
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
                             customClass: {
-                                confirmButton: "btn btn-sm btn-primary"
+                                confirmButton: "btn btn-xs btn-primary"
                             }
                         });
                     }
@@ -605,7 +605,7 @@ var KTAppCalendar = function () {
                 confirmButtonText: "Yes, delete it!",
                 cancelButtonText: "No, return",
                 customClass: {
-                    confirmButton: "btn btn-sm btn-primary",
+                    confirmButton: "btn btn-xs btn-primary",
                     cancelButton: "btn btn-active-light"
                 }
             }).then(function (result) {
@@ -620,7 +620,7 @@ var KTAppCalendar = function () {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-primary",
+                            confirmButton: "btn btn-xs btn-primary",
                         }
                     });
                 }
@@ -652,7 +652,7 @@ var KTAppCalendar = function () {
                 confirmButtonText: "Yes, cancel it!",
                 cancelButtonText: "No, return",
                 customClass: {
-                    confirmButton: "btn btn-sm btn-primary",
+                    confirmButton: "btn btn-xs btn-primary",
                     cancelButton: "btn btn-active-light"
                 }
             }).then(function (result) {
@@ -666,7 +666,7 @@ var KTAppCalendar = function () {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-primary",
+                            confirmButton: "btn btn-xs btn-primary",
                         }
                     });
                 }
@@ -688,7 +688,7 @@ var KTAppCalendar = function () {
                 confirmButtonText: "Yes, cancel it!",
                 cancelButtonText: "No, return",
                 customClass: {
-                    confirmButton: "btn btn-sm btn-primary",
+                    confirmButton: "btn btn-xs btn-primary",
                     cancelButton: "btn btn-active-light"
                 }
             }).then(function (result) {
@@ -702,7 +702,7 @@ var KTAppCalendar = function () {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-primary",
+                            confirmButton: "btn btn-xs btn-primary",
                         }
                     });
                 }

@@ -60,7 +60,7 @@ var KTUsersAddTask = function () {
                 confirmButtonText: "Yes, cancel it!",
                 cancelButtonText: "No, return",
                 customClass: {
-                    confirmButton: "btn btn-sm btn-primary",
+                    confirmButton: "btn btn-xs btn-primary",
                     cancelButton: "btn btn-active-light"
                 }
             }).then(function (result) {
@@ -74,7 +74,7 @@ var KTUsersAddTask = function () {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-primary",
+                            confirmButton: "btn btn-xs btn-primary",
                         }
                     });
                 }
@@ -94,7 +94,7 @@ var KTUsersAddTask = function () {
                 confirmButtonText: "Yes, cancel it!",
                 cancelButtonText: "No, return",
                 customClass: {
-                    confirmButton: "btn btn-sm btn-primary",
+                    confirmButton: "btn btn-xs btn-primary",
                     cancelButton: "btn btn-active-light"
                 }
             }).then(function (result) {
@@ -108,7 +108,7 @@ var KTUsersAddTask = function () {
                         buttonsStyling: false,
                         confirmButtonText: "Ok, got it!",
                         customClass: {
-                            confirmButton: "btn btn-sm btn-primary",
+                            confirmButton: "btn btn-xs btn-primary",
                         }
                     });
                 }
@@ -148,7 +148,7 @@ var KTUsersAddTask = function () {
                                 buttonsStyling: false,
                                 confirmButtonText: "Ok, got it!",
                                 customClass: {
-                                    confirmButton: "btn btn-sm btn-primary"
+                                    confirmButton: "btn btn-xs btn-primary"
                                 }
                             }).then(function (result) {
                                 if (result.isConfirmed) {
@@ -166,7 +166,7 @@ var KTUsersAddTask = function () {
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
                             customClass: {
-                                confirmButton: "btn btn-sm btn-primary"
+                                confirmButton: "btn btn-xs btn-primary"
                             }
                         });
                     }
@@ -227,7 +227,7 @@ var KTUsersAddTask = function () {
                     confirmButtonText: "Yes, reset it!",
                     cancelButtonText: "No, return",
                     customClass: {
-                        confirmButton: "btn btn-sm btn-primary",
+                        confirmButton: "btn btn-xs btn-primary",
                         cancelButton: "btn btn-active-light"
                     }
                 }).then(function (result) {
@@ -241,7 +241,7 @@ var KTUsersAddTask = function () {
                             buttonsStyling: false,
                             confirmButtonText: "Ok, got it!",
                             customClass: {
-                                confirmButton: "btn btn-sm btn-primary",
+                                confirmButton: "btn btn-xs btn-primary",
                             }
                         });
                     }
@@ -279,7 +279,7 @@ var KTUsersAddTask = function () {
                                     buttonsStyling: false,
                                     confirmButtonText: "Ok, got it!",
                                     customClass: {
-                                        confirmButton: "btn btn-sm btn-primary"
+                                        confirmButton: "btn btn-xs btn-primary"
                                     }
                                 }).then(function (result) {
                                     if (result.isConfirmed) {
@@ -297,7 +297,7 @@ var KTUsersAddTask = function () {
                                 buttonsStyling: false,
                                 confirmButtonText: "Ok, got it!",
                                 customClass: {
-                                    confirmButton: "btn btn-sm btn-primary"
+                                    confirmButton: "btn btn-xs btn-primary"
                                 }
                             }).then(function(){
                                 //el.show();

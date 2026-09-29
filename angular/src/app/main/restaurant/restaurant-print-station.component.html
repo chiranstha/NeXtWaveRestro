@@ -1,0 +1,32 @@
+<section class="restaurant-staff-page">
+    <header class="restaurant-staff-header"><div><span class="staff-kicker">PAIRED WINDOWS STATION</span><h1>Print queue</h1><p>Keep this page open on the designated Windows browser to deliver ERP jobs to the local Print Agent.</p></div><button class="btn btn-light-primary" (click)="loadJobs()">Refresh queue</button></header>
+    <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+    <div class="alert alert-info" *ngIf="message">{{ message }}</div>
+
+    <section class="station-panel">
+        <h2>Connect this browser</h2>
+        <div class="print-pair-grid">
+            <label>Local Print Agent URL<input [(ngModel)]="agentUrl" (change)="saveSettings()" placeholder="https://localhost:631" /></label>
+            <label>Pairing code from the Tray app<input [(ngModel)]="pairingCode" maxlength="12" autocomplete="one-time-code" /></label>
+            <button class="btn btn-primary" [disabled]="!pairingCode" (click)="pair()">Pair browser</button>
+            <button class="btn btn-light" type="button" (click)="openAgentHealth()">Open agent health</button>
+        </div>
+        <div class="mt-4" *ngIf="routes.length">
+            <strong>Configured routes</strong>
+            <span class="badge bg-light-success text-success ms-2" *ngFor="let route of routes">{{ route.name }} · {{ route.kind }}</span>
+        </div>
+        <div class="d-flex gap-2 mt-4">
+            <button *ngIf="!running" class="btn btn-success" [disabled]="!token" (click)="start()"><i class="fa fa-play"></i> Start station</button>
+            <button *ngIf="running" class="btn btn-light-danger" (click)="stop()"><i class="fa fa-stop"></i> Stop station</button>
+            <span class="text-muted align-self-center">{{ running ? 'Station is active' : 'Station is stopped' }}</span>
+        </div>
+    </section>
+
+    <section class="station-panel">
+        <h2>Recent print jobs</h2>
+        <div class="table-wrap"><table class="reservation-grid"><thead><tr><th>Type</th><th>Route</th><th>Status</th><th>Attempts</th><th>Last error</th><th></th></tr></thead>
+            <tbody><tr *ngFor="let job of jobs"><td>{{ job.type === 0 ? 'Kitchen ticket' : 'Receipt' }}<small class="d-block text-muted">{{ job.externalJobId }}</small></td><td>{{ job.routeName }}</td><td [class.status-bad]="job.status === 3">{{ statusLabel(job.status) }}</td><td>{{ job.attempts || '—' }}</td><td>{{ job.lastError || '—' }}<small *ngIf="job.reprintReason" class="d-block text-muted">Reprint: {{ job.reprintReason }}</small></td><td><button *ngIf="job.status === 3" class="btn btn-xs btn-light-primary" (click)="retry(job)">Retry</button></td></tr>
+            <tr *ngIf="!jobs.length"><td colspan="6" class="text-center text-muted py-6">No queued print jobs.</td></tr></tbody>
+        </table></div>
+    </section>
+</section>

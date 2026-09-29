@@ -11,6 +11,7 @@ namespace NextWave.Erp.Restaurant
     {
         [Required, StringLength(30)] public string PhoneNumber { get; set; }
         [Required, StringLength(1000)] public string Message { get; set; }
+        public Guid? ReservationId { get; set; }
         public RestaurantSmsOutboxStatus Status { get; set; } = RestaurantSmsOutboxStatus.Pending;
         public int Attempts { get; set; }
         [StringLength(500)] public string LastError { get; set; }

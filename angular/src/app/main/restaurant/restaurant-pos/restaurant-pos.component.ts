@@ -1478,34 +1478,18 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     }
 
     printTicket(ticket: RestaurantTicketDto, reprint = false): void {
+        if (!reprint) {
+            this.notify.info('This ticket was sent to the configured Print Agent route. Check the print station if it is waiting or failed.');
+            return;
+        }
         const reason = reprint ? (window.prompt('Reason for reprinting this KOT/BOT') || '').trim() : '';
         if (reprint && !reason) return;
         const approvalPin = reprint ? (window.prompt('Manager PIN (if required)') || '') : '';
-        const request = reprint
-            ? this.restaurantOrderService.reprintTicket(
-                  new ReprintRestaurantTicketDto({
-                      ticketId: ticket.id,
-                      approvalPin: approvalPin || undefined,
-                      approvalNote: reason,
-                  }),
-              )
-            : this.restaurantOrderService.getTicketForPrint(ticket.id);
-
-        request.subscribe((printTicket) => {
-            if (!this.openTicketPrint(printTicket)) {
-                return;
-            }
-
-            this.notify.info('Print dialog opened. Confirm that the ticket printed successfully.');
-
-            if (reprint) {
-                this.loadTickets(printTicket.orderId);
-            }
-
-            if (!window.confirm('Did the ticket print successfully?')) return;
-            this.restaurantOrderService.markTicketPrinted(new EntityDtoOfGuid({ id: ticket.id })).subscribe(() => {
-                this.loadTickets(printTicket.orderId);
-            });
+        this.restaurantOrderService.reprintTicket(
+            new ReprintRestaurantTicketDto({ ticketId: ticket.id, approvalPin: approvalPin || undefined, approvalNote: reason }),
+        ).subscribe((printTicket) => {
+            this.notify.success('Audited reprint queued for the configured Print Agent route.');
+            this.loadTickets(printTicket.orderId);
         });
     }
 

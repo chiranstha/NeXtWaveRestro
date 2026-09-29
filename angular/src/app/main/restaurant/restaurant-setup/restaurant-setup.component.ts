@@ -26,12 +26,14 @@ import {
 import { finalize } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { CellClickedEvent, ColDef } from 'ag-grid-community';
+import { RestaurantGuestApiService } from '../restaurant-guest-api.service';
 
 type RestaurantSetupSection = 'areas' | 'tables' | 'stations' | 'devices' | 'settings';
 
 @Component({
     selector: 'restaurant-setup',
     templateUrl: './restaurant-setup.component.html',
+    styles: [`.restaurant-qr-overlay{position:fixed;inset:0;z-index:1200;display:grid;place-items:center;padding:16px;background:rgba(9,24,15,.68)}.restaurant-qr-dialog{width:min(100%,460px);padding:24px;border-radius:16px;background:#fff;text-align:center;box-shadow:0 18px 60px #0004}.restaurant-qr-dialog img{display:block;width:min(76vw,280px);height:auto;margin:16px auto}`],
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation],
     changeDetection: ChangeDetectionStrategy.Eager,
@@ -65,9 +67,12 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
     stationColumnDefs: ColDef<RestaurantStationDto>[] = [];
     deviceColumnDefs: ColDef<RestaurantDeviceDto>[] = [];
     noRowsOverlayTemplate = '';
+    qrResult: any;
+    qrBusyTableId = '';
 
     private fb = inject(FormBuilder);
     private restaurantSetupService = inject(RestaurantSetupServiceProxy);
+    private guestApi = inject(RestaurantGuestApiService);
     private cdr = inject(ChangeDetectorRef);
     private route = inject(ActivatedRoute);
 
@@ -221,6 +226,12 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
     }
 
     onSetupGridCellClicked(event: CellClickedEvent): void {
+        if (event.column.getColId() === 'qr' && event.data) {
+            const action = (event.event?.target as HTMLElement | null)?.closest('button')?.dataset['action'];
+            if (action === 'generate') this.generateTableQr(event.data as RestaurantTableDto);
+            if (action === 'revoke') this.revokeTableQr(event.data as RestaurantTableDto);
+            return;
+        }
         if (event.column.getColId() !== 'actions' || !event.data) {
             return;
         }
@@ -239,6 +250,23 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
                 this.editDevice(event.data as RestaurantDeviceDto);
                 break;
         }
+    }
+
+    generateTableQr(table: RestaurantTableDto): void {
+        this.qrBusyTableId = table.id;
+        this.guestApi.generateTableQr(table.id).pipe(finalize(() => this.qrBusyTableId = '')).subscribe({
+            next: (result) => { this.qrResult = result; this.notify.success('Table QR code generated. Any previous QR code for this table has been revoked.'); this.refresh(); },
+            error: (error) => this.notify.error(error?.error?.error?.message || 'Could not generate the table QR code.'),
+        });
+    }
+
+    revokeTableQr(table: RestaurantTableDto): void {
+        if (!window.confirm(`Revoke the QR code for ${table.name}? Printed copies will stop working.`)) return;
+        this.qrBusyTableId = table.id;
+        this.guestApi.revokeTableQr(table.id).pipe(finalize(() => this.qrBusyTableId = '')).subscribe({
+            next: () => { this.notify.success('Table QR code revoked.'); this.refresh(); },
+            error: (error) => this.notify.error(error?.error?.error?.message || 'Could not revoke the table QR code.'),
+        });
     }
 
     editStation(station: RestaurantStationDto): void {
@@ -269,7 +297,7 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
     }
 
     resetStation(): void {
-        this.stationForm.reset({ id: undefined, name: '', stationType: 0, isActive: true });
+        this.stationForm.reset({ id: undefined, name: '', stationType: 0, isActive: true, printRouteName: '' });
     }
 
     resetDevice(): void {
@@ -338,6 +366,7 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
             name: ['', Validators.required],
             stationType: [0, Validators.required],
             isActive: [true],
+            printRouteName: [''],
         });
 
         this.deviceForm = this.fb.group({
@@ -356,6 +385,10 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
             ticketPrintingEnabled: [true],
             channelAvailabilityEnabled: [true],
             tableWorkflow: ['TableSession', Validators.required],
+            qrOrderingEnabled: [false],
+            reservationBookingEnabled: [false],
+            defaultReservationDurationMinutes: [90, [Validators.required, Validators.min(30), Validators.max(240)]],
+            receiptPrintRouteName: [''],
         });
     }
 
@@ -385,6 +418,16 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
                 width: 150,
                 cellRenderer: (params) => this.statusBadge(this.tableStatusText(Number(params.value)), 'primary'),
             },
+            {
+                colId: 'qr',
+                headerName: 'Guest QR',
+                width: 185,
+                sortable: false,
+                filter: false,
+                cellRenderer: (params) => params.data
+                    ? `<button type="button" class="btn btn-xs btn-light-primary me-1" data-action="generate" title="Generate or rotate QR">QR</button><button type="button" class="btn btn-xs btn-light-danger" data-action="revoke" title="Revoke QR">Revoke</button>`
+                    : '',
+            },
             this.actionColumn(),
         ];
     }
@@ -392,6 +435,7 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
     private createStationColumnDefs(): ColDef<RestaurantStationDto>[] {
         return [
             { headerName: this.l('Station'), field: 'name', flex: 1, minWidth: 140 },
+            { headerName: 'Print route', field: 'printRouteName', minWidth: 150 },
             {
                 headerName: this.l('Type'),
                 field: 'stationType',

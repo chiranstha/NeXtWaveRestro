@@ -107,7 +107,7 @@ var KTAppEcommerceSettings = function () {
                                     buttonsStyling: false,
                                     confirmButtonText: "Ok, got it!",
                                     customClass: {
-                                        confirmButton: "btn btn-sm btn-primary"
+                                        confirmButton: "btn btn-xs btn-primary"
                                     }
                                 });
 
@@ -121,7 +121,7 @@ var KTAppEcommerceSettings = function () {
                                 buttonsStyling: false,
                                 confirmButtonText: "Ok, got it!",
                                 customClass: {
-                                    confirmButton: "btn btn-sm btn-primary"
+                                    confirmButton: "btn btn-xs btn-primary"
                                 }
                             });
                         }

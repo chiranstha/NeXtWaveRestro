@@ -50,3 +50,5 @@ public sealed record PairRequest(string Code, string Origin);
 public sealed record PairResponse(string Token);
 
 public sealed record TestPrintRequest(string Route, int PaperWidth = 80);
+
+public sealed record SubmitPrintJobRequest(string ExternalJobId, string Route, string PayloadBase64);

@@ -94,7 +94,7 @@ var KTModalCreateApiKey = function () {
 								buttonsStyling: false,
 								confirmButtonText: "Ok, got it!",
 								customClass: {
-									confirmButton: "btn btn-sm btn-primary"
+									confirmButton: "btn btn-xs btn-primary"
 								}
 							}).then(function (result) {
 								if (result.isConfirmed) {
@@ -112,7 +112,7 @@ var KTModalCreateApiKey = function () {
 							buttonsStyling: false,
 							confirmButtonText: "Ok, got it!",
 							customClass: {
-								confirmButton: "btn btn-sm btn-primary"
+								confirmButton: "btn btn-xs btn-primary"
 							}
 						});
 					}
@@ -132,7 +132,7 @@ var KTModalCreateApiKey = function () {
 				confirmButtonText: "Yes, cancel it!",
 				cancelButtonText: "No, return",
 				customClass: {
-					confirmButton: "btn btn-sm btn-primary",
+					confirmButton: "btn btn-xs btn-primary",
 					cancelButton: "btn btn-active-light"
 				}
 			}).then(function (result) {
@@ -147,7 +147,7 @@ var KTModalCreateApiKey = function () {
 						buttonsStyling: false,
 						confirmButtonText: "Ok, got it!",
 						customClass: {
-							confirmButton: "btn btn-sm btn-primary",
+							confirmButton: "btn btn-xs btn-primary",
 						}
 					});
 				}

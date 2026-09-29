@@ -15,10 +15,10 @@ export class AppNavigationService {
             new AppMenuItem(
                 'Dashboard',
                 'Pages.Administration.Host.Dashboard',
-                'fa-duotone fa-thin  fa-house',
+                'fa-sharp  fa-house',
                 '/app/admin/hostDashboard'
             ),
-            new AppMenuItem('Dashboard', 'Pages.Restaurant.Reports', 'fa-duotone fa-thin  fa-house', '/app/main/dashboard'),
+            new AppMenuItem('Dashboard', 'Pages.Restaurant.Reports', 'fa-sharp  fa-house', '/app/main/dashboard'),
             new AppMenuItem('Saas', '', 'flaticon-users', '', [],
                 [
                     new AppMenuItem('Tenants', 'Pages.Tenants', 'flaticon-list-3', '/app/admin/tenants'),
@@ -26,63 +26,63 @@ export class AppNavigationService {
             new AppMenuItem(
                 'Restaurant',
                 'Pages.Restaurant',
-                'fa-duotone fa-utensils',
+                'fa-sharp fa-utensils',
                 '',
                 [],
                 [
                     new AppMenuItem(
                         'POS Billing',
                         'Pages.Restaurant.Pos',
-                        'fa-duotone fa-cash-register',
+                        'fa-sharp fa-cash-register',
                         '/app/main/restaurant/pos'
                     ),
                     new AppMenuItem(
                         'KDS',
                         'Pages.Restaurant.Kds',
-                        'fa-duotone fa-kitchen-set',
+                        'fa-sharp fa-kitchen-set',
                         '/app/main/restaurant/kds'
                     ),
                     new AppMenuItem(
                         'Restaurant Inventory',
                         'Pages.Restaurant.Inventory',
-                        'fa-duotone fa-boxes-stacked',
+                        'fa-sharp fa-boxes-stacked',
                         '/app/main/restaurant/inventory'
                     ),
                     new AppMenuItem(
                         'Menu & Recipes',
                         'Pages.Restaurant.Menu',
-                        'fa-duotone fa-clipboard-list',
+                        'fa-sharp fa-clipboard-list',
                         '/app/main/restaurant/menu'
                     ),
                     new AppMenuItem(
                         'Channels',
                         'Pages.Restaurant.Channels',
-                        'fa-duotone fa-store',
+                        'fa-sharp fa-store',
                         '/app/main/restaurant/channels'
                     ),
                     new AppMenuItem(
                         'Restaurant Setup',
                         'Pages.Restaurant.Setup',
-                        'fa-duotone fa-table-picnic',
+                        'fa-sharp fa-table-picnic',
                         '/app/main/restaurant/setup'
                     ),
                     new AppMenuItem(
                         'Restaurant Reports',
                         'Pages.Restaurant.Reports',
-                        'fa-duotone fa-chart-column',
+                        'fa-sharp fa-chart-column',
                         '/app/main/restaurant/reports'
                     ),
                     new AppMenuItem(
                         'Restaurant Payroll',
                         'Pages.Restaurant.Payroll',
-                        'fa-duotone fa-money-check-dollar',
+                        'fa-sharp fa-money-check-dollar',
                         '/app/main/restaurant/payroll'
                     ),
                 ]
             ),
-            new AppMenuItem('Accounting', 'Pages.Accounting', 'fa-duotone fa-books', '', [],
+            new AppMenuItem('Accounting', 'Pages.Accounting', 'fa-sharp fa-books', '', [],
                 [
-                    new AppMenuItem('Account Groups', 'Pages.AccountGroups', 'fa-duotone fa-user-group', '/app/main/accounting/accountGroups',
+                    new AppMenuItem('Account Groups', 'Pages.AccountGroups', 'fa-sharp fa-user-group', '/app/main/accounting/accountGroups',
                         [
                             '/app/main/accounting/accountGroups/add',
                             '/app/main/accounting/accountGroups/edit'
@@ -91,7 +91,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Account Ledgers',
                         'Pages.AccountLedgers',
-                        'fa-duotone fa-memo',
+                        'fa-sharp fa-memo',
                         '/app/main/accounting/accountLedgers',
                         [
                             '/app/main/accounting/accountLedgers/add',
@@ -101,14 +101,14 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Financial Years',
                         'Pages.FinancialYears',
-                        'fa-duotone fa-calendar',
+                        'fa-sharp fa-calendar',
                         '/app/main/accounting/financialYears',
                         [
                             '/app/main/accounting/financialYears/add',
                             '/app/main/accounting/financialYears/edit',
                         ]
                     ),
-                    new AppMenuItem('Taxes', 'Pages.Taxes', 'fa-duotone fa-money-check-dollar', '/app/main/accounting/taxes',
+                    new AppMenuItem('Taxes', 'Pages.Taxes', 'fa-sharp fa-money-check-dollar', '/app/main/accounting/taxes',
                         [
                             '/app/main/accounting/taxes/add',
                             '/app/main/accounting/taxes/edit',
@@ -117,7 +117,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Voucher Types',
                         'Pages.VoucherTypes',
-                        'fa-duotone fa-receipt',
+                        'fa-sharp fa-receipt',
                         '/app/main/accounting/voucherTypes',
                         [
                             '/app/main/accounting/voucherTypes/add',
@@ -127,7 +127,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Merge Ledger',
                         'Pages.MergeLedger',
-                        'fa-duotone fa-layer-plus',
+                        'fa-sharp fa-layer-plus',
                         '/app/main/accounting/mergeLedger',
                     )
                 ]),
@@ -135,11 +135,11 @@ export class AppNavigationService {
             new AppMenuItem(
                 'Inventory',
                 'Pages.Inventory',
-                'fa-duotone fa-pancakes',
+                'fa-sharp fa-pancakes',
                 '',
                 [],
                 [
-                    new AppMenuItem('Units', 'Pages.Units', 'fa-duotone fa-weight-scale', '/app/main/inventory/units',
+                    new AppMenuItem('Units', 'Pages.Units', 'fa-sharp fa-weight-scale', '/app/main/inventory/units',
                         [
                             '/app/main/inventory/units/add',
                             '/app/main/inventory/units/edit',
@@ -148,14 +148,14 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'ProductGroups',
                         'Pages.ProductGroups',
-                        'fa-duotone fa-ball-pile',
+                        'fa-sharp fa-ball-pile',
                         '/app/main/inventory/productGroups',
                         [
                             '/app/main/inventory/productGroups/add',
                             '/app/main/inventory/productGroups/edit',
                         ]
                     ),
-                    new AppMenuItem('Products', 'Pages.Products', 'fa-duotone fa-boxes-stacked', '/app/main/inventory/products',
+                    new AppMenuItem('Products', 'Pages.Products', 'fa-sharp fa-boxes-stacked', '/app/main/inventory/products',
                         [
                             '/app/main/inventory/products/add',
                             '/app/main/inventory/products/edit',
@@ -164,13 +164,13 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Opening Stocks',
                         'Pages.Products',
-                        'fa-duotone fa-chart-line-up',
+                        'fa-sharp fa-chart-line-up',
                         '/app/main/inventory/openingStock'
                     ),
                     new AppMenuItem(
                         'Product Merge',
                         'Pages.ProductMerge',
-                        'fa-duotone fa-barcode-scan',
+                        'fa-sharp fa-barcode-scan',
                         '/app/main/inventory/productMerge'
                     ),
                 ]
@@ -178,14 +178,14 @@ export class AppNavigationService {
             new AppMenuItem(
                 'Purchase',
                 'Pages.Purchase',
-                'fa-duotone fa-cart-shopping-fast',
+                'fa-sharp fa-cart-shopping-fast',
                 '',
                 [],
                 [
                     new AppMenuItem(
                         'PurchaseOrder',
                         'Pages.PurchaseOrderMasters',
-                        'fa-duotone fa-cart-plus',
+                        'fa-sharp fa-cart-plus',
                         '/app/main/purchase/purchaseOrderMasters',
                         [
                             '/app/main/purchase/purchaseOrderMasters/add',
@@ -195,7 +195,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'PurchaseInvoice',
                         'Pages.PurchaseMasters',
-                        'fa-duotone fa-file-invoice-dollar',
+                        'fa-sharp fa-file-invoice-dollar',
                         '/app/main/purchase/purchaseMasters',
                         [
                             '/app/main/purchase/purchaseMasters/add',
@@ -205,7 +205,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'PurchaseReturns',
                         'Pages.PurchaseReturns',
-                        'fa-duotone fa-rotate-left',
+                        'fa-sharp fa-rotate-left',
                         '/app/main/purchase/purchaseReturns',
                         [
                             '/app/main/purchase/purchaseReturns/add',
@@ -218,14 +218,14 @@ export class AppNavigationService {
             new AppMenuItem(
                 'Sales',
                 'Pages.Sales',
-                'fa-duotone fa-cart-circle-check',
+                'fa-sharp fa-cart-circle-check',
                 '',
                 [],
                 [
                     new AppMenuItem(
                         'SalesInvoice',
                         'Pages.SalesMasters',
-                        'fa-duotone fa-file-invoice-dollar',
+                        'fa-sharp fa-file-invoice-dollar',
                         '/app/main/sales/salesInvoiceMasters',
                         [
                             '/app/main/sales/salesInvoiceMasters/add',
@@ -235,7 +235,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'SalesReturn',
                         'Pages.SalesReturnMasters',
-                        'fa-duotone fa-cart-circle-xmark',
+                        'fa-sharp fa-cart-circle-xmark',
                         '/app/main/sales/salesReturnMasters',
                         [
                             '/app/main/sales/salesReturnMasters/add',
@@ -248,14 +248,14 @@ export class AppNavigationService {
             new AppMenuItem(
                 'Transaction',
                 'Pages.Transaction',
-                'fa-duotone fa-gift-card',
+                'fa-sharp fa-gift-card',
                 '',
                 [],
                 [
                     new AppMenuItem(
                         'Payment Masters',
                         'Pages.PaymentMasters',
-                        'fa-duotone fa-sack-dollar',
+                        'fa-sharp fa-sack-dollar',
                         '/app/main/transaction/paymentMasters',
                         [
                             '/app/main/transaction/paymentMasters/add',
@@ -265,7 +265,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Restaurant Stock Used',
                         'Pages.Restaurant.Inventory.StockAdjustment',
-                        'fa-duotone fa-box-open',
+                        'fa-sharp fa-box-open',
                         '/app/main/transaction/restaurantStockUsed',
                         [
                             '/app/main/transaction/restaurantStockUsed/add',
@@ -274,7 +274,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Receipt Masters',
                         'Pages.ReceiptMasters',
-                        'fa-duotone fa-receipt',
+                        'fa-sharp fa-receipt',
                         '/app/main/transaction/receiptMaster',
                         [
                             '/app/main/transaction/receiptMaster/add',
@@ -284,7 +284,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Journal Masters',
                         'Pages.JournalMasters',
-                        'fa-duotone fa-book',
+                        'fa-sharp fa-book',
                         '/app/main/transaction/journalMasters',
                         [
                             '/app/main/transaction/journalMasters/add',
@@ -294,7 +294,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Contra Masters',
                         'Pages.ContraMasters',
-                        'fa-duotone fa-bank',
+                        'fa-sharp fa-bank',
                         '/app/main/transaction/contraMasters',
                         [
                             '/app/main/transaction/contraMasters/add',
@@ -304,7 +304,7 @@ export class AppNavigationService {
                      new AppMenuItem(
                         'PDC Payable',
                         'Pages.PDCPayables',
-                        'fa-duotone fa-hand-holding-dollar',
+                        'fa-sharp fa-hand-holding-dollar',
                         '/app/main/transaction/PdcPayable',
                         [
                             '/app/main/transaction/PdcPayable/add',
@@ -314,7 +314,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'PDC Receivable',
                         'Pages.PDCReceivables',
-                        'fa-duotone fa-hands-holding-dollar',
+                        'fa-sharp fa-hands-holding-dollar',
                         '/app/main/transaction/PdcReceivable',
                         [
                             '/app/main/transaction/PdcReceivable/add',
@@ -325,7 +325,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'PDC Clearance',
                         'Pages.PDCClearances',
-                        'fa-duotone fa-file-check',
+                        'fa-sharp fa-file-check',
                         '/app/main/transaction/PdcClearance',
                         [
                             '/app/main/transaction/PdcClearance/add',
@@ -339,39 +339,39 @@ export class AppNavigationService {
             new AppMenuItem(
                 'Reports',
                 'Pages.Reporting',
-                'fa-duotone fa-chart-simple',
+                'fa-sharp fa-chart-simple',
                 '',
                 [],
                 [
                     new AppMenuItem(
                         'Accounting',
                         'Pages.AccountingReport',
-                        'fa-duotone fa-books',
+                        'fa-sharp fa-books',
                         '',
                         [],
                         [
                             new AppMenuItem(
                                 'AccountGroup',
                                 'Pages.AccountGroupReport',
-                                'fa-duotone fa-layer-group',
+                                'fa-sharp fa-layer-group',
                                 '/app/main/reports/account-group'
                             ),
                             new AppMenuItem(
                                 'AccountLedger',
                                 'Pages.AccountLedgerReport',
-                                'fa-duotone fa-layer-group',
+                                'fa-sharp fa-layer-group',
                                 '/app/main/reports/account-ledger'
                             ),
                             new AppMenuItem(
                                 'Daybook',
                                 'Pages.BookReport',
-                                'fa-duotone fa-book-open',
+                                'fa-sharp fa-book-open',
                                 '/app/main/reports/daybook'
                             ),
                             new AppMenuItem(
                                 'Book Report',
                                 'Pages.BookReport',
-                                'fa-duotone fa-book-open',
+                                'fa-sharp fa-book-open',
                                 '/app/main/reports/book-report'
                             )
                         ]
@@ -379,20 +379,20 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Inventory',
                         'Pages.InventoryReport',
-                        'fa-duotone fa-pancakes',
+                        'fa-sharp fa-pancakes',
                         '',
                         [],
                         [
                             new AppMenuItem(
                                 'StockReport',
                                 'Pages.StockReport',
-                                'fa-duotone fa-layer-group',
+                                'fa-sharp fa-layer-group',
                                 '/app/main/reports/stock-report'
                             ),
                             new AppMenuItem(
                                 'ProductProfit',
                                 'Pages.ProductProfitReport',
-                                'fa-duotone fa-chart-mixed',
+                                'fa-sharp fa-chart-mixed',
                                 '/app/main/reports/product-profit'
                             ),
                         ]
@@ -401,32 +401,32 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Purchase',
                         'Pages.PurchaseReport',
-                        'fa-duotone fa-receipt',
+                        'fa-sharp fa-receipt',
                         '',
                         [],
                         [
                             new AppMenuItem(
                                 'PurchaseReport',
                                 'Pages.PurchaseMasterReport',
-                                'fa-duotone fa-layer-group',
+                                'fa-sharp fa-layer-group',
                                 '/app/main/reports/purchase-report'
                             ),
                             new AppMenuItem(
                                 'PurchaseReturnReport',
                                 'Pages.PurchaseReturnReport',
-                                'fa-duotone fa-rotate-left',
+                                'fa-sharp fa-rotate-left',
                                 '/app/main/reports/purchase-return'
                             ),
                             new AppMenuItem(
                                 'Purchase Party Wise Tax',
                                 'Pages.TaxableCustomerReport',
-                                'fa-duotone fa-percent',
+                                'fa-sharp fa-percent',
                                 '/app/main/reports/purchase-party-tax'
                             ),
                             new AppMenuItem(
                                 'Product Wise Monthly',
                                 'Pages.ProductWiseMonthlyReport',
-                                'fa-duotone fa-calendar',
+                                'fa-sharp fa-calendar',
                                 '/app/main/reports/productWiseMonthlyPurchase'
                             ),
                         ]
@@ -434,38 +434,38 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Sales',
                         'Pages.SalesReport',
-                        'fa-duotone fa-chart-waterfall',
+                        'fa-sharp fa-chart-waterfall',
                         '',
                         [],
                         [
                             new AppMenuItem(
                                 'SalesReport',
                                 'Pages.SalesMasterReport',
-                                'fa-duotone fa-layer-group',
+                                'fa-sharp fa-layer-group',
                                 '/app/main/reports/sales-report'
                             ),
                             new AppMenuItem(
                                 'Sales Return',
                                 'Pages.SalesReturnReport',
-                                'fa-duotone fa-arrow-rotate-left',
+                                'fa-sharp fa-arrow-rotate-left',
                                 '/app/main/reports/sales-return-report'
                             ),
                              new AppMenuItem(
                                 'Material Sales',
                                 'Pages.MaterialSalesReport',
-                                'fa-duotone fa-chart-waterfall',
+                                'fa-sharp fa-chart-waterfall',
                                 '/app/main/reports/material-sales-report'
                             ),
                             new AppMenuItem(
                                 'LedgerWiseSales',
                                 'Pages.LedgerWiseSalesReport',
-                                'fa-duotone fa-chart-gantt',
+                                'fa-sharp fa-chart-gantt',
                                 '/app/main/reports/ledger-wise-sales'
                             ),
                             new AppMenuItem(
                                 'ProductWiseSales',
                                 'Pages.ProductWiseSalesReport',
-                                'fa-duotone fa-chart-line-up',
+                                'fa-sharp fa-chart-line-up',
                                 '/app/main/reports/product-wise-sales'
                             ),
                         ]
@@ -473,44 +473,44 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'TaxReport',
                         'Pages.TaxReporting',
-                        'fa-duotone fa-memo-pad',
+                        'fa-sharp fa-memo-pad',
                         '',
                         [],
                         [
                             new AppMenuItem(
                                 'VatSummaryReport',
                                 'Pages.VatSummaryReport',
-                                'fa-duotone fa-percent',
+                                'fa-sharp fa-percent',
                                 '/app/main/reports/tax-report/vatSummaryReport'
                             ),
                             new AppMenuItem(
                                 'Purchase Tax Report',
                                 'Pages.TaxPurchaseRegisterReport',
-                                'fa-duotone fa-chart-mixed',
+                                'fa-sharp fa-chart-mixed',
                                 '/app/main/reports/tax-report/purchaseTaxReport'
                             ),
                             new AppMenuItem(
                                 'Sales Tax Report',
                                 'Pages.TaxSalesRegisterReport',
-                                'fa-duotone fa-chart-line-up',
+                                'fa-sharp fa-chart-line-up',
                                 '/app/main/reports/tax-report/salesTaxReport'
                             ),
                             new AppMenuItem(
                                 'Sales Above Lakhs',
                                 'Pages.SalesReturnReport',
-                                'fa-duotone fa-chart-line',
+                                'fa-sharp fa-chart-line',
                                 '/app/main/reports/tax-report/salesAboveLakhsReport'
                             ),
                             new AppMenuItem(
                                 'Purchase Above Lakhs',
                                 'Pages.SalesReturnReport',
-                                'fa-duotone fa-cart-shopping',
+                                'fa-sharp fa-cart-shopping',
                                 '/app/main/reports/tax-report/purchaseAboveLakhsReport'
                             ),
                             new AppMenuItem(
                                 'Party wise tax',
                                 'Pages.SalesReturnReport',
-                                'fa-duotone fa-badge-percent',
+                                'fa-sharp fa-badge-percent',
                                 '/app/main/reports/partyWiseTax'
                             ),
                         ]
@@ -555,73 +555,73 @@ export class AppNavigationService {
             new AppMenuItem(
                 'Administration',
                 'Pages.Administration',
-                'fa-duotone fa-gear',
+                'fa-sharp fa-gear',
                 '',
                 [],
                 [
                     new AppMenuItem(
                         'OrganizationUnits',
                         'Pages.Administration.OrganizationUnits',
-                        'fa-duotone fa-buildings',
+                        'fa-sharp fa-buildings',
                         '/app/admin/organization-units'
                     ),
-                    new AppMenuItem('Roles', 'Pages.Administration.Roles', 'fa-duotone fa-thin fa-person', '/app/admin/roles'),
-                    new AppMenuItem('Users', 'Pages.Administration.Users', 'fa-duotone fa-thin fa-users', '/app/admin/users'),
+                    new AppMenuItem('Roles', 'Pages.Administration.Roles', 'fa-sharp fa-person', '/app/admin/roles'),
+                    new AppMenuItem('Users', 'Pages.Administration.Users', 'fa-sharp fa-users', '/app/admin/users'),
                     new AppMenuItem(
                         'Languages',
                         'Pages.Administration.Languages',
-                        'fa-duotone fa-thin fa-language',
+                        'fa-sharp fa-language',
                         '/app/admin/languages',
                         ['/app/admin/languages/{name}/texts']
                     ),
                     new AppMenuItem(
                         'AuditLogs',
                         'Pages.Administration.AuditLogs',
-                        'fa-duotone fa-thin fa-list-check',
+                        'fa-sharp fa-list-check',
                         '/app/admin/auditLogs'
                     ),
                     new AppMenuItem(
                         'Maintenance',
                         'Pages.Administration.Host.Maintenance',
-                        'fa-duotone fa-thin fa-sliders',
+                        'fa-sharp fa-sliders',
                         '/app/admin/maintenance'
                     ),
                     new AppMenuItem(
                         'Subscription',
                         'Pages.Administration.Tenant.SubscriptionManagement',
-                        'fa-duotone fa-thin fa-hand-pointer',
+                        'fa-sharp fa-hand-pointer',
                         '/app/admin/subscription-management'
                     ),
                     new AppMenuItem(
                         'VisualSettings',
                         'Pages.Administration.UiCustomization',
-                        'fa-duotone fa-thin fa-eye',
+                        'fa-sharp fa-eye',
                         '/app/admin/ui-customization'
                     ),
                     new AppMenuItem(
                         'WebhookSubscriptions',
                         'Pages.Administration.WebhookSubscription',
-                        'fa-duotone fa-thin fa-bell',
+                        'fa-sharp fa-bell',
                         '/app/admin/webhook-subscriptions'
                     ),
                     new AppMenuItem(
                         'DynamicProperties',
                         'Pages.Administration.DynamicProperties',
-                        'fa-duotone fa-thin fa-star',
+                        'fa-sharp fa-star',
                         '/app/admin/dynamic-property'
                     ),
                     new AppMenuItem(
                         'Notifications',
                         '',
-                        'fa-duotone fa-thin fa-alarm-clock',
+                        'fa-sharp fa-alarm-clock',
                         '',
                         [],
                         [
-                            new AppMenuItem('Inbox', '', 'fa-duotone fa-thin fa-envelope', '/app/notifications'),
+                            new AppMenuItem('Inbox', '', 'fa-sharp fa-envelope', '/app/notifications'),
                             new AppMenuItem(
                                 'MassNotifications',
                                 'Pages.Administration.MassNotification',
-                                'fa-duotone fa-thin fa-paper-plane',
+                                'fa-sharp fa-paper-plane',
                                 '/app/admin/mass-notifications'
                             ),
                         ]
@@ -629,13 +629,13 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Settings',
                         'Pages.Administration.Host.Settings',
-                        'fa-duotone fa-thin fa-gear',
+                        'fa-sharp fa-gear',
                         '/app/admin/hostSettings'
                     ),
                     new AppMenuItem(
                         'Settings',
                         'Pages.Administration.Tenant.Settings',
-                        'fa-duotone fa-thin fa-gear',
+                        'fa-sharp fa-gear',
                         '/app/admin/tenantSettings'
                     ),
                 ]

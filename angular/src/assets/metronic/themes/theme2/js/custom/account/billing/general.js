@@ -29,7 +29,7 @@ var KTAccountBillingGeneral = function () {
                         confirmButtonText: "Ok",
                         buttonsStyling: false,
                         customClass: {
-                            confirmButton: "btn btn-sm btn-light-primary"
+                            confirmButton: "btn btn-xs btn-light-primary"
                         }
                     })
                 }
@@ -66,7 +66,7 @@ var KTAccountBillingGeneral = function () {
                             confirmButtonText: "Ok",
                             buttonsStyling: false,
                             customClass: {
-                                confirmButton: "btn btn-sm btn-light-primary"
+                                confirmButton: "btn btn-xs btn-light-primary"
                             }
                         }).then((result) => {
                             el.closest('[data-kt-billing-element="card"]').remove();
@@ -106,7 +106,7 @@ var KTAccountBillingGeneral = function () {
                             confirmButtonText: "Ok",
                             buttonsStyling: false,
                             customClass: {
-                                confirmButton: "btn btn-sm btn-light-primary"
+                                confirmButton: "btn btn-xs btn-light-primary"
                             }
                         }).then((result) => {
                             el.closest('[data-kt-billing-element="address"]').remove();

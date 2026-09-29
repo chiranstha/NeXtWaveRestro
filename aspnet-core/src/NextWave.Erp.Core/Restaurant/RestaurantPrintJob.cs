@@ -18,6 +18,9 @@ namespace NextWave.Erp.Restaurant
         [Required, StringLength(128)] public string RouteName { get; set; }
         [Required] public byte[] Payload { get; set; }
         [StringLength(120)] public string LeaseOwner { get; set; }
+        [StringLength(120)] public string AgentJobId { get; set; }
+        [StringLength(500)] public string ReprintReason { get; set; }
+        public bool IsDeliberateReprint { get; set; }
         public DateTime? LeaseUntilUtc { get; set; }
         public int Attempts { get; set; }
         [StringLength(500)] public string LastError { get; set; }

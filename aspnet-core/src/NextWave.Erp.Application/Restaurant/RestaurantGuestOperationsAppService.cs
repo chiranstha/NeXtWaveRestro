@@ -1,9 +1,11 @@
 using Abp.Application.Services.Dto;
 using Abp.Authorization;
 using Abp.Domain.Repositories;
+using Abp.Runtime.Session;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
 using NextWave.Erp.Authorization;
+using NextWave.Erp.Configuration;
 using NextWave.Erp.Enums;
 using NextWave.Erp.Restaurant.Dtos;
 using QRCoder;
@@ -18,6 +20,7 @@ namespace NextWave.Erp.Restaurant
 {
     public class RestaurantGuestOperationsAppService(
         IRepository<RestaurantTable, Guid> tableRepository,
+        IRepository<RestaurantStation, Guid> stationRepository,
         IRepository<RestaurantTableSession, Guid> sessionRepository,
         IRepository<RestaurantOrder, Guid> orderRepository,
         IRepository<RestaurantOrderItem, Guid> orderItemRepository,
@@ -25,7 +28,8 @@ namespace NextWave.Erp.Restaurant
         IRepository<RestaurantSmsOutbox, Guid> smsOutboxRepository,
         IRepository<RestaurantPrintJob, Guid> printJobRepository,
         IRepository<RestaurantTicket, Guid> ticketRepository,
-        IRestaurantOrderAppService orderAppService)
+        IRestaurantOrderAppService orderAppService,
+        IAppConfigurationAccessor configurationAccessor)
         : ErpAppServiceBase, IRestaurantGuestOperationsAppService
     {
         [AbpAuthorize(AppPermissions.PagesRestaurantSetupEdit)]
@@ -41,7 +45,10 @@ namespace NextWave.Erp.Restaurant
             table.QrTokenUpdatedAt = DateTime.Now;
             await tableRepository.UpdateAsync(table);
 
-            var url = $"{AppConfiguration["App:ClientRootAddress"]?.TrimEnd('/')}/guest/table/{token}";
+            var rootAddress = configurationAccessor.Configuration["App:ClientRootAddress"]?.TrimEnd('/');
+            var url = string.IsNullOrWhiteSpace(rootAddress)
+                ? $"/guest/table/{token}"
+                : $"{rootAddress}/guest/table/{token}";
             if (url.StartsWith("/guest/", StringComparison.Ordinal)) url = $"/guest/table/{token}";
             using var generator = new QRCodeGenerator();
             using var data = generator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
@@ -54,6 +61,17 @@ namespace NextWave.Erp.Restaurant
                 PngBase64 = Convert.ToBase64String(png),
                 UpdatedAt = table.QrTokenUpdatedAt
             };
+        }
+
+        [AbpAuthorize(AppPermissions.PagesRestaurantSetupEdit)]
+        public async Task RevokeTableQr(EntityDto<Guid> input)
+        {
+            var tenantId = AbpSession.GetTenantId();
+            var table = await tableRepository.FirstOrDefaultAsync(x => x.Id == input.Id && x.TenantId == tenantId && !x.IsDeleted);
+            if (table == null) throw new UserFriendlyException("Restaurant table not found");
+            table.QrTokenHash = null;
+            table.QrTokenUpdatedAt = DateTime.UtcNow;
+            await tableRepository.UpdateAsync(table);
         }
 
         [AbpAuthorize(AppPermissions.PagesRestaurantPos)]
@@ -181,22 +199,30 @@ namespace NextWave.Erp.Restaurant
             var items = await reservationRepository.GetAll().Include(x => x.TableFk)
                 .Where(x => x.TenantId == tenantId && x.StartsAtUtc >= fromUtc && x.StartsAtUtc <= toUtc)
                 .OrderBy(x => x.StartsAtUtc).ToListAsync();
-            return items.Select(x => new RestaurantReservationDto
+            var result = new List<RestaurantReservationDto>();
+            foreach (var x in items)
             {
-                Id = x.Id,
-                Status = x.Status,
-                IsWalkIn = x.IsWalkIn,
-                GuestName = x.GuestName,
-                PhoneNumber = x.PhoneNumber,
-                Notes = x.Notes,
-                PartySize = x.PartySize,
-                StartsAt = x.StartsAtUtc,
-                EndsAt = x.EndsAtUtc,
-                TableId = x.TableId,
-                TableName = x.TableFk?.Name,
-                CreatedAt = x.CreatedAtUtc,
-                SmsStatus = "Queued"
-            }).ToList();
+                var latestMessage = await smsOutboxRepository.GetAll()
+                    .Where(m => m.TenantId == tenantId && m.ReservationId == x.Id)
+                    .OrderByDescending(m => m.CreatedAtUtc).FirstOrDefaultAsync();
+                result.Add(new RestaurantReservationDto
+                {
+                    Id = x.Id,
+                    Status = x.Status,
+                    IsWalkIn = x.IsWalkIn,
+                    GuestName = x.GuestName,
+                    PhoneNumber = x.PhoneNumber,
+                    Notes = x.Notes,
+                    PartySize = x.PartySize,
+                    StartsAt = x.StartsAtUtc,
+                    EndsAt = x.EndsAtUtc,
+                    TableId = x.TableId,
+                    TableName = x.TableFk?.Name,
+                    CreatedAt = x.CreatedAtUtc,
+                    SmsStatus = latestMessage == null ? "No message" : latestMessage.Status == RestaurantSmsOutboxStatus.Failed ? "Failed: " + latestMessage.LastError : latestMessage.Status == RestaurantSmsOutboxStatus.Sent ? "Queued for delivery" : "Queued for delivery"
+                });
+            }
+            return result;
         }
 
         [AbpAuthorize(AppPermissions.PagesRestaurantReservations)]
@@ -279,6 +305,7 @@ namespace NextWave.Erp.Restaurant
                 await smsOutboxRepository.InsertAsync(new RestaurantSmsOutbox
                 {
                     TenantId = tenantId,
+                    ReservationId = reservation.Id,
                     PhoneNumber = reservation.PhoneNumber,
                     Message = message,
                     Status = RestaurantSmsOutboxStatus.Pending,
@@ -305,6 +332,28 @@ namespace NextWave.Erp.Restaurant
             job.Attempts++;
             await printJobRepository.UpdateAsync(job);
             return MapPrintJob(job);
+        }
+
+        [AbpAuthorize(AppPermissions.PagesRestaurantPrinterSetup)]
+        public async Task<List<RestaurantPrintJobDto>> GetPrintJobs()
+        {
+            return await printJobRepository.GetAll()
+                .Where(x => x.TenantId == AbpSession.TenantId)
+                .OrderByDescending(x => x.CreatedAtUtc)
+                .Take(100)
+                .Select(x => new RestaurantPrintJobDto
+                {
+                    Id = x.Id,
+                    ExternalJobId = x.ExternalJobId,
+                    Type = x.Type,
+                    RouteName = x.RouteName,
+                    PayloadBase64 = string.Empty,
+                    AgentJobId = x.AgentJobId,
+                    Status = x.Status,
+                    LastError = x.LastError,
+                    Attempts = x.Attempts,
+                    ReprintReason = x.ReprintReason
+                }).ToListAsync();
         }
 
         [AbpAuthorize(AppPermissions.PagesRestaurantPrinterSetup)]
@@ -339,11 +388,24 @@ namespace NextWave.Erp.Restaurant
         }
 
         [AbpAuthorize(AppPermissions.PagesRestaurantPrinterSetup)]
-        public async Task RetryPrintJob(EntityDto<Guid> input)
+        public async Task RetryPrintJob(RetryRestaurantPrintJobDto input)
         {
-            var job = await printJobRepository.FirstOrDefaultAsync(x => x.Id == input.Id && x.TenantId == AbpSession.TenantId);
+            var job = await printJobRepository.FirstOrDefaultAsync(x => x.Id == input.JobId && x.TenantId == AbpSession.TenantId);
             if (job == null || job.Status != RestaurantPrintJobStatus.Failed)
                 throw new UserFriendlyException("Failed print job not found");
+            if (job.StationId.HasValue)
+            {
+                var station = await stationRepository.FirstOrDefaultAsync(x => x.Id == job.StationId.Value && x.TenantId == AbpSession.TenantId);
+                if (!string.IsNullOrWhiteSpace(station?.PrintRouteName)) job.RouteName = station.PrintRouteName.Trim();
+            }
+            else if (job.Type == RestaurantPrintJobType.BillReceipt)
+            {
+                var receiptRoute = await SettingManager.GetSettingValueForTenantAsync(
+                    AppSettings.ErpSettings.RestaurantReceiptPrintRouteName, AbpSession.GetTenantId());
+                if (!string.IsNullOrWhiteSpace(receiptRoute)) job.RouteName = receiptRoute.Trim();
+            }
+            if (string.IsNullOrWhiteSpace(job.RouteName) || job.RouteName == "unconfigured")
+                throw new UserFriendlyException("Configure a printer route before retrying this job");
             job.Status = RestaurantPrintJobStatus.Pending;
             job.LastError = null;
             job.LeaseOwner = null;
@@ -360,7 +422,9 @@ namespace NextWave.Erp.Restaurant
             PayloadBase64 = Convert.ToBase64String(job.Payload ?? Array.Empty<byte>()),
             AgentJobId = job.AgentJobId,
             Status = job.Status,
-            LastError = job.LastError
+            LastError = job.LastError,
+            Attempts = job.Attempts,
+            ReprintReason = job.ReprintReason
         };
 
         private static string HashToken(string token) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));

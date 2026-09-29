@@ -98,6 +98,24 @@ app.MapPut("/api/v1/routes", (IReadOnlyList<PrinterRoute> routes, RouteStore sto
     return Results.NoContent();
 });
 app.MapGet("/api/v1/jobs", (PrintQueue queue) => queue.GetStatuses());
+app.MapPost("/api/v1/jobs", async (SubmitPrintJobRequest request, HttpResponse response, PrintQueue queue, RouteStore routes) =>
+{
+    if (string.IsNullOrWhiteSpace(request.ExternalJobId) || request.ExternalJobId.Length > 120 ||
+        string.IsNullOrWhiteSpace(request.Route) || request.Route.Length > 128)
+    {
+        return Results.BadRequest(new { error = "An external job ID and configured route are required." });
+    }
+    if (routes.Find(request.Route) is null) return Results.NotFound(new { error = "The requested print route is not configured." });
+    byte[] payload;
+    try { payload = Convert.FromBase64String(request.PayloadBase64); }
+    catch (FormatException) { return Results.BadRequest(new { error = "The print payload is invalid." }); }
+    if (payload.Length == 0 || payload.Length > IppRequestParser.MaxDocumentBytes)
+        return Results.BadRequest(new { error = "The print payload is empty or too large." });
+    var job = await queue.EnqueueAsync(request.ExternalJobId, request.Route, payload);
+    response.Headers["X-Print-Agent-Job-Id"] = job.Id.ToString();
+    response.Headers["X-Print-Agent-Job-State"] = job.State.ToString();
+    return Results.Accepted($"/api/v1/jobs/{job.Id}", job.ToStatus());
+});
 app.MapGet("/api/v1/jobs/{id:guid}", (Guid id, PrintQueue queue) =>
     queue.Find(id) is { } job ? Results.Ok(job.ToStatus()) : Results.NotFound());
 app.MapPost("/api/v1/jobs/{id:guid}/retry", async (Guid id, PrintQueue queue) =>

@@ -206,6 +206,10 @@ public static class AppSettings
         public const string RestaurantTicketPrintingEnabled = "App.Nextwave.Restaurant.TicketPrintingEnabled";
         public const string RestaurantChannelAvailabilityEnabled = "App.Nextwave.Restaurant.ChannelAvailabilityEnabled";
         public const string RestaurantTableWorkflow = "App.Nextwave.Restaurant.TableWorkflow";
+        public const string RestaurantQrOrderingEnabled = "App.Nextwave.Restaurant.QrOrderingEnabled";
+        public const string RestaurantReservationBookingEnabled = "App.Nextwave.Restaurant.ReservationBookingEnabled";
+        public const string RestaurantDefaultReservationDurationMinutes = "App.Nextwave.Restaurant.DefaultReservationDurationMinutes";
+        public const string RestaurantReceiptPrintRouteName = "App.Nextwave.Restaurant.ReceiptPrintRouteName";
         public static string SalesBillFormat = "App.Nextwave.SalesBillFormat";
         public const string IsEmailSent = "App.Nextwave.IsEmailSent";
         public const string Transaction = "App.Nextwave.Transaction";

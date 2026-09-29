@@ -161,7 +161,7 @@ html[data-bs-theme=dark] .card:hover {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.025em;
-  font-family: 'AvenirNext', sans-serif;
+  font-family: 'Sofia Pro', sans-serif;
   font-size: 13px;
   border-bottom: 1px solid var(--ag-border-color);
 }
@@ -351,7 +351,7 @@ body.bulk-bus-quick-add-open {
   line-height: 1.2;
   font-size: 12px;
   font-weight: 700;
-  font-family: 'AvenirNext', sans-serif;
+  font-family: 'Sofia Pro', sans-serif;
   display: flex !important;
   align-items: center !important;
 }

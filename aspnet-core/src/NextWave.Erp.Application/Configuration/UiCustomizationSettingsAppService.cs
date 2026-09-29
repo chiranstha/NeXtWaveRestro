@@ -112,6 +112,8 @@ public class UiCustomizationSettingsAppService : ErpAppServiceBase, IUiCustomiza
     private static void EnsureSupportedTheme(string themeName)
     {
         if (!string.Equals(themeName, AppConsts.ThemeDefault, System.StringComparison.OrdinalIgnoreCase)
+            && !string.Equals(themeName, AppConsts.Theme2, System.StringComparison.OrdinalIgnoreCase)
+            && !string.Equals(themeName, AppConsts.Theme3, System.StringComparison.OrdinalIgnoreCase)
             && !string.Equals(themeName, AppConsts.Theme8, System.StringComparison.OrdinalIgnoreCase)
             && !string.Equals(themeName, AppConsts.Theme11, System.StringComparison.OrdinalIgnoreCase))
         {
