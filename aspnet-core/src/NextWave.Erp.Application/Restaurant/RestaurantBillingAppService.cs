@@ -817,5 +817,13 @@ namespace NextWave.Erp.Restaurant
                 $"{x.ProductName} required {x.RequiredQty} {x.UnitName}, available {x.AvailableQty}"));
         }
 
+        private static DateTime GetNepalNow()
+        {
+            TimeZoneInfo zone;
+            try { zone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Kathmandu"); }
+            catch (TimeZoneNotFoundException) { zone = TimeZoneInfo.FindSystemTimeZoneById("Nepal Standard Time"); }
+            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zone);
+        }
+
     }
 }

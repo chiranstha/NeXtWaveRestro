@@ -56693,6 +56693,8 @@ export class CancelRestaurantTicketDto implements ICancelRestaurantTicketDto {
     reason!: string | undefined;
     approvalPin!: string | undefined;
     approvalNote!: string | undefined;
+    clientRequestId!: string | undefined;
+    expectedOrderVersion!: string | undefined;
 
     constructor(data?: ICancelRestaurantTicketDto) {
         if (data) {
@@ -56709,6 +56711,8 @@ export class CancelRestaurantTicketDto implements ICancelRestaurantTicketDto {
             this.reason = _data["reason"];
             this.approvalPin = _data["approvalPin"];
             this.approvalNote = _data["approvalNote"];
+            this.clientRequestId = _data["clientRequestId"];
+            this.expectedOrderVersion = _data["expectedOrderVersion"];
         }
     }
 
@@ -56725,6 +56729,8 @@ export class CancelRestaurantTicketDto implements ICancelRestaurantTicketDto {
         data["reason"] = this.reason;
         data["approvalPin"] = this.approvalPin;
         data["approvalNote"] = this.approvalNote;
+        data["clientRequestId"] = this.clientRequestId;
+        data["expectedOrderVersion"] = this.expectedOrderVersion;
         return data;
     }
 }
@@ -56734,6 +56740,8 @@ export interface ICancelRestaurantTicketDto {
     reason: string | undefined;
     approvalPin: string | undefined;
     approvalNote: string | undefined;
+    clientRequestId?: string | undefined;
+    expectedOrderVersion?: string | undefined;
 }
 
 export class CaptchaSettingsEditDto implements ICaptchaSettingsEditDto {
@@ -93293,6 +93301,8 @@ export class UpdateRestaurantTicketItemStatusDto implements IUpdateRestaurantTic
     ticketItemId!: string;
     status!: RestaurantOrderItemStatus;
     cancelReason!: string | undefined;
+    clientRequestId!: string | undefined;
+    expectedOrderVersion!: string | undefined;
 
     constructor(data?: IUpdateRestaurantTicketItemStatusDto) {
         if (data) {
@@ -93308,6 +93318,8 @@ export class UpdateRestaurantTicketItemStatusDto implements IUpdateRestaurantTic
             this.ticketItemId = _data["ticketItemId"];
             this.status = _data["status"];
             this.cancelReason = _data["cancelReason"];
+            this.clientRequestId = _data["clientRequestId"];
+            this.expectedOrderVersion = _data["expectedOrderVersion"];
         }
     }
 
@@ -93323,6 +93335,8 @@ export class UpdateRestaurantTicketItemStatusDto implements IUpdateRestaurantTic
         data["ticketItemId"] = this.ticketItemId;
         data["status"] = this.status;
         data["cancelReason"] = this.cancelReason;
+        data["clientRequestId"] = this.clientRequestId;
+        data["expectedOrderVersion"] = this.expectedOrderVersion;
         return data;
     }
 }
@@ -93331,11 +93345,15 @@ export interface IUpdateRestaurantTicketItemStatusDto {
     ticketItemId: string;
     status: RestaurantOrderItemStatus;
     cancelReason: string | undefined;
+    clientRequestId?: string | undefined;
+    expectedOrderVersion?: string | undefined;
 }
 
 export class BulkUpdateRestaurantTicketItemStatusDto implements IBulkUpdateRestaurantTicketItemStatusDto {
     ticketItemIds!: string[] | undefined;
     status!: RestaurantOrderItemStatus;
+    clientRequestId!: string | undefined;
+    expectedOrderVersions!: { [key: string]: string } | undefined;
 
     constructor(data?: IBulkUpdateRestaurantTicketItemStatusDto) {
         if (data) {
@@ -93350,6 +93368,8 @@ export class BulkUpdateRestaurantTicketItemStatusDto implements IBulkUpdateResta
         if (_data) {
             this.ticketItemIds = _data["ticketItemIds"];
             this.status = _data["status"];
+            this.clientRequestId = _data["clientRequestId"];
+            this.expectedOrderVersions = _data["expectedOrderVersions"];
         }
     }
 
@@ -93364,6 +93384,8 @@ export class BulkUpdateRestaurantTicketItemStatusDto implements IBulkUpdateResta
         data = typeof data === 'object' ? data : {};
         data["ticketItemIds"] = this.ticketItemIds;
         data["status"] = this.status;
+        data["clientRequestId"] = this.clientRequestId;
+        data["expectedOrderVersions"] = this.expectedOrderVersions;
         return data;
     }
 }
@@ -93371,6 +93393,8 @@ export class BulkUpdateRestaurantTicketItemStatusDto implements IBulkUpdateResta
 export interface IBulkUpdateRestaurantTicketItemStatusDto {
     ticketItemIds: string[] | undefined;
     status: RestaurantOrderItemStatus;
+    clientRequestId?: string | undefined;
+    expectedOrderVersions?: { [key: string]: string } | undefined;
 }
 
 export class BulkUpdateRestaurantTicketItemStatusResultDto implements IBulkUpdateRestaurantTicketItemStatusResultDto {
@@ -93417,6 +93441,8 @@ export class UpdateRestaurantTicketStatusDto implements IUpdateRestaurantTicketS
     ticketId!: string;
     status!: RestaurantTicketStatus;
     cancelReason!: string | undefined;
+    clientRequestId!: string | undefined;
+    expectedOrderVersion!: string | undefined;
 
     constructor(data?: IUpdateRestaurantTicketStatusDto) {
         if (data) {
@@ -93432,6 +93458,8 @@ export class UpdateRestaurantTicketStatusDto implements IUpdateRestaurantTicketS
             this.ticketId = _data["ticketId"];
             this.status = _data["status"];
             this.cancelReason = _data["cancelReason"];
+            this.clientRequestId = _data["clientRequestId"];
+            this.expectedOrderVersion = _data["expectedOrderVersion"];
         }
     }
 
@@ -93447,6 +93475,8 @@ export class UpdateRestaurantTicketStatusDto implements IUpdateRestaurantTicketS
         data["ticketId"] = this.ticketId;
         data["status"] = this.status;
         data["cancelReason"] = this.cancelReason;
+        data["clientRequestId"] = this.clientRequestId;
+        data["expectedOrderVersion"] = this.expectedOrderVersion;
         return data;
     }
 }
@@ -93455,6 +93485,8 @@ export interface IUpdateRestaurantTicketStatusDto {
     ticketId: string;
     status: RestaurantTicketStatus;
     cancelReason: string | undefined;
+    clientRequestId?: string | undefined;
+    expectedOrderVersion?: string | undefined;
 }
 
 export class UpdateTenantFeaturesInput implements IUpdateTenantFeaturesInput {
@@ -95261,6 +95293,8 @@ export class VoidRestaurantOrderItemDto implements IVoidRestaurantOrderItemDto {
     reason!: string | undefined;
     approvalPin!: string | undefined;
     approvalNote!: string | undefined;
+    clientRequestId!: string | undefined;
+    expectedOrderVersion!: string | undefined;
 
     constructor(data?: IVoidRestaurantOrderItemDto) {
         if (data) {
@@ -95277,6 +95311,8 @@ export class VoidRestaurantOrderItemDto implements IVoidRestaurantOrderItemDto {
             this.reason = _data["reason"];
             this.approvalPin = _data["approvalPin"];
             this.approvalNote = _data["approvalNote"];
+            this.clientRequestId = _data["clientRequestId"];
+            this.expectedOrderVersion = _data["expectedOrderVersion"];
         }
     }
 
@@ -95293,6 +95329,8 @@ export class VoidRestaurantOrderItemDto implements IVoidRestaurantOrderItemDto {
         data["reason"] = this.reason;
         data["approvalPin"] = this.approvalPin;
         data["approvalNote"] = this.approvalNote;
+        data["clientRequestId"] = this.clientRequestId;
+        data["expectedOrderVersion"] = this.expectedOrderVersion;
         return data;
     }
 }
@@ -95302,6 +95340,8 @@ export interface IVoidRestaurantOrderItemDto {
     reason: string | undefined;
     approvalPin: string | undefined;
     approvalNote: string | undefined;
+    clientRequestId?: string | undefined;
+    expectedOrderVersion?: string | undefined;
 }
 
 export class VoucherDublicateDto implements IVoucherDublicateDto {

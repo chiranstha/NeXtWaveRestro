@@ -1364,6 +1364,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     private getOrderCreationRequestId(request: CreateOrEditRestaurantOrderDto): string {
         const body = request.toJSON();
         delete body.clientRequestId;
+        delete body.approvalPin;
         const signature = JSON.stringify(body);
         const key = this.orderCreationStorageKey();
         try {
@@ -1458,19 +1459,20 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
             return;
         }
 
-        this.restaurantOrderService
-            .voidOrderItem(
-                new VoidRestaurantOrderItemDto({
+        const request = new VoidRestaurantOrderItemDto({
                     orderItemId: line.id,
                     reason: reason || '',
                     approvalPin: undefined,
                     approvalNote: undefined,
-                }),
-            )
+                    expectedOrderVersion: this.selectedOrder?.rowVersion,
+                });
+        request.clientRequestId = this.getMutationRequestId('void-item', request);
+        this.restaurantOrderService
+            .voidOrderItem(request)
             .subscribe(() => {
                 this.notify.success('Item voided');
                 this.afterOrderChange(this.selectedOrder?.id);
-            });
+            }, (error) => this.resolveOrderMutationError(error, 'OrderVoidItem', request.clientRequestId));
     }
 
     validateStock(): void {
@@ -1850,22 +1852,30 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
             return;
         }
 
+        const orderId = ticket.orderId || this.selectedOrder?.id;
+        if (!orderId) return;
         this.saving = true;
-        this.restaurantOrderService
-            .cancelTicket(
-                new CancelRestaurantTicketDto({
+        this.restaurantOrderService.getOrderForPos(orderId).subscribe((latest) => {
+            const request = new CancelRestaurantTicketDto({
                     ticketId: ticket.id,
                     reason,
                     approvalPin: undefined,
                     approvalNote: undefined,
-                }),
-            )
-            .pipe(finalize(() => (this.saving = false)))
-            .subscribe(() => {
-                this.notify.success('KOT/BOT cancelled');
-                this.stockValidation = null;
-                this.afterOrderChange(ticket.orderId || this.selectedOrder?.id);
-            });
+                    expectedOrderVersion: latest.rowVersion,
+                });
+            request.clientRequestId = this.getMutationRequestId('cancel-ticket', request);
+            this.restaurantOrderService
+                .cancelTicket(request)
+                .pipe(finalize(() => (this.saving = false)))
+                .subscribe(() => {
+                    this.notify.success('KOT/BOT cancelled');
+                    this.stockValidation = null;
+                    this.afterOrderChange(orderId);
+                }, (error) => this.resolveOrderMutationError(error, 'OrderCancelTicket', request.clientRequestId));
+        }, () => {
+            this.saving = false;
+            this.notify.error('Could not refresh the order before cancelling its kitchen ticket.');
+        });
     }
 
     toggleModifier(group: PosModifierGroup, modifier: RestaurantModifierDto, checked: boolean): void {

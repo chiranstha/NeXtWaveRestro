@@ -444,13 +444,10 @@ namespace NextWave.Erp.Restaurant
             await uow.CompleteAsync();
         }
 
-        public async Task CancelItem(EntityDto<Guid> input)
+        [AbpAuthorize(AppPermissions.PagesRestaurantKotBot)]
+        public async Task CancelItem(VoidRestaurantOrderItemDto input)
         {
-            await VoidOrderItem(new VoidRestaurantOrderItemDto
-            {
-                OrderItemId = input.Id,
-                Reason = "Cancelled"
-            });
+            await VoidOrderItem(input);
         }
 
         [AbpAuthorize(AppPermissions.PagesRestaurantKotBot)]
@@ -467,6 +464,20 @@ namespace NextWave.Erp.Restaurant
             using var uow = unitOfWorkManager.Begin(new UnitOfWorkOptions { IsTransactional = true });
             var ticket = await ticketRepository.FirstOrDefaultAsync(x => x.Id == input.TicketId && x.TenantId == tenantId);
             if (ticket == null) throw new UserFriendlyException("Ticket not found");
+            var order = await orderRepository.FirstOrDefaultAsync(x => x.Id == ticket.OrderId && x.TenantId == tenantId);
+            if (order == null) throw new UserFriendlyException("Restaurant order not found");
+            var versionChecksEnabled = await IsOrderVersionChecksEnabled(tenantId);
+            if (versionChecksEnabled && string.IsNullOrWhiteSpace(input.ClientRequestId))
+                throw new UserFriendlyException("A unique request ID is required when cancelling a kitchen ticket");
+            var cancelHash = HashOrderMutation(new { input.TicketId, Reason = reason, input.ExpectedOrderVersion });
+            var priorCancellation = await FindOperation(tenantId, "OrderCancelTicket", input.ClientRequestId);
+            if (priorCancellation != null)
+            {
+                EnsureOperationHash(priorCancellation, cancelHash);
+                await uow.CompleteAsync();
+                return;
+            }
+            await EnsureOrderVersion(order, input.ExpectedOrderVersion, versionChecksEnabled);
             if (ticket.Purpose == RestaurantTicketPurpose.Cancellation)
                 throw new UserFriendlyException("Cancellation tickets cannot be deleted");
             if (ticket.Status == RestaurantTicketStatus.Cancelled)
@@ -515,20 +526,41 @@ namespace NextWave.Erp.Restaurant
                 ticket.Id,
                 input.ApprovalNote,
                 new { ticket.TicketNo, ticket.OrderId, Reason = reason });
+            await RecordOperation(tenantId, "OrderCancelTicket", input.ClientRequestId, cancelHash, order.Id);
             await uow.CompleteAsync();
         }
 
         [AbpAuthorize(AppPermissions.PagesRestaurantKotBot)]
         public async Task VoidOrderItem(VoidRestaurantOrderItemDto input)
         {
+            if (input == null || input.OrderItemId == Guid.Empty)
+                throw new UserFriendlyException("Order item not found");
+            var tenantId = AbpSession.GetTenantId();
+            using var uow = unitOfWorkManager.Begin(new UnitOfWorkOptions { IsTransactional = true });
+            var versionChecksEnabled = await IsOrderVersionChecksEnabled(tenantId);
+            if (versionChecksEnabled && string.IsNullOrWhiteSpace(input.ClientRequestId))
+                throw new UserFriendlyException("A unique request ID is required when voiding an order item");
             var item = await orderItemRepository.GetAll()
                 .Include(x => x.OrderFk)
-                .FirstOrDefaultAsync(x => x.Id == input.OrderItemId && x.TenantId == AbpSession.TenantId);
+                .FirstOrDefaultAsync(x => x.Id == input.OrderItemId && x.TenantId == tenantId);
             if (item == null) throw new UserFriendlyException("Order item not found");
+            var requestHash = HashOrderMutation(new { input.OrderItemId, Reason = input.Reason ?? string.Empty, input.ExpectedOrderVersion });
+            var priorVoid = await FindOperation(tenantId, "OrderVoidItem", input.ClientRequestId);
+            if (priorVoid != null)
+            {
+                EnsureOperationHash(priorVoid, requestHash);
+                await uow.CompleteAsync();
+                return;
+            }
+            await EnsureOrderVersion(item.OrderFk, input.ExpectedOrderVersion, versionChecksEnabled);
             if (item.OrderFk.Status is RestaurantOrderStatus.Billed or RestaurantOrderStatus.Closed)
                 throw new UserFriendlyException("Billed order items cannot be cancelled");
             if (item.Status == RestaurantOrderItemStatus.Cancelled)
+            {
+                await RecordOperation(tenantId, "OrderVoidItem", input.ClientRequestId, requestHash, item.OrderId);
+                await uow.CompleteAsync();
                 return;
+            }
             if (item.Status == RestaurantOrderItemStatus.Served)
                 throw new UserFriendlyException("Served order items cannot be voided from KOT/BOT");
             if (item.Status != RestaurantOrderItemStatus.Draft && string.IsNullOrWhiteSpace(input.Reason))
@@ -552,6 +584,8 @@ namespace NextWave.Erp.Restaurant
                 item.Id,
                 input.ApprovalNote,
                 new { item.OrderId, item.ItemNameSnapshot, item.Qty, Reason = input.Reason });
+            await RecordOperation(tenantId, "OrderVoidItem", input.ClientRequestId, requestHash, item.OrderId);
+            await uow.CompleteAsync();
         }
 
         public async Task<List<RestaurantTicketDto>> GetTicketsForOrder(EntityDto<Guid> input)

@@ -4,11 +4,13 @@ using Abp.Runtime.Session;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
 using NextWave.Erp.Authorization;
+using NextWave.Erp.Configuration;
 using NextWave.Erp.Enums;
 using NextWave.Erp.Restaurant.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -21,7 +23,8 @@ namespace NextWave.Erp.Restaurant
         IRepository<RestaurantOrderItem, Guid> orderItemRepository,
         IRepository<RestaurantOrderItemModifier, Guid> orderItemModifierRepository,
         IRepository<RestaurantOrder, Guid> orderRepository,
-        IRepository<RestaurantChangeLog, Guid> changeLogRepository)
+        IRepository<RestaurantChangeLog, Guid> changeLogRepository,
+        IRepository<RestaurantClientOperation, Guid> operationRepository)
         : ErpAppServiceBase, IRestaurantKdsAppService
     {
         public async Task<List<RestaurantTicketDto>> GetOpenTickets(Guid? stationId)
@@ -46,8 +49,21 @@ namespace NextWave.Erp.Restaurant
 
         public async Task UpdateTicketStatus(UpdateRestaurantTicketStatusDto input)
         {
+            var tenantId = AbpSession.GetTenantId();
             var ticket = await ticketRepository.FirstOrDefaultAsync(x => x.Id == input.TicketId && x.TenantId == AbpSession.TenantId);
             if (ticket == null) throw new UserFriendlyException("Ticket not found");
+            var order = await orderRepository.FirstOrDefaultAsync(x => x.Id == ticket.OrderId && x.TenantId == tenantId);
+            if (order == null) throw new UserFriendlyException("Restaurant order not found");
+            var versionChecksEnabled = await IsOrderVersionChecksEnabled(tenantId);
+            RequireRequestIdWhenVersioned(input.ClientRequestId, versionChecksEnabled);
+            var requestHash = HashOrderMutation(new { input.TicketId, input.Status, CancelReason = input.CancelReason ?? string.Empty, input.ExpectedOrderVersion });
+            var priorOperation = await FindOperation(tenantId, "KdsTicketStatus", input.ClientRequestId);
+            if (priorOperation != null)
+            {
+                EnsureOperationHash(priorOperation, requestHash);
+                return;
+            }
+            await EnsureOrderVersion(order, input.ExpectedOrderVersion, versionChecksEnabled);
             ValidateTicketTransition(ticket.Status, input.Status);
             if (ticket.Purpose != RestaurantTicketPurpose.Cancellation &&
                 input.Status == RestaurantTicketStatus.Cancelled &&
@@ -58,7 +74,10 @@ namespace NextWave.Erp.Restaurant
             await ticketRepository.UpdateAsync(ticket);
 
             if (ticket.Purpose == RestaurantTicketPurpose.Cancellation)
+            {
+                await RecordOperation(tenantId, "KdsTicketStatus", input.ClientRequestId, requestHash, order.Id);
                 return;
+            }
 
             var itemStatus = input.Status switch
             {
@@ -92,14 +111,28 @@ namespace NextWave.Erp.Restaurant
 
             await RefreshOrderStatus(ticket.OrderId);
             await RecordSyncChange(RestaurantSyncEntityType.Ticket, ticket.Id, new { ticket.OrderId, ticket.Status, ItemStatus = itemStatus });
+            await RecordOperation(tenantId, "KdsTicketStatus", input.ClientRequestId, requestHash, order.Id);
         }
 
         public async Task UpdateTicketItemStatus(UpdateRestaurantTicketItemStatusDto input)
         {
+            var tenantId = AbpSession.GetTenantId();
             var ticketItem = await ticketItemRepository.GetAll()
                 .Include(x => x.TicketFk)
                 .FirstOrDefaultAsync(x => x.Id == input.TicketItemId && x.TenantId == AbpSession.TenantId);
             if (ticketItem == null) throw new UserFriendlyException("Ticket item not found");
+            var order = await orderRepository.FirstOrDefaultAsync(x => x.Id == ticketItem.TicketFk.OrderId && x.TenantId == tenantId);
+            if (order == null) throw new UserFriendlyException("Restaurant order not found");
+            var versionChecksEnabled = await IsOrderVersionChecksEnabled(tenantId);
+            RequireRequestIdWhenVersioned(input.ClientRequestId, versionChecksEnabled);
+            var requestHash = HashOrderMutation(new { input.TicketItemId, input.Status, CancelReason = input.CancelReason ?? string.Empty, input.ExpectedOrderVersion });
+            var priorOperation = await FindOperation(tenantId, "KdsTicketItemStatus", input.ClientRequestId);
+            if (priorOperation != null)
+            {
+                EnsureOperationHash(priorOperation, requestHash);
+                return;
+            }
+            await EnsureOrderVersion(order, input.ExpectedOrderVersion, versionChecksEnabled);
             if (ticketItem.TicketFk.Purpose == RestaurantTicketPurpose.Cancellation)
                 throw new UserFriendlyException("Cancellation ticket items cannot change item status");
             ValidateItemTransition(ticketItem.Status, input.Status);
@@ -125,6 +158,7 @@ namespace NextWave.Erp.Restaurant
             await RecordSyncChanges(
                 (RestaurantSyncEntityType.TicketItem, ticketItem.Id, new { ticketItem.TicketId, ticketItem.OrderItemId, ticketItem.Status }, RestaurantSyncOperation.Upsert),
                 (RestaurantSyncEntityType.OrderItem, ticketItem.OrderItemId, new { ticketItem.TicketFk.OrderId, ticketItem.Status }, RestaurantSyncOperation.Upsert));
+            await RecordOperation(tenantId, "KdsTicketItemStatus", input.ClientRequestId, requestHash, order.Id);
         }
 
         public async Task<BulkUpdateRestaurantTicketItemStatusResultDto> UpdateTicketItemStatuses(BulkUpdateRestaurantTicketItemStatusDto input)
@@ -136,10 +170,35 @@ namespace NextWave.Erp.Restaurant
             if (requestedIds.Count == 0)
                 return new BulkUpdateRestaurantTicketItemStatusResultDto();
 
+            var tenantId = AbpSession.GetTenantId();
+            var versionChecksEnabled = await IsOrderVersionChecksEnabled(tenantId);
+            RequireRequestIdWhenVersioned(input.ClientRequestId, versionChecksEnabled);
+            var requestHash = HashOrderMutation(new
+            {
+                Ids = requestedIds.OrderBy(x => x).ToArray(), input.Status,
+                Versions = (input.ExpectedOrderVersions ?? new Dictionary<Guid, string>()).OrderBy(x => x.Key).ToArray()
+            });
+            var priorOperation = await FindOperation(tenantId, "KdsBulkTicketItems", input.ClientRequestId);
+            if (priorOperation != null)
+            {
+                EnsureOperationHash(priorOperation, requestHash);
+                return JsonSerializer.Deserialize<BulkUpdateRestaurantTicketItemStatusResultDto>(priorOperation.ResultJson,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new BulkUpdateRestaurantTicketItemStatusResultDto();
+            }
+
             var ticketItems = await ticketItemRepository.GetAll()
                 .Include(x => x.TicketFk)
                 .Where(x => x.TenantId == AbpSession.TenantId && requestedIds.Contains(x.Id))
                 .ToListAsync();
+
+            var orderIdsToCheck = ticketItems.Select(x => x.TicketFk.OrderId).Distinct().ToList();
+            var expectedOrderVersions = input.ExpectedOrderVersions ?? new Dictionary<Guid, string>();
+            foreach (var orderId in orderIdsToCheck)
+            {
+                var order = await orderRepository.FirstOrDefaultAsync(x => x.Id == orderId && x.TenantId == tenantId);
+                if (order == null) throw new UserFriendlyException("Restaurant order not found");
+                await EnsureOrderVersion(order, expectedOrderVersions.GetValueOrDefault(orderId), versionChecksEnabled);
+            }
 
             var updatedItems = new List<RestaurantTicketItem>();
             var changes = new List<(RestaurantSyncEntityType EntityType, Guid EntityId, object Payload, RestaurantSyncOperation Operation)>();
@@ -179,11 +238,74 @@ namespace NextWave.Erp.Restaurant
             if (changes.Count > 0)
                 await RecordSyncChanges(changes.ToArray());
 
-            return new BulkUpdateRestaurantTicketItemStatusResultDto
+            var result = new BulkUpdateRestaurantTicketItemStatusResultDto
             {
                 UpdatedCount = updatedItems.Count,
                 SkippedCount = requestedIds.Count - updatedItems.Count
             };
+            await RecordOperation(tenantId, "KdsBulkTicketItems", input.ClientRequestId, requestHash,
+                orderIds.FirstOrDefault(), result);
+            return result;
+        }
+
+        private async Task<bool> IsOrderVersionChecksEnabled(int tenantId) =>
+            string.Equals(await SettingManager.GetSettingValueForTenantAsync(
+                AppSettings.ErpSettings.RestaurantOrderVersionChecksEnabled, tenantId), "true", StringComparison.OrdinalIgnoreCase);
+
+        private static void RequireRequestIdWhenVersioned(string requestId, bool enabled)
+        {
+            if (enabled && string.IsNullOrWhiteSpace(requestId))
+                throw new UserFriendlyException("A unique request ID is required for this kitchen update");
+            if (!string.IsNullOrWhiteSpace(requestId) && requestId.Trim().Length > 100)
+                throw new UserFriendlyException("Kitchen request ID is too long");
+        }
+
+        private async Task EnsureOrderVersion(RestaurantOrder order, string expectedVersion, bool enabled)
+        {
+            if (!enabled) return;
+            var currentVersion = order.RowVersion == null ? null : Convert.ToBase64String(order.RowVersion);
+            if (string.IsNullOrWhiteSpace(expectedVersion) || !string.Equals(currentVersion, expectedVersion, StringComparison.Ordinal))
+                throw new UserFriendlyException("This order changed on another device. Refresh the kitchen screen before retrying.",
+                    JsonSerializer.Serialize(new
+                    {
+                        Code = "Restaurant.OrderConflict",
+                        LatestOrder = new RestaurantOrderDto { Id = order.Id, RowVersion = currentVersion }
+                    }));
+        }
+
+        private Task<RestaurantClientOperation> FindOperation(int tenantId, string operationType, string requestId)
+        {
+            if (string.IsNullOrWhiteSpace(requestId)) return Task.FromResult<RestaurantClientOperation>(null);
+            return operationRepository.FirstOrDefaultAsync(x => x.TenantId == tenantId &&
+                x.UserId == AbpSession.GetUserId() && x.OperationType == operationType && x.ClientRequestId == requestId.Trim());
+        }
+
+        private async Task RecordOperation(int tenantId, string operationType, string requestId, string requestHash, Guid entityId, object result = null)
+        {
+            if (string.IsNullOrWhiteSpace(requestId)) return;
+            await operationRepository.InsertAsync(new RestaurantClientOperation
+            {
+                TenantId = tenantId,
+                UserId = AbpSession.GetUserId(),
+                ClientRequestId = requestId.Trim(),
+                OperationType = operationType,
+                RequestHash = requestHash,
+                EntityId = entityId,
+                ResultJson = JsonSerializer.Serialize(result ?? new { EntityId = entityId }),
+                CreatedAt = DateTime.UtcNow
+            });
+        }
+
+        private static void EnsureOperationHash(RestaurantClientOperation operation, string requestHash)
+        {
+            if (!string.Equals(operation.RequestHash, requestHash, StringComparison.Ordinal))
+                throw new UserFriendlyException("This kitchen request ID was already used for different changes");
+        }
+
+        private static string HashOrderMutation<T>(T value)
+        {
+            var bytes = System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(value)));
+            return Convert.ToHexString(bytes).ToLowerInvariant();
         }
 
         private static bool CanBulkTransition(RestaurantOrderItemStatus currentStatus, RestaurantOrderItemStatus nextStatus)

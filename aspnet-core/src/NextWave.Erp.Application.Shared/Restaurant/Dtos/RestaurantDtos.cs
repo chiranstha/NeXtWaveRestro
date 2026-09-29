@@ -469,6 +469,8 @@ namespace NextWave.Erp.Restaurant.Dtos
         public string Reason { get; set; }
         public string ApprovalPin { get; set; }
         public string ApprovalNote { get; set; }
+        public string ClientRequestId { get; set; }
+        public string ExpectedOrderVersion { get; set; }
     }
 
     public class CancelRestaurantTicketDto
@@ -477,6 +479,8 @@ namespace NextWave.Erp.Restaurant.Dtos
         public string Reason { get; set; }
         public string ApprovalPin { get; set; }
         public string ApprovalNote { get; set; }
+        public string ClientRequestId { get; set; }
+        public string ExpectedOrderVersion { get; set; }
     }
 
     public class ReprintRestaurantTicketDto
@@ -536,6 +540,8 @@ namespace NextWave.Erp.Restaurant.Dtos
         public Guid TicketId { get; set; }
         public RestaurantTicketStatus Status { get; set; }
         public string CancelReason { get; set; }
+        public string ClientRequestId { get; set; }
+        public string ExpectedOrderVersion { get; set; }
     }
 
     public class UpdateRestaurantTicketItemStatusDto
@@ -543,12 +549,16 @@ namespace NextWave.Erp.Restaurant.Dtos
         public Guid TicketItemId { get; set; }
         public RestaurantOrderItemStatus Status { get; set; }
         public string CancelReason { get; set; }
+        public string ClientRequestId { get; set; }
+        public string ExpectedOrderVersion { get; set; }
     }
 
     public class BulkUpdateRestaurantTicketItemStatusDto
     {
         public List<Guid> TicketItemIds { get; set; } = new();
         public RestaurantOrderItemStatus Status { get; set; }
+        public string ClientRequestId { get; set; }
+        public Dictionary<Guid, string> ExpectedOrderVersions { get; set; } = new();
     }
 
     public class BulkUpdateRestaurantTicketItemStatusResultDto
