@@ -12,6 +12,7 @@ using NextWave.Erp.Configuration;
 using NextWave.Erp.EntityFrameworkCore;
 using NextWave.Erp.MultiTenancy;
 using NextWave.Erp.MultiTenancy.Subscription;
+using NextWave.Erp.Restaurant;
 using NextWave.Erp.Web.Areas.AppAreaName.Startup;
 
 namespace NextWave.Erp.Web.Startup;
@@ -69,6 +70,7 @@ public class ErpWebMvcModule : AbpModule
         }
 
         workManager.Add(IocManager.Resolve<PasswordExpirationBackgroundWorker>());
+        workManager.Add(IocManager.Resolve<RestaurantSmsOutboxWorker>());
     }
 }
 

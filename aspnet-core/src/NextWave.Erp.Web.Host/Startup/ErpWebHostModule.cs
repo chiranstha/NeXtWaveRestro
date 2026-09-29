@@ -22,6 +22,7 @@ using NextWave.Erp.Configuration;
 using NextWave.Erp.EntityFrameworkCore;
 using NextWave.Erp.MultiTenancy;
 using NextWave.Erp.MultiTenancy.Subscription;
+using NextWave.Erp.Restaurant;
 using NextWave.Erp.Web.Startup.ExternalLoginInfoProviders;
 
 namespace NextWave.Erp.Web.Startup;
@@ -77,6 +78,7 @@ public class ErpWebHostModule : AbpModule
         }
 
         workManager.Add(IocManager.Resolve<PasswordExpirationBackgroundWorker>());
+        workManager.Add(IocManager.Resolve<RestaurantSmsOutboxWorker>());
 
         ConfigureExternalAuthProviders();
     }

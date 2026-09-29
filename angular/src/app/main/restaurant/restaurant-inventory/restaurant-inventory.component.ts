@@ -17,7 +17,7 @@ import {
 } from '@shared/service-proxies/service-proxies';
 import { DateTime } from 'luxon';
 import { finalize, forkJoin } from 'rxjs';
-import { ColDef, GridCellClickedEvent } from 'ag-grid-community';
+import { CellClickedEvent, ColDef } from 'ag-grid-community';
 
 type RestaurantInventoryTab = 'reorder' | 'consumption' | 'coverage' | 'mapping' | 'adjustment' | 'wastage';
 
@@ -404,7 +404,7 @@ export class RestaurantInventoryComponent extends AppComponentBase implements On
     }
 
     onAdjustmentLineGridCellClicked(
-        event: GridCellClickedEvent<RestaurantStockAdjustmentLineForm>,
+        event: CellClickedEvent<RestaurantStockAdjustmentLineForm>,
         form: RestaurantStockAdjustmentForm,
     ): void {
         if (event.column.getColId() !== 'actions' || !event.data) {
@@ -447,7 +447,7 @@ export class RestaurantInventoryComponent extends AppComponentBase implements On
         return ['Increase', 'Decrease', 'Physical Count', 'Wastage'][type] || 'Adjustment';
     }
 
-    onMappingGridCellClicked(params: GridCellClickedEvent<RestaurantSupplierItemMappingDto>): void {
+    onMappingGridCellClicked(params: CellClickedEvent<RestaurantSupplierItemMappingDto>): void {
         if (params.column.getColId() !== 'actions' || !params.data) {
             return;
         }

@@ -25,7 +25,7 @@ import {
 } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { ColDef, GridCellClickedEvent } from 'ag-grid-community';
+import { CellClickedEvent, ColDef } from 'ag-grid-community';
 
 type RestaurantSetupSection = 'areas' | 'tables' | 'stations' | 'devices' | 'settings';
 
@@ -220,7 +220,7 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
         this.tableForm.patchValue({ ...table });
     }
 
-    onSetupGridCellClicked(event: GridCellClickedEvent): void {
+    onSetupGridCellClicked(event: CellClickedEvent): void {
         if (event.column.getColId() !== 'actions' || !event.data) {
             return;
         }
