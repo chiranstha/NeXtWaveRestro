@@ -103,7 +103,7 @@
                     <ag-grid-angular class="ag-theme-balham w-100" [gridOptions]="gridOptions" (gridReady)="onGridReady($event)"
                         [columnDefs]="columnDefs" [rowData]="tableRows"
                         (cellDoubleClicked)="onCellDoubleClicked($event)"
-                        [pinnedBottomRowData]="pinnedBottomRowData" style="width: 100%; "
+                        [pinnedBottomRowData]="pinnedBottomRowData" [loading]="loading" style="width: 100%; "
                         [style.height.px]="screenHeight">
                     </ag-grid-angular>
                 </div>

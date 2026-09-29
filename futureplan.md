@@ -21,7 +21,7 @@ The main release gaps are:
 | Printing | Database claims now run serializably; the existing Windows agent retains queue and retry support | Verify restart durability, competing stations, paper failures, and explicit handling of uncertain physical output |
 | Automatic digital settlement | No restaurant gateway confirmation integration | Add after pilot, beginning with Fonepay dynamic QR |
 
-Code above is implemented in the current working tree; it is not a production-readiness claim. Refund workflows, order-version conflict checks, the combined daily closing view, and a guided launch checklist remain open release work. Automated accounting/race tests, the isolated busy-restaurant run, backup-restore drill, and ten-shift pilot have not been completed.
+Code above is implemented in the current working tree; it is not a production-readiness claim. Refund workflows, order-version conflict checks, the combined daily closing view, a guided launch checklist, and restaurant-level rollout switches/client-capability discovery remain open release work. Automated accounting/race tests, the isolated busy-restaurant run, backup-restore drill, and ten-shift pilot have not been completed.
 
 ## Release sequence
 

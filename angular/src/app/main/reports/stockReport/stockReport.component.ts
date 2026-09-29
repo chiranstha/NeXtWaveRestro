@@ -1,7 +1,7 @@
 import { Component, Injector, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { GridApi, RowSelectionOptions, ColDef, GridOptions, ValueFormatterParams } from 'ag-grid-community';
+import { GridApi, ColDef, GridOptions, ValueFormatterParams } from 'ag-grid-community';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import {
     StockCalculationDto,
@@ -41,17 +41,13 @@ export class StockReportComponent extends AppComponentBase implements OnInit, On
 
     // AG Grid Configuration
     private gridApi: GridApi;
-    public autoGroupColumnDef: ColDef = {
-        minWidth: 200,
-        cellClass: params => params.node.group ? 'ag-group-cell' : ''
-    };
-    public rowSelection: RowSelectionOptions | 'single' | 'multiple' = { mode: 'multiRow' };
-
     // Formatting function for numeric values
     private currencyFormatter(params: ValueFormatterParams): string {
         const {value} = params;
         if (value === null || value === undefined || value === '') {return '';}
-        return value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue)) {return '';}
+        return numericValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
 
     // Column definitions with improved formatting
@@ -80,7 +76,8 @@ export class StockReportComponent extends AppComponentBase implements OnInit, On
             field: 'rate',
             minWidth: 100,
             valueFormatter: this.currencyFormatter,
-            cellStyle: { 'text-align': 'right' }
+            cellClass: 'ag-right-aligned-cell',
+            headerClass: 'ag-right-aligned-header',
         },
         {
             headerName: 'O. Qty',
@@ -95,7 +92,8 @@ export class StockReportComponent extends AppComponentBase implements OnInit, On
             minWidth: 100,
             valueFormatter: this.currencyFormatter,
             aggFunc: 'sum',
-            cellStyle: { 'text-align': 'right' }
+            cellClass: 'ag-right-aligned-cell',
+            headerClass: 'ag-right-aligned-header',
         },
         {
             headerName: 'I. Qty',
@@ -110,7 +108,8 @@ export class StockReportComponent extends AppComponentBase implements OnInit, On
             minWidth: 100,
             valueFormatter: this.currencyFormatter,
             aggFunc: 'sum',
-            cellStyle: { 'text-align': 'right' }
+            cellClass: 'ag-right-aligned-cell',
+            headerClass: 'ag-right-aligned-header',
         },
         {
             headerName: 'O. Qty',
@@ -125,7 +124,8 @@ export class StockReportComponent extends AppComponentBase implements OnInit, On
             minWidth: 100,
             valueFormatter: this.currencyFormatter,
             aggFunc: 'sum',
-            cellStyle: { 'text-align': 'right' }
+            cellClass: 'ag-right-aligned-cell',
+            headerClass: 'ag-right-aligned-header',
         },
         {
             headerName: 'Closing\nQty',
@@ -140,7 +140,8 @@ export class StockReportComponent extends AppComponentBase implements OnInit, On
             minWidth: 120,
             valueFormatter: this.currencyFormatter,
             aggFunc: 'sum',
-            cellStyle: { 'text-align': 'right' }
+            cellClass: 'ag-right-aligned-cell',
+            headerClass: 'ag-right-aligned-header',
         },
     ];
 
@@ -152,6 +153,8 @@ export class StockReportComponent extends AppComponentBase implements OnInit, On
             maxWidth: 300,
             sortable: true,
             filter: true,
+            suppressHeaderFilterButton: false,
+            suppressHeaderMenuButton: false,
         },
         headerHeight: 44,
         rowHeight: 40,
@@ -159,7 +162,7 @@ export class StockReportComponent extends AppComponentBase implements OnInit, On
         pagination: false,
         pinnedBottomRowData: [],
         suppressHorizontalScroll: false,
-        getContextMenuItems: this.getCustomContextMenuItems,
+        getContextMenuItems: (params) => this.getCustomContextMenuItems(params),
         getRowStyle: (params) => {
             if (params.node.rowPinned === 'bottom') {
                 return {
@@ -368,23 +371,6 @@ export class StockReportComponent extends AppComponentBase implements OnInit, On
     // Grid initialization
     onGridReady(params): void {
         this.gridApi = params.api;
-
-        // Apply specific CSS for headers
-        const style = document.createElement('style');
-        style.innerHTML = `
-            .ag-theme-balham .ag-header-cell-text {
-                font-size: 13px !important;
-                font-weight: bold !important;
-            }
-            .ag-theme-balham .ag-row-pinned {
-                background-color: #f5f5f5 !important;
-                font-weight: bold !important;
-                border-top: 2px solid #711905 !important;
-                color: #711905 !important;
-            }
-        `;
-        document.head.appendChild(style);
-
         // Size columns to fit
         setTimeout(() => this.gridApi.sizeColumnsToFit());
 
