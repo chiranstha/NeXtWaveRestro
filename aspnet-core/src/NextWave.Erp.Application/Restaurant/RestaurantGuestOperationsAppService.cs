@@ -1,6 +1,7 @@
 using Abp.Application.Services.Dto;
 using Abp.Authorization;
 using Abp.Domain.Repositories;
+using Abp.Domain.Uow;
 using Abp.Runtime.Session;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Transactions;
 using System.Threading.Tasks;
 
 namespace NextWave.Erp.Restaurant
@@ -29,6 +31,7 @@ namespace NextWave.Erp.Restaurant
         IRepository<RestaurantPrintJob, Guid> printJobRepository,
         IRepository<RestaurantTicket, Guid> ticketRepository,
         IRestaurantOrderAppService orderAppService,
+        IUnitOfWorkManager unitOfWorkManager,
         IAppConfigurationAccessor configurationAccessor)
         : ErpAppServiceBase, IRestaurantGuestOperationsAppService
     {
@@ -319,18 +322,29 @@ namespace NextWave.Erp.Restaurant
         {
             if (string.IsNullOrWhiteSpace(input?.AgentId) || input.AgentId.Length > 120)
                 throw new UserFriendlyException("Print station identity is required");
+            using var uow = unitOfWorkManager.Begin(new UnitOfWorkOptions
+            {
+                IsTransactional = true,
+                IsolationLevel = IsolationLevel.Serializable,
+                Scope = TransactionScopeOption.RequiresNew
+            });
             var now = DateTime.UtcNow;
             var job = await printJobRepository.GetAll()
                 .Where(x => x.TenantId == AbpSession.TenantId &&
                             (x.Status == RestaurantPrintJobStatus.Pending ||
                              (x.Status == RestaurantPrintJobStatus.Leased && x.LeaseUntilUtc < now)))
                 .OrderBy(x => x.CreatedAtUtc).FirstOrDefaultAsync();
-            if (job == null) return null;
+            if (job == null)
+            {
+                await uow.CompleteAsync();
+                return null;
+            }
             job.Status = RestaurantPrintJobStatus.Leased;
             job.LeaseOwner = input.AgentId.Trim();
             job.LeaseUntilUtc = now.AddMinutes(5);
             job.Attempts++;
             await printJobRepository.UpdateAsync(job);
+            await uow.CompleteAsync();
             return MapPrintJob(job);
         }
 

@@ -61,10 +61,15 @@ export class StockReportComponent extends AppComponentBase implements OnInit, On
             field: 'productName',
             minWidth: 200,
             cellRenderer: (params) => {
+                const productName = document.createElement('span');
                 if (params.node?.rowPinned === 'bottom') {
-                    return '<span style="color:rgb(113, 25, 5); font-weight: bold;">Grand Total</span>';
+                    productName.textContent = 'Grand Total';
+                    productName.className = 'stock-report-grand-total';
+                    return productName;
                 }
-                return `<span class="cursor-pointer">${params.value}</span>`;
+                productName.textContent = params.value ?? '';
+                productName.className = 'cursor-pointer';
+                return productName;
             },
             sortable: true,
             filter: true,
@@ -145,19 +150,16 @@ export class StockReportComponent extends AppComponentBase implements OnInit, On
             resizable: true,
             minWidth: 100,
             maxWidth: 300,
-            sortable: false,
-            filter: false
+            sortable: true,
+            filter: true,
         },
-        headerHeight: 40,
-        rowHeight: 30,
+        headerHeight: 44,
+        rowHeight: 40,
         animateRows: true,
-        rowSelection: { mode: 'multiRow', enableClickSelection: false },
-        groupSelectsChildren: true,
         pagination: false,
         pinnedBottomRowData: [],
-
         suppressHorizontalScroll: false,
-        onGridReady: this.onGridReady.bind(this),
+        getContextMenuItems: this.getCustomContextMenuItems,
         getRowStyle: (params) => {
             if (params.node.rowPinned === 'bottom') {
                 return {

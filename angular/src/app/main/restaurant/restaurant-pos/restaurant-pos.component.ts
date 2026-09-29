@@ -131,6 +131,14 @@ interface PosBillForm {
     isPrint: boolean;
 }
 
+interface PosBillTender {
+    paymentMethod: PaymentMethod;
+    amount: number;
+    receivedAmount: number;
+    paymentLedgerId: string | null;
+    reference?: string;
+}
+
 interface PosBillReceiptLine {
     name: string;
     details: string;
@@ -174,6 +182,9 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     openOrders: RestaurantOrderDto[] = [];
     ledgers: SalesMasterAccountLedgerTableDto[] = [];
     salesLedgerList: SalesMasterAccountLedgerTableDto[] = [];
+    cardSettlementLedgerId: string | null = null;
+    qrSettlementLedgerId: string | null = null;
+    tipLedgerId: string | null = null;
     selectedTable: RestaurantTableDto | null = null;
     selectedOrder: RestaurantOrderDto | null = null;
     cart: PosCartLine[] = [];
@@ -290,6 +301,8 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         customerPaidAmount: null,
         isPrint: true,
     };
+    billTenders: PosBillTender[] = [];
+    unresolvedBillOrderId = '';
 
     private restaurantSetupService = inject(RestaurantSetupServiceProxy);
     private restaurantMenuService = inject(RestaurantMenuServiceProxy);
@@ -324,6 +337,13 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         this.refresh();
         this.loadCashShift();
         this.loadLocalDraftState();
+        this.restaurantSetupService.getOperationalSettings().subscribe((settings) => {
+            this.cardSettlementLedgerId = settings?.cardLedgerId || null;
+            this.qrSettlementLedgerId = settings?.qrLedgerId || null;
+            this.tipLedgerId = settings?.tipLedgerId || null;
+            for (const tender of this.billTenders) tender.paymentLedgerId = this.ledgerForPaymentMethod(tender.paymentMethod);
+            this.cdr.markForCheck();
+        });
         window.addEventListener('online', this.onConnectionChange);
         window.addEventListener('offline', this.onConnectionChange);
         document.addEventListener('fullscreenchange', this.onFullscreenChange);
@@ -782,9 +802,110 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     }
 
     setPaymentMethod(method: number): void {
+        if (method === PaymentMethod.Credit || method === PaymentMethod.Cheque) {
+            this.notify.warn('Restaurant checkout supports cash, cashier-verified card, and QR payments.');
+            return;
+        }
+        if (!this.isPaymentMethodEnabled(method)) {
+            this.notify.warn('Configure this payment method ledger under Restaurant Setup before using it.');
+            return;
+        }
         this.billForm.paymentMethod = method;
+        if (!this.billTenders.length) this.addInitialTender(method);
+        else {
+            this.billTenders[0].paymentMethod = method;
+            this.billTenders[0].paymentLedgerId = this.ledgerForPaymentMethod(method as PaymentMethod);
+        }
         this.applyPaymentDefaults(true);
         this.recalculateTenderState();
+    }
+
+    addTender(): void {
+        if (this.billTenders.length >= 3) {
+            this.notify.warn('A bill can use up to three payment methods.');
+            return;
+        }
+        const used = new Set(this.billTenders.map((tender) => tender.paymentMethod));
+        const method = [PaymentMethod.Cash, PaymentMethod.Card_Swipe, PaymentMethod.QR]
+            .find((candidate) => !used.has(candidate) && this.isPaymentMethodEnabled(candidate));
+        if (method === undefined) return;
+        const allocated = this.billTenders.reduce((sum, tender) => sum + Number(tender.amount || 0), 0);
+        const remaining = Math.max(0, this.billPayableAmount - allocated);
+        this.billTenders.push({ paymentMethod: method, amount: remaining, receivedAmount: remaining, paymentLedgerId: this.ledgerForPaymentMethod(method) });
+        this.recalculateTenderState();
+    }
+
+    removeTender(index: number): void {
+        this.billTenders.splice(index, 1);
+        if (!this.billTenders.length && this.billForm.paymentMethod !== PaymentMethod.Credit) {
+            this.addInitialTender(this.billForm.paymentMethod);
+        }
+        this.recalculateTenderState();
+    }
+
+    updateTenderMethod(index: number, method: number): void {
+        if (this.billTenders.some((tender, other) => other !== index && tender.paymentMethod === method)) {
+            this.notify.warn('Choose each payment method only once.');
+            return;
+        }
+        const tender = this.billTenders[index];
+        if (!tender) return;
+        if (!this.isPaymentMethodEnabled(method)) {
+            this.notify.warn('Configure this payment method ledger under Restaurant Setup before using it.');
+            return;
+        }
+        tender.paymentMethod = method as PaymentMethod;
+        tender.paymentLedgerId = this.ledgerForPaymentMethod(method as PaymentMethod);
+        if (index === 0) this.billForm.paymentMethod = method as PaymentMethod;
+        this.recalculateTenderState();
+    }
+
+    isPaymentMethodEnabled(method: number): boolean {
+        return (method === PaymentMethod.Cash && this.ledgers.some((item) => this.normalizeLedgerName(item.displayName).includes('cash'))) ||
+            (method === PaymentMethod.Card_Swipe && !!this.cardSettlementLedgerId) ||
+            (method === PaymentMethod.QR && !!this.qrSettlementLedgerId);
+    }
+
+    tenderLedgerName(method: number): string {
+        const id = this.ledgerForPaymentMethod(method as PaymentMethod);
+        return this.ledgers.find((item) => item.id === id)?.displayName || 'Ledger not configured';
+    }
+
+    private ledgerForPaymentMethod(method: PaymentMethod): string | null {
+        if (method === PaymentMethod.Card_Swipe) return this.cardSettlementLedgerId;
+        if (method === PaymentMethod.QR) return this.qrSettlementLedgerId;
+        return null;
+    }
+
+    updateTenderAmount(index: number, value: number | string): void {
+        const tender = this.billTenders[index];
+        if (!tender) return;
+        tender.amount = Math.max(0, Number(value || 0));
+        if (tender.receivedAmount === tender.amount || tender.paymentMethod !== PaymentMethod.Cash) {
+            tender.receivedAmount = tender.amount;
+        }
+        this.recalculateTenderState();
+    }
+
+    updateTenderReceived(index: number, value: number | string): void {
+        const tender = this.billTenders[index];
+        if (!tender) return;
+        tender.receivedAmount = Math.max(0, Number(value || 0));
+        this.recalculateTenderState();
+    }
+
+    tenderMethodLabel(method: number): string {
+        return this.paymentMethods.find((item) => item.value === method)?.label || 'Payment';
+    }
+
+    private addInitialTender(method: PaymentMethod): void {
+        if (method === PaymentMethod.Credit) return;
+        this.billTenders = [{
+            paymentMethod: method,
+            amount: this.billPayableAmount,
+            receivedAmount: Number(this.billForm.customerPaidAmount || this.billPayableAmount),
+            paymentLedgerId: this.billForm.paymentMethodLedgerId,
+        }];
     }
 
     get payButtonAmount(): number {
@@ -794,6 +915,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     get canFinalizePayment(): boolean {
         return (
             !this.saving &&
+            !this.hasUnresolvedBill() &&
             !!this.selectedOrder?.id &&
             !!this.billForm.ledgerId &&
             !!this.billForm.salesAccountId &&
@@ -833,6 +955,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
 
     private showCheckout(): void {
         this.applyDefaultLedgerSelection();
+        this.recalculateTenderState();
         this.advancedCheckoutOpen = !this.billForm.ledgerId || !this.billForm.salesAccountId;
         this.checkoutVisible = true;
         this.mobileCartOpen = false;
@@ -1324,6 +1447,11 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
             return;
         }
 
+        if (this.hasUnresolvedBill()) {
+            this.notify.warn('A previous bill has an unknown result. Check or retry that exact request before starting another payment.');
+            return;
+        }
+
         if (!this.posOnline) {
             this.notify.warn('Billing is unavailable while disconnected. Your current order remains saved on the server.');
             return;
@@ -1400,24 +1528,136 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
             isPrint: this.billForm.isPrint,
             confirmNegativeStock,
             cashShiftId: this.cashShift?.id,
-            tenders: this.billForm.paymentMethod === PaymentMethod.Credit ? [] : [{
-                paymentMethod: this.billForm.paymentMethod,
-                paymentLedgerId: this.billForm.paymentMethodLedgerId || undefined,
-                amount: this.billPayableAmount,
-                receivedAmount: this.billForm.customerPaidAmount === null
-                    ? this.billPayableAmount
-                    : Number(this.billForm.customerPaidAmount || 0),
-            }],
+            tenders: this.billTenders.map((tender) => ({
+                paymentMethod: tender.paymentMethod,
+                paymentLedgerId: tender.paymentLedgerId || undefined,
+                amount: Number(tender.amount || 0),
+                receivedAmount: Number(tender.receivedAmount || 0),
+                reference: tender.reference,
+            })),
             billLines,
         });
         billRequest.clientRequestId = this.getBillingRequestId(billRequest);
+
+        this.savePendingBillRequest(billRequest, receiptSnapshot, confirmNegativeStock);
 
         this.saving = true;
         this.restaurantBillingService
             .finalizeBill(billRequest)
             .pipe(finalize(() => (this.saving = false)))
             .subscribe((result) => {
+                this.handleBillPosted(billRequest, receiptSnapshot, confirmNegativeStock, result);
+            }, (error) => {
+                if (error?.status > 0 && error.status < 500) {
+                    localStorage.removeItem(this.pendingBillResultStorageKey(billRequest.orderId));
+                    this.notify.error(error?.message || 'The server rejected this bill. Review the details and try again.');
+                    return;
+                }
+                this.unresolvedBillOrderId = billRequest.orderId;
+                this.restaurantBillingService.getBillStatus(billRequest.clientRequestId).subscribe((result) => {
+                    if (result) {
+                        this.handleBillPosted(billRequest, receiptSnapshot, confirmNegativeStock, result);
+                    } else {
+                        this.notify.warn('The bill result is still unknown. Check the saved request or retry that exact request; do not create a new payment.');
+                    }
+                }, () => this.notify.warn('Could not confirm the bill result. Check or retry the saved request before continuing.'));
+            });
+    }
+
+    hasUnresolvedBill(): boolean {
+        const orderId = this.selectedOrder?.id;
+        if (!orderId) return false;
+        if (this.unresolvedBillOrderId === orderId) return true;
+        try {
+            return !!localStorage.getItem(this.pendingBillResultStorageKey(orderId));
+        } catch {
+            return false;
+        }
+    }
+
+    checkUnresolvedBill(): void {
+        const pending = this.readPendingBillRequest();
+        if (!pending || !this.selectedOrder?.id) return;
+        const request = FinalizeRestaurantBillDto.fromJS(pending.request);
+        this.restaurantBillingService.getBillStatus(request.clientRequestId).subscribe((result) => {
+            if (result) {
+                this.handleBillPosted(request, this.deserializeReceiptSnapshot(pending.receiptSnapshot), pending.confirmNegativeStock === true, result);
+            } else {
+                this.notify.warn('The server has not confirmed a posted bill yet. You can retry this same saved request.');
+            }
+        }, () => this.notify.warn('Could not check the saved bill request.'));
+    }
+
+    retryUnresolvedBill(): void {
+        const pending = this.readPendingBillRequest();
+        if (!pending || !this.selectedOrder?.id || !this.posOnline) return;
+        const request = FinalizeRestaurantBillDto.fromJS(pending.request);
+        const receipt = this.deserializeReceiptSnapshot(pending.receiptSnapshot);
+        this.saving = true;
+        this.restaurantBillingService.getBillStatus(request.clientRequestId).subscribe((knownResult) => {
+            if (knownResult) {
+                this.saving = false;
+                this.handleBillPosted(request, receipt, pending.confirmNegativeStock === true, knownResult);
+                return;
+            }
+            this.restaurantBillingService.finalizeBill(request).pipe(finalize(() => (this.saving = false))).subscribe((result) => {
+                this.handleBillPosted(request, receipt, pending.confirmNegativeStock === true, result);
+            }, () => {
+                this.restaurantBillingService.getBillStatus(request.clientRequestId).subscribe((result) => {
+                    if (result) this.handleBillPosted(request, receipt, pending.confirmNegativeStock === true, result);
+                    else this.notify.warn('The retry is still unconfirmed. Keep this request and check again.');
+                }, () => this.notify.warn('The retry is still unconfirmed. Keep this request and check again.'));
+            });
+        }, () => {
+            this.saving = false;
+            this.notify.warn('Could not check the saved bill request.');
+        });
+    }
+
+    private savePendingBillRequest(
+        request: FinalizeRestaurantBillDto,
+        receiptSnapshot: PosBillReceiptSnapshot,
+        confirmNegativeStock: boolean,
+    ): void {
+        try {
+            localStorage.setItem(this.pendingBillResultStorageKey(request.orderId), JSON.stringify({
+                request: request.toJSON(),
+                receiptSnapshot: { ...receiptSnapshot, printedAt: receiptSnapshot.printedAt.toISO() },
+                confirmNegativeStock,
+            }));
+        } catch {
+            this.notify.warn('This browser could not save the bill retry record. Keep this tab open until the server confirms the bill.');
+        }
+    }
+
+    private readPendingBillRequest(): any | null {
+        const orderId = this.selectedOrder?.id;
+        if (!orderId) return null;
+        try {
+            const data = JSON.parse(localStorage.getItem(this.pendingBillResultStorageKey(orderId)) || 'null');
+            if (data?.request) return data;
+        } catch { }
+        return null;
+    }
+
+    private deserializeReceiptSnapshot(raw: any): PosBillReceiptSnapshot {
+        if (!raw) return this.buildBillReceiptSnapshot();
+        return { ...raw, printedAt: DateTime.fromISO(raw.printedAt || DateTime.now().toISO()) } as PosBillReceiptSnapshot;
+    }
+
+    private pendingBillResultStorageKey(orderId: string): string {
+        return `${this.orderCreationStorageKey()}:restaurant-bill-pending:${orderId}`;
+    }
+
+    private handleBillPosted(
+        billRequest: FinalizeRestaurantBillDto,
+        receiptSnapshot: PosBillReceiptSnapshot,
+        confirmNegativeStock: boolean,
+        result: FinalizeRestaurantBillResultDto,
+    ): void {
                 localStorage.removeItem(`${this.orderCreationStorageKey()}:restaurant-bill:${billRequest.orderId}`);
+        localStorage.removeItem(this.pendingBillResultStorageKey(billRequest.orderId));
+        this.unresolvedBillOrderId = '';
                 this.loadCashShift();
                 const stockWarnings =
                     result.stockWarnings || (confirmNegativeStock ? this.getStockShortages(this.stockValidation) : []);
@@ -1427,7 +1667,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
                 if (stockWarnings.length) {
                     this.message.warn(this.formatStockWarnings(stockWarnings), this.l('Negative stock posted'));
                 }
-                if (this.billForm.isPrint) {
+                if (billRequest.isPrint) {
                     this.printOrDownloadPosBill(receiptSnapshot, result);
                 }
                 this.closeCheckout(true);
@@ -1445,7 +1685,6 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
                     this.menuItems = menuItems || [];
                     this.recalculateViewState();
                 });
-            });
     }
 
     private getStockShortages(
@@ -1858,28 +2097,36 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         const tipAmount = Math.max(0, Number(this.billForm.tipAmount || 0));
         const payableAmount = this.billBaseAmount() + tipAmount;
         const method = Number(this.billForm.paymentMethod);
-        const paidWasBlank =
-            this.billForm.customerPaidAmount === null ||
-            this.billForm.customerPaidAmount === undefined ||
-            this.billForm.customerPaidAmount === '';
-
         this.billPayableAmount = payableAmount;
 
         if (method === PaymentMethod.Credit) {
+            this.billTenders = [];
             this.billForm.customerPaidAmount = 0;
             this.billReturnAmount = 0;
             return;
         }
 
-        if (
-            this.shouldAutoTenderPayment(method) &&
-            (paidWasBlank || Number(this.billForm.customerPaidAmount || 0) === previousPayableAmount)
-        ) {
-            this.billForm.customerPaidAmount = payableAmount;
+        if (!this.billTenders.length) {
+            this.addInitialTender(method as PaymentMethod);
+        } else {
+            const allocations = this.billTenders.reduce((sum, tender) => sum + Number(tender.amount || 0), 0);
+            if (Math.abs(allocations - previousPayableAmount) < 0.01 && this.billTenders.length) {
+                const last = this.billTenders[this.billTenders.length - 1];
+                const earlier = this.billTenders.slice(0, -1).reduce((sum, tender) => sum + Number(tender.amount || 0), 0);
+                const priorLastAmount = Number(last.amount || 0);
+                last.amount = Math.max(0, payableAmount - earlier);
+                if (Math.abs(Number(last.receivedAmount || 0) - priorLastAmount) < 0.01 || last.paymentMethod !== PaymentMethod.Cash) {
+                    last.receivedAmount = last.amount;
+                }
+            }
         }
 
-        const paidAmount = Math.max(0, Number(this.billForm.customerPaidAmount || 0));
-        this.billReturnAmount = Math.max(0, paidAmount - payableAmount);
+        this.billForm.paymentMethod = this.billTenders[0]?.paymentMethod ?? method as PaymentMethod;
+        this.billForm.paymentMethodLedgerId = this.billTenders[0]?.paymentLedgerId || null;
+        this.billForm.customerPaidAmount = this.billTenders.reduce((sum, tender) => sum + Number(tender.receivedAmount || 0), 0);
+        this.billReturnAmount = this.billTenders
+            .filter((tender) => tender.paymentMethod === PaymentMethod.Cash)
+            .reduce((sum, tender) => sum + Math.max(0, Number(tender.receivedAmount || 0) - Number(tender.amount || 0)), 0);
     }
 
     private applyPaymentDefaults(force = false): void {
@@ -1889,14 +2136,8 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
             this.billForm.customerPaidAmount === undefined ||
             this.billForm.customerPaidAmount === '';
 
-        if (method === PaymentMethod.Credit) {
-            this.billForm.customerPaidAmount = 0;
-            return;
-        }
-
-        if (this.shouldAutoTenderPayment(method) && (force || paidWasBlank)) {
-            this.billForm.customerPaidAmount = this.billPayableAmount;
-        }
+        if (method === PaymentMethod.Credit) return;
+        if (force || paidWasBlank || !this.billTenders.length) this.addInitialTender(method as PaymentMethod);
     }
 
     private shouldAutoTenderPayment(method: number): boolean {
@@ -1910,17 +2151,50 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
             this.notify.warn('Tip cannot be negative');
             return false;
         }
-
-        if (Number(this.billForm.customerPaidAmount || 0) < 0) {
-            this.notify.warn('Customer paid cannot be negative');
+        if (Number(this.billForm.tipAmount || 0) > 0 && !this.tipLedgerId) {
+            this.notify.warn('Configure the tip liability ledger under Restaurant Setup before accepting tips.');
             return false;
         }
 
-        if (
-            Number(this.billForm.paymentMethod) !== PaymentMethod.Credit &&
-            Number(this.billForm.customerPaidAmount || 0) + 0.0001 < this.billPayableAmount
-        ) {
-            this.notify.warn('Customer paid amount is less than payable total');
+        if (this.billTenders.length < 1 || this.billTenders.length > 3) {
+            this.notify.warn('Add one to three payment methods.');
+            return false;
+        }
+        if (this.billTenders.some((tender) => ![PaymentMethod.Cash, PaymentMethod.Card_Swipe, PaymentMethod.QR].includes(tender.paymentMethod))) {
+            this.notify.warn('Use cash, cashier-verified card, or QR for restaurant checkout.');
+            return false;
+        }
+        if (new Set(this.billTenders.map((tender) => tender.paymentMethod)).size !== this.billTenders.length) {
+            this.notify.warn('Choose each payment method only once.');
+            return false;
+        }
+        if (this.billTenders.some((tender) => Number(tender.amount) <= 0)) {
+            this.notify.warn('Each payment allocation must be greater than zero.');
+            return false;
+        }
+        const allocated = this.billTenders.reduce((sum, tender) => sum + Number(tender.amount || 0), 0);
+        if (Math.abs(allocated - this.billPayableAmount) > 0.009) {
+            this.notify.warn('Payment allocations must add up to the bill and tip total.');
+            return false;
+        }
+        for (const tender of this.billTenders) {
+            if (tender.paymentMethod === PaymentMethod.Cash && Number(tender.receivedAmount) < Number(tender.amount)) {
+                this.notify.warn('Cash received must cover the cash allocation.');
+                return false;
+            }
+            if (tender.paymentMethod !== PaymentMethod.Cash && Number(tender.receivedAmount) !== Number(tender.amount)) {
+                this.notify.warn('Card and QR received amounts must match their allocations.');
+                return false;
+            }
+            if (tender.paymentMethod !== PaymentMethod.Cash && !tender.paymentLedgerId) {
+                this.notify.warn(`Select the ledger for ${this.tenderMethodLabel(tender.paymentMethod)}.`);
+                return false;
+            }
+        }
+
+        const received = this.billTenders.reduce((sum, tender) => sum + Number(tender.receivedAmount || 0), 0);
+        if (received - this.billPayableAmount - this.billReturnAmount > 0.009) {
+            this.notify.warn('Change can only be returned from cash received.');
             return false;
         }
 
@@ -2371,6 +2645,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
     }
 
     private resetTenderFields(): void {
+        this.billTenders = [];
         this.billForm.tipAmount = 0;
         this.billForm.customerPaidAmount = null;
         this.billPayableAmount = 0;

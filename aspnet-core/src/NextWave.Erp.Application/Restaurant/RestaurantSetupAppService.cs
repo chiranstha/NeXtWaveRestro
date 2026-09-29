@@ -264,6 +264,10 @@ namespace NextWave.Erp.Restaurant
                     tenantId),
                 TipLedgerId = Guid.TryParse(await SettingManager.GetSettingValueForTenantAsync(
                     AppSettings.ErpSettings.RestaurantTipLedgerId, tenantId), out var tipLedgerId) ? tipLedgerId : null,
+                CardLedgerId = Guid.TryParse(await SettingManager.GetSettingValueForTenantAsync(
+                    AppSettings.ErpSettings.RestaurantCardLedgerId, tenantId), out var cardLedgerId) ? cardLedgerId : null,
+                QrLedgerId = Guid.TryParse(await SettingManager.GetSettingValueForTenantAsync(
+                    AppSettings.ErpSettings.RestaurantQrLedgerId, tenantId), out var qrLedgerId) ? qrLedgerId : null,
                 RequireManagerPinForSensitiveActions = await GetBoolSetting(
                     AppSettings.ErpSettings.RestaurantRequireManagerPinForSensitiveActions,
                     tenantId),
@@ -300,6 +304,12 @@ namespace NextWave.Erp.Restaurant
             if (input.TipLedgerId.HasValue && await accountLedgerRepository.CountAsync(x =>
                     x.Id == input.TipLedgerId.Value && x.TenantId == tenantId) == 0)
                 throw new UserFriendlyException("Select an active restaurant tip ledger");
+            if (input.CardLedgerId.HasValue && await accountLedgerRepository.CountAsync(x =>
+                    x.Id == input.CardLedgerId.Value && x.TenantId == tenantId) == 0)
+                throw new UserFriendlyException("Select a valid tenant card settlement ledger");
+            if (input.QrLedgerId.HasValue && await accountLedgerRepository.CountAsync(x =>
+                    x.Id == input.QrLedgerId.Value && x.TenantId == tenantId) == 0)
+                throw new UserFriendlyException("Select a valid tenant QR settlement ledger");
 
             await SettingManager.ChangeSettingForTenantAsync(
                 tenantId,
@@ -313,6 +323,14 @@ namespace NextWave.Erp.Restaurant
                 tenantId,
                 AppSettings.ErpSettings.RestaurantTipLedgerId,
                 input.TipLedgerId?.ToString() ?? string.Empty);
+            await SettingManager.ChangeSettingForTenantAsync(
+                tenantId,
+                AppSettings.ErpSettings.RestaurantCardLedgerId,
+                input.CardLedgerId?.ToString() ?? string.Empty);
+            await SettingManager.ChangeSettingForTenantAsync(
+                tenantId,
+                AppSettings.ErpSettings.RestaurantQrLedgerId,
+                input.QrLedgerId?.ToString() ?? string.Empty);
             await SettingManager.ChangeSettingForTenantAsync(
                 tenantId,
                 AppSettings.ErpSettings.RestaurantRequireManagerPinForSensitiveActions,

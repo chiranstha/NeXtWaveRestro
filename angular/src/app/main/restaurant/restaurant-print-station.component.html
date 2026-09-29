@@ -24,9 +24,17 @@
 
     <section class="station-panel">
         <h2>Recent print jobs</h2>
-        <div class="table-wrap"><table class="reservation-grid"><thead><tr><th>Type</th><th>Route</th><th>Status</th><th>Attempts</th><th>Last error</th><th></th></tr></thead>
-            <tbody><tr *ngFor="let job of jobs"><td>{{ job.type === 0 ? 'Kitchen ticket' : 'Receipt' }}<small class="d-block text-muted">{{ job.externalJobId }}</small></td><td>{{ job.routeName }}</td><td [class.status-bad]="job.status === 3">{{ statusLabel(job.status) }}</td><td>{{ job.attempts || '—' }}</td><td>{{ job.lastError || '—' }}<small *ngIf="job.reprintReason" class="d-block text-muted">Reprint: {{ job.reprintReason }}</small></td><td><button *ngIf="job.status === 3" class="btn btn-xs btn-light-primary" (click)="retry(job)">Retry</button></td></tr>
-            <tr *ngIf="!jobs.length"><td colspan="6" class="text-center text-muted py-6">No queued print jobs.</td></tr></tbody>
-        </table></div>
+        <div class="table-wrap ag-theme-balham">
+            <ag-grid-angular
+                [columnDefs]="columnDefs"
+                [defaultColDef]="defaultColDef"
+                [rowData]="jobs"
+                [animateRows]="true"
+                [rowHeight]="54"
+                [style.height.px]="420"
+                style="width: 100%"
+            ></ag-grid-angular>
+            <div *ngIf="!jobs.length" class="text-center text-muted py-6">No queued print jobs.</div>
+        </div>
     </section>
 </section>

@@ -202,6 +202,8 @@ public static class AppSettings
         public const string RestaurantVatPercent = "App.Nextwave.Restaurant.VatPercent";
         public const string RestaurantServiceChargePercent = "App.Nextwave.Restaurant.ServiceChargePercent";
         public const string RestaurantTipLedgerId = "App.Nextwave.Restaurant.TipLedgerId";
+        public const string RestaurantCardLedgerId = "App.Nextwave.Restaurant.CardLedgerId";
+        public const string RestaurantQrLedgerId = "App.Nextwave.Restaurant.QrLedgerId";
         public const string RestaurantRequireManagerPinForSensitiveActions = "App.Nextwave.Restaurant.RequireManagerPinForSensitiveActions";
         public const string RestaurantManagerPin = "App.Nextwave.Restaurant.ManagerPin";
         public const string RestaurantTicketPrintingEnabled = "App.Nextwave.Restaurant.TicketPrintingEnabled";

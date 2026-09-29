@@ -27,7 +27,7 @@ class RestaurantSetupScreen extends StatelessWidget {
         const SizedBox(height: 12),
         _ResponsiveGrid(
           minTileWidth: 250,
-          tileHeight: 176,
+          tileHeight: 216,
           children: [
             _setupListCard(
               context,

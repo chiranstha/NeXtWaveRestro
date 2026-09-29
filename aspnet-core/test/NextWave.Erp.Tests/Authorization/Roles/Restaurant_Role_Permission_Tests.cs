@@ -68,7 +68,8 @@ public class Restaurant_Role_Permission_Tests : AppTestBase
             AppPermissions.PagesRestaurantReportsInventory,
             AppPermissions.PagesRestaurantReportsOperations,
             AppPermissions.PagesRestaurantReportsPayroll,
-            AppPermissions.PagesRestaurantReportsSales
+            AppPermissions.PagesRestaurantReportsSales,
+            AppPermissions.PagesFinancialYears
         }.Concat(FinanceReportPermissions).OrderBy(permission => permission, System.StringComparer.Ordinal).ToArray());
 
         UsingDbContext(context =>
@@ -97,7 +98,8 @@ public class Restaurant_Role_Permission_Tests : AppTestBase
         GetManagerGrantedPermissions(tenantId).ShouldBe(new[]
         {
             AppPermissions.PagesRestaurant,
-            AppPermissions.PagesRestaurantPos
+            AppPermissions.PagesRestaurantPos,
+            AppPermissions.PagesFinancialYears
         }.Concat(FinanceReportPermissions).OrderBy(permission => permission, System.StringComparer.Ordinal).ToArray());
     }
 
@@ -150,7 +152,8 @@ public class Restaurant_Role_Permission_Tests : AppTestBase
             {
                 AppPermissions.PagesRestaurant,
                 AppPermissions.PagesRestaurantReports,
-                reportPermission
+                reportPermission,
+                AppPermissions.PagesFinancialYears
             }.Concat(additionalPermissions).OrderBy(permission => permission, System.StringComparer.Ordinal).ToArray());
         });
     }

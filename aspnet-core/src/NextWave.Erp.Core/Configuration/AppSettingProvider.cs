@@ -313,6 +313,8 @@ public class AppSettingProvider : SettingProvider
                     GetFromAppSettings(AppSettings.ErpSettings.RestaurantServiceChargePercent, "0"),
                     scopes: SettingScopes.Tenant),
                 new SettingDefinition(AppSettings.ErpSettings.RestaurantTipLedgerId, "", scopes: SettingScopes.Tenant),
+                new SettingDefinition(AppSettings.ErpSettings.RestaurantCardLedgerId, "", scopes: SettingScopes.Tenant),
+                new SettingDefinition(AppSettings.ErpSettings.RestaurantQrLedgerId, "", scopes: SettingScopes.Tenant),
                 new SettingDefinition(AppSettings.ErpSettings.RestaurantRequireManagerPinForSensitiveActions,
                     GetFromAppSettings(AppSettings.ErpSettings.RestaurantRequireManagerPinForSensitiveActions, "false"),
                     scopes: SettingScopes.Tenant),

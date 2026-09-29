@@ -431,6 +431,28 @@
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
+                                <label class="form-label">Tip liability ledger</label>
+                                <select class="form-select" formControlName="tipLedgerId">
+                                    <option [ngValue]="null">Not configured</option>
+                                    <option *ngFor="let ledger of tipLedgerOptions" [ngValue]="ledger.id">{{ ledger.displayName }}</option>
+                                </select>
+                                <small class="form-text text-muted">Required before accepting tips.</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Card settlement ledger</label>
+                                <select class="form-select" formControlName="cardLedgerId">
+                                    <option [ngValue]="null">Disabled until configured</option>
+                                    <option *ngFor="let ledger of tipLedgerOptions" [ngValue]="ledger.id">{{ ledger.displayName }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">QR settlement ledger</label>
+                                <select class="form-select" formControlName="qrLedgerId">
+                                    <option [ngValue]="null">Disabled until configured</option>
+                                    <option *ngFor="let ledger of tipLedgerOptions" [ngValue]="ledger.id">{{ ledger.displayName }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
                                 <label class="required form-label">{{ 'Negative Stock' | localize }}</label>
                                 <select class="form-select" formControlName="negativeStockStatus">
                                     <option *ngFor="let option of negativeStockOptions" [ngValue]="option">{{ option }}</option>

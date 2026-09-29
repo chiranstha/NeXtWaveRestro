@@ -2,6 +2,25 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:restaurant_erp/main.dart';
 
 void main() {
+  test('sign-out clears credentials without deleting user-scoped order drafts', () async {
+    final store = MemorySessionStore()
+      ..value = StoredSession(
+        baseUrl: AppConfig.defaultApiBaseUrl,
+        accessToken: 'access',
+        refreshToken: 'refresh',
+        tenantId: 9,
+        tenancyName: 'cafe',
+        userName: 'waiter',
+        userId: 27,
+      );
+    await store.writeValue('restaurant-cart-draft:9:27', '{"lines":[]}');
+
+    await store.clear();
+
+    expect(await store.read(), isNull);
+    expect(await store.readValue('restaurant-cart-draft:9:27'), '{"lines":[]}');
+  });
+
   test(
     'tenant-branded app rejects a saved session from another tenant',
     () async {

@@ -373,6 +373,7 @@ class RestaurantApi {
     required String customerName,
     required String customerPhone,
     required List<CartLine> items,
+    String? clientRequestId,
   }) async {
     final result = await client.post(
       '/api/services/app/RestaurantOrder/CreateOrEditOrder',
@@ -382,7 +383,7 @@ class RestaurantApi {
         'tableId': tableId,
         'deviceId': null,
         'source': 'Flutter POS',
-        'clientRequestId': 'flutter-${DateTime.now().microsecondsSinceEpoch}',
+        'clientRequestId': clientRequestId,
         'waiterUserId': userId == 0 ? null : userId,
         'guestCount': 0,
         'customerName': customerName,

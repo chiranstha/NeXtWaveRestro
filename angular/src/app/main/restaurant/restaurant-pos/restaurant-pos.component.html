@@ -956,23 +956,47 @@
                     </section>
 
                     <section class="restaurant-checkout-section bg-white border mb-3 p-4 rounded-3">
-                        <strong class="d-block mb-3">Payment method</strong>
-                        <div class="restaurant-payment-grid d-grid gap-2">
-                            <button
-                                type="button"
-                                class="btn align-items-center d-inline-flex gap-2 justify-content-center min-h-50px min-w-0 px-2 text-nowrap"
-                                *ngFor="let method of paymentMethods"
-                                [class.btn-primary]="billForm.paymentMethod === method.value"
-                                [class.btn-light]="billForm.paymentMethod !== method.value"
-                                (click)="setPaymentMethod(method.value)"
-                            >
-                                <i [class]="'fa ' + method.icon"></i>{{ method.label }}
-                            </button>
+                        <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
+                            <strong>Payment methods</strong>
+                            <button class="btn btn-sm btn-light-primary" type="button" (click)="addTender()" [disabled]="billTenders.length >= 3">Add method</button>
                         </div>
-                        <div class="alert alert-warning mt-3 mb-0" *ngIf="billForm.paymentMethod === paymentMethodEnum.Card_Swipe || billForm.paymentMethod === paymentMethodEnum.QR">
-                            This payment is recorded by staff. Provider verification is not connected yet.
+                        <div class="d-grid gap-3">
+                            <div class="row g-2 align-items-end border-bottom pb-3" *ngFor="let tender of billTenders; let i = index">
+                                <div class="col-12 col-sm-3">
+                                    <label class="form-label fs-9 fw-bold text-gray-600">Method</label>
+                                    <select class="form-select" [ngModel]="tender.paymentMethod" (ngModelChange)="updateTenderMethod(i, $event)">
+                                        <option [ngValue]="paymentMethodEnum.Cash">Cash</option>
+                                        <option *ngIf="isPaymentMethodEnabled(paymentMethodEnum.Card_Swipe)" [ngValue]="paymentMethodEnum.Card_Swipe">Card · staff verified</option>
+                                        <option *ngIf="isPaymentMethodEnabled(paymentMethodEnum.QR)" [ngValue]="paymentMethodEnum.QR">QR · staff verified</option>
+                                    </select>
+                                </div>
+                                <div class="col-6 col-sm-3">
+                                    <label class="form-label fs-9 fw-bold text-gray-600">Allocated amount</label>
+                                    <input class="form-control text-end" type="number" min="0" step="0.01" [ngModel]="tender.amount" (ngModelChange)="updateTenderAmount(i, $event)" />
+                                </div>
+                                <div class="col-6 col-sm-3" *ngIf="tender.paymentMethod === paymentMethodEnum.Cash">
+                                    <label class="form-label fs-9 fw-bold text-gray-600">Cash received</label>
+                                    <input class="form-control text-end" type="number" min="0" step="0.01" [ngModel]="tender.receivedAmount" (ngModelChange)="updateTenderReceived(i, $event)" />
+                                </div>
+                                <div class="col-12 col-sm-5" *ngIf="tender.paymentMethod !== paymentMethodEnum.Cash">
+                                    <label class="form-label fs-9 fw-bold text-gray-600">Payment ledger</label>
+                                    <div class="form-control bg-light">{{ tenderLedgerName(tender.paymentMethod) }}</div>
+                                </div>
+                                <div class="col-12 col-sm-auto ms-sm-auto text-end">
+                                    <button class="btn btn-sm btn-light-danger" type="button" aria-label="Remove payment method" (click)="removeTender(i)"><i class="fa fa-trash"></i></button>
+                                </div>
+                                <div class="col-12 small text-warning" *ngIf="tender.paymentMethod === paymentMethodEnum.Card_Swipe || tender.paymentMethod === paymentMethodEnum.QR">
+                                    Staff must verify the card or QR payment before confirming this bill.
+                                </div>
+                            </div>
                         </div>
-
+                        <div class="alert alert-danger mt-3 mb-0" *ngIf="hasUnresolvedBill()">
+                            <strong>This bill has not been confirmed.</strong> Check its result before continuing. A retry will reuse the saved request.
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <button class="btn btn-sm btn-light-danger" type="button" (click)="checkUnresolvedBill()" [disabled]="saving">Check bill result</button>
+                                <button class="btn btn-sm btn-danger" type="button" (click)="retryUnresolvedBill()" [disabled]="saving || !posOnline">Retry saved bill</button>
+                            </div>
+                        </div>
                         <div class="row g-3 mt-1">
                             <div class="col-12 col-sm-4">
                                 <label class="form-label fs-9 fw-bold text-gray-600" for="checkout-tip">Tip</label>
@@ -981,20 +1005,15 @@
                                     type="number"
                                     class="form-control text-end"
                                     min="0"
+                                    [disabled]="!tipLedgerId"
                                     [(ngModel)]="billForm.tipAmount"
                                     (ngModelChange)="onTipChanged()"
                                 />
+                                <small class="form-text text-muted" *ngIf="!tipLedgerId">Configure a tip liability ledger in Restaurant Setup to enable tips.</small>
                             </div>
                             <div class="col-12 col-sm-4">
-                                <label class="form-label fs-9 fw-bold text-gray-600" for="checkout-paid">Paid</label>
-                                <input
-                                    id="checkout-paid"
-                                    type="number"
-                                    class="form-control text-end"
-                                    min="0"
-                                    [(ngModel)]="billForm.customerPaidAmount"
-                                    (ngModelChange)="onCustomerPaidChanged()"
-                                />
+                                <label class="form-label fs-9 fw-bold text-gray-600" for="checkout-paid">Total received</label>
+                                <input id="checkout-paid" type="text" class="form-control text-end" [value]="billForm.customerPaidAmount | number: '1.2-2'" readonly />
                             </div>
                             <div class="col-12 col-sm-4">
                                 <label class="form-label fs-9 fw-bold text-gray-600" for="checkout-return">Return</label>

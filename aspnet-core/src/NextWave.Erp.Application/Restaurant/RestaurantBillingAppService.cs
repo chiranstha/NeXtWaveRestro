@@ -188,6 +188,13 @@ namespace NextWave.Erp.Restaurant
 
                 if (tender.PaymentMethod is not PaymentMethod.Card_Swipe and not PaymentMethod.QR)
                     throw new UserFriendlyException("Restaurant settlement supports cash, card, and QR tenders");
+                var ledgerSetting = tender.PaymentMethod == PaymentMethod.Card_Swipe
+                    ? AppSettings.ErpSettings.RestaurantCardLedgerId
+                    : AppSettings.ErpSettings.RestaurantQrLedgerId;
+                var configuredLedger = await SettingManager.GetSettingValueForTenantAsync(ledgerSetting, tenantId);
+                if (!Guid.TryParse(configuredLedger, out var configuredLedgerId) ||
+                    configuredLedgerId != tender.PaymentLedgerId)
+                    throw new UserFriendlyException($"Configure the {tender.PaymentMethod} settlement ledger before accepting that payment method");
                 if (!tender.PaymentLedgerId.HasValue ||
                     await accountLedgerRepository.CountAsync(x =>
                         x.Id == tender.PaymentLedgerId.Value && x.TenantId == tenantId) == 0)

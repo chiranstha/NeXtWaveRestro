@@ -90,6 +90,8 @@ namespace NextWave.Erp.Restaurant.Dtos
         public decimal VatPercent { get; set; }
         public decimal ServiceChargePercent { get; set; }
         public Guid? TipLedgerId { get; set; }
+        public Guid? CardLedgerId { get; set; }
+        public Guid? QrLedgerId { get; set; }
         public bool RequireManagerPinForSensitiveActions { get; set; }
         public string ManagerPin { get; set; }
         public string NegativeStockStatus { get; set; }
@@ -814,5 +816,9 @@ namespace NextWave.Erp.Restaurant.Dtos
         public decimal TaxAmount { get; set; }
         public decimal NetAmount { get; set; }
         public decimal GrandTotal { get; set; }
+        public decimal CollectedAmount { get; set; }
+        public decimal TipAmount { get; set; }
+        public decimal CashReceivedAmount { get; set; }
+        public decimal ChangeAmount { get; set; }
     }
 }

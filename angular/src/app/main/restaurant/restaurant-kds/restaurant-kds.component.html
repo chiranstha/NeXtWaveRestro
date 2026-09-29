@@ -34,7 +34,11 @@
                 </div>
                 <div class="restaurant-kds-refresh-pill align-items-center bg-gray-100 border border-gray-200 col-auto d-inline-flex fs-9 fw-bolder gap-2 min-h-30px px-3 py-2 rounded-2 text-gray-700 text-nowrap">
                     <i class="fa fa-rotate" [class.fa-spin]="loading"></i>
-                    <span>{{ loading ? ('Loading' | localize) : ('15s' | localize) }}</span>
+                    <span *ngIf="!online">Disconnected</span>
+                    <span *ngIf="online && refreshFailed">Refresh failed</span>
+                    <span *ngIf="online && !refreshFailed && lastSuccessfulRefresh">Updated {{ lastSuccessfulRefresh | date: 'shortTime' }}</span>
+                    <span *ngIf="online && !refreshFailed && !lastSuccessfulRefresh">{{ loading ? ('Loading' | localize) : ('15s' | localize) }}</span>
+                    <button class="btn btn-sm btn-light-primary py-1" type="button" (click)="refresh()" [disabled]="loading || !online" aria-label="Refresh kitchen tickets">Refresh</button>
                 </div>
             </div>
 

@@ -33017,6 +33017,23 @@ export class RestaurantBillingServiceProxy {
         return _observableOf(null as any);
     }
 
+    getBillStatus(clientRequestId: string | undefined): Observable<FinalizeRestaurantBillResultDto | null> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantBilling/GetBillStatus?";
+        if (clientRequestId !== undefined && clientRequestId !== null)
+            url_ += "clientRequestId=" + encodeURIComponent("" + clientRequestId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+        const options_: any = { observe: "response", responseType: "blob", headers: new HttpHeaders({ "Accept": "application/json" }) };
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            const status = response_.status;
+            const blob = response_ instanceof HttpResponse ? response_.body : undefined;
+            if (status === 200) return blobToText(blob).pipe(_observableMergeMap((text: string) => {
+                const data = text === "" ? null : JSON.parse(text, this.jsonParseReviver);
+                return _observableOf(data ? FinalizeRestaurantBillResultDto.fromJS(data) : null);
+            }));
+            return _observableOf(null);
+        }));
+    }
+
     /**
      * @param body (optional) 
      * @return OK
@@ -85393,6 +85410,9 @@ export interface IRestaurantModifierGroupDto {
 export class RestaurantOperationalSettingsDto implements IRestaurantOperationalSettingsDto {
     vatPercent!: number;
     serviceChargePercent!: number;
+    tipLedgerId!: string | undefined;
+    cardLedgerId!: string | undefined;
+    qrLedgerId!: string | undefined;
     requireManagerPinForSensitiveActions!: boolean;
     managerPin!: string | undefined;
     negativeStockStatus!: string | undefined;
@@ -85417,6 +85437,9 @@ export class RestaurantOperationalSettingsDto implements IRestaurantOperationalS
         if (_data) {
             this.vatPercent = _data["vatPercent"];
             this.serviceChargePercent = _data["serviceChargePercent"];
+            this.tipLedgerId = _data["tipLedgerId"];
+            this.cardLedgerId = _data["cardLedgerId"];
+            this.qrLedgerId = _data["qrLedgerId"];
             this.requireManagerPinForSensitiveActions = _data["requireManagerPinForSensitiveActions"];
             this.managerPin = _data["managerPin"];
             this.negativeStockStatus = _data["negativeStockStatus"];
@@ -85441,6 +85464,9 @@ export class RestaurantOperationalSettingsDto implements IRestaurantOperationalS
         data = typeof data === 'object' ? data : {};
         data["vatPercent"] = this.vatPercent;
         data["serviceChargePercent"] = this.serviceChargePercent;
+        data["tipLedgerId"] = this.tipLedgerId;
+        data["cardLedgerId"] = this.cardLedgerId;
+        data["qrLedgerId"] = this.qrLedgerId;
         data["requireManagerPinForSensitiveActions"] = this.requireManagerPinForSensitiveActions;
         data["managerPin"] = this.managerPin;
         data["negativeStockStatus"] = this.negativeStockStatus;
@@ -85458,6 +85484,9 @@ export class RestaurantOperationalSettingsDto implements IRestaurantOperationalS
 export interface IRestaurantOperationalSettingsDto {
     vatPercent: number;
     serviceChargePercent: number;
+    tipLedgerId: string | undefined;
+    cardLedgerId: string | undefined;
+    qrLedgerId: string | undefined;
     requireManagerPinForSensitiveActions: boolean;
     managerPin: string | undefined;
     negativeStockStatus: string | undefined;
@@ -86274,6 +86303,10 @@ export class RestaurantSettlementReportDto implements IRestaurantSettlementRepor
     taxAmount!: number;
     netAmount!: number;
     grandTotal!: number;
+    collectedAmount!: number;
+    tipAmount!: number;
+    cashReceivedAmount!: number;
+    changeAmount!: number;
 
     constructor(data?: IRestaurantSettlementReportDto) {
         if (data) {
@@ -86294,6 +86327,10 @@ export class RestaurantSettlementReportDto implements IRestaurantSettlementRepor
             this.taxAmount = _data["taxAmount"];
             this.netAmount = _data["netAmount"];
             this.grandTotal = _data["grandTotal"];
+            this.collectedAmount = _data["collectedAmount"];
+            this.tipAmount = _data["tipAmount"];
+            this.cashReceivedAmount = _data["cashReceivedAmount"];
+            this.changeAmount = _data["changeAmount"];
         }
     }
 
@@ -86314,6 +86351,10 @@ export class RestaurantSettlementReportDto implements IRestaurantSettlementRepor
         data["taxAmount"] = this.taxAmount;
         data["netAmount"] = this.netAmount;
         data["grandTotal"] = this.grandTotal;
+        data["collectedAmount"] = this.collectedAmount;
+        data["tipAmount"] = this.tipAmount;
+        data["cashReceivedAmount"] = this.cashReceivedAmount;
+        data["changeAmount"] = this.changeAmount;
         return data;
     }
 }
@@ -86327,6 +86368,10 @@ export interface IRestaurantSettlementReportDto {
     taxAmount: number;
     netAmount: number;
     grandTotal: number;
+    collectedAmount: number;
+    tipAmount: number;
+    cashReceivedAmount: number;
+    changeAmount: number;
 }
 
 export class RestaurantStationDto implements IRestaurantStationDto {

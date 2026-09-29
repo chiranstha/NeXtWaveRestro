@@ -110,6 +110,10 @@ export interface RestaurantSettlementReportDto {
     taxAmount: number;
     netAmount: number;
     grandTotal: number;
+    collectedAmount: number;
+    tipAmount: number;
+    cashReceivedAmount: number;
+    changeAmount: number;
 }
 
 export interface RestaurantRecipeCostingLineDto {

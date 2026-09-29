@@ -9,6 +9,10 @@ import {
     ChangeDetectionStrategy,
 } from '@angular/core';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NgComponentOutlet } from '@angular/common';
+import { AgGridAngular } from 'ag-grid-angular';
+import { ICellRendererAngularComp } from 'ag-grid-angular';
+import { ColDef } from 'ag-grid-community';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import {
     CleanValuesInput,
@@ -28,11 +32,26 @@ import {
     SelectedValuesOptions,
 } from '@app/shared/common/input-types/InputTypeConsts';
 import { BusyIfDirective } from '../../../../../shared/utils/busy-if.directive';
-import { TableModule } from '@shared/ui-compat';
-import { AppTemplate } from '@shared/ui-compat';
-import { NgComponentOutlet } from '@angular/common';
 import { LocalizePipe } from '@shared/common/pipes/localize.pipe';
 import { PermissionPipe } from '@shared/common/pipes/permission.pipe';
+
+@Component({
+    standalone: true,
+    imports: [NgComponentOutlet],
+    template: '<ng-container *ngComponentOutlet="params.data.definition.component; injector: params.data.injector"></ng-container>',
+})
+class DynamicPropertyValueCellRenderer implements ICellRendererAngularComp {
+    params: any;
+
+    agInit(params: any): void {
+        this.params = params;
+    }
+
+    refresh(params: any): boolean {
+        this.params = params;
+        return true;
+    }
+}
 export class DynamicEntityPropertyValueViewItem {
     data: GetAllDynamicEntityPropertyValuesOutputItem;
     definition: InputTypeConfigurationDefinition;
@@ -46,7 +65,7 @@ export class DynamicEntityPropertyValueViewItem {
 @Component({
     selector: 'dynamic-entity-property-value-manager',
     templateUrl: './manager.component.html',
-    imports: [BusyIfDirective, TableModule, AppTemplate, NgComponentOutlet, LocalizePipe, PermissionPipe],
+    imports: [BusyIfDirective, AgGridAngular, LocalizePipe, PermissionPipe],
     changeDetection: ChangeDetectionStrategy.Eager,
     schemas: [NO_ERRORS_SCHEMA],
 })
@@ -59,6 +78,32 @@ export class ManagerComponent extends AppComponentBase implements OnInit {
     @Output() onSaveDone: EventEmitter<any> = new EventEmitter<any>();
     initialized = false;
     items: DynamicEntityPropertyValueViewItem[];
+    readonly columnDefs: ColDef[] = [
+        { headerName: this.l('PropertyName'), field: 'data.propertyName', flex: 1, minWidth: 180 },
+        {
+            headerName: this.l('Values'),
+            flex: 2,
+            minWidth: 260,
+            sortable: false,
+            cellRenderer: DynamicPropertyValueCellRenderer,
+        },
+        {
+            headerName: this.l('Actions'),
+            width: 130,
+            sortable: false,
+            filter: false,
+            cellRenderer: (params: any) => {
+                if (!this.isGranted('Pages.Administration.DynamicEntityPropertyValue.Delete')) return '';
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'btn btn-danger btn-sm';
+                button.textContent = this.l('Delete');
+                button.addEventListener('click', () => this.deleteAllValuesOfDynamicEntityPropertyId(params.data));
+                return button;
+            },
+        },
+    ];
+    readonly defaultColDef: ColDef = { resizable: true, sortable: true, minWidth: 100 };
     constructor() {
         const _injector = inject(Injector);
         super();

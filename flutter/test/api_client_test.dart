@@ -49,6 +49,43 @@ void main() {
     client.close();
   });
 
+  test('granted permissions come from ASP.NET Zero user configuration', () async {
+    late http.Request captured;
+    final httpClient = MockClient((request) async {
+      captured = request;
+      return http.Response(
+        jsonEncode({
+          'success': true,
+          'result': {
+            'auth': {
+              'grantedPermissions': {
+                'Pages.Restaurant': true,
+                'Pages.Restaurant.Setup': true,
+                'Pages.Restaurant.Setup.Edit': false,
+              },
+            },
+          },
+        }),
+        200,
+        headers: {'content-type': 'application/json'},
+      );
+    });
+    final client = AbpApiClient(
+      baseUrl: 'https://restaurant.example',
+      accessToken: 'staff-token',
+      tenantId: 42,
+      httpClient: httpClient,
+    );
+
+    final granted = await RestaurantApi(client).getGrantedPermissions();
+
+    expect(captured.url.path, '/AbpUserConfiguration/GetAll');
+    expect(captured.headers['authorization'], 'Bearer staff-token');
+    expect(captured.headers['abp-tenantid'], '42');
+    expect(granted, {'Pages.Restaurant', 'Pages.Restaurant.Setup'});
+    client.close();
+  });
+
   test('two-factor delivery uses the existing TokenAuth contract', () async {
     late http.Request captured;
     final httpClient = MockClient((request) async {

@@ -94,52 +94,52 @@ export class TrialBalanceReportComponent extends AppComponentBase implements OnI
     public initializeAgGrid() {
         this.columnDefs = [
             {
-                headerName: 'Opening Debit',
+                headerName: this.l('Opening debit'),
                 field: 'openingDr',
                 type: 'numericColumn',
                 valueFormatter: this.currencyFormatter,
                 minWidth: 120,
-                cellClass: 'fw-medium text-dark',
+                cellClass: 'amount-cell',
             },
             {
-                headerName: 'Opening Credit',
+                headerName: this.l('Opening credit'),
                 field: 'openingCr',
                 type: 'numericColumn',
                 valueFormatter: this.currencyFormatter,
                 minWidth: 120,
-                cellClass: 'fw-medium text-dark',
+                cellClass: 'amount-cell',
             },
             {
-                headerName: 'Transaction Debit',
+                headerName: this.l('Period debit'),
                 field: 'debit',
                 type: 'numericColumn',
                 valueFormatter: this.currencyFormatter,
                 minWidth: 140,
-                cellClass: 'fw-bold text-success',
+                cellClass: 'amount-cell',
             },
             {
-                headerName: 'Transaction Credit',
+                headerName: this.l('Period credit'),
                 field: 'credit',
                 type: 'numericColumn',
                 valueFormatter: this.currencyFormatter,
                 minWidth: 140,
-                cellClass: 'fw-bold text-danger',
+                cellClass: 'amount-cell',
             },
             {
-                headerName: 'Closing Debit',
+                headerName: this.l('Closing debit'),
                 field: 'closingDr',
                 type: 'numericColumn',
                 valueFormatter: this.currencyFormatter,
                 minWidth: 120,
-                cellClass: 'fw-bold text-primary',
+                cellClass: 'amount-cell',
             },
             {
-                headerName: 'Closing Credit',
+                headerName: this.l('Closing credit'),
                 field: 'closingCr',
                 type: 'numericColumn',
                 valueFormatter: this.currencyFormatter,
                 minWidth: 120,
-                cellClass: 'fw-bold text-primary',
+                cellClass: 'amount-cell',
             },
         ];
         this.defaultColDef = {
@@ -153,11 +153,14 @@ export class TrialBalanceReportComponent extends AppComponentBase implements OnI
             return data.path || [];
         };
         this.autoGroupColumnDef = {
-            headerName: 'PARTICULAR',
+            headerName: this.l('Account / group'),
             minWidth: 250,
             cellRendererParams: {
                 suppressCount: true,
                 innerRenderer: (params) => {
+                    if (params.value === 'GrandTotal') {
+                        return this.l('Grand total');
+                    }
                     if (
                         params.data &&
                         (params.data.groupType === 1 || params.data.groupType === 2 || params.data.groupType === 5)
@@ -375,7 +378,7 @@ export class TrialBalanceReportComponent extends AppComponentBase implements OnI
         return new Intl.NumberFormat('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
-        }).format(Math.abs(params.value));
+        }).format(params.value);
     }
 
     enabledorDisabled() {

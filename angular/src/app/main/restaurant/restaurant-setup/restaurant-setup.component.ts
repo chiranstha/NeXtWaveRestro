@@ -22,6 +22,8 @@ import {
     RestaurantSetupServiceProxy,
     RestaurantStationDto,
     RestaurantTableDto,
+    SalesMasterAccountLedgerTableDto,
+    SalesMastersServiceProxy,
 } from '@shared/service-proxies/service-proxies';
 import { finalize } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
@@ -44,6 +46,7 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
     tables: RestaurantTableDto[] = [];
     stations: RestaurantStationDto[] = [];
     devices: RestaurantDeviceDto[] = [];
+    tipLedgerOptions: SalesMasterAccountLedgerTableDto[] = [];
     saving = false;
     loading = false;
     activeSection: RestaurantSetupSection = 'areas';
@@ -72,6 +75,7 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
 
     private fb = inject(FormBuilder);
     private restaurantSetupService = inject(RestaurantSetupServiceProxy);
+    private salesMastersService = inject(SalesMastersServiceProxy);
     private guestApi = inject(RestaurantGuestApiService);
     private cdr = inject(ChangeDetectorRef);
     private route = inject(ActivatedRoute);
@@ -120,6 +124,10 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
             if (settings) {
                 this.settingsForm.patchValue(settings);
             }
+            this.cdr.markForCheck();
+        });
+        this.salesMastersService.getAllAccountLedgerForTableDropdown().subscribe((result) => {
+            this.tipLedgerOptions = result || [];
             this.cdr.markForCheck();
         });
         this.restaurantSetupService
@@ -379,6 +387,9 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
         this.settingsForm = this.fb.group({
             vatPercent: [13, [Validators.required, Validators.min(0), Validators.max(100)]],
             serviceChargePercent: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+            tipLedgerId: [null],
+            cardLedgerId: [null],
+            qrLedgerId: [null],
             requireManagerPinForSensitiveActions: [false],
             managerPin: [''],
             negativeStockStatus: ['Warn', Validators.required],

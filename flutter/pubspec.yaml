@@ -37,6 +37,8 @@ dependencies:
   http: ^1.6.0
   flutter_secure_storage: 9.2.4
   nepali_utils: ^3.0.8
+  pdf: ^3.13.1
+  printing: ^5.15.1
 
 dev_dependencies:
   flutter_test:

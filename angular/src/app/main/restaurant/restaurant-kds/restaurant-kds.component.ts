@@ -64,8 +64,22 @@ export class RestaurantKdsComponent extends AppComponentBase implements OnInit, 
     selectedTicketType = '';
     selectedStatus = '';
     loading = false;
+    refreshFailed = false;
+    online = navigator.onLine;
+    lastSuccessfulRefresh: Date | null = null;
     bulkActionKey = '';
     private refreshTimer: number | undefined;
+    private readonly handleOnline = (): void => {
+        this.online = true;
+        this.refresh();
+    };
+    private readonly handleOffline = (): void => {
+        this.online = false;
+        this.cdr.markForCheck();
+    };
+    private readonly handleVisibility = (): void => {
+        if (document.visibilityState === 'visible') this.refresh();
+    };
 
     private restaurantSetupService = inject(RestaurantSetupServiceProxy);
     private restaurantKdsService = inject(RestaurantKdsServiceProxy);
@@ -82,6 +96,9 @@ export class RestaurantKdsComponent extends AppComponentBase implements OnInit, 
         });
         this.refresh();
         this.refreshTimer = window.setInterval(() => this.refresh(), 15000);
+        window.addEventListener('online', this.handleOnline);
+        window.addEventListener('offline', this.handleOffline);
+        document.addEventListener('visibilitychange', this.handleVisibility);
     }
 
     ngAfterViewInit(): void {
@@ -92,17 +109,26 @@ export class RestaurantKdsComponent extends AppComponentBase implements OnInit, 
         if (this.refreshTimer) {
             window.clearInterval(this.refreshTimer);
         }
+        window.removeEventListener('online', this.handleOnline);
+        window.removeEventListener('offline', this.handleOffline);
+        document.removeEventListener('visibilitychange', this.handleVisibility);
     }
 
     refresh(): void {
+        if (this.loading || !this.online || document.visibilityState === 'hidden') return;
         this.loading = true;
+        this.refreshFailed = false;
         this.cdr.markForCheck();
         this.restaurantKdsService
             .getOpenTickets(this.selectedStationId || undefined)
             .pipe(finalize(() => this.finishLoading()))
             .subscribe((result) => {
+                this.lastSuccessfulRefresh = new Date();
                 this.tickets = result || [];
                 this.updateFilteredTickets();
+            }, () => {
+                this.refreshFailed = true;
+                this.cdr.markForCheck();
             });
     }
 

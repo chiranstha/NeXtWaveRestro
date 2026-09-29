@@ -39,6 +39,8 @@ namespace NextWave.Erp.Restaurant
         IRepository<RestaurantPayrollRun, Guid> payrollRunRepository,
         IRepository<RestaurantPayrollLine, Guid> payrollLineRepository,
         IRepository<RestaurantPayrollAttendance, Guid> payrollAttendanceRepository,
+        IRepository<RestaurantBillPayment, Guid> billPaymentRepository,
+        IRepository<RestaurantBillTender, Guid> billTenderRepository,
         RestaurantReorderService reorderService)
         : ErpAppServiceBase, IRestaurantReportsAppService
     {
@@ -969,9 +971,10 @@ namespace NextWave.Erp.Restaurant
         public async Task<List<RestaurantSettlementReportDto>> GetSettlementReport(RestaurantReportFilterDto input)
         {
             await EnsureReportCategoryGrantedAsync(AppPermissions.PagesRestaurantReportsAuditFinance);
-            var rows = await GetBilledSales(input)
+            var sales = await GetBilledSales(input)
                 .Select(sales => new
                     {
+                        sales.Id,
                         sales.PaymentMethod,
                         sales.GrossAmount,
                         DiscountAmount = sales.BillDiscount,
@@ -981,19 +984,82 @@ namespace NextWave.Erp.Restaurant
                     })
                 .AsNoTracking()
                 .ToListAsync();
+            var salesIds = sales.Select(x => x.Id).ToList();
+            var payments = salesIds.Count == 0
+                ? new List<RestaurantBillPayment>()
+                : await billPaymentRepository.GetAll()
+                    .Where(x => x.TenantId == AbpSession.TenantId && salesIds.Contains(x.SalesMasterId))
+                    .AsNoTracking()
+                    .ToListAsync();
+            var paymentIds = payments.Select(x => x.Id).ToList();
+            var tenders = paymentIds.Count == 0
+                ? new List<RestaurantBillTender>()
+                : await billTenderRepository.GetAll()
+                    .Where(x => x.TenantId == AbpSession.TenantId && paymentIds.Contains(x.BillPaymentId))
+                    .AsNoTracking()
+                    .ToListAsync();
+            var paymentBySale = payments.GroupBy(x => x.SalesMasterId)
+                .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.PaidAt).First());
+            var tendersByPayment = tenders.GroupBy(x => x.BillPaymentId)
+                .ToDictionary(x => x.Key, x => x.ToList());
+            var amountsByMethod = new Dictionary<NextWave.Erp.Enums.PaymentMethod, RestaurantSettlementReportDto>();
+            var salesByMethod = new Dictionary<NextWave.Erp.Enums.PaymentMethod, HashSet<Guid>>();
 
-            return rows
-                .GroupBy(x => x.PaymentMethod)
-                .Select(x => new RestaurantSettlementReportDto
+            void AddAmount(NextWave.Erp.Enums.PaymentMethod method, Guid saleId, decimal factor,
+                decimal gross, decimal discount, decimal tax, decimal net, decimal grandTotal,
+                decimal collected, decimal tips, decimal cashReceived, decimal change)
+            {
+                if (!amountsByMethod.TryGetValue(method, out var row))
                 {
-                    PaymentMethod = (int)x.Key,
-                    PaymentMethodName = GetPaymentMethodName(x.Key),
-                    OrderCount = x.Count(),
-                    GrossAmount = x.Sum(y => y.GrossAmount),
-                    DiscountAmount = x.Sum(y => y.DiscountAmount),
-                    TaxAmount = x.Sum(y => y.TaxAmount),
-                    NetAmount = x.Sum(y => y.NetAmount),
-                    GrandTotal = x.Sum(y => y.GrandTotal)
+                    row = new RestaurantSettlementReportDto
+                    {
+                        PaymentMethod = (int)method,
+                        PaymentMethodName = GetPaymentMethodName(method)
+                    };
+                    amountsByMethod[method] = row;
+                    salesByMethod[method] = new HashSet<Guid>();
+                }
+                salesByMethod[method].Add(saleId);
+                row.GrossAmount += gross * factor;
+                row.DiscountAmount += discount * factor;
+                row.TaxAmount += tax * factor;
+                row.NetAmount += net * factor;
+                row.GrandTotal += grandTotal * factor;
+                row.CollectedAmount += collected;
+                row.TipAmount += tips;
+                row.CashReceivedAmount += cashReceived;
+                row.ChangeAmount += change;
+            }
+
+            foreach (var sale in sales)
+            {
+                if (paymentBySale.TryGetValue(sale.Id, out var payment) && tendersByPayment.TryGetValue(payment.Id, out var paymentTenders) && paymentTenders.Count > 0)
+                {
+                    foreach (var tender in paymentTenders)
+                    {
+                        var tipShare = payment.PayableAmount == 0 ? 0 : payment.TipAmount * tender.Amount / payment.PayableAmount;
+                        var share = payment.BillAmount == 0 ? 0 : (tender.Amount - tipShare) / payment.BillAmount;
+                        AddAmount(tender.PaymentMethod, sale.Id, share,
+                            sale.GrossAmount, sale.DiscountAmount, sale.TaxAmount, sale.NetAmount, sale.GrandTotal,
+                            tender.Amount,
+                            tipShare,
+                            tender.PaymentMethod == NextWave.Erp.Enums.PaymentMethod.Cash ? tender.ReceivedAmount : 0,
+                            tender.ChangeAmount);
+                    }
+                }
+                else
+                {
+                    AddAmount(sale.PaymentMethod, sale.Id, 1,
+                        sale.GrossAmount, sale.DiscountAmount, sale.TaxAmount, sale.NetAmount, sale.GrandTotal,
+                        sale.GrandTotal, 0, 0, 0);
+                }
+            }
+
+            return amountsByMethod.Values
+                .Select(row =>
+                {
+                    row.OrderCount = salesByMethod[(NextWave.Erp.Enums.PaymentMethod)row.PaymentMethod].Count;
+                    return row;
                 })
                 .OrderBy(x => x.PaymentMethodName)
                 .ToList();

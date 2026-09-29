@@ -100,7 +100,7 @@
             </form>
             <div *ngIf="!isPdfShow">
                 <div class="overflow-x-auto border rounded-1">
-                    <ag-grid-angular class="w-100" [gridOptions]="gridOptions" (gridReady)="onGridReady($event)"
+                    <ag-grid-angular class="ag-theme-balham w-100" [gridOptions]="gridOptions" (gridReady)="onGridReady($event)"
                         [columnDefs]="columnDefs" [rowData]="tableRows"
                         (cellDoubleClicked)="onCellDoubleClicked($event)"
                         [pinnedBottomRowData]="pinnedBottomRowData" style="width: 100%; "

@@ -103,6 +103,11 @@ class RestaurantAppController extends ChangeNotifier {
 
   bool initialized = false;
   bool isAuthenticated = false;
+  bool serverReachable = false;
+  bool draftSynced = false;
+  bool draftNeedsReview = false;
+  String draftReviewMessage = '';
+  DateTime? draftSavedAt;
   bool busy = false;
   bool refreshing = false;
   bool permissionsLoaded = false;
@@ -162,6 +167,7 @@ class RestaurantAppController extends ChangeNotifier {
   String? currentOrderId;
   List<CartLine> cart = [];
   bool orderDirty = false;
+  String? draftOrderRequestId;
 
   static const _allRestaurantPermissions = <String>{
     'Pages.Restaurant',
@@ -227,16 +233,30 @@ class RestaurantAppController extends ChangeNotifier {
           tenantId: stored.tenantId,
           tenancyName: stored.tenancyName,
           userName: stored.userName,
+          userId: stored.userId,
         );
         session = configuredSession;
         _attachAuthenticatedApi(configuredSession);
-        await _loadAuthenticatedData();
+        try {
+          await _loadAuthenticatedData();
+        } on ApiException catch (error) {
+          if (error.isUnauthorized) rethrow;
+          await _restoreLocalCartDraft();
+          errorMessage = error.message;
+        } on TimeoutException {
+          serverReachable = false;
+          await _restoreLocalCartDraft();
+          errorMessage =
+              'The restaurant server is offline. Your saved on-device draft is available.';
+        }
       }
     } on ApiException catch (error) {
       if (error.isUnauthorized) {
         await _sessionStore.clear();
         _detachSession();
       } else {
+        serverReachable = false;
+        await _restoreLocalCartDraft();
         errorMessage = error.message;
       }
     } catch (error) {
@@ -326,6 +346,7 @@ class RestaurantAppController extends ChangeNotifier {
         tenantId: tenantId,
         tenancyName: brand.usesTenantName ? tenancyName.trim() : '',
         userName: userName.trim(),
+        userId: auth.userId,
       );
       await _sessionStore.write(stored);
       loginApi.close();
@@ -339,6 +360,8 @@ class RestaurantAppController extends ChangeNotifier {
       errorMessage = error.details?.isNotEmpty == true
           ? '${error.message}\n${error.details}'
           : error.message;
+      serverReachable = false;
+      await _restoreLocalCartDraft();
     } on TimeoutException {
       errorMessage = 'The restaurant server did not respond in time.';
     } catch (error) {
@@ -516,9 +539,10 @@ class RestaurantAppController extends ChangeNotifier {
         ),
         ModuleKind.menuRecipes => hasPermission('Pages.Restaurant.Menu'),
         ModuleKind.channels => hasPermission('Pages.Restaurant.Channels'),
-        ModuleKind.restaurantSetup => hasPermission(
-          'Pages.Restaurant.Setup.Edit',
-        ),
+        // Setup is the read/access permission for this module. Mutating setup
+        // data is gated separately by Setup.Create, Setup.Edit and Setup.Delete
+        // in the screen and by ASP.NET Zero on the corresponding API methods.
+        ModuleKind.restaurantSetup => hasPermission('Pages.Restaurant.Setup'),
         ModuleKind.restaurantReports => hasPermission(
           'Pages.Restaurant.Reports',
         ),
@@ -529,9 +553,7 @@ class RestaurantAppController extends ChangeNotifier {
         ModuleKind.reservations => hasPermission(
           'Pages.Restaurant.Reservations',
         ),
-        ModuleKind.printQueue => hasPermission(
-          'Pages.Restaurant.PrinterSetup',
-        ),
+        ModuleKind.printQueue => hasPermission('Pages.Restaurant.PrinterSetup'),
         _ => false,
       };
     }).toList();
@@ -616,6 +638,7 @@ class RestaurantAppController extends ChangeNotifier {
           .toList();
     }
     orderDirty = false;
+    unawaited(_persistLocalCartDraft(synced: true));
     notifyListeners();
   }
 
@@ -632,6 +655,7 @@ class RestaurantAppController extends ChangeNotifier {
         .where((ticket) => ticket.orderId == order.id)
         .toList();
     orderDirty = false;
+    unawaited(_persistLocalCartDraft(synced: true));
     notifyListeners();
   }
 
@@ -665,6 +689,8 @@ class RestaurantAppController extends ChangeNotifier {
       cart = next;
     }
     orderDirty = true;
+    draftNeedsReview = false;
+    unawaited(_persistLocalCartDraft());
     notifyListeners();
   }
 
@@ -681,6 +707,8 @@ class RestaurantAppController extends ChangeNotifier {
     }
     cart = next;
     orderDirty = true;
+    draftNeedsReview = false;
+    unawaited(_persistLocalCartDraft());
     notifyListeners();
   }
 
@@ -689,6 +717,11 @@ class RestaurantAppController extends ChangeNotifier {
     String customerPhone = '',
   }) async {
     if (cart.isEmpty) throw const ApiException('Add at least one menu item.');
+    if (draftNeedsReview) {
+      throw const ApiException(
+        'Review the restored order against current prices and availability before sending it.',
+      );
+    }
     if (_demoMode) {
       _demoSendToKitchen();
       return;
@@ -707,6 +740,8 @@ class RestaurantAppController extends ChangeNotifier {
         cart = List<CartLine>.from(updated.first.items);
       }
       orderDirty = false;
+      draftNeedsReview = false;
+      await _persistLocalCartDraft(synced: true);
     });
   }
 
@@ -714,6 +749,11 @@ class RestaurantAppController extends ChangeNotifier {
     PosCheckoutDraft draft, {
     bool confirmNegativeStock = false,
   }) async {
+    if (!_demoMode) {
+      throw const ApiException(
+        'Final billing is completed in the browser cashier. Android is for waiter and kitchen work.',
+      );
+    }
     if (cart.isEmpty) throw const ApiException('Add at least one menu item.');
     if (draft.ledgerId.isEmpty || draft.salesAccountId.isEmpty) {
       throw const ApiException(
@@ -889,6 +929,8 @@ class RestaurantAppController extends ChangeNotifier {
     if (itemId == null || itemId.isEmpty || _demoMode) {
       cart = cart.where((item) => item != line).toList();
       orderDirty = true;
+      draftNeedsReview = false;
+      unawaited(_persistLocalCartDraft());
       notifyListeners();
       return;
     }
@@ -1807,10 +1849,28 @@ class RestaurantAppController extends ChangeNotifier {
 
   Future<void> _loadAuthenticatedData() async {
     final api = _api!;
+    final savedSession = session;
+    if (savedSession != null && savedSession.userId > 0) {
+      profile = LoginProfile(
+        userId: savedSession.userId,
+        userName: savedSession.userName,
+        name: savedSession.userName,
+        tenantName: savedSession.tenancyName,
+      );
+      isAuthenticated = true;
+    }
     profile = await api.getCurrentLoginProfile();
     _applyGrantedPermissions(await api.getGrantedPermissions());
     isAuthenticated = true;
+    serverReachable = true;
+    await _sessionStore.writeValue(
+      _permissionCacheKey(),
+      jsonEncode(
+        permissions.where((p) => p == 'Pages.Restaurant.Pos').toList(),
+      ),
+    );
     await _loadRestaurantData();
+    await _restoreLocalCartDraft();
     _startKdsRefresh();
     _startPermissionRefresh();
   }
@@ -1902,9 +1962,14 @@ class RestaurantAppController extends ChangeNotifier {
     Future<void> load(String label, Future<void> Function() action) async {
       try {
         await action();
+        serverReachable = true;
       } on ApiException catch (error) {
         if (error.isUnauthorized && error.statusCode == 401) rethrow;
+        serverReachable = false;
         warnings.add('$label: ${error.message}');
+      } on TimeoutException {
+        serverReachable = false;
+        warnings.add('$label: the server did not respond.');
       }
     }
 
@@ -2032,6 +2097,295 @@ class RestaurantAppController extends ChangeNotifier {
     errorMessage = warnings.isEmpty ? null : warnings.join('\n');
   }
 
+  String _cartDraftKey() {
+    final active = session;
+    final userId = profile?.userId ?? active?.userId ?? 0;
+    return 'restaurant-cart-draft:${active?.tenantId ?? 'host'}:$userId';
+  }
+
+  String _permissionCacheKey() => '${_cartDraftKey()}:pos-permission';
+
+  Future<void> _persistLocalCartDraft({bool synced = false}) async {
+    final active = session;
+    final userId = profile?.userId ?? active?.userId ?? 0;
+    if (active == null || userId <= 0) return;
+    if (cart.isEmpty && currentOrderId == null) {
+      await _sessionStore.deleteValue(_cartDraftKey());
+      draftSavedAt = null;
+      draftSynced = false;
+      draftNeedsReview = false;
+      return;
+    }
+    draftSavedAt = DateTime.now();
+    draftSynced = synced;
+    await _sessionStore.writeValue(
+      _cartDraftKey(),
+      jsonEncode({
+        'version': 1,
+        'savedAt': draftSavedAt!.toIso8601String(),
+        'synced': synced,
+        'orderDirty': orderDirty,
+        'currentOrderId': currentOrderId,
+        'orderRequestId': draftOrderRequestId,
+        'selectedPosContext': selectedPosContext,
+        'lines': cart.map(_serializeCartLine).toList(),
+      }),
+    );
+  }
+
+  Future<void> _restoreLocalCartDraft() async {
+    final active = session;
+    final userId = profile?.userId ?? active?.userId ?? 0;
+    if (active == null || userId <= 0) return;
+    final rawPermission = await _sessionStore.readValue(_permissionCacheKey());
+    if (!permissionsLoaded && rawPermission != null) {
+      final cached = (jsonDecode(rawPermission) as List)
+          .whereType<String>()
+          .toSet();
+      permissions = {...permissions, ...cached};
+      permissionsLoaded = true;
+    }
+    final raw = await _sessionStore.readValue(_cartDraftKey());
+    if (raw == null) return;
+    final data = jsonDecode(raw) as Map<String, dynamic>;
+    final orderId = data['currentOrderId'] as String?;
+    final hasCurrentServerOrder =
+        orderId != null && openOrders.any((order) => order.id == orderId);
+    if (data['synced'] == true &&
+        hasCurrentServerOrder &&
+        data['orderDirty'] != true) {
+      return;
+    }
+    final restored = (data['lines'] as List? ?? const [])
+        .map(
+          (line) =>
+              _deserializeCartLine(Map<String, dynamic>.from(line as Map)),
+        )
+        .toList();
+    final reviewNotes = <String>[];
+    cart = restored.map((line) {
+      final matches = products.where((item) => item.id == line.product.id);
+      if (matches.isEmpty) {
+        reviewNotes.add(
+          '${line.product.name} is no longer on the current menu',
+        );
+        return line;
+      }
+      final latest = matches.first;
+      final variantId = line.variant?.id;
+      final variantsNow = latest.variants.where((item) => item.id == variantId);
+      final latestVariant = variantId == null || variantsNow.isEmpty
+          ? line.variant
+          : variantsNow.first;
+      final oldUnit = line.unitPrice + line.modifierUnitTotal;
+      final latestPrice = latestVariant == null
+          ? latest.price
+          : latestVariant.isAbsolutePrice
+          ? latestVariant.priceDelta
+          : latest.price + latestVariant.priceDelta;
+      final newUnit = latestPrice + line.modifierUnitTotal;
+      if ((oldUnit - newUnit).abs() > 0.009) {
+        reviewNotes.add(
+          '${latest.name}: ${oldUnit.toStringAsFixed(2)} → ${newUnit.toStringAsFixed(2)} per item',
+        );
+      }
+      if (!latest.isActive || !latest.isAvailable) {
+        reviewNotes.add('${latest.name} is currently unavailable');
+      }
+      return line.copyWith(product: latest, variant: latestVariant);
+    }).toList();
+    currentOrderId = orderId;
+    draftOrderRequestId = data['orderRequestId'] as String?;
+    selectedPosContext =
+        data['selectedPosContext'] as String? ?? selectedPosContext;
+    orderDirty = data['orderDirty'] == true;
+    draftSynced = data['synced'] == true;
+    draftNeedsReview = true;
+    draftReviewMessage = reviewNotes.isEmpty
+        ? 'Check the current menu and order details before dispatching.'
+        : reviewNotes.join(' · ');
+    draftSavedAt = DateTime.tryParse(data['savedAt'] as String? ?? '');
+    noticeMessage =
+        'Restored an on-device order draft. Review current prices and availability before sending it to the server.';
+    notifyListeners();
+  }
+
+  Map<String, dynamic> _serializeCartLine(CartLine line) => {
+    'product': _serializeProduct(line.product),
+    'qty': line.qty,
+    'orderItemId': line.orderItemId,
+    'variantId': line.variant?.id,
+    'modifiers': line.modifiers
+        .map(
+          (item) => {
+            'id': item.id,
+            'name': item.name,
+            'priceDelta': item.priceDelta,
+          },
+        )
+        .toList(),
+    'status': line.status,
+    'notes': line.notes,
+    'discountAmount': line.discountAmount,
+    'billedQty': line.billedQty,
+    'unbilledQty': line.unbilledQty,
+    'ticketItemId': line.ticketItemId,
+    'unitName': line.unitName,
+  };
+
+  Map<String, dynamic> _serializeProduct(MenuProduct product) => {
+    'id': product.id,
+    'name': product.name,
+    'category': product.category,
+    'station': product.station,
+    'price': product.price,
+    'cost': product.cost,
+    'stock': product.stock,
+    'color': product.color.toARGB32(),
+    'recipe': product.recipe,
+    'productId': product.productId,
+    'categoryId': product.categoryId,
+    'stationId': product.stationId,
+    'productType': product.productType,
+    'isAvailable': product.isAvailable,
+    'hasRecipe': product.hasRecipe,
+    'variants': product.variants
+        .map(
+          (v) => {
+            'id': v.id,
+            'name': v.name,
+            'priceDelta': v.priceDelta,
+            'isAbsolutePrice': v.isAbsolutePrice,
+            'isDefault': v.isDefault,
+          },
+        )
+        .toList(),
+    'modifierGroups': product.modifierGroups
+        .map(
+          (g) => {
+            'id': g.id,
+            'name': g.name,
+            'minSelect': g.minSelect,
+            'maxSelect': g.maxSelect,
+            'isRequired': g.isRequired,
+            'modifiers': g.modifiers
+                .map(
+                  (m) => {
+                    'id': m.id,
+                    'name': m.name,
+                    'priceDelta': m.priceDelta,
+                  },
+                )
+                .toList(),
+          },
+        )
+        .toList(),
+    'shortCode': product.shortCode,
+    'description': product.description,
+    'imageUrl': product.imageUrl,
+    'preparationMinutes': product.preparationMinutes,
+    'sortOrder': product.sortOrder,
+    'isVeg': product.isVeg,
+    'spiceLevel': product.spiceLevel,
+    'isFeatured': product.isFeatured,
+    'isActive': product.isActive,
+    'unavailableUntil': product.unavailableUntil?.toIso8601String(),
+  };
+
+  CartLine _deserializeCartLine(Map<String, dynamic> raw) {
+    final p = Map<String, dynamic>.from(raw['product'] as Map);
+    final variants = (p['variants'] as List? ?? const []).map((item) {
+      final v = Map<String, dynamic>.from(item as Map);
+      return MenuVariant(
+        id: v['id'] as String,
+        name: v['name'] as String,
+        priceDelta: (v['priceDelta'] as num).toDouble(),
+        isAbsolutePrice: v['isAbsolutePrice'] as bool? ?? false,
+        isDefault: v['isDefault'] as bool? ?? false,
+      );
+    }).toList();
+    final groups = (p['modifierGroups'] as List? ?? const []).map((item) {
+      final g = Map<String, dynamic>.from(item as Map);
+      final mods = (g['modifiers'] as List? ?? const []).map((m) {
+        final value = Map<String, dynamic>.from(m as Map);
+        return MenuModifier(
+          id: value['id'] as String,
+          name: value['name'] as String,
+          priceDelta: (value['priceDelta'] as num).toDouble(),
+        );
+      }).toList();
+      return ModifierGroup(
+        id: g['id'] as String,
+        name: g['name'] as String,
+        minSelect: g['minSelect'] as int? ?? 0,
+        maxSelect: g['maxSelect'] as int? ?? 0,
+        isRequired: g['isRequired'] as bool? ?? false,
+        modifiers: mods,
+      );
+    }).toList();
+    final product = MenuProduct(
+      id: p['id'] as String,
+      name: p['name'] as String,
+      category: p['category'] as String? ?? '',
+      station: p['station'] as String? ?? '',
+      price: (p['price'] as num).toDouble(),
+      cost: (p['cost'] as num).toDouble(),
+      stock: (p['stock'] as num).toDouble(),
+      color: Color(p['color'] as int? ?? 0xff607d8b),
+      recipe: (p['recipe'] as List? ?? const []).cast<String>(),
+      productId: p['productId'] as String? ?? '',
+      categoryId: p['categoryId'] as String? ?? '',
+      stationId: p['stationId'] as String?,
+      productType: p['productType'] as int? ?? 0,
+      isAvailable: p['isAvailable'] as bool? ?? false,
+      hasRecipe: p['hasRecipe'] as bool? ?? false,
+      variants: variants,
+      modifierGroups: groups,
+      shortCode: p['shortCode'] as String? ?? '',
+      description: p['description'] as String? ?? '',
+      imageUrl: p['imageUrl'] as String? ?? '',
+      preparationMinutes: p['preparationMinutes'] as int? ?? 0,
+      sortOrder: p['sortOrder'] as int? ?? 0,
+      isVeg: p['isVeg'] as bool?,
+      spiceLevel: p['spiceLevel'] as int?,
+      isFeatured: p['isFeatured'] as bool? ?? false,
+      isActive: p['isActive'] as bool? ?? true,
+      unavailableUntil: DateTime.tryParse(
+        p['unavailableUntil'] as String? ?? '',
+      ),
+    );
+    final variantId = raw['variantId'] as String?;
+    MenuVariant? variant;
+    for (final item in variants) {
+      if (item.id == variantId) {
+        variant = item;
+        break;
+      }
+    }
+    final modifiers = (raw['modifiers'] as List? ?? const []).map((item) {
+      final m = Map<String, dynamic>.from(item as Map);
+      return MenuModifier(
+        id: m['id'] as String,
+        name: m['name'] as String,
+        priceDelta: (m['priceDelta'] as num).toDouble(),
+      );
+    }).toList();
+    return CartLine(
+      product: product,
+      qty: raw['qty'] as int,
+      orderItemId: raw['orderItemId'] as String?,
+      variant: variant,
+      modifiers: modifiers,
+      status: raw['status'] as int? ?? 0,
+      notes: raw['notes'] as String? ?? '',
+      discountAmount: (raw['discountAmount'] as num? ?? 0).toDouble(),
+      billedQty: (raw['billedQty'] as num? ?? 0).toDouble(),
+      unbilledQty: (raw['unbilledQty'] as num?)?.toDouble(),
+      ticketItemId: raw['ticketItemId'] as String?,
+      unitName: raw['unitName'] as String? ?? '',
+    );
+  }
+
   Future<void> reviewGuestOrder({
     required GuestOrderModel order,
     required bool approve,
@@ -2134,6 +2488,13 @@ class RestaurantAppController extends ChangeNotifier {
     required String customerName,
     required String customerPhone,
   }) async {
+    final clientRequestId = currentOrderId == null
+        ? (draftOrderRequestId ?? _newClientRequestId())
+        : null;
+    if (clientRequestId != null) {
+      draftOrderRequestId = clientRequestId;
+      await _persistLocalCartDraft(synced: false);
+    }
     final id = await _api!.saveOrder(
       orderId: currentOrderId,
       orderType: currentOrderType,
@@ -2142,10 +2503,20 @@ class RestaurantAppController extends ChangeNotifier {
       customerName: customerName,
       customerPhone: customerPhone,
       items: cart,
+      clientRequestId: clientRequestId,
     );
     currentOrderId = id;
+    draftOrderRequestId = null;
     orderDirty = false;
+    draftSynced = true;
+    draftNeedsReview = false;
+    await _persistLocalCartDraft(synced: true);
     return id;
+  }
+
+  String _newClientRequestId() {
+    final random = math.Random.secure();
+    return 'flutter-${DateTime.now().microsecondsSinceEpoch}-${random.nextInt(1 << 32)}';
   }
 
   Future<void> _reloadCurrentOrder() async {
@@ -2186,6 +2557,7 @@ class RestaurantAppController extends ChangeNotifier {
     try {
       await action();
     } on ApiException catch (error) {
+      serverReachable = false;
       errorMessage = error.message;
       rethrow;
     } finally {
@@ -2281,6 +2653,18 @@ class RestaurantAppController extends ChangeNotifier {
     cart = [];
     currentOrderId = null;
     orderDirty = false;
+    serverReachable = false;
+    draftSynced = false;
+    draftNeedsReview = false;
+    draftReviewMessage = '';
+    draftSavedAt = null;
+  }
+
+  void acknowledgeDraftReview() {
+    draftNeedsReview = false;
+    draftReviewMessage = '';
+    unawaited(_persistLocalCartDraft(synced: false));
+    notifyListeners();
   }
 
   void _startKdsRefresh() {

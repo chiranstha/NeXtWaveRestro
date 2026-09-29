@@ -1,13 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AgGridAngular } from 'ag-grid-angular';
+import { ColDef, ICellRendererParams } from 'ag-grid-community';
 import { Subscription, firstValueFrom, interval } from 'rxjs';
 import { RestaurantGuestApiService } from './restaurant-guest-api.service';
 
 @Component({
     selector: 'restaurant-print-station',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, AgGridAngular],
     templateUrl: './restaurant-print-station.component.html',
     styleUrl: './restaurant-staff.component.scss',
 })
@@ -25,6 +27,58 @@ export class RestaurantPrintStationComponent implements OnInit, OnDestroy {
     busy = false;
     message = '';
     error = '';
+
+    readonly columnDefs: ColDef[] = [
+        {
+            headerName: 'Type',
+            minWidth: 210,
+            flex: 1,
+            cellRenderer: (params: ICellRendererParams) => {
+                const container = document.createElement('div');
+                container.append(document.createTextNode(params.data.type === 0 ? 'Kitchen ticket' : 'Receipt'));
+                const id = document.createElement('small');
+                id.className = 'd-block text-muted';
+                id.textContent = params.data.externalJobId || '';
+                container.append(id);
+                return container;
+            },
+        },
+        { headerName: 'Route', field: 'routeName', minWidth: 130 },
+        {
+            headerName: 'Status', field: 'status', width: 140,
+            valueFormatter: (params) => this.statusLabel(params.value),
+            cellClass: (params) => params.value === 3 ? 'status-bad' : undefined,
+        },
+        { headerName: 'Attempts', field: 'attempts', width: 110, valueFormatter: (params) => params.value || '—' },
+        {
+            headerName: 'Last error', field: 'lastError', minWidth: 220, flex: 1,
+            cellRenderer: (params: ICellRendererParams) => {
+                const container = document.createElement('div');
+                container.append(document.createTextNode(params.value || '—'));
+                if (params.data.reprintReason) {
+                    const reason = document.createElement('small');
+                    reason.className = 'd-block text-muted';
+                    reason.textContent = `Reprint: ${params.data.reprintReason}`;
+                    container.append(reason);
+                }
+                return container;
+            },
+        },
+        {
+            headerName: '', minWidth: 95, maxWidth: 110, sortable: false, filter: false,
+            cellRenderer: (params: ICellRendererParams) => {
+                if (params.data.status !== 3) return '';
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'btn btn-xs btn-light-primary';
+                button.textContent = 'Retry';
+                button.addEventListener('click', () => this.retry(params.data));
+                return button;
+            },
+        },
+    ];
+
+    readonly defaultColDef: ColDef = { resizable: true, sortable: true, minWidth: 85 };
 
     ngOnInit(): void {
         try {

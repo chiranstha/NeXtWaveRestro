@@ -14,28 +14,19 @@
         </div>
     </section>
 
-    <div class="table-wrap">
-        <table class="reservation-grid">
-            <thead><tr><th>Guest</th><th>Party</th><th>Date and time</th><th>Table</th><th>Duration ends</th><th>Status</th><th>SMS</th><th>Actions</th></tr></thead>
-            <tbody>
-                <tr *ngFor="let row of reservations">
-                    <td><strong>{{ row.guestName }}</strong><small class="d-block text-muted">{{ row.phoneNumber }}</small><small *ngIf="row.isWalkIn" class="badge bg-light-warning">Walk-in</small></td>
-                    <td>{{ row.partySize }}</td>
-                    <td>{{ row.startsAt | date:'short' }}</td>
-                    <td><select [(ngModel)]="assignedTable[row.id]"><option value="">Choose table</option><option *ngFor="let table of suitableTables(row)" [value]="table.id">{{ table.name }} · {{ table.capacity }} seats</option></select></td>
-                    <td><input type="datetime-local" [(ngModel)]="endsAt[row.id]" /></td>
-                    <td>{{ statusLabel(row.status) }}</td>
-                    <td [class.status-bad]="row.smsStatus?.startsWith('Failed')">{{ row.smsStatus }}</td>
-                    <td><div class="reservation-actions">
-                        <button *ngIf="row.status === 0 || row.status === 3" class="btn btn-xs btn-success" [disabled]="busyId === row.id" (click)="confirm(row)">Confirm</button>
-                        <button *ngIf="row.status === 0" class="btn btn-xs btn-light-danger" [disabled]="busyId === row.id" (click)="decline(row)">Decline</button>
-                        <button *ngIf="row.status === 1 || row.status === 3" class="btn btn-xs btn-primary" [disabled]="busyId === row.id" (click)="seat(row)">Seat</button>
-                        <button *ngIf="row.status === 0 || row.status === 1 || row.status === 3" class="btn btn-xs btn-light-danger" [disabled]="busyId === row.id" (click)="cancel(row)">Cancel</button>
-                        <button *ngIf="row.status === 0 || row.status === 1 || row.status === 3" class="btn btn-xs btn-light" [disabled]="busyId === row.id" (click)="noShow(row)">No-show</button>
-                    </div></td>
-                </tr>
-                <tr *ngIf="!reservations.length"><td colspan="8" class="text-center text-muted py-8">No reservations or walk-ins in this date range.</td></tr>
-            </tbody>
-        </table>
+    <div class="table-wrap ag-theme-balham">
+        <ag-grid-angular
+            [columnDefs]="columnDefs"
+            [defaultColDef]="defaultColDef"
+            [rowData]="reservations"
+            [loading]="loading"
+            [animateRows]="true"
+            [rowHeight]="72"
+            [style.height.px]="520"
+            style="width: 100%"
+        ></ag-grid-angular>
+        <div *ngIf="!loading && !reservations.length" class="text-center text-muted py-8">
+            No reservations or walk-ins in this date range.
+        </div>
     </div>
 </section>

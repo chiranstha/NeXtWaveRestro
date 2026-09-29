@@ -311,116 +311,15 @@
                         </div>
                         <div class="row align-items-center">
                             <div [busyIf]="entityChangesLoading" class="col">
-                                <app-data-table
-                                    #dataTableEntityChanges
-                                    (onLazyLoad)="getEntityChanges($event)"
-                                    ScrollWidth="100%"
-                                    [lazy]="true"
-                                    [paginator]="false"
-                                    [tableStyle]="{ 'min-width': '50rem' }"
-                                    [value]="dataTableHelperEntityChanges.records"
-                                    resizableColumns="dataTableHelperEntityChanges.resizableColumns"
-                                    rows="{{ dataTableHelperEntityChanges.defaultRecordsCountPerPage }}"
-                                    scrollable="true"
-                                    sortMode="multiple"
-                                >
-                                    <ng-template appTemplate="header">
-                                        <tr>
-                                            <th style="width: 40px"></th>
-                                            <th style="width: 150px">
-                                                {{ 'Action' | localize }}
-                                            </th>
-                                            <th style="width: 250px">
-                                                {{ 'Object' | localize }}
-                                            </th>
-                                            <th appSortableColumn="userName" style="width: 150px">
-                                                {{ 'UserName' | localize }}
-                                                <app-sort-icon field="userName"></app-sort-icon>
-                                            </th>
-                                            <th appSortableColumn="changeTime" style="width: 150px">
-                                                {{ 'Time' | localize }}
-                                                <app-sort-icon field="changeTime"></app-sort-icon>
-                                            </th>
-                                        </tr>
-                                    </ng-template>
-                                    <ng-template let-record="$implicit" appTemplate="body">
-                                        <tr>
-                                            <td>
-                                                <div
-                                                    class="btn-group"
-                                                    container="body"
-                                                    dropdown
-                                                    placement="bottom left"
-                                                >
-                                                    <button
-                                                        aria-controls="dropdownMenu"
-                                                        class="btn btn-sm btn-primary btn-sm dropdown-toggle"
-                                                        dropdownToggle
-                                                        id="dropdownButton"
-                                                        type="button"
-                                                    >
-                                                        <i class="fa fa-cog"></i>
-                                                        <span class="caret"></span>
-                                                        {{ 'Actions' | localize }}
-                                                    </button>
-                                                    <ul
-                                                        *dropdownMenu
-                                                        aria-labelledby="dropdownButton"
-                                                        class="dropdown-menu"
-                                                        id="dropdownMenu"
-                                                        role="menu"
-                                                    >
-                                                        @if (
-                                                            'Pages.Administration.EntityChanges.FullHistory'
-                                                                | permission
-                                                        ) {
-                                                            <li role="menuitem">
-                                                                <a
-                                                                    (click)="showEntityChangeAllDetails(record)"
-                                                                    class="dropdown-item"
-                                                                    href="javascript:;"
-                                                                    title="{{
-                                                                        'EntityChangeAllDetailTooltipTitle' | localize
-                                                                    }}"
-                                                                >
-                                                                    {{ 'AllChanges' | localize }}
-                                                                </a>
-                                                            </li>
-                                                        }
-                                                        <li role="menuitem">
-                                                            <a
-                                                                (click)="showEntityChangeDetails(record)"
-                                                                class="dropdown-item"
-                                                                href="javascript:;"
-                                                                title="{{ 'EntityChangeDetailTooltip' | localize }}"
-                                                            >
-                                                                {{ 'ViewChange' | localize }}
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                            <td style="width: 150px">
-                                                <span class="app-column-title">{{ 'Action' | localize }}</span>
-                                                <span title="{{ record.changeTypeName }}">
-                                                    {{ l(record.changeTypeName) }}
-                                                </span>
-                                            </td>
-                                            <td style="width: 250px">
-                                                <span class="app-column-title">{{ 'Object' | localize }}</span>
-                                                {{ record.entityTypeFullName }}
-                                            </td>
-                                            <td style="width: 150px">
-                                                <span class="app-column-title">{{ 'UserName' | localize }}</span>
-                                                {{ record.userName }}
-                                            </td>
-                                            <td style="width: 150px">
-                                                <span class="app-column-title">{{ 'Time' | localize }}</span>
-                                                {{ record.changeTime | luxonFormat: 'yyyy-LL-dd HH:mm:ss' }}
-                                            </td>
-                                        </tr>
-                                    </ng-template>
-                                </app-data-table>
+                                <ag-grid-angular
+                                    class="ag-theme-balham w-100"
+                                    (sortChanged)="onEntityChangesSortChanged($event)"
+                                    [columnDefs]="entityChangesColumnDefs"
+                                    [defaultColDef]="entityChangesDefaultColDef"
+                                    [rowData]="dataTableHelperEntityChanges.records"
+                                    [loading]="entityChangesLoading"
+                                    [style.height.px]="420"
+                                ></ag-grid-angular>
                                 @if (dataTableHelperEntityChanges.totalRecordsCount == 0) {
                                     <div class="app-no-data">
                                         {{ 'NoData' | localize }}

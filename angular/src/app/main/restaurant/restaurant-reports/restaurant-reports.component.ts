@@ -177,7 +177,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                     { label: this.l('Void / Cancelled'), value: String(this.voidCancelledAudit.length) },
                     { label: this.l('Discounts'), value: money(sum(this.discountReport, (row) => Number(row.totalDiscountAmount || 0))) },
                     { label: this.l('Payment Methods'), value: String(this.settlementReport.length) },
-                    { label: this.l('Settled Sales'), value: money(sum(this.settlementReport, (row) => Number(row.grandTotal || 0))) },
+                    { label: this.l('Collected'), value: money(sum(this.settlementReport, (row) => Number(row.collectedAmount || 0))) },
                 ];
             default:
                 return [
@@ -548,7 +548,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                 this.primaryChartOptions = this.chartOptions(
                     this.settlementReport.map((row) => ({
                         label: row.paymentMethodName,
-                        amount: Number(row.grandTotal || 0),
+                        amount: Number(row.collectedAmount || 0),
                     })),
                     [{ type: 'pie', angleKey: 'amount', legendItemKey: 'label' }],
                 );
@@ -598,6 +598,10 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
                     this.textColumn('Category', 'categoryName', 160),
                     this.numberColumn('Qty', 'qty'),
                     this.numberColumn('Sales', 'grandTotal'),
+                    this.numberColumn('Collected', 'collectedAmount'),
+                    this.numberColumn('Tips', 'tipAmount'),
+                    this.numberColumn('Cash received', 'cashReceivedAmount'),
+                    this.numberColumn('Change', 'changeAmount'),
                 ],
             },
             {

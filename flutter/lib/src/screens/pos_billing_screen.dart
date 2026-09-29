@@ -12,64 +12,28 @@ class PosBillingScreen extends StatefulWidget {
 class _PosBillingScreenState extends State<PosBillingScreen> {
   final customerController = TextEditingController();
   final phoneController = TextEditingController();
-  final discountController = TextEditingController(text: '0');
-  final tipController = TextEditingController(text: '0');
-  final paidController = TextEditingController();
   String search = '';
-  int paymentMethod = 0;
-  String? accountLedgerId;
-  String? salesLedgerId;
-  String? paymentLedgerId;
-  bool partialBilling = false;
-  final selectedBillQuantities = <String, double>{};
   String? managerPin;
-
-  static const paymentMethods = <int, String>{
-    0: 'Cash',
-    1: 'Cheque',
-    2: 'Credit',
-    3: 'Card',
-    5: 'QR',
-  };
 
   RestaurantAppController get controller => widget.controller;
   double get subtotal =>
       controller.cart.fold(0, (total, line) => total + line.total);
-  double get discount => _number(discountController.text);
-  double get tip => _number(tipController.text);
-  double get estimate => math.max(0, subtotal - discount + tip).toDouble();
 
   @override
   void initState() {
     super.initState();
-    _setDefaultLedgers();
     _syncCustomerFromCurrentOrder();
-  }
-
-  @override
-  void didUpdateWidget(covariant PosBillingScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _setDefaultLedgers();
-  }
-
-  void _setDefaultLedgers() {
-    accountLedgerId ??= controller.defaultAccountLedger?.id;
-    salesLedgerId ??= controller.defaultSalesLedger?.id;
   }
 
   @override
   void dispose() {
     customerController.dispose();
     phoneController.dispose();
-    discountController.dispose();
-    tipController.dispose();
-    paidController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    _setDefaultLedgers();
     final compact = MediaQuery.sizeOf(context).width < 1040;
     final categories = <String>{
       'All',
@@ -317,172 +281,8 @@ class _PosBillingScreenState extends State<PosBillingScreen> {
               isDense: true,
             ),
           ),
-          const SizedBox(height: 10),
-          DropdownButtonFormField<int>(
-            initialValue: paymentMethod,
-            decoration: const InputDecoration(
-              labelText: 'Payment method',
-              isDense: true,
-            ),
-            items: [
-              for (final entry in paymentMethods.entries)
-                DropdownMenuItem(value: entry.key, child: Text(entry.value)),
-            ],
-            onChanged: (value) => setState(() {
-              paymentMethod = value ?? 0;
-              if (paymentMethod == 0) paymentLedgerId = null;
-            }),
-          ),
-          const SizedBox(height: 8),
-          if (controller.hasPermission('Pages.Restaurant.Pos.Discount'))
-            _PosNumberField(
-              controller: discountController,
-              label: 'Order discount (Rs)',
-              onChanged: (_) => setState(() {}),
-            ),
-          const SizedBox(height: 8),
-          _PosNumberField(
-            controller: tipController,
-            label: 'Tip amount (Rs)',
-            onChanged: (_) => setState(() {}),
-          ),
-          const SizedBox(height: 8),
-          _PosNumberField(
-            controller: paidController,
-            label: 'Customer paid (blank = payable)',
-            onChanged: (_) {},
-          ),
-          const SizedBox(height: 8),
-          if (controller.currentOrderId != null &&
-              controller.cart.any(
-                (line) =>
-                    line.orderItemId != null &&
-                    (line.unbilledQty ?? line.qty) > 0,
-              ))
-            ExpansionTile(
-              tilePadding: EdgeInsets.zero,
-              title: const Text(
-                'Split / partial bill',
-                style: TextStyle(fontWeight: FontWeight.w800),
-              ),
-              subtitle: Text(
-                partialBilling
-                    ? '${selectedBillQuantities.length} line(s) selected'
-                    : 'Full remaining order',
-              ),
-              leading: Switch(
-                value: partialBilling,
-                onChanged: (value) => setState(() {
-                  partialBilling = value;
-                  if (!value) selectedBillQuantities.clear();
-                }),
-              ),
-              children: partialBilling
-                  ? [
-                      for (final line in controller.cart.where(
-                        (line) =>
-                            line.orderItemId != null &&
-                            (line.unbilledQty ?? line.qty) > 0,
-                      ))
-                        CheckboxListTile(
-                          dense: true,
-                          contentPadding: EdgeInsets.zero,
-                          value: selectedBillQuantities.containsKey(
-                            line.orderItemId,
-                          ),
-                          title: Text(line.product.name),
-                          subtitle: Text(
-                            '${selectedBillQuantities[line.orderItemId]?.toStringAsFixed(2) ?? '0'} of '
-                            '${(line.unbilledQty ?? line.qty).toStringAsFixed(2)} selected · ${money(line.total)}',
-                          ),
-                          secondary:
-                              selectedBillQuantities.containsKey(
-                                line.orderItemId,
-                              )
-                              ? SizedBox(
-                                  width: 104,
-                                  child: Row(
-                                    children: [
-                                      IconButton(
-                                        tooltip: 'Reduce bill quantity',
-                                        onPressed: () =>
-                                            _changeBillQty(line, -1),
-                                        icon: const Icon(
-                                          Icons.remove_circle_outline_rounded,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        tooltip: 'Increase bill quantity',
-                                        onPressed: () =>
-                                            _changeBillQty(line, 1),
-                                        icon: const Icon(
-                                          Icons.add_circle_outline_rounded,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : null,
-                          onChanged: (checked) => setState(() {
-                            if (checked == true) {
-                              selectedBillQuantities[line.orderItemId!] =
-                                  line.unbilledQty ?? line.qty.toDouble();
-                            } else {
-                              selectedBillQuantities.remove(line.orderItemId);
-                            }
-                          }),
-                        ),
-                    ]
-                  : const [],
-            ),
-          const SizedBox(height: 8),
-          ExpansionTile(
-            tilePadding: EdgeInsets.zero,
-            childrenPadding: EdgeInsets.zero,
-            title: const Text(
-              'Accounting ledgers',
-              style: TextStyle(fontWeight: FontWeight.w800),
-            ),
-            subtitle: const Text('Required by the current billing workflow'),
-            children: [
-              _ledgerDropdown(
-                label: 'Customer / cash ledger',
-                value: accountLedgerId,
-                options: controller.accountLedgers,
-                onChanged: (value) => setState(() => accountLedgerId = value),
-              ),
-              const SizedBox(height: 8),
-              _ledgerDropdown(
-                label: 'Sales account',
-                value: salesLedgerId,
-                options: controller.salesLedgers,
-                onChanged: (value) => setState(() => salesLedgerId = value),
-              ),
-              if (paymentMethod != 0 && paymentMethod != 2) ...[
-                const SizedBox(height: 8),
-                _ledgerDropdown(
-                  label: 'Payment ledger (optional)',
-                  value: paymentLedgerId,
-                  options: controller.accountLedgers,
-                  onChanged: (value) => setState(() => paymentLedgerId = value),
-                  optional: true,
-                ),
-              ],
-            ],
-          ),
           const Divider(height: 22),
           _AmountRow(label: 'Menu subtotal', value: money(subtotal)),
-          if (discount > 0)
-            _AmountRow(
-              label: 'Requested discount',
-              value: '- ${money(discount)}',
-            ),
-          if (tip > 0) _AmountRow(label: 'Tip', value: money(tip)),
-          _AmountRow(
-            label: 'Estimated payable',
-            value: money(estimate),
-            strong: true,
-          ),
           const Padding(
             padding: EdgeInsets.only(top: 4, bottom: 10),
             child: Text(
@@ -490,64 +290,50 @@ class _PosBillingScreenState extends State<PosBillingScreen> {
               style: TextStyle(color: AppColors.muted, fontSize: 11.5),
             ),
           ),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: controller.busy || controller.cart.isEmpty
-                      ? null
-                      : _sendKot,
-                  icon: const Icon(Icons.soup_kitchen_rounded),
-                  label: const Text('Send KOT'),
+          if (controller.draftSavedAt != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text(
+                'Saved ${controller.draftSavedAt!.toLocal()} · server ${controller.serverReachable ? 'connected' : 'unavailable'} · ${controller.draftSynced ? 'saved to server' : 'on this device only'}',
+                style: const TextStyle(color: AppColors.muted, fontSize: 11.5),
+              ),
+            ),
+          if (controller.draftNeedsReview)
+            Card(
+              color: AppColors.amber.withValues(alpha: .10),
+              child: ListTile(
+                leading: const Icon(
+                  Icons.sync_problem_rounded,
+                  color: AppColors.amber,
+                ),
+                title: const Text('Review this restored draft'),
+                subtitle: Text(controller.draftReviewMessage),
+                trailing: TextButton(
+                  onPressed: controller.serverReachable
+                      ? controller.acknowledgeDraftReview
+                      : null,
+                  child: const Text('Reviewed'),
                 ),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: controller.busy || controller.cart.isEmpty
-                      ? null
-                      : () => _settle(false),
-                  icon: controller.busy
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.check_circle_rounded),
-                  label: const Text('Settle'),
-                ),
-              ),
-            ],
+            ),
+          const Padding(
+            padding: EdgeInsets.only(bottom: 10),
+            child: Text(
+              'Final bills and payment settlement are completed in the browser cashier.',
+            ),
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: controller.busy || controller.cart.isEmpty
+                  ? null
+                  : _sendKot,
+              icon: const Icon(Icons.soup_kitchen_rounded),
+              label: const Text('Send KOT'),
+            ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _ledgerDropdown({
-    required String label,
-    required String? value,
-    required List<LedgerOption> options,
-    required ValueChanged<String?> onChanged,
-    bool optional = false,
-  }) {
-    final validValue = options.any((item) => item.id == value) ? value : null;
-    return DropdownButtonFormField<String>(
-      initialValue: validValue,
-      isExpanded: true,
-      decoration: InputDecoration(labelText: label, isDense: true),
-      items: [
-        if (optional)
-          const DropdownMenuItem(value: '', child: Text('Server default')),
-        for (final option in options)
-          DropdownMenuItem(
-            value: option.id,
-            child: Text(option.name, overflow: TextOverflow.ellipsis),
-          ),
-      ],
-      onChanged: options.isEmpty
-          ? null
-          : (next) => onChanged(next?.isEmpty == true ? null : next),
     );
   }
 
@@ -569,29 +355,11 @@ class _PosBillingScreenState extends State<PosBillingScreen> {
       controller.operationalSettings['requireManagerPinForSensitiveActions'] ==
       true;
 
-  void _changeBillQty(CartLine line, int delta) {
-    final id = line.orderItemId;
-    if (id == null) return;
-    final maximum = line.unbilledQty ?? line.qty.toDouble();
-    final step = maximum < 1 ? maximum : 1.0;
-    final current = selectedBillQuantities[id] ?? maximum;
-    final next = math.min(maximum, current + delta * step);
-    setState(() {
-      if (next <= 0) {
-        selectedBillQuantities.remove(id);
-      } else {
-        selectedBillQuantities[id] = next;
-      }
-    });
-  }
-
   Future<void> _changeContext(String? value) async {
     if (value == null || value == controller.selectedPosContext) return;
     if (controller.orderDirty && !await _confirmDiscard()) return;
     controller.selectPosContext(value);
     _syncCustomerFromCurrentOrder();
-    partialBilling = false;
-    selectedBillQuantities.clear();
   }
 
   Future<bool> _confirmDiscard() async {
@@ -660,8 +428,6 @@ class _PosBillingScreenState extends State<PosBillingScreen> {
     if (selected != null) {
       controller.loadOpenOrder(selected);
       _syncCustomerFromCurrentOrder();
-      partialBilling = false;
-      selectedBillQuantities.clear();
     }
   }
 
@@ -1035,155 +801,10 @@ class _PosBillingScreenState extends State<PosBillingScreen> {
     }
   }
 
-  Future<void> _settle(bool confirmNegativeStock) async {
-    if (partialBilling && selectedBillQuantities.isEmpty) {
-      _showError('Select at least one saved order line for a partial bill.');
-      return;
-    }
-    if (discount > 0 &&
-        _requiresManagerPin &&
-        (managerPin == null || managerPin!.isEmpty)) {
-      managerPin = await _requestPin('Discount approval');
-      if (managerPin == null || managerPin!.isEmpty) return;
-    }
-    final ledgerId =
-        accountLedgerId ?? controller.defaultAccountLedger?.id ?? '';
-    final salesId = salesLedgerId ?? controller.defaultSalesLedger?.id ?? '';
-    final draft = PosCheckoutDraft(
-      customerName: customerController.text.trim(),
-      customerPhone: phoneController.text.trim(),
-      discount: discount,
-      paymentMethod: paymentMethod,
-      tipAmount: tip,
-      customerPaidAmount: paidController.text.trim().isEmpty
-          ? null
-          : _number(paidController.text),
-      ledgerId: ledgerId,
-      salesAccountId: salesId,
-      paymentLedgerId: paymentLedgerId,
-      approvalPin: managerPin,
-      billLines: partialBilling
-          ? [
-              for (final line in controller.cart.where(
-                (line) => selectedBillQuantities.containsKey(line.orderItemId),
-              ))
-                BillLineSelection(
-                  orderItemId: line.orderItemId!,
-                  qty: selectedBillQuantities[line.orderItemId]!,
-                ),
-            ]
-          : const [],
-    );
-    try {
-      final result = await controller.settle(
-        draft,
-        confirmNegativeStock: confirmNegativeStock,
-      );
-      if (!mounted) return;
-      await showDialog<void>(
-        context: context,
-        builder: (context) => AlertDialog(
-          icon: const Icon(
-            Icons.check_circle_rounded,
-            color: AppColors.green,
-            size: 42,
-          ),
-          title: Text('Bill ${result.orderNo} posted'),
-          content: Text(
-            'Payable: ${money(result.payable)}\nReturn: ${money(result.returnAmount)}'
-            '${result.isFullyBilled ? '' : '\nRemaining order balance: ${money(result.remainingGrandTotal)}'}',
-          ),
-          actions: [
-            FilledButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Done'),
-            ),
-          ],
-        ),
-      );
-      if (result.isFullyBilled) {
-        customerController.clear();
-        phoneController.clear();
-      }
-      discountController.text = '0';
-      tipController.text = '0';
-      paidController.clear();
-      partialBilling = false;
-      selectedBillQuantities.clear();
-      managerPin = null;
-      setState(() {});
-    } on StockShortageException catch (error) {
-      if (!mounted) return;
-      final proceed = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Insufficient recipe stock'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('The server reported these shortages:'),
-                const SizedBox(height: 10),
-                for (final item in error.items)
-                  Text(
-                    '• ${item.productName}: need ${item.requiredQty.toStringAsFixed(2)} ${item.unitName}, available ${item.availableQty.toStringAsFixed(2)}',
-                  ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Post anyway'),
-            ),
-          ],
-        ),
-      );
-      if (proceed == true) await _settle(true);
-    } on ApiException catch (error) {
-      _showError(error.message);
-    }
-  }
-
   void _showError(String message) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: AppColors.red),
-    );
-  }
-
-  static double _number(String value) {
-    return double.tryParse(value.trim().replaceAll(',', '')) ?? 0;
-  }
-}
-
-class _PosNumberField extends StatelessWidget {
-  const _PosNumberField({
-    required this.controller,
-    required this.label,
-    required this.onChanged,
-  });
-
-  final TextEditingController controller;
-  final String label;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixText: 'Rs ',
-        isDense: true,
-      ),
     );
   }
 }

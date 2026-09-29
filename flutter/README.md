@@ -7,13 +7,14 @@ Flutter staff application backed by the existing NextWave ERP restaurant service
 - tenant login, two-factor verification, required-password reset, encrypted session storage, and permission-aware navigation;
 - live POS menu, variants/modifiers, dine-in/takeaway/delivery orders, guarded context switching, open-order editing, item voids, table transfer, order split/merge, KOT/BOT history and audited reprints;
 - full and partial billing by item/quantity, stock validation, manager-PIN discounts, payment/ledger selection, tips, and server-side bill posting;
+- 80 mm customer receipt PDFs after billing, sent to the Android/iOS system print dialog for compatible installed printers;
 - KDS ticket and item progression/cancellation with live polling;
 - menu availability and recipe-cost visibility;
 - low-stock replenishment, draft purchase-order generation, supplier mappings, stock counts/adjustments/wastage, consumption history, and recipe coverage;
 - channel setup/menu publishing, aggregator acceptance/status handling, payout reconciliation, editable area/table/station/operational setup, device sync health, and all 17 restaurant report endpoints;
 - automatic access-token refresh, secure session persistence, Android and iOS runners, and responsive phone/tablet layouts.
 
-Final taxes, charges, inventory consumption, ledger posting, and bill totals are calculated by the backend. The app is online-first; offline sync is intentionally deferred to `../futureplan.md`.
+Final taxes, charges, inventory consumption, ledger posting, and bill totals are calculated by the backend. Receipt printing uses printers exposed by the device's system print service (such as AirPrint or Android print services). Direct Bluetooth/LAN ESC/POS pairing and KOT station routing remain planned in `../futureplan.md`. The app is online-first; offline sync is intentionally deferred there too.
 
 ## Run
 

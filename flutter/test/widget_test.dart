@@ -89,6 +89,35 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('setup read permission opens setup without edit actions', (
+    tester,
+  ) async {
+    await _setDesktopViewport(tester);
+    final controller = RestaurantAppController.demo(
+      grantedPermissions: const {'Pages.Restaurant', 'Pages.Restaurant.Setup'},
+    );
+
+    await tester.pumpWidget(RestaurantErpApp(controller: controller));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Restaurant Setup'), findsWidgets);
+    expect(
+      controller.visibleModules.any(
+        (module) => module.kind == ModuleKind.restaurantSetup,
+      ),
+      isTrue,
+    );
+
+    await tester.tap(find.text('Restaurant Setup').first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Areas'), findsOneWidget);
+    expect(find.byTooltip('Add Areas'), findsNothing);
+    expect(find.byTooltip('Add Tables'), findsNothing);
+    expect(find.byTooltip('Add Stations'), findsNothing);
+    expect(find.byTooltip('Edit settings'), findsNothing);
+  });
+
   testWidgets('finance manager dashboard shows only finance report cards', (
     tester,
   ) async {
@@ -143,7 +172,7 @@ void main() {
     expect(find.textContaining('KOT-'), findsWidgets);
   });
 
-  testWidgets('demo POS settles through the backend-shaped checkout', (
+  testWidgets('Android POS keeps final billing in the browser cashier', (
     tester,
   ) async {
     await _setDesktopViewport(tester);
@@ -156,15 +185,14 @@ void main() {
     await tester.tap(find.text('Veg Chowmein').first);
     await tester.pumpAndSettle();
 
-    final settleButton = find.text('Settle');
-    await tester.ensureVisible(settleButton);
-    await tester.tap(settleButton);
-    await tester.pumpAndSettle();
-
-    expect(find.textContaining('Bill DEMO-'), findsOneWidget);
-    await tester.tap(find.text('Done'));
-    await tester.pumpAndSettle();
-    expect(controller.cart, isEmpty);
+    expect(
+      find.text(
+        'Final bills and payment settlement are completed in the browser cashier.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Settle'), findsNothing);
+    expect(controller.cart, hasLength(1));
   });
 
   testWidgets('phone layout opens the POS without render overflows', (
