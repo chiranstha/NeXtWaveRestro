@@ -409,3 +409,108 @@
     padding: 0.5rem;
   }
 }
+
+/* Keep the report controls and totals aligned with the wide financial grid. */
+.trial-balance {
+  --tb-debit: #159455;
+  --tb-credit: #d04462;
+  --tb-closing: #1677c8;
+  min-width: 0;
+}
+
+.trial-balance__heading {
+  border-bottom: 0;
+  margin-bottom: 1.1rem;
+  padding-bottom: 0;
+}
+
+.trial-balance__status {
+  border-radius: 999px;
+  gap: 0.55rem;
+  min-width: 0;
+  padding: 0.45rem 0.75rem;
+}
+
+.trial-balance__status-icon {
+  height: 1.65rem;
+  width: 1.65rem;
+}
+
+.trial-balance__filter-bar {
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.75rem;
+  padding: 0.55rem 0.8rem;
+}
+
+.trial-balance__report {
+  min-width: 0;
+}
+
+.trial-balance__toolbar {
+  flex-direction: row;
+  gap: 0.8rem;
+  min-width: 0;
+  padding: 0.65rem 0.8rem;
+}
+
+.trial-balance__search {
+  flex: 1 1 300px;
+  max-width: 420px;
+  min-width: min(220px, 100%);
+}
+
+.trial-balance__toolbar-actions {
+  flex: 0 0 auto;
+}
+
+.trial-balance__table {
+  border-radius: 0 0 0.55rem 0.55rem;
+}
+
+.trial-balance__footer {
+  gap: 0.75rem;
+  padding: 0.6rem 0.85rem;
+}
+
+:host ::ng-deep .trial-balance__grid .ag-cell[col-id="debit"] {
+  color: var(--tb-debit);
+  font-weight: 600;
+}
+
+:host ::ng-deep .trial-balance__grid .ag-cell[col-id="credit"] {
+  color: var(--tb-credit);
+  font-weight: 600;
+}
+
+:host ::ng-deep .trial-balance__grid .ag-cell[col-id="closingDr"],
+:host ::ng-deep .trial-balance__grid .ag-cell[col-id="closingCr"] {
+  color: var(--tb-closing);
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .trial-balance__toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .trial-balance__search {
+    max-width: none;
+  }
+
+  .trial-balance__toolbar-actions {
+    flex: 1 1 auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .trial-balance__heading {
+    border-bottom: 1px solid var(--tb-line);
+    padding-bottom: 0.85rem;
+  }
+
+  .trial-balance__status-copy span {
+    display: inline;
+    margin-left: 0.3rem;
+  }
+}

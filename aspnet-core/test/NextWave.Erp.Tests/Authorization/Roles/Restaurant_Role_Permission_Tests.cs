@@ -69,6 +69,7 @@ public class Restaurant_Role_Permission_Tests : AppTestBase
             AppPermissions.PagesRestaurantReportsOperations,
             AppPermissions.PagesRestaurantReportsPayroll,
             AppPermissions.PagesRestaurantReportsSales,
+            AppPermissions.PagesRestaurantRefundApprove,
             AppPermissions.PagesFinancialYears
         }.Concat(FinanceReportPermissions).OrderBy(permission => permission, System.StringComparer.Ordinal).ToArray());
 
@@ -99,6 +100,7 @@ public class Restaurant_Role_Permission_Tests : AppTestBase
         {
             AppPermissions.PagesRestaurant,
             AppPermissions.PagesRestaurantPos,
+            AppPermissions.PagesRestaurantRefundApprove,
             AppPermissions.PagesFinancialYears
         }.Concat(FinanceReportPermissions).OrderBy(permission => permission, System.StringComparer.Ordinal).ToArray());
     }

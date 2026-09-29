@@ -151,6 +151,10 @@ export class RestaurantReleaseApiService {
         return this.get('RestaurantOrder', 'GetOperationStatus', { operationType, clientRequestId });
     }
 
+    kdsOperationStatus(operationType: string, clientRequestId: string): Observable<any> {
+        return this.get('RestaurantKds', 'GetOperationStatus', { operationType, clientRequestId });
+    }
+
     currentCashShift(): Observable<any> {
         const params = new HttpParams().set('registerName', 'Main');
         return this.http.get<any>(`${this.baseUrl}/api/services/app/RestaurantCashShift/GetCurrent`, { params })

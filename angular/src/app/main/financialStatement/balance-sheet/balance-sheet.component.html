@@ -14,7 +14,7 @@
         </div>
 
         <div class="col-lg-auto">
-          <div class="page-intro__status card shadow-sm border d-flex align-items-center gap-3 px-4 py-3 rounded-3 transition-all" 
+          <div class="page-intro__status card shadow-sm border d-flex flex-row align-items-center gap-3 px-4 py-3 rounded-3 transition-all" 
                [ngClass]="statementVerified ? 'border-success bg-success-subtle text-success' : 'border-danger bg-danger-subtle text-danger'"
                [attr.title]="statementIntegrityMessage">
             <i class="fad fs-4" [ngClass]="statementVerified ? 'fa-check-circle text-success' : 'fa-exclamation-triangle text-danger'"></i>
@@ -32,7 +32,7 @@
     <!-- Dynamic Metric Cards -->
     <div class="row g-3 page-metrics mb-2">
       <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
-        <article class="stat-card stat-card--primary card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-primary transition-all position-relative overflow-hidden">
+        <article class="stat-card stat-card--primary card border shadow-sm d-flex flex-row align-items-center gap-3 p-3 h-100 text-primary transition-all position-relative overflow-hidden">
           <div class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-primary-subtle fs-5 w-11 h-11">
             <i class="fad fa-chart-pie"></i>
           </div>
@@ -45,7 +45,7 @@
       </div>
       
       <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
-        <article class="stat-card stat-card--success card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-success transition-all position-relative overflow-hidden">
+        <article class="stat-card stat-card--success card border shadow-sm d-flex flex-row align-items-center gap-3 p-3 h-100 text-success transition-all position-relative overflow-hidden">
           <div class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-success-subtle fs-5 w-11 h-11">
             <i class="fad fa-file-invoice-dollar"></i>
           </div>
@@ -58,7 +58,7 @@
       </div>
       
       <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
-        <article class="stat-card stat-card--info card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-info transition-all position-relative overflow-hidden">
+        <article class="stat-card stat-card--info card border shadow-sm d-flex flex-row align-items-center gap-3 p-3 h-100 text-info transition-all position-relative overflow-hidden">
           <div class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-info-subtle fs-5 w-11 h-11">
             <i class="fad fa-balance-scale"></i>
           </div>
@@ -71,7 +71,7 @@
       </div>
       
       <div class="col-xl-3 col-md-6 animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
-        <article class="stat-card stat-card--warning card border shadow-sm d-flex align-items-center gap-3 p-3 h-100 text-warning transition-all position-relative overflow-hidden">
+        <article class="stat-card stat-card--warning card border shadow-sm d-flex flex-row align-items-center gap-3 p-3 h-100 text-warning transition-all position-relative overflow-hidden">
           <div class="stat-card__icon d-inline-flex align-items-center justify-content-center rounded-3 bg-warning-subtle fs-5 w-11 h-11">
             <i class="fad fa-coins"></i>
           </div>
@@ -153,14 +153,14 @@
 
     <!-- Main Report Surface -->
     <main class="report-surface d-flex flex-column gap-3" *ngIf="!showPdfOk">
-      <div class="report-toolbar card shadow-sm border d-flex align-items-center justify-content-between gap-3 p-2 p-md-3 bg-body position-relative">
-        <div class="search-inline flex-grow-1 me-3 d-flex align-items-center" style="flex: 0 0 60%; max-width: 60%; min-width: 280px;">
+      <div class="report-toolbar card shadow-sm border d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3 p-2 p-md-3 bg-body position-relative">
+        <div class="search-inline flex-grow-1 me-3 d-flex align-items-center" style="flex: 1 1 60%; min-width: min(280px, 100%);">
           <span class="me-3 text-muted d-flex align-items-center"><i class="fad fa-search fs-5"></i></span>
           <input (input)="searchDataTable($event.target.value)" class="form-control flex-grow-1 border bg-body rounded-pill"
             placeholder="{{ 'Search accounts, balances or amounts...' | localize }}" type="text" />
         </div>
         
-        <div class="report-toolbar__buttons d-flex gap-2">
+        <div class="report-toolbar__buttons d-flex flex-wrap gap-2">
           <div class="btn-group shadow-sm">
             <button (click)="expandAll()" class="btn btn-sm btn-white text-success border">
               <i class="fad fa-expand-arrows me-2"></i>{{ 'Expand' | localize }}
@@ -219,14 +219,14 @@
       </div>
 
       <!-- Compact & Elegant Footer -->
-      <footer class="report-summary card shadow-sm border animate__animated animate__fadeInUp d-flex align-items-center justify-content-between gap-3 p-3 bg-body">
+      <footer class="report-summary card shadow-sm border animate__animated animate__fadeInUp d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 p-3 bg-body">
         <div class="report-summary__info d-flex align-items-center gap-4">
           <div class="d-flex flex-column">
             <span class="text-muted small text-uppercase fw-bold">{{ 'Total Records' | localize }}</span>
             <span class="fs-5 fw-bold text-primary">{{ rowData?.length || 0 }}</span>
           </div>
         </div>
-        <div class="report-summary__totals d-flex gap-3 ms-auto">
+        <div class="report-summary__totals d-flex flex-wrap gap-3 ms-md-auto">
           <div class="total-chip total-chip--assets shadow-sm d-flex align-items-center rounded-3 bg-primary-subtle text-primary border-primary fw-bold gap-3 border border-transparent p-2 px-4 py-2">
             <i class="fad fa-chart-pie"></i>
             <div class="d-flex flex-column">

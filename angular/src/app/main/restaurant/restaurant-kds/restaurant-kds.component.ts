@@ -21,7 +21,8 @@ import {
     UpdateRestaurantTicketItemStatusDto,
     UpdateRestaurantTicketStatusDto,
 } from '@shared/service-proxies/service-proxies';
-import { finalize } from 'rxjs';
+import { Observable, finalize, firstValueFrom } from 'rxjs';
+import { RestaurantReleaseApiService } from '../restaurant-release-api.service';
 
 interface RestaurantKdsItemEntry {
     ticket: RestaurantTicketDto;
@@ -83,6 +84,7 @@ export class RestaurantKdsComponent extends AppComponentBase implements OnInit, 
 
     private restaurantSetupService = inject(RestaurantSetupServiceProxy);
     private restaurantKdsService = inject(RestaurantKdsServiceProxy);
+    private releaseApi = inject(RestaurantReleaseApiService);
     private cdr = inject(ChangeDetectorRef);
 
     constructor() {
@@ -171,29 +173,39 @@ export class RestaurantKdsComponent extends AppComponentBase implements OnInit, 
         return total.entries.filter((entry) => allowedStatuses.includes(entry.item.status));
     }
 
-    bulkUpdateItemStatus(total: RestaurantKdsItemTotal, status: number): void {
+    bulkUpdateItemStatus(total: RestaurantKdsItemTotal, status: number): Promise<void> | void {
         const entries = this.eligibleItemEntries(total, status);
         if (!entries.length || this.bulkActionKey) {
             return;
         }
 
         this.bulkActionKey = `${total.key}:${status}`;
-        this.restaurantKdsService
-            .updateTicketItemStatuses(
+        const ticketItemIds = entries.map((entry) => entry.item.id).sort();
+        const expectedVersions = Object.fromEntries(entries.map((entry) => [entry.ticket.orderId, entry.ticket.orderRowVersion || '']));
+        if (Object.values(expectedVersions).some((version) => !version)) {
+            this.notify.error('The order version is missing. Refresh the KDS before updating items.');
+            this.bulkActionKey = '';
+            this.cdr.markForCheck();
+            return;
+        }
+        return this.runKitchenMutation('KdsBulkTicketItems', total.key, expectedVersions, { ticketItemIds, status }, (clientRequestId, versions) =>
+            this.restaurantKdsService.updateTicketItemStatuses(
                 new BulkUpdateRestaurantTicketItemStatusDto({
-                    ticketItemIds: entries.map((entry) => entry.item.id),
+                    ticketItemIds,
                     status,
+                    clientRequestId,
+                    expectedOrderVersions: versions,
                 }),
-            )
-            .pipe(finalize(() => {
-                this.bulkActionKey = '';
-                this.cdr.markForCheck();
-            }))
-            .subscribe((result) => {
+            ),
+        ).then((result) => {
                 const skippedText = result.skippedCount ? ` (${result.skippedCount} already changed)` : '';
                 this.notify.success(`${this.itemStatusText(status)}: ${result.updatedCount} line(s) updated${skippedText}`);
                 this.refresh();
-            }, () => this.notify.error('Items could not be updated. Refresh the KDS and retry.'));
+            }, () => this.notify.error('Items could not be updated. Your pending request is preserved; refresh the KDS and retry.'))
+            .finally(() => {
+                this.bulkActionKey = '';
+                this.cdr.markForCheck();
+            });
     }
 
     private buildItemTotals(tickets: RestaurantTicketDto[]): RestaurantKdsItemTotal[] {
@@ -313,14 +325,24 @@ export class RestaurantKdsComponent extends AppComponentBase implements OnInit, 
             return;
         }
 
-        this.restaurantKdsService
-            .updateTicketStatus(
-                new UpdateRestaurantTicketStatusDto({ ticketId: ticket.id, status, cancelReason: cancelReason || '' }),
-            )
-            .subscribe(() => {
+        this.runKitchenMutation(
+            'KdsTicketStatus',
+            ticket.id,
+            { [ticket.orderId]: ticket.orderRowVersion || '' },
+            { ticketId: ticket.id, status, cancelReason: cancelReason || '' },
+            (clientRequestId, versions) => this.restaurantKdsService.updateTicketStatus(
+                new UpdateRestaurantTicketStatusDto({
+                    ticketId: ticket.id,
+                    status,
+                    cancelReason: cancelReason || '',
+                    clientRequestId,
+                    expectedOrderVersion: versions[ticket.orderId],
+                }),
+            ),
+        ).then(() => {
                 this.refresh();
                 this.cdr.markForCheck();
-            });
+            }, () => this.notify.error('Ticket could not be updated. Your pending request is preserved; refresh the KDS and retry.'));
     }
 
     setItemStatus(item: RestaurantTicketItemDto, status: number): void {
@@ -329,18 +351,29 @@ export class RestaurantKdsComponent extends AppComponentBase implements OnInit, 
             return;
         }
 
-        this.restaurantKdsService
-            .updateTicketItemStatus(
+        const ticket = this.tickets.find((candidate) => candidate.items?.some((ticketItem) => ticketItem.id === item.id));
+        if (!ticket) {
+            this.notify.error('Ticket is no longer on this kitchen screen. Refresh and retry.');
+            return;
+        }
+        this.runKitchenMutation(
+            'KdsTicketItemStatus',
+            item.id,
+            { [ticket.orderId]: ticket.orderRowVersion || '' },
+            { ticketItemId: item.id, status, cancelReason: cancelReason || '' },
+            (clientRequestId, versions) => this.restaurantKdsService.updateTicketItemStatus(
                 new UpdateRestaurantTicketItemStatusDto({
                     ticketItemId: item.id,
                     status,
                     cancelReason: cancelReason || '',
+                    clientRequestId,
+                    expectedOrderVersion: versions[ticket.orderId],
                 }),
-            )
-            .subscribe(() => {
+            ),
+        ).then(() => {
                 this.refresh();
                 this.cdr.markForCheck();
-            });
+            }, () => this.notify.error('Kitchen item could not be updated. Your pending request is preserved; refresh the KDS and retry.'));
     }
 
     ticketTypeText(ticket: RestaurantTicketDto): string {
@@ -418,5 +451,65 @@ export class RestaurantKdsComponent extends AppComponentBase implements OnInit, 
     private finishLoading(): void {
         this.loading = false;
         this.cdr.markForCheck();
+    }
+
+    private async runKitchenMutation<T>(
+        operationType: string,
+        actionKey: string,
+        latestExpectedVersions: Record<string, string>,
+        signatureValue: unknown,
+        send: (clientRequestId: string, expectedOrderVersions: Record<string, string>) => Observable<T>,
+    ): Promise<T> {
+        const requestKey = this.kitchenOperationStorageKey(operationType, actionKey);
+        const signature = JSON.stringify(signatureValue);
+        let operation: { clientRequestId: string; expectedOrderVersions: Record<string, string>; signature: string } | null = null;
+        try {
+            const stored = JSON.parse(localStorage.getItem(requestKey) || 'null');
+            if (stored?.clientRequestId && stored?.expectedOrderVersions && stored?.signature === signature) {
+                operation = stored;
+            } else if (stored?.clientRequestId) {
+                const status = await firstValueFrom(this.releaseApi.kdsOperationStatus(operationType, stored.clientRequestId));
+                if (status?.status !== 'Completed' && status?.status !== 'NotFound') {
+                    throw new Error('The earlier kitchen request could not be resolved.');
+                }
+                localStorage.removeItem(requestKey);
+                if (status?.status === 'Completed') {
+                    this.refresh();
+                    throw new Error('The previous kitchen action completed. Refresh before making another change.');
+                }
+            }
+        } catch (error) {
+            if (error instanceof SyntaxError) localStorage.removeItem(requestKey);
+            else throw error;
+        }
+
+        if (!operation) {
+            if (Object.values(latestExpectedVersions).some((version) => !version)) {
+                throw new Error('The server did not return an order version. Refresh the KDS and retry.');
+            }
+            operation = {
+                clientRequestId: this.newKitchenRequestId(),
+                expectedOrderVersions: latestExpectedVersions,
+                signature,
+            };
+            localStorage.setItem(requestKey, JSON.stringify(operation));
+        }
+
+        const result = await firstValueFrom(send(operation.clientRequestId, operation.expectedOrderVersions));
+        localStorage.removeItem(requestKey);
+        return result;
+    }
+
+    private kitchenOperationStorageKey(operationType: string, actionKey: string): string {
+        const session = (this as any).abpSession;
+        const tenantId = session?.tenantId ?? 'host';
+        const userId = session?.userId ?? 'user';
+        return `restaurant-kds-op:${tenantId}:${userId}:${operationType}:${encodeURIComponent(actionKey)}`;
+    }
+
+    private newKitchenRequestId(): string {
+        return typeof crypto !== 'undefined' && 'randomUUID' in crypto
+            ? crypto.randomUUID()
+            : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     }
 }

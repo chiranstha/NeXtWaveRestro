@@ -25,6 +25,7 @@ describe('RestaurantKdsComponent item totals', () => {
                     of(new BulkUpdateRestaurantTicketItemStatusResultDto({ updatedCount: 2, skippedCount: 1 })),
                 ),
             },
+            releaseApi: { kdsOperationStatus: jasmine.createSpy('kdsOperationStatus').and.returnValue(of({ status: 'NotFound' })) },
             notify: { success: jasmine.createSpy('success'), error: jasmine.createSpy('error') },
         });
         return component;
@@ -42,6 +43,8 @@ describe('RestaurantKdsComponent item totals', () => {
             ticketType: options.ticketType ?? 0,
             ticketNo: `KOT-${id}`,
             orderNo: `ORD-${id}`,
+            orderId: `order-${id}`,
+            orderRowVersion: `version-${id}`,
             tableName: `Table ${id}`,
             items: items.map((item, index) => ({
                 id: `${id}-item-${index}`,
@@ -94,7 +97,8 @@ describe('RestaurantKdsComponent item totals', () => {
         expect(component.itemTotals.map((total) => total.qty)).toEqual([6, 5, 4, 3, 2]);
     });
 
-    it('sends only currently eligible item lines to the bulk status API', () => {
+    it('sends only currently eligible item lines with order versions and a stable request ID', async () => {
+        localStorage.clear();
         const component = createComponent();
         component.tickets = [
             ticket('sent', [{ id: 'sent-item', qty: 2, status: 1 }]),
@@ -109,12 +113,14 @@ describe('RestaurantKdsComponent item totals', () => {
         expect(component.eligibleItemEntries(total, 3).map((entry) => entry.item.id)).toEqual(['sent-item', 'preparing-item']);
         expect(component.eligibleItemEntries(total, 4).map((entry) => entry.item.id)).toEqual(['ready-item']);
 
-        component.bulkUpdateItemStatus(total, 3);
+        await component.bulkUpdateItemStatus(total, 3);
 
         const service = (component as any).restaurantKdsService;
         const request = service.updateTicketItemStatuses.calls.mostRecent().args[0] as BulkUpdateRestaurantTicketItemStatusDto;
         expect(request.ticketItemIds).toEqual(['sent-item', 'preparing-item']);
         expect(request.status).toBe(3);
+        expect(request.expectedOrderVersions).toEqual({ 'order-preparing': 'version-preparing', 'order-sent': 'version-sent' });
+        expect(request.clientRequestId).toBeTruthy();
         expect(component.refresh).toHaveBeenCalled();
         expect((component as any).notify.success).toHaveBeenCalledWith('Ready: 2 line(s) updated (1 already changed)');
     });

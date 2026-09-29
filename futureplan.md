@@ -21,7 +21,7 @@ The main release gaps are:
 | Printing | Database claims now run serializably; the existing Windows agent retains queue and retry support | Verify restart durability, competing stations, paper failures, and explicit handling of uncertain physical output |
 | Automatic digital settlement | No restaurant gateway confirmation integration | Add after pilot, beginning with Fonepay dynamic QR |
 
-Code above is implemented in the current working tree; it is not a production-readiness claim. Refund workflows, order-version conflict checks, the combined daily closing view, a guided launch checklist, and restaurant-level rollout switches/client-capability discovery remain open release work. Automated accounting/race tests, the isolated busy-restaurant run, backup-restore drill, and ten-shift pilot have not been completed.
+The current working tree now includes refund approval and separate payout settlement, version-checked order and kitchen mutations, retry/status receipts, a Kathmandu daily close view, setup readiness acknowledgements, and tenant release switches with server capabilities. The database change is additive and has not been applied to a database. Browser and backend builds pass; Flutter analysis and tests pass; the backend test suite passes (160 passed, 1 skipped). Angular's unit-test command remains blocked by existing workspace test configuration and missing test dependencies/assets. These checks do not establish production readiness. The isolated busy-restaurant run, database race/accounting validation, backup-restore drill, and ten-consecutive-shift pilot remain launch gates.
 
 ## Release sequence
 

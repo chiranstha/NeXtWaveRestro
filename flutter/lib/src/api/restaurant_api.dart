@@ -442,6 +442,8 @@ class RestaurantApi {
     required String orderItemId,
     required String reason,
     String? approvalPin,
+    String? clientRequestId,
+    String? expectedOrderVersion,
   }) async {
     await client.post(
       '/api/services/app/RestaurantOrder/VoidOrderItem',
@@ -450,6 +452,8 @@ class RestaurantApi {
         'reason': reason,
         'approvalPin': approvalPin,
         'approvalNote': 'Flutter POS',
+        'clientRequestId': clientRequestId,
+        'expectedOrderVersion': expectedOrderVersion,
       },
     );
   }
@@ -538,10 +542,18 @@ class RestaurantApi {
     String ticketId,
     int status, {
     String reason = '',
+    String? clientRequestId,
+    String? expectedOrderVersion,
   }) async {
     await client.post(
       '/api/services/app/RestaurantKds/UpdateTicketStatus',
-      body: {'ticketId': ticketId, 'status': status, 'cancelReason': reason},
+      body: {
+        'ticketId': ticketId,
+        'status': status,
+        'cancelReason': reason,
+        'clientRequestId': clientRequestId,
+        'expectedOrderVersion': expectedOrderVersion,
+      },
     );
   }
 
@@ -549,6 +561,8 @@ class RestaurantApi {
     required String ticketItemId,
     required int status,
     String reason = '',
+    String? clientRequestId,
+    String? expectedOrderVersion,
   }) async {
     await client.post(
       '/api/services/app/RestaurantKds/UpdateTicketItemStatus',
@@ -556,7 +570,24 @@ class RestaurantApi {
         'ticketItemId': ticketItemId,
         'status': status,
         'cancelReason': reason,
+        'clientRequestId': clientRequestId,
+        'expectedOrderVersion': expectedOrderVersion,
       },
+    );
+  }
+
+  Future<Map<String, dynamic>> getKdsOperationStatus(
+    String operationType,
+    String clientRequestId,
+  ) async {
+    return _map(
+      await client.get(
+        '/api/services/app/RestaurantKds/GetOperationStatus',
+        query: {
+          'operationType': operationType,
+          'clientRequestId': clientRequestId,
+        },
+      ),
     );
   }
 
@@ -1521,6 +1552,7 @@ KdsTicket _ticketFromJson(
     id: _string(item['ticketNo']),
     serverId: _string(item['id']),
     orderId: _string(item['orderId']),
+    orderRowVersion: _nullableString(item['orderRowVersion']),
     orderNo: _string(item['orderNo']),
     ticketType: _integer(item['ticketType']),
     purpose: _integer(item['purpose']),

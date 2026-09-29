@@ -101,17 +101,6 @@ export class AddSalesMasterComponent extends AppComponentBase implements OnInit,
     productId: string;
     arrayNumber: number;
     serialNumber = 0;
-    isFullPage = true;
-    private hiddenShellElements: Array<{ element: HTMLElement; display: string }> = [];
-    private expandedShellElements: Array<{
-        element: HTMLElement;
-        width: string;
-        widthPriority: string;
-        marginLeft: string;
-        marginLeftPriority: string;
-        paddingLeft: string;
-        paddingLeftPriority: string;
-    }> = [];
     voucherName: string;
     validQuantity: boolean;
     maxQty: number;
@@ -199,7 +188,6 @@ export class AddSalesMasterComponent extends AppComponentBase implements OnInit,
     }
 
     ngOnInit(): void {
-        this.enterFullPage();
         this.id = this.route.snapshot.params['id'];
         this.type = this.route.snapshot.params['type'];
         this.createForm();
@@ -251,57 +239,9 @@ export class AddSalesMasterComponent extends AppComponentBase implements OnInit,
         this.typeofSearch.setValue(0);
     }
 
-    exitFullPage(): void {
-        this.restoreFullPageShell();
-        this.isFullPage = false;
-    }
-
     ngOnDestroy(): void {
-        this.restoreFullPageShell();
         this.destroy$.next();
         this.destroy$.complete();
-    }
-
-    private enterFullPage(): void {
-        const header = document.querySelector('#kt_app_header, #kt_header, .theme2-header') as HTMLElement | null;
-        const sidebars = Array.from(
-            document.querySelectorAll('#kt_app_sidebar, #kt_app_sidebar_menu_wrapper, #kt_app_sidebar_menu, #kt_aside, .kt-aside, .aside-left, .theme2-sidebar')
-        ) as HTMLElement[];
-
-        for (const element of [...sidebars, header].filter((item): item is HTMLElement => !!item)) {
-            if (!this.hiddenShellElements.some((item) => item.element === element)) {
-                this.hiddenShellElements.push({ element, display: element.style.display });
-                element.style.display = 'none';
-            }
-        }
-
-        const wrappers = Array.from(document.querySelectorAll('#kt_body, #kt_app_wrapper, #kt_wrapper')) as HTMLElement[];
-        for (const wrapper of wrappers) {
-            if (this.expandedShellElements.some((item) => item.element === wrapper)) continue;
-            this.expandedShellElements.push({
-                element: wrapper,
-                width: wrapper.style.width,
-                widthPriority: wrapper.style.getPropertyPriority('width'),
-                marginLeft: wrapper.style.marginLeft,
-                marginLeftPriority: wrapper.style.getPropertyPriority('margin-left'),
-                paddingLeft: wrapper.style.paddingLeft,
-                paddingLeftPriority: wrapper.style.getPropertyPriority('padding-left'),
-            });
-            wrapper.style.setProperty('width', '100%', 'important');
-            wrapper.style.setProperty('margin-left', '0', 'important');
-            wrapper.style.setProperty('padding-left', '0', 'important');
-        }
-    }
-
-    private restoreFullPageShell(): void {
-        this.hiddenShellElements.forEach(({ element, display }) => { element.style.display = display; });
-        this.expandedShellElements.forEach(({ element, width, widthPriority, marginLeft, marginLeftPriority, paddingLeft, paddingLeftPriority }) => {
-            element.style.setProperty('width', width, widthPriority);
-            element.style.setProperty('margin-left', marginLeft, marginLeftPriority);
-            element.style.setProperty('padding-left', paddingLeft, paddingLeftPriority);
-        });
-        this.hiddenShellElements = [];
-        this.expandedShellElements = [];
     }
 
     initShortcuts(): void {

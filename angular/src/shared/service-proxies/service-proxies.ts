@@ -36418,7 +36418,7 @@ export class RestaurantOrderServiceProxy {
      * @param body (optional) 
      * @return OK
      */
-    cancelItem(body: EntityDtoOfGuid | undefined): Observable<void> {
+    cancelItem(body: VoidRestaurantOrderItemDto | undefined): Observable<void> {
         let url_ = this.baseUrl + "/api/services/app/RestaurantOrder/CancelItem";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -87014,6 +87014,7 @@ export class RestaurantTicketDto implements IRestaurantTicketDto {
     ticketNo!: string | undefined;
     orderNo!: string | undefined;
     orderId!: string;
+    orderRowVersion!: string | undefined;
     orderType!: RestaurantOrderType;
     tableId!: string | undefined;
     tableName!: string | undefined;
@@ -87054,6 +87055,7 @@ export class RestaurantTicketDto implements IRestaurantTicketDto {
             this.ticketNo = _data["ticketNo"];
             this.orderNo = _data["orderNo"];
             this.orderId = _data["orderId"];
+            this.orderRowVersion = _data["orderRowVersion"];
             this.orderType = _data["orderType"];
             this.tableId = _data["tableId"];
             this.tableName = _data["tableName"];
@@ -87098,6 +87100,7 @@ export class RestaurantTicketDto implements IRestaurantTicketDto {
         data["ticketNo"] = this.ticketNo;
         data["orderNo"] = this.orderNo;
         data["orderId"] = this.orderId;
+        data["orderRowVersion"] = this.orderRowVersion;
         data["orderType"] = this.orderType;
         data["tableId"] = this.tableId;
         data["tableName"] = this.tableName;
@@ -87135,6 +87138,7 @@ export interface IRestaurantTicketDto {
     ticketNo: string | undefined;
     orderNo: string | undefined;
     orderId: string;
+    orderRowVersion: string | undefined;
     orderType: RestaurantOrderType;
     tableId: string | undefined;
     tableName: string | undefined;

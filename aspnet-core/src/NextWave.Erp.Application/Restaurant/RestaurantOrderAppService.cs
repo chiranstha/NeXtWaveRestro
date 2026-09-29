@@ -1477,6 +1477,7 @@ namespace NextWave.Erp.Restaurant
                 TicketNo = ticket.TicketNo,
                 OrderNo = ticket.OrderFk?.OrderNo,
                 OrderId = ticket.OrderId,
+                OrderRowVersion = ticket.OrderFk?.RowVersion == null ? null : Convert.ToBase64String(ticket.OrderFk.RowVersion),
                 OrderType = ticket.OrderFk?.OrderType ?? RestaurantOrderType.DineIn,
                 TableId = ticket.OrderFk?.TableId,
                 TableName = ticket.OrderFk?.TableFk == null ? "" : ticket.OrderFk.TableFk.Name,

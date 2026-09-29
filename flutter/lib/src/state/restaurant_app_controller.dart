@@ -879,8 +879,24 @@ class RestaurantAppController extends ChangeNotifier {
       TicketStatus.ready => 3,
       TicketStatus.bumped => 3,
     };
+    final orderId = ticket.orderId;
+    final orderVersion = ticket.orderRowVersion;
+    if (orderId == null || orderVersion == null || orderVersion.isEmpty) {
+      throw const ApiException('The kitchen ticket has no current order version. Refresh the KDS.');
+    }
     await _runBusy(() async {
-      await _api!.updateTicketStatus(serverId, nextStatus);
+      await _runVersionedKitchenMutation(
+        operationType: 'KdsTicketStatus',
+        actionKey: serverId,
+        expectedOrderVersions: {orderId: orderVersion},
+        signature: {'ticketId': serverId, 'status': nextStatus, 'cancelReason': ''},
+        send: (requestId, versions) => _api!.updateTicketStatus(
+          serverId,
+          nextStatus,
+          clientRequestId: requestId,
+          expectedOrderVersion: versions[orderId],
+        ),
+      );
       tickets = await _api!.getOpenTickets(products);
       noticeMessage = 'Ticket ${ticket.id} updated.';
     });
@@ -911,11 +927,28 @@ class RestaurantAppController extends ChangeNotifier {
       }
       return;
     }
+    final orderId = ticket.orderId;
+    final orderVersion = ticket.orderRowVersion;
+    if (orderId == null || orderVersion == null || orderVersion.isEmpty) {
+      throw const ApiException('The kitchen ticket has no current order version. Refresh the KDS.');
+    }
     await _runBusy(() async {
-      await _api!.updateTicketItemStatus(
-        ticketItemId: itemId,
-        status: status,
-        reason: reason,
+      await _runVersionedKitchenMutation(
+        operationType: 'KdsTicketItemStatus',
+        actionKey: itemId,
+        expectedOrderVersions: {orderId: orderVersion},
+        signature: {
+          'ticketItemId': itemId,
+          'status': status,
+          'cancelReason': reason,
+        },
+        send: (requestId, versions) => _api!.updateTicketItemStatus(
+          ticketItemId: itemId,
+          status: status,
+          reason: reason,
+          clientRequestId: requestId,
+          expectedOrderVersion: versions[orderId],
+        ),
       );
       tickets = await _api!.getOpenTickets(products);
       noticeMessage = 'Kitchen item updated.';
@@ -930,8 +963,25 @@ class RestaurantAppController extends ChangeNotifier {
       notifyListeners();
       return;
     }
+    final orderId = ticket.orderId;
+    final orderVersion = ticket.orderRowVersion;
+    if (orderId == null || orderVersion == null || orderVersion.isEmpty) {
+      throw const ApiException('The kitchen ticket has no current order version. Refresh the KDS.');
+    }
     await _runBusy(() async {
-      await _api!.updateTicketStatus(ticketId, 4, reason: reason);
+      await _runVersionedKitchenMutation(
+        operationType: 'KdsTicketStatus',
+        actionKey: ticketId,
+        expectedOrderVersions: {orderId: orderVersion},
+        signature: {'ticketId': ticketId, 'status': 4, 'cancelReason': reason},
+        send: (requestId, versions) => _api!.updateTicketStatus(
+          ticketId,
+          4,
+          reason: reason,
+          clientRequestId: requestId,
+          expectedOrderVersion: versions[orderId],
+        ),
+      );
       tickets = await _api!.getOpenTickets(products);
       noticeMessage = 'Ticket ${ticket.id} cancelled: $reason';
     });
@@ -951,11 +1001,24 @@ class RestaurantAppController extends ChangeNotifier {
       notifyListeners();
       return;
     }
+    final orderId = currentOrderId;
+    final orderVersion = currentOrderVersion;
+    if (orderId == null || orderVersion == null || orderVersion.isEmpty) {
+      throw const ApiException('The order version is unavailable. Reload the order before voiding an item.');
+    }
     await _runBusy(() async {
-      await _api!.voidOrderItem(
-        orderItemId: itemId,
-        reason: reason,
-        approvalPin: approvalPin,
+      await _runVersionedKitchenMutation(
+        operationType: 'OrderVoidItem',
+        actionKey: '$itemId:void',
+        expectedOrderVersions: {orderId: orderVersion},
+        signature: {'orderItemId': itemId, 'reason': reason},
+        send: (requestId, versions) => _api!.voidOrderItem(
+          orderItemId: itemId,
+          reason: reason,
+          approvalPin: approvalPin,
+          clientRequestId: requestId,
+          expectedOrderVersion: versions[orderId],
+        ),
       );
       await _reloadCurrentOrder();
       noticeMessage = '${line.product.name} voided.';
@@ -2587,6 +2650,94 @@ class RestaurantAppController extends ChangeNotifier {
     return id;
   }
 
+  Future<void> _runVersionedKitchenMutation({
+    required String operationType,
+    required String actionKey,
+    required Map<String, String> expectedOrderVersions,
+    required Map<String, Object?> signature,
+    required Future<void> Function(
+      String requestId,
+      Map<String, String> expectedOrderVersions,
+    ) send,
+  }) async {
+    final storageKey = _orderOperationKey('kds:$operationType:$actionKey');
+    final signatureJson = jsonEncode(signature);
+    var requestId = '';
+    var versions = expectedOrderVersions;
+    final raw = await _sessionStore.readValue(storageKey);
+    if (raw != null) {
+      final stored = jsonDecode(raw) as Map<String, dynamic>;
+      final storedRequestId = stored['id'] as String?;
+      if (storedRequestId != null && storedRequestId.isNotEmpty) {
+        final status = await _api!.getKdsOperationStatus(operationType, storedRequestId);
+        final statusText = _string(status['status']);
+        final sameAction = stored['signature'] == signatureJson;
+        if (sameAction && statusText == 'Completed') {
+          await _sessionStore.deleteValue(storageKey);
+          await _refreshAfterKitchenOperation(operationType);
+          return;
+        }
+        if (!sameAction && statusText == 'Completed') {
+          await _sessionStore.deleteValue(storageKey);
+          await _refreshAfterKitchenOperation(operationType);
+          throw const ApiException(
+            'The previous kitchen action completed. Refresh the order and retry the new action.',
+          );
+        }
+        if (statusText != 'NotFound') {
+          throw const ApiException(
+            'The previous kitchen action could not be resolved. Check the connection and retry.',
+          );
+        }
+        if (sameAction) {
+          requestId = storedRequestId;
+          final storedVersions = Map<String, dynamic>.from(
+            stored['expectedOrderVersions'] as Map? ?? const {},
+          );
+          versions = storedVersions.map((key, value) => MapEntry(key, value.toString()));
+        } else {
+          await _sessionStore.deleteValue(storageKey);
+        }
+      }
+    }
+
+    if (requestId.isEmpty) {
+      if (versions.isEmpty || versions.values.any((value) => value.isEmpty)) {
+        throw const ApiException('The order version is unavailable. Refresh the kitchen screen.');
+      }
+      requestId = _newClientRequestId();
+      await _sessionStore.writeValue(
+        storageKey,
+        jsonEncode({
+          'id': requestId,
+          'signature': signatureJson,
+          'expectedOrderVersions': versions,
+        }),
+      );
+    }
+
+    try {
+      await send(requestId, versions);
+      await _sessionStore.deleteValue(storageKey);
+    } on ApiException catch (error) {
+      final details = error.message.toLowerCase();
+      if (details.contains('restaurant.orderconflict') ||
+          details.contains('changed on another device')) {
+        await _sessionStore.deleteValue(storageKey);
+        await _refreshAfterKitchenOperation(operationType);
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> _refreshAfterKitchenOperation(String operationType) async {
+    if (operationType.startsWith('Kds')) {
+      tickets = await _api!.getOpenTickets(products);
+      return;
+    }
+    await _refreshOrdersAndTickets();
+  }
+
   String _newClientRequestId() {
     final random = math.Random.secure();
     return 'flutter-${DateTime.now().microsecondsSinceEpoch}-${random.nextInt(1 << 32)}';
@@ -2631,7 +2782,7 @@ class RestaurantAppController extends ChangeNotifier {
     try {
       await action();
     } on ApiException catch (error) {
-      serverReachable = false;
+      if (error.statusCode == null) serverReachable = false;
       errorMessage = error.message;
       rethrow;
     } finally {

@@ -47,6 +47,26 @@ namespace NextWave.Erp.Restaurant
             return result;
         }
 
+        public async Task<RestaurantOperationStatusDto> GetOperationStatus(string operationType, string clientRequestId)
+        {
+            var allowedOperationTypes = new[] { "KdsTicketStatus", "KdsTicketItemStatus", "KdsBulkTicketItems", "OrderVoidItem" };
+            if (string.IsNullOrWhiteSpace(operationType) || !allowedOperationTypes.Contains(operationType.Trim(), StringComparer.OrdinalIgnoreCase) ||
+                string.IsNullOrWhiteSpace(clientRequestId) || clientRequestId.Trim().Length > 100)
+                throw new UserFriendlyException("A valid kitchen operation type and request ID are required");
+
+            var normalizedType = operationType.Trim();
+            var normalizedRequestId = clientRequestId.Trim();
+            var operation = await FindOperation(AbpSession.GetTenantId(), normalizedType, normalizedRequestId);
+            return new RestaurantOperationStatusDto
+            {
+                OperationType = normalizedType,
+                ClientRequestId = normalizedRequestId,
+                Status = operation == null ? "NotFound" : "Completed",
+                EntityId = operation?.EntityId,
+                ResultJson = operation?.ResultJson
+            };
+        }
+
         public async Task UpdateTicketStatus(UpdateRestaurantTicketStatusDto input)
         {
             var tenantId = AbpSession.GetTenantId();
@@ -175,7 +195,8 @@ namespace NextWave.Erp.Restaurant
             RequireRequestIdWhenVersioned(input.ClientRequestId, versionChecksEnabled);
             var requestHash = HashOrderMutation(new
             {
-                Ids = requestedIds.OrderBy(x => x).ToArray(), input.Status,
+                Ids = requestedIds.OrderBy(x => x).ToArray(),
+                input.Status,
                 Versions = (input.ExpectedOrderVersions ?? new Dictionary<Guid, string>()).OrderBy(x => x.Key).ToArray()
             });
             var priorOperation = await FindOperation(tenantId, "KdsBulkTicketItems", input.ClientRequestId);

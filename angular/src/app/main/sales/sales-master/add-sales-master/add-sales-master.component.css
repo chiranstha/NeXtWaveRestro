@@ -43,12 +43,23 @@
 .sales-stock-qty strong { padding-left: 3px; font-size: 15px; }
 .sales-table-scroll { flex: 1 1 auto; min-height: 250px; overflow: auto; border-top: 1px solid #edf0f5; }
 .sales-lines-table { width: 100%; min-width: 1450px; margin: 0; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
-.sales-lines-table th { height: 38px; padding: 8px 7px; background: #f8f9fb; color: #758195; font-size: 11px; font-weight: 600; text-align: center; white-space: nowrap; }
-.sales-lines-table td { height: 54px; padding: 5px 6px; background: #fff; text-align: center; }
+.sales-lines-table th { height: 38px; padding: 8px 7px; border: 0; background: #f8f9fb; color: #758195; font-size: 11px; font-weight: 600; text-align: center; white-space: nowrap; }
+.sales-lines-table td { height: 54px; padding: 5px 6px; border: 0; border-bottom: 1px solid #f0f2f6; background: #fff; text-align: center; }
 .sales-lines-table th:first-child { border-radius: 7px 0 0 0; }
 .sales-lines-table th:last-child { border-radius: 0 7px 0 0; }
 .sales-lines-table th:first-child, .sales-lines-table td:first-child { width: 48px; }
 .sales-lines-table th:nth-child(2), .sales-lines-table td:nth-child(2) { width: 250px; }
+.sales-lines-table th:last-child, .sales-lines-table td:last-child { width: 56px; }
+.sales-lines-table th:nth-child(3), .sales-lines-table td:nth-child(3),
+.sales-lines-table th:nth-child(4), .sales-lines-table td:nth-child(4),
+.sales-lines-table th:nth-child(5), .sales-lines-table td:nth-child(5),
+.sales-lines-table th:nth-child(6), .sales-lines-table td:nth-child(6),
+.sales-lines-table th:nth-child(7), .sales-lines-table td:nth-child(7),
+.sales-lines-table th:nth-child(8), .sales-lines-table td:nth-child(8),
+.sales-lines-table th:nth-child(9), .sales-lines-table td:nth-child(9),
+.sales-lines-table th:nth-child(10), .sales-lines-table td:nth-child(10),
+.sales-lines-table th:nth-child(11), .sales-lines-table td:nth-child(11),
+.sales-lines-table th:nth-child(12), .sales-lines-table td:nth-child(12) { width: 125px; }
 .sales-lines-table th:last-child, .sales-lines-table td:last-child { width: 56px; }
 .sales-lines-table td .form-control { min-height: 38px; padding: 6px 10px; }
 .sales-lines-table .ng-select .ng-select-container { min-height: 38px; }
@@ -70,6 +81,8 @@
 .sales-upload-panel { padding: 10px 14px; }
 .sales-upload-panel .expand-upload { min-height: 26px; }
 .sales-upload-panel .card-upload { margin-top: 10px; }
+.sales-upload-panel .card-upload .table { margin-bottom: 0; border-color: #e8edf4; }
+.sales-upload-panel .card-upload .table th { background: #f8f9fb; color: #758195; font-size: 11px; font-weight: 600; }
 .sales-footer-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; gap: 16px 20px; padding: 0 2px 12px; }
 .sales-footer-fields .sales-description-field { grid-column: span 2; }
 .sales-footer-fields textarea.form-control { min-height: 58px; }

@@ -276,6 +276,7 @@ class KdsTicket {
     required this.items,
     this.serverId,
     this.orderId,
+    this.orderRowVersion,
     this.orderNo = '',
     this.ticketType = 0,
     this.purpose = 0,
@@ -290,6 +291,7 @@ class KdsTicket {
   final List<CartLine> items;
   final String? serverId;
   final String? orderId;
+  final String? orderRowVersion;
   final String orderNo;
   final int ticketType;
   final int purpose;
@@ -304,6 +306,7 @@ class KdsTicket {
     List<CartLine>? items,
     String? serverId,
     String? orderId,
+    String? orderRowVersion,
     String? orderNo,
     int? ticketType,
     int? purpose,
@@ -318,6 +321,7 @@ class KdsTicket {
       items: items ?? this.items,
       serverId: serverId ?? this.serverId,
       orderId: orderId ?? this.orderId,
+      orderRowVersion: orderRowVersion ?? this.orderRowVersion,
       orderNo: orderNo ?? this.orderNo,
       ticketType: ticketType ?? this.ticketType,
       purpose: purpose ?? this.purpose,

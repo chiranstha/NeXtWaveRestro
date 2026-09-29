@@ -496,6 +496,7 @@ namespace NextWave.Erp.Restaurant.Dtos
         public string TicketNo { get; set; }
         public string OrderNo { get; set; }
         public Guid OrderId { get; set; }
+        public string OrderRowVersion { get; set; }
         public RestaurantOrderType OrderType { get; set; }
         public Guid? TableId { get; set; }
         public string TableName { get; set; }

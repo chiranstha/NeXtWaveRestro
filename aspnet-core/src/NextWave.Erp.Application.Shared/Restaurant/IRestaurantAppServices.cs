@@ -116,6 +116,7 @@ namespace NextWave.Erp.Restaurant
     public interface IRestaurantKdsAppService : IApplicationService
     {
         Task<List<RestaurantTicketDto>> GetOpenTickets(Guid? stationId);
+        Task<RestaurantOperationStatusDto> GetOperationStatus(string operationType, string clientRequestId);
         Task UpdateTicketStatus(UpdateRestaurantTicketStatusDto input);
         Task UpdateTicketItemStatus(UpdateRestaurantTicketItemStatusDto input);
         Task<BulkUpdateRestaurantTicketItemStatusResultDto> UpdateTicketItemStatuses(BulkUpdateRestaurantTicketItemStatusDto input);
