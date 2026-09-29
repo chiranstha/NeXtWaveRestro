@@ -15,10 +15,10 @@ export class AppNavigationService {
             new AppMenuItem(
                 'Dashboard',
                 'Pages.Administration.Host.Dashboard',
-                'fa-sharp  fa-house',
+                'fa-sharp fa-regular  fa-house',
                 '/app/admin/hostDashboard'
             ),
-            new AppMenuItem('Dashboard', 'Pages.Restaurant.Reports', 'fa-sharp  fa-house', '/app/main/dashboard'),
+            new AppMenuItem('Dashboard', 'Pages.Restaurant.Reports', 'fa-sharp fa-regular  fa-house', '/app/main/dashboard'),
             new AppMenuItem('Saas', '', 'flaticon-users', '', [],
                 [
                     new AppMenuItem('Tenants', 'Pages.Tenants', 'flaticon-list-3', '/app/admin/tenants'),
@@ -26,63 +26,63 @@ export class AppNavigationService {
             new AppMenuItem(
                 'Restaurant',
                 'Pages.Restaurant',
-                'fa-sharp fa-utensils',
+                'fa-sharp fa-regular fa-utensils',
                 '',
                 [],
                 [
                     new AppMenuItem(
                         'POS Billing',
                         'Pages.Restaurant.Pos',
-                        'fa-sharp fa-cash-register',
+                        'fa-sharp fa-regular fa-cash-register',
                         '/app/main/restaurant/pos'
                     ),
                     new AppMenuItem(
                         'KDS',
                         'Pages.Restaurant.Kds',
-                        'fa-sharp fa-kitchen-set',
+                        'fa-sharp fa-regular fa-kitchen-set',
                         '/app/main/restaurant/kds'
                     ),
                     new AppMenuItem(
                         'Restaurant Inventory',
                         'Pages.Restaurant.Inventory',
-                        'fa-sharp fa-boxes-stacked',
+                        'fa-sharp fa-regular fa-boxes-stacked',
                         '/app/main/restaurant/inventory'
                     ),
                     new AppMenuItem(
                         'Menu & Recipes',
                         'Pages.Restaurant.Menu',
-                        'fa-sharp fa-clipboard-list',
+                        'fa-sharp fa-regular fa-clipboard-list',
                         '/app/main/restaurant/menu'
                     ),
                     new AppMenuItem(
                         'Channels',
                         'Pages.Restaurant.Channels',
-                        'fa-sharp fa-store',
+                        'fa-sharp fa-regular fa-store',
                         '/app/main/restaurant/channels'
                     ),
                     new AppMenuItem(
                         'Restaurant Setup',
                         'Pages.Restaurant.Setup',
-                        'fa-sharp fa-table-picnic',
+                        'fa-sharp fa-regular fa-table-picnic',
                         '/app/main/restaurant/setup'
                     ),
                     new AppMenuItem(
                         'Restaurant Reports',
                         'Pages.Restaurant.Reports',
-                        'fa-sharp fa-chart-column',
+                        'fa-sharp fa-regular fa-chart-column',
                         '/app/main/restaurant/reports'
                     ),
                     new AppMenuItem(
                         'Restaurant Payroll',
                         'Pages.Restaurant.Payroll',
-                        'fa-sharp fa-money-check-dollar',
+                        'fa-sharp fa-regular fa-money-check-dollar',
                         '/app/main/restaurant/payroll'
                     ),
                 ]
             ),
-            new AppMenuItem('Accounting', 'Pages.Accounting', 'fa-sharp fa-books', '', [],
+            new AppMenuItem('Accounting', 'Pages.Accounting', 'fa-sharp fa-regular fa-books', '', [],
                 [
-                    new AppMenuItem('Account Groups', 'Pages.AccountGroups', 'fa-sharp fa-user-group', '/app/main/accounting/accountGroups',
+                    new AppMenuItem('Account Groups', 'Pages.AccountGroups', 'fa-sharp fa-regular fa-user-group', '/app/main/accounting/accountGroups',
                         [
                             '/app/main/accounting/accountGroups/add',
                             '/app/main/accounting/accountGroups/edit'
@@ -91,7 +91,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Account Ledgers',
                         'Pages.AccountLedgers',
-                        'fa-sharp fa-memo',
+                        'fa-sharp fa-regular fa-memo',
                         '/app/main/accounting/accountLedgers',
                         [
                             '/app/main/accounting/accountLedgers/add',
@@ -101,14 +101,14 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Financial Years',
                         'Pages.FinancialYears',
-                        'fa-sharp fa-calendar',
+                        'fa-sharp fa-regular fa-calendar',
                         '/app/main/accounting/financialYears',
                         [
                             '/app/main/accounting/financialYears/add',
                             '/app/main/accounting/financialYears/edit',
                         ]
                     ),
-                    new AppMenuItem('Taxes', 'Pages.Taxes', 'fa-sharp fa-money-check-dollar', '/app/main/accounting/taxes',
+                    new AppMenuItem('Taxes', 'Pages.Taxes', 'fa-sharp fa-regular fa-money-check-dollar', '/app/main/accounting/taxes',
                         [
                             '/app/main/accounting/taxes/add',
                             '/app/main/accounting/taxes/edit',
@@ -117,7 +117,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Voucher Types',
                         'Pages.VoucherTypes',
-                        'fa-sharp fa-receipt',
+                        'fa-sharp fa-regular fa-receipt',
                         '/app/main/accounting/voucherTypes',
                         [
                             '/app/main/accounting/voucherTypes/add',
@@ -127,7 +127,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Merge Ledger',
                         'Pages.MergeLedger',
-                        'fa-sharp fa-layer-plus',
+                        'fa-sharp fa-regular fa-layer-plus',
                         '/app/main/accounting/mergeLedger',
                     )
                 ]),
@@ -135,11 +135,11 @@ export class AppNavigationService {
             new AppMenuItem(
                 'Inventory',
                 'Pages.Inventory',
-                'fa-sharp fa-pancakes',
+                'fa-sharp fa-regular fa-pancakes',
                 '',
                 [],
                 [
-                    new AppMenuItem('Units', 'Pages.Units', 'fa-sharp fa-weight-scale', '/app/main/inventory/units',
+                    new AppMenuItem('Units', 'Pages.Units', 'fa-sharp fa-regular fa-weight-scale', '/app/main/inventory/units',
                         [
                             '/app/main/inventory/units/add',
                             '/app/main/inventory/units/edit',
@@ -148,14 +148,14 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'ProductGroups',
                         'Pages.ProductGroups',
-                        'fa-sharp fa-ball-pile',
+                        'fa-sharp fa-regular fa-ball-pile',
                         '/app/main/inventory/productGroups',
                         [
                             '/app/main/inventory/productGroups/add',
                             '/app/main/inventory/productGroups/edit',
                         ]
                     ),
-                    new AppMenuItem('Products', 'Pages.Products', 'fa-sharp fa-boxes-stacked', '/app/main/inventory/products',
+                    new AppMenuItem('Products', 'Pages.Products', 'fa-sharp fa-regular fa-boxes-stacked', '/app/main/inventory/products',
                         [
                             '/app/main/inventory/products/add',
                             '/app/main/inventory/products/edit',
@@ -164,13 +164,13 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Opening Stocks',
                         'Pages.Products',
-                        'fa-sharp fa-chart-line-up',
+                        'fa-sharp fa-regular fa-chart-line-up',
                         '/app/main/inventory/openingStock'
                     ),
                     new AppMenuItem(
                         'Product Merge',
                         'Pages.ProductMerge',
-                        'fa-sharp fa-barcode-scan',
+                        'fa-sharp fa-regular fa-barcode-scan',
                         '/app/main/inventory/productMerge'
                     ),
                 ]
@@ -178,14 +178,14 @@ export class AppNavigationService {
             new AppMenuItem(
                 'Purchase',
                 'Pages.Purchase',
-                'fa-sharp fa-cart-shopping-fast',
+                'fa-sharp fa-regular fa-cart-shopping-fast',
                 '',
                 [],
                 [
                     new AppMenuItem(
                         'PurchaseOrder',
                         'Pages.PurchaseOrderMasters',
-                        'fa-sharp fa-cart-plus',
+                        'fa-sharp fa-regular fa-cart-plus',
                         '/app/main/purchase/purchaseOrderMasters',
                         [
                             '/app/main/purchase/purchaseOrderMasters/add',
@@ -195,7 +195,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'PurchaseInvoice',
                         'Pages.PurchaseMasters',
-                        'fa-sharp fa-file-invoice-dollar',
+                        'fa-sharp fa-regular fa-file-invoice-dollar',
                         '/app/main/purchase/purchaseMasters',
                         [
                             '/app/main/purchase/purchaseMasters/add',
@@ -205,7 +205,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'PurchaseReturns',
                         'Pages.PurchaseReturns',
-                        'fa-sharp fa-rotate-left',
+                        'fa-sharp fa-regular fa-rotate-left',
                         '/app/main/purchase/purchaseReturns',
                         [
                             '/app/main/purchase/purchaseReturns/add',
@@ -218,14 +218,14 @@ export class AppNavigationService {
             new AppMenuItem(
                 'Sales',
                 'Pages.Sales',
-                'fa-sharp fa-cart-circle-check',
+                'fa-sharp fa-regular fa-cart-circle-check',
                 '',
                 [],
                 [
                     new AppMenuItem(
                         'SalesInvoice',
                         'Pages.SalesMasters',
-                        'fa-sharp fa-file-invoice-dollar',
+                        'fa-sharp fa-regular fa-file-invoice-dollar',
                         '/app/main/sales/salesInvoiceMasters',
                         [
                             '/app/main/sales/salesInvoiceMasters/add',
@@ -235,7 +235,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'SalesReturn',
                         'Pages.SalesReturnMasters',
-                        'fa-sharp fa-cart-circle-xmark',
+                        'fa-sharp fa-regular fa-cart-circle-xmark',
                         '/app/main/sales/salesReturnMasters',
                         [
                             '/app/main/sales/salesReturnMasters/add',
@@ -248,14 +248,14 @@ export class AppNavigationService {
             new AppMenuItem(
                 'Transaction',
                 'Pages.Transaction',
-                'fa-sharp fa-gift-card',
+                'fa-sharp fa-regular fa-gift-card',
                 '',
                 [],
                 [
                     new AppMenuItem(
                         'Payment Masters',
                         'Pages.PaymentMasters',
-                        'fa-sharp fa-sack-dollar',
+                        'fa-sharp fa-regular fa-sack-dollar',
                         '/app/main/transaction/paymentMasters',
                         [
                             '/app/main/transaction/paymentMasters/add',
@@ -265,7 +265,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Restaurant Stock Used',
                         'Pages.Restaurant.Inventory.StockAdjustment',
-                        'fa-sharp fa-box-open',
+                        'fa-sharp fa-regular fa-box-open',
                         '/app/main/transaction/restaurantStockUsed',
                         [
                             '/app/main/transaction/restaurantStockUsed/add',
@@ -274,7 +274,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Receipt Masters',
                         'Pages.ReceiptMasters',
-                        'fa-sharp fa-receipt',
+                        'fa-sharp fa-regular fa-receipt',
                         '/app/main/transaction/receiptMaster',
                         [
                             '/app/main/transaction/receiptMaster/add',
@@ -284,7 +284,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Journal Masters',
                         'Pages.JournalMasters',
-                        'fa-sharp fa-book',
+                        'fa-sharp fa-regular fa-book',
                         '/app/main/transaction/journalMasters',
                         [
                             '/app/main/transaction/journalMasters/add',
@@ -294,7 +294,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Contra Masters',
                         'Pages.ContraMasters',
-                        'fa-sharp fa-bank',
+                        'fa-sharp fa-regular fa-bank',
                         '/app/main/transaction/contraMasters',
                         [
                             '/app/main/transaction/contraMasters/add',
@@ -304,7 +304,7 @@ export class AppNavigationService {
                      new AppMenuItem(
                         'PDC Payable',
                         'Pages.PDCPayables',
-                        'fa-sharp fa-hand-holding-dollar',
+                        'fa-sharp fa-regular fa-hand-holding-dollar',
                         '/app/main/transaction/PdcPayable',
                         [
                             '/app/main/transaction/PdcPayable/add',
@@ -314,7 +314,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'PDC Receivable',
                         'Pages.PDCReceivables',
-                        'fa-sharp fa-hands-holding-dollar',
+                        'fa-sharp fa-regular fa-hands-holding-dollar',
                         '/app/main/transaction/PdcReceivable',
                         [
                             '/app/main/transaction/PdcReceivable/add',
@@ -325,7 +325,7 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'PDC Clearance',
                         'Pages.PDCClearances',
-                        'fa-sharp fa-file-check',
+                        'fa-sharp fa-regular fa-file-check',
                         '/app/main/transaction/PdcClearance',
                         [
                             '/app/main/transaction/PdcClearance/add',
@@ -339,39 +339,39 @@ export class AppNavigationService {
             new AppMenuItem(
                 'Reports',
                 'Pages.Reporting',
-                'fa-sharp fa-chart-simple',
+                'fa-sharp fa-regular fa-chart-simple',
                 '',
                 [],
                 [
                     new AppMenuItem(
                         'Accounting',
                         'Pages.AccountingReport',
-                        'fa-sharp fa-books',
+                        'fa-sharp fa-regular fa-books',
                         '',
                         [],
                         [
                             new AppMenuItem(
                                 'AccountGroup',
                                 'Pages.AccountGroupReport',
-                                'fa-sharp fa-layer-group',
+                                'fa-sharp fa-regular fa-layer-group',
                                 '/app/main/reports/account-group'
                             ),
                             new AppMenuItem(
                                 'AccountLedger',
                                 'Pages.AccountLedgerReport',
-                                'fa-sharp fa-layer-group',
+                                'fa-sharp fa-regular fa-layer-group',
                                 '/app/main/reports/account-ledger'
                             ),
                             new AppMenuItem(
                                 'Daybook',
                                 'Pages.BookReport',
-                                'fa-sharp fa-book-open',
+                                'fa-sharp fa-regular fa-book-open',
                                 '/app/main/reports/daybook'
                             ),
                             new AppMenuItem(
                                 'Book Report',
                                 'Pages.BookReport',
-                                'fa-sharp fa-book-open',
+                                'fa-sharp fa-regular fa-book-open',
                                 '/app/main/reports/book-report'
                             )
                         ]
@@ -379,20 +379,20 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Inventory',
                         'Pages.InventoryReport',
-                        'fa-sharp fa-pancakes',
+                        'fa-sharp fa-regular fa-pancakes',
                         '',
                         [],
                         [
                             new AppMenuItem(
                                 'StockReport',
                                 'Pages.StockReport',
-                                'fa-sharp fa-layer-group',
+                                'fa-sharp fa-regular fa-layer-group',
                                 '/app/main/reports/stock-report'
                             ),
                             new AppMenuItem(
                                 'ProductProfit',
                                 'Pages.ProductProfitReport',
-                                'fa-sharp fa-chart-mixed',
+                                'fa-sharp fa-regular fa-chart-mixed',
                                 '/app/main/reports/product-profit'
                             ),
                         ]
@@ -401,32 +401,32 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Purchase',
                         'Pages.PurchaseReport',
-                        'fa-sharp fa-receipt',
+                        'fa-sharp fa-regular fa-receipt',
                         '',
                         [],
                         [
                             new AppMenuItem(
                                 'PurchaseReport',
                                 'Pages.PurchaseMasterReport',
-                                'fa-sharp fa-layer-group',
+                                'fa-sharp fa-regular fa-layer-group',
                                 '/app/main/reports/purchase-report'
                             ),
                             new AppMenuItem(
                                 'PurchaseReturnReport',
                                 'Pages.PurchaseReturnReport',
-                                'fa-sharp fa-rotate-left',
+                                'fa-sharp fa-regular fa-rotate-left',
                                 '/app/main/reports/purchase-return'
                             ),
                             new AppMenuItem(
                                 'Purchase Party Wise Tax',
                                 'Pages.TaxableCustomerReport',
-                                'fa-sharp fa-percent',
+                                'fa-sharp fa-regular fa-percent',
                                 '/app/main/reports/purchase-party-tax'
                             ),
                             new AppMenuItem(
                                 'Product Wise Monthly',
                                 'Pages.ProductWiseMonthlyReport',
-                                'fa-sharp fa-calendar',
+                                'fa-sharp fa-regular fa-calendar',
                                 '/app/main/reports/productWiseMonthlyPurchase'
                             ),
                         ]
@@ -434,38 +434,38 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Sales',
                         'Pages.SalesReport',
-                        'fa-sharp fa-chart-waterfall',
+                        'fa-sharp fa-regular fa-chart-waterfall',
                         '',
                         [],
                         [
                             new AppMenuItem(
                                 'SalesReport',
                                 'Pages.SalesMasterReport',
-                                'fa-sharp fa-layer-group',
+                                'fa-sharp fa-regular fa-layer-group',
                                 '/app/main/reports/sales-report'
                             ),
                             new AppMenuItem(
                                 'Sales Return',
                                 'Pages.SalesReturnReport',
-                                'fa-sharp fa-arrow-rotate-left',
+                                'fa-sharp fa-regular fa-arrow-rotate-left',
                                 '/app/main/reports/sales-return-report'
                             ),
                              new AppMenuItem(
                                 'Material Sales',
                                 'Pages.MaterialSalesReport',
-                                'fa-sharp fa-chart-waterfall',
+                                'fa-sharp fa-regular fa-chart-waterfall',
                                 '/app/main/reports/material-sales-report'
                             ),
                             new AppMenuItem(
                                 'LedgerWiseSales',
                                 'Pages.LedgerWiseSalesReport',
-                                'fa-sharp fa-chart-gantt',
+                                'fa-sharp fa-regular fa-chart-gantt',
                                 '/app/main/reports/ledger-wise-sales'
                             ),
                             new AppMenuItem(
                                 'ProductWiseSales',
                                 'Pages.ProductWiseSalesReport',
-                                'fa-sharp fa-chart-line-up',
+                                'fa-sharp fa-regular fa-chart-line-up',
                                 '/app/main/reports/product-wise-sales'
                             ),
                         ]
@@ -473,44 +473,44 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'TaxReport',
                         'Pages.TaxReporting',
-                        'fa-sharp fa-memo-pad',
+                        'fa-sharp fa-regular fa-memo-pad',
                         '',
                         [],
                         [
                             new AppMenuItem(
                                 'VatSummaryReport',
                                 'Pages.VatSummaryReport',
-                                'fa-sharp fa-percent',
+                                'fa-sharp fa-regular fa-percent',
                                 '/app/main/reports/tax-report/vatSummaryReport'
                             ),
                             new AppMenuItem(
                                 'Purchase Tax Report',
                                 'Pages.TaxPurchaseRegisterReport',
-                                'fa-sharp fa-chart-mixed',
+                                'fa-sharp fa-regular fa-chart-mixed',
                                 '/app/main/reports/tax-report/purchaseTaxReport'
                             ),
                             new AppMenuItem(
                                 'Sales Tax Report',
                                 'Pages.TaxSalesRegisterReport',
-                                'fa-sharp fa-chart-line-up',
+                                'fa-sharp fa-regular fa-chart-line-up',
                                 '/app/main/reports/tax-report/salesTaxReport'
                             ),
                             new AppMenuItem(
                                 'Sales Above Lakhs',
                                 'Pages.SalesReturnReport',
-                                'fa-sharp fa-chart-line',
+                                'fa-sharp fa-regular fa-chart-line',
                                 '/app/main/reports/tax-report/salesAboveLakhsReport'
                             ),
                             new AppMenuItem(
                                 'Purchase Above Lakhs',
                                 'Pages.SalesReturnReport',
-                                'fa-sharp fa-cart-shopping',
+                                'fa-sharp fa-regular fa-cart-shopping',
                                 '/app/main/reports/tax-report/purchaseAboveLakhsReport'
                             ),
                             new AppMenuItem(
                                 'Party wise tax',
                                 'Pages.SalesReturnReport',
-                                'fa-sharp fa-badge-percent',
+                                'fa-sharp fa-regular fa-badge-percent',
                                 '/app/main/reports/partyWiseTax'
                             ),
                         ]
@@ -519,32 +519,32 @@ export class AppNavigationService {
                      new AppMenuItem(
                         'FinancialStatement',
                         'Pages.FinancialStatement',
-                        'fa-light fa-chart-mixed',
+                        'fa-sharp fa-regular fa-chart-mixed',
                         '',
                         [],
                         [
                             new AppMenuItem(
                                 'TrialBalance',
                                 'Pages.TrialBalanceReport',
-                                'fa-light fa-receipt',
+                                'fa-sharp fa-regular fa-receipt',
                                 '/app/main/financialStatement/trailbalance',
                             ),
                             new AppMenuItem(
                                 'ProfitandLoss',
                                 'Pages.ProfitAndLossReport',
-                                'fa-light fa-arrow-down-arrow-up',
+                                'fa-sharp fa-regular fa-arrow-down-arrow-up',
                                 '/app/main/financialStatement/profit-loss',
                             ),
                             new AppMenuItem(
                                 'BalanceSheet',
                                 'Pages.PagesBalanceSheetReport',
-                                'fa-light fa-memo-pad',
+                                'fa-sharp fa-regular fa-memo-pad',
                                 '/app/main/financialStatement/balance-sheet',
                             ),
                             new AppMenuItem(
                                 'CashFlow',
                                 'Pages.PagesCashFlowReport',
-                                'fa-light fa-water',
+                                'fa-sharp fa-regular fa-water',
                                 '/app/main/financialStatement/cash-flow',
                             ),
                         ],
@@ -555,73 +555,73 @@ export class AppNavigationService {
             new AppMenuItem(
                 'Administration',
                 'Pages.Administration',
-                'fa-sharp fa-gear',
+                'fa-sharp fa-regular fa-gear',
                 '',
                 [],
                 [
                     new AppMenuItem(
                         'OrganizationUnits',
                         'Pages.Administration.OrganizationUnits',
-                        'fa-sharp fa-buildings',
+                        'fa-sharp fa-regular fa-buildings',
                         '/app/admin/organization-units'
                     ),
-                    new AppMenuItem('Roles', 'Pages.Administration.Roles', 'fa-sharp fa-person', '/app/admin/roles'),
-                    new AppMenuItem('Users', 'Pages.Administration.Users', 'fa-sharp fa-users', '/app/admin/users'),
+                    new AppMenuItem('Roles', 'Pages.Administration.Roles', 'fa-sharp fa-regular fa-person', '/app/admin/roles'),
+                    new AppMenuItem('Users', 'Pages.Administration.Users', 'fa-sharp fa-regular fa-users', '/app/admin/users'),
                     new AppMenuItem(
                         'Languages',
                         'Pages.Administration.Languages',
-                        'fa-sharp fa-language',
+                        'fa-sharp fa-regular fa-language',
                         '/app/admin/languages',
                         ['/app/admin/languages/{name}/texts']
                     ),
                     new AppMenuItem(
                         'AuditLogs',
                         'Pages.Administration.AuditLogs',
-                        'fa-sharp fa-list-check',
+                        'fa-sharp fa-regular fa-list-check',
                         '/app/admin/auditLogs'
                     ),
                     new AppMenuItem(
                         'Maintenance',
                         'Pages.Administration.Host.Maintenance',
-                        'fa-sharp fa-sliders',
+                        'fa-sharp fa-regular fa-sliders',
                         '/app/admin/maintenance'
                     ),
                     new AppMenuItem(
                         'Subscription',
                         'Pages.Administration.Tenant.SubscriptionManagement',
-                        'fa-sharp fa-hand-pointer',
+                        'fa-sharp fa-regular fa-hand-pointer',
                         '/app/admin/subscription-management'
                     ),
                     new AppMenuItem(
                         'VisualSettings',
                         'Pages.Administration.UiCustomization',
-                        'fa-sharp fa-eye',
+                        'fa-sharp fa-regular fa-eye',
                         '/app/admin/ui-customization'
                     ),
                     new AppMenuItem(
                         'WebhookSubscriptions',
                         'Pages.Administration.WebhookSubscription',
-                        'fa-sharp fa-bell',
+                        'fa-sharp fa-regular fa-bell',
                         '/app/admin/webhook-subscriptions'
                     ),
                     new AppMenuItem(
                         'DynamicProperties',
                         'Pages.Administration.DynamicProperties',
-                        'fa-sharp fa-star',
+                        'fa-sharp fa-regular fa-star',
                         '/app/admin/dynamic-property'
                     ),
                     new AppMenuItem(
                         'Notifications',
                         '',
-                        'fa-sharp fa-alarm-clock',
+                        'fa-sharp fa-regular fa-alarm-clock',
                         '',
                         [],
                         [
-                            new AppMenuItem('Inbox', '', 'fa-sharp fa-envelope', '/app/notifications'),
+                            new AppMenuItem('Inbox', '', 'fa-sharp fa-regular fa-envelope', '/app/notifications'),
                             new AppMenuItem(
                                 'MassNotifications',
                                 'Pages.Administration.MassNotification',
-                                'fa-sharp fa-paper-plane',
+                                'fa-sharp fa-regular fa-paper-plane',
                                 '/app/admin/mass-notifications'
                             ),
                         ]
@@ -629,13 +629,13 @@ export class AppNavigationService {
                     new AppMenuItem(
                         'Settings',
                         'Pages.Administration.Host.Settings',
-                        'fa-sharp fa-gear',
+                        'fa-sharp fa-regular fa-gear',
                         '/app/admin/hostSettings'
                     ),
                     new AppMenuItem(
                         'Settings',
                         'Pages.Administration.Tenant.Settings',
-                        'fa-sharp fa-gear',
+                        'fa-sharp fa-regular fa-gear',
                         '/app/admin/tenantSettings'
                     ),
                 ]

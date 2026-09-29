@@ -79,6 +79,7 @@ export class RestaurantInventoryComponent extends AppComponentBase implements On
     defaultColDef: ColDef = {
         sortable: true,
         filter: true,
+        suppressHeaderFilterButton: false,
         resizable: true,
         minWidth: 120,
     };

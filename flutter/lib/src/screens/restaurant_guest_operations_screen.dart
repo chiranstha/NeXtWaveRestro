@@ -258,6 +258,16 @@ class _RestaurantReservationsScreenState
         Icons.event_busy_rounded,
       ));
     }
+    if (reservation.status != 2 &&
+        reservation.status != 5 &&
+        reservation.status != 6 &&
+        reservation.status != 7) {
+      actions.add(OutlinedButton.icon(
+        onPressed: controller.busy ? null : () => _adjustDuration(context, reservation),
+        icon: const Icon(Icons.schedule_rounded, size: 18),
+        label: const Text('Adjust duration'),
+      ));
+    }
 
     return _Panel(
       child: Column(
@@ -388,6 +398,50 @@ class _RestaurantReservationsScreenState
       backgroundColor: color.withValues(alpha: 0.12),
       labelStyle: TextStyle(color: color, fontWeight: FontWeight.w800),
     );
+  }
+
+  Future<void> _adjustDuration(
+    BuildContext context,
+    RestaurantReservationRecord reservation,
+  ) async {
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: reservation.endsAt,
+      firstDate: reservation.startsAt,
+      lastDate: reservation.startsAt.add(const Duration(days: 2)),
+    );
+    if (selectedDate == null || !context.mounted) return;
+    final selectedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(reservation.endsAt),
+    );
+    if (selectedTime == null || !context.mounted) return;
+    final end = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+      selectedTime.hour,
+      selectedTime.minute,
+    );
+    if (!end.isAfter(reservation.startsAt)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('The end time must be after the start time.')),
+      );
+      return;
+    }
+    try {
+      await controller.updateReservation(
+        reservation: reservation,
+        status: reservation.status,
+        endsAt: end,
+      );
+    } on ApiException catch (error) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error.message)),
+        );
+      }
+    }
   }
 
   Future<void> _addWalkIn(BuildContext context) async {

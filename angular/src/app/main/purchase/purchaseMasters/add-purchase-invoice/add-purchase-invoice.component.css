@@ -1,0 +1,138 @@
+.purchase-invoice-page {
+    --purchase-border: #e8edf4;
+    --purchase-muted: #778397;
+    --purchase-ink: #243247;
+    color: var(--purchase-ink);
+}
+
+.purchase-invoice-page sub-header { display: block; }
+.purchase-page-actions { display: flex; align-items: center; gap: 10px; }
+.purchase-invoice-container { width: 100%; max-width: none; padding-inline: 12px; }
+.purchase-invoice-form { width: 100%; }
+.purchase-fields-card,
+.purchase-details-card,
+.purchase-compliance-card {
+    background: #fff;
+    border: 1px solid var(--purchase-border);
+    border-radius: 13px;
+    box-shadow: 0 3px 14px rgba(31, 48, 74, .035);
+}
+
+.purchase-fields-card { padding: 18px 20px 13px; margin-bottom: 12px; }
+.purchase-fields-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 20px;
+    row-gap: 13px;
+}
+.purchase-field { min-width: 0; }
+.purchase-field .form-label,
+.purchase-footer-fields > div > label,
+.compliance-grid label {
+    display: block;
+    margin-bottom: 6px;
+    color: #344258;
+    font-size: 13px;
+    font-weight: 600;
+}
+.required-mark { padding-left: 3px; }
+.purchase-field small { color: #79869a; font-size: 10px; font-weight: 600; }
+.purchase-invoice-page .form-control,
+.purchase-invoice-page .ng-select .ng-select-container,
+.purchase-invoice-page ne-datepicker .form-control {
+    min-height: 38px;
+    border-color: #e2e7ee;
+    border-radius: 8px;
+    color: #29364b;
+    box-shadow: none;
+}
+.purchase-invoice-page textarea.form-control { min-height: 58px; }
+.purchase-input-with-action,
+.product-select { display: flex; align-items: stretch; min-width: 0; }
+.purchase-input-with-action > ng-select,
+.product-select > ng-select { flex: 1; min-width: 0; }
+.purchase-inline-add,
+.product-select > button,
+.purchase-barcode button {
+    width: 38px;
+    flex: 0 0 38px;
+    border: 1px solid #e2e7ee;
+    background: #fff;
+    color: #6288d3;
+    border-radius: 0 8px 8px 0;
+}
+.purchase-input-with-action .ng-select .ng-select-container,
+.product-select .ng-select .ng-select-container { border-radius: 8px 0 0 8px; }
+
+.purchase-details-card { display: flex; flex-direction: column; min-height: min(570px, 58vh); margin-bottom: 10px; padding: 0 12px 12px; }
+.purchase-details-heading {
+    min-height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 4px 12px;
+}
+.purchase-details-heading h3 { margin: 0; font-size: 16px; font-weight: 700; }
+.purchase-detail-tools { display: flex; align-items: center; gap: 10px; }
+.purchase-detail-tools .btn { min-height: 36px; white-space: nowrap; border-radius: 8px; }
+.purchase-barcode { height: 36px; display: flex; align-items: center; padding-left: 8px; border: 1px solid var(--purchase-border); border-radius: 8px; background: #f8faff; color: #90a0b8; }
+.purchase-barcode input { width: 125px; border: 0; outline: 0; background: transparent; padding: 0 8px; color: #46546a; font-size: 12px; }
+.purchase-barcode button { width: 34px; flex-basis: 34px; height: 30px; border: 0; background: #f0f5ff; }
+.purchase-barcode button:last-child { border-radius: 0 6px 6px 0; }
+.purchase-table-scroll { flex: 1 1 auto; min-height: 250px; overflow: auto; border-top: 1px solid #edf0f5; }
+.purchase-lines-table { width: 100%; min-width: 1390px; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
+.purchase-lines-table th { height: 38px; padding: 8px 7px; color: #758195; background: #f8f9fb; font-size: 11px; font-weight: 600; text-align: center; white-space: nowrap; }
+.purchase-lines-table td { height: 54px; padding: 5px 6px; background: #fff; text-align: center; }
+.purchase-lines-table th:first-child { border-radius: 7px 0 0 0; }
+.purchase-lines-table th:last-child { border-radius: 0 7px 0 0; }
+.purchase-lines-table th:nth-child(1), .purchase-lines-table td:nth-child(1) { width: 48px; }
+.purchase-lines-table th:nth-child(2), .purchase-lines-table td:nth-child(2) { width: 260px; }
+.purchase-lines-table th:nth-child(3), .purchase-lines-table td:nth-child(3),
+.purchase-lines-table th:nth-child(4), .purchase-lines-table td:nth-child(4),
+.purchase-lines-table th:nth-child(6), .purchase-lines-table td:nth-child(6),
+.purchase-lines-table th:nth-child(7), .purchase-lines-table td:nth-child(7),
+.purchase-lines-table th:nth-child(8), .purchase-lines-table td:nth-child(8),
+.purchase-lines-table th:nth-child(10), .purchase-lines-table td:nth-child(10) { width: 125px; }
+.purchase-lines-table th:nth-child(5), .purchase-lines-table td:nth-child(5) { width: 95px; }
+.purchase-lines-table th:nth-child(9), .purchase-lines-table td:nth-child(9) { width: 135px; }
+.purchase-lines-table th:nth-child(11), .purchase-lines-table td:nth-child(11) { width: 145px; }
+.purchase-lines-table th:nth-child(12), .purchase-lines-table td:nth-child(12) { width: 55px; }
+.purchase-lines-table td .form-control { min-height: 38px; padding: 6px 10px; }
+.purchase-lines-table .ng-select .ng-select-container { min-height: 38px; }
+.purchase-remove-row { border: 0; background: transparent; color: #a6afbc; font-size: 16px; }
+.purchase-totals { display: flex; justify-content: flex-end; align-items: center; gap: 15px; min-height: 60px; margin-top: auto; padding: 10px 8px 0; border-top: 1px solid #edf0f5; }
+.purchase-totals > div { min-width: 68px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.purchase-totals span { color: #748196; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.purchase-totals strong { color: #344258; font-size: 13px; }
+.purchase-totals .grand-total { color: #2763c7; font-size: 16px; }
+.purchase-totals .form-control { width: 105px; min-height: 32px; text-align: right; }
+
+.purchase-compliance-card { margin-bottom: 12px; overflow: hidden; }
+.purchase-compliance-card h3 { display: flex; align-items: center; gap: 10px; min-height: 50px; margin: 0; padding: 0 18px; background: #fafbfc; border-bottom: 1px solid var(--purchase-border); font-size: 14px; font-weight: 700; }
+.purchase-compliance-card h3 i { color: #9aa8bb; font-size: 16px; }
+.compliance-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px; padding: 13px 18px 15px; }
+.compliance-grid > div { min-width: 0; }
+.purchase-footer-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; gap: 16px 20px; padding: 0 2px 16px; }
+.purchase-footer-fields > div { min-width: 0; }
+.purchase-footer-fields .description-field { grid-column: span 3; }
+.purchase-print { display: flex; align-items: center; gap: 7px; min-height: 39px; padding-left: 8px; font-weight: 500; }
+.purchase-print .form-check-input { width: 20px; height: 20px; margin: 0; }
+.legacy-totals { display: none; }
+
+@media (max-width: 1100px) {
+    .purchase-fields-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .compliance-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .purchase-footer-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .purchase-footer-fields .description-field { grid-column: span 2; }
+    .purchase-details-card { min-height: 460px; }
+}
+@media (max-width: 650px) {
+    .purchase-invoice-container { padding-inline: 7px; }
+    .purchase-fields-card { padding: 14px; }
+    .purchase-fields-grid, .compliance-grid, .purchase-footer-fields { grid-template-columns: 1fr; }
+    .purchase-footer-fields .description-field { grid-column: auto; }
+    .purchase-details-heading { align-items: flex-start; flex-direction: column; padding: 12px 3px; }
+    .purchase-detail-tools { flex-wrap: wrap; }
+    .purchase-totals { justify-content: flex-start; overflow-x: auto; }
+}
