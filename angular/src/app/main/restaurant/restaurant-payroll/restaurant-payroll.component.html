@@ -100,7 +100,7 @@
                         <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">Recent payroll runs</div>
                         <button type="button" class="btn btn-xs btn-light-primary" (click)="changeSection('runs')">View all</button>
                     </div>
-                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                    <div class="card-body p-2 p-sm-3 restaurant-table-wrap overflow-x-auto">
                         <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="dashboard.recentRuns.length; else noRecentRuns">
                             <thead class="table-light text-gray-600 text-uppercase"><tr><th>Run</th><th>Period</th><th>Status</th><th class="text-end">Net</th></tr></thead>
                             <tbody>
@@ -121,7 +121,7 @@
                         <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">Latest payslips</div>
                         <button type="button" class="btn btn-xs btn-light-primary" (click)="changeSection('payslips')">View all</button>
                     </div>
-                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                    <div class="card-body p-2 p-sm-3 restaurant-table-wrap overflow-x-auto">
                         <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="dashboard.myRecentPayslips.length; else noLatestPayslips">
                             <thead class="table-light text-gray-600 text-uppercase"><tr><th>Run</th><th>Period</th><th class="text-end">Gross</th><th class="text-end">Net</th></tr></thead>
                             <tbody><tr *ngFor="let line of dashboard.myRecentPayslips; trackBy: trackById"><td class="fw-bold">{{ line.runNumber }}</td><td>{{ dateBs(line.periodStart) }} – {{ dateBs(line.periodEnd) }} BS</td><td class="text-end">NPR {{ money(line.grossPay) }}</td><td class="text-end fw-bold">NPR {{ money(line.netPay) }}</td></tr></tbody>
@@ -155,7 +155,7 @@
                     </div>
                 </div>
 
-                <div class="card-body p-0" *ngIf="filteredEmployees.length; else noEmployees">
+                <div class="card-body p-2 p-sm-3" *ngIf="filteredEmployees.length; else noEmployees">
                     <div class="payroll-staff-table d-none d-lg-block overflow-x-auto">
                         <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100">
                             <thead class="table-light text-gray-600 text-uppercase">
@@ -271,7 +271,7 @@
 
                 <div class="card card-custom restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
                     <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between"><div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">Attendance log</div><span class="text-gray-600 fs-8">{{ attendance.length }} entries</span></div>
-                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                    <div class="card-body p-2 p-sm-3 restaurant-table-wrap overflow-x-auto">
                         <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="attendance.length; else noAttendance">
                             <thead class="table-light text-gray-600 text-uppercase"><tr><th>Date</th><th>Employee</th><th>In / out</th><th>Status</th><th class="text-end">Hours</th><th>Shift</th><th *ngIf="canManageAttendance"></th></tr></thead>
                             <tbody><tr *ngFor="let row of attendance; trackBy: trackById"><td class="fw-bold">{{ dateBs(row.workDate) }} BS</td><td><div>{{ row.employeeName }}</div><div class="text-gray-600 fs-8">{{ row.staffCode }}</div></td><td><div>{{ dateTime(row.clockIn) }}</div><div class="text-gray-600">{{ dateTime(row.clockOut) }}</div></td><td><span class="badge bg-light-primary text-primary">{{ attendanceStatusText(row.status) }}</span></td><td class="text-end"><div>{{ row.regularHours }} regular</div><div class="text-gray-600">{{ row.overtimeHours }} overtime</div></td><td>{{ row.shiftName || '-' }}</td><td class="text-end" *ngIf="canManageAttendance"><button type="button" class="btn btn-xs btn-light-primary" (click)="editAttendance(row)"><i class="fa fa-pencil"></i></button></td></tr></tbody>
@@ -309,7 +309,7 @@
 
                 <div class="card card-custom restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0">
                     <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between"><div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">Payroll runs</div><span class="text-gray-600 fs-8">{{ payrollRuns.length }} runs</span></div>
-                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                    <div class="card-body p-2 p-sm-3 restaurant-table-wrap overflow-x-auto">
                         <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="payrollRuns.length; else noPayrollRuns">
                             <thead class="table-light text-gray-600 text-uppercase"><tr><th>Run</th><th>Period</th><th>Staff</th><th>Status</th><th class="text-end">Gross</th><th class="text-end">Deductions</th><th class="text-end">Net</th><th></th></tr></thead>
                             <tbody><tr *ngFor="let run of payrollRuns; trackBy: trackById"><td><button type="button" class="btn btn-link p-0 fw-bold" (click)="loadPayrollRun(run.id)">{{ run.runNumber }}</button></td><td>{{ dateBs(run.periodStart) }} – {{ dateBs(run.periodEnd) }} BS</td><td>{{ run.employeeCount }}</td><td><span class="badge" [class.bg-light-warning]="run.status === 0" [class.text-warning]="run.status === 0" [class.bg-light-primary]="run.status === 1" [class.text-primary]="run.status === 1" [class.bg-light-success]="run.status === 2" [class.text-success]="run.status === 2">{{ runStatusText(run.status) }}</span></td><td class="text-end">NPR {{ money(run.totalGross) }}</td><td class="text-end">NPR {{ money(run.totalDeduction) }}</td><td class="text-end fw-bold">NPR {{ money(run.totalNet) }}</td><td class="text-end text-nowrap"><button type="button" class="btn btn-xs btn-light-primary me-1" (click)="loadPayrollRun(run.id)" tooltip="View"><i class="fa fa-eye"></i></button><button type="button" class="btn btn-xs btn-light-success me-1" *ngIf="run.status === 0 && canApprovePayroll" [buttonBusy]="saving" (click)="approveRun(run)" tooltip="Approve"><i class="fa fa-check"></i></button><button type="button" class="btn btn-xs btn-light-success me-1" *ngIf="run.status === 1 && canApprovePayroll" [buttonBusy]="saving" (click)="markRunPaid(run)" tooltip="Mark paid"><i class="fa fa-money-bill-transfer"></i></button><button type="button" class="btn btn-xs btn-light-danger" *ngIf="run.status === 0 && canProcessPayroll" [buttonBusy]="saving" (click)="deleteDraft(run)" tooltip="Delete draft"><i class="fa fa-trash"></i></button></td></tr></tbody>
@@ -320,7 +320,7 @@
 
                 <div class="card card-custom restaurant-card bg-white border border-primary rounded-3 shadow-sm min-w-0" *ngIf="selectedRun">
                     <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between flex-wrap"><div><div class="fw-bolder text-gray-900">{{ selectedRun.runNumber }} · {{ runStatusText(selectedRun.status) }}</div><div class="text-gray-600 fs-8">{{ dateBs(selectedRun.periodStart) }} – {{ dateBs(selectedRun.periodEnd) }} BS</div></div><div class="d-flex gap-2"><button type="button" class="btn btn-xs btn-success" *ngIf="selectedRun.status === 0 && canApprovePayroll" (click)="approveRun(selectedRun)">Approve</button><button type="button" class="btn btn-xs btn-success" *ngIf="selectedRun.status === 1 && canApprovePayroll" (click)="markRunPaid(selectedRun)">Mark paid</button><button type="button" class="btn btn-xs btn-light" (click)="selectedRun = undefined"><i class="fa fa-xmark"></i></button></div></div>
-                    <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                    <div class="card-body p-2 p-sm-3 restaurant-table-wrap overflow-x-auto">
                         <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100"><thead class="table-light text-gray-600 text-uppercase"><tr><th>Employee</th><th class="text-end">Hours</th><th class="text-end">Base</th><th class="text-end">OT</th><th class="text-end">Allowance</th><th class="text-end">Tips + service</th><th class="text-end">Deductions</th><th class="text-end">Net</th></tr></thead><tbody><tr *ngFor="let line of selectedRun.lines; trackBy: trackById"><td><div class="fw-bold">{{ line.employeeName }}</div><div class="text-gray-600 fs-8">{{ line.staffCode }} · {{ line.jobRole || '-' }}</div></td><td class="text-end"><div>{{ line.workedHours }}</div><div class="text-gray-600">+{{ line.overtimeHours }} OT</div></td><td class="text-end">{{ money(line.basicPay) }}</td><td class="text-end">{{ money(line.overtimePay) }}</td><td class="text-end">{{ money(line.allowance) }}</td><td class="text-end">{{ money(line.tipsShare + line.serviceChargeShare) }}</td><td class="text-end">{{ money(line.taxDeduction + line.otherDeduction + line.advanceRecovery) }}</td><td class="text-end fw-bold">NPR {{ money(line.netPay) }}</td></tr></tbody><tfoot><tr class="fw-bolder"><td colspan="7" class="text-end">Total net</td><td class="text-end">NPR {{ money(selectedRun.totalNet) }}</td></tr></tfoot></table>
                     </div>
                 </div>
@@ -328,7 +328,7 @@
 
             <div class="card card-custom restaurant-card bg-white border border-gray-300 rounded-3 shadow-sm min-w-0" *ngIf="activeSection === 'payslips' && canViewOwnPayslip">
                 <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-center d-flex justify-content-between"><div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">My payslips</div><span class="text-gray-600 fs-8">Approved and paid payroll only</span></div>
-                <div class="card-body p-0 restaurant-table-wrap overflow-x-auto">
+                <div class="card-body p-2 p-sm-3 restaurant-table-wrap overflow-x-auto">
                     <table class="restaurant-table table table-row-bordered align-middle mb-0 w-100" *ngIf="payslips.length; else noPayslips"><thead class="table-light text-gray-600 text-uppercase"><tr><th>Run</th><th>Period</th><th>Status</th><th class="text-end">Base</th><th class="text-end">Overtime</th><th class="text-end">Allowances</th><th class="text-end">Tips + service</th><th class="text-end">Deductions</th><th class="text-end">Net pay</th></tr></thead><tbody><tr *ngFor="let line of payslips; trackBy: trackById"><td class="fw-bold">{{ line.runNumber }}</td><td>{{ dateBs(line.periodStart) }} – {{ dateBs(line.periodEnd) }} BS</td><td><span class="badge bg-light-success text-success">{{ runStatusText(line.runStatus) }}</span></td><td class="text-end">NPR {{ money(line.basicPay) }}</td><td class="text-end">NPR {{ money(line.overtimePay) }}</td><td class="text-end">NPR {{ money(line.allowance) }}</td><td class="text-end">NPR {{ money(line.tipsShare + line.serviceChargeShare) }}</td><td class="text-end">NPR {{ money(line.taxDeduction + line.otherDeduction + line.advanceRecovery) }}</td><td class="text-end fw-bolder">NPR {{ money(line.netPay) }}</td></tr></tbody></table>
                     <ng-template #noPayslips><div class="p-5 text-center text-gray-600">No approved payslips are available for this employee account.</div></ng-template>
                 </div>

@@ -245,6 +245,7 @@ export class RestaurantInventoryComponent extends AppComponentBase implements On
     activeTab: RestaurantInventoryTab = 'reorder';
     loading = false;
     saving = false;
+    loadError = '';
     rawMaterials: UniversalDropdownDto[] = [];
     suppliers: UniversalDropdownDto[] = [];
     units: UniversalDropdownDto[] = [];
@@ -291,15 +292,19 @@ export class RestaurantInventoryComponent extends AppComponentBase implements On
             rawMaterials: this.inventoryService.getRawMaterials(),
             suppliers: this.restaurantReportingService.getAllSuppliersForTableDropdown(),
             units: this.inventoryService.getUnits(),
-        }).subscribe((result) => {
-            this.rawMaterials = result.rawMaterials || [];
-            this.suppliers = result.suppliers || [];
-            this.units = result.units || [];
+        }).subscribe({
+            next: (result) => {
+                this.rawMaterials = result.rawMaterials || [];
+                this.suppliers = result.suppliers || [];
+                this.units = result.units || [];
+            },
+            error: (error) => (this.loadError = this.getErrorMessage(error, 'Could not load inventory lookups.')),
         });
     }
 
     refresh(): void {
         this.loading = true;
+        this.loadError = '';
         forkJoin({
             mappings: this.inventoryService.getSupplierItemMappings(undefined),
             lowStock: this.inventoryService.getLowStockSuggestions(),
@@ -324,13 +329,21 @@ export class RestaurantInventoryComponent extends AppComponentBase implements On
             recipeCoverage: this.inventoryService.getRecipeCoverage(undefined, undefined, undefined, undefined, undefined),
         })
             .pipe(finalize(() => (this.loading = false)))
-            .subscribe((result) => {
-                this.mappings = result.mappings || [];
-                this.lowStock = result.lowStock || [];
-                this.adjustments = result.adjustments || [];
-                this.consumptionLedger = result.consumptionLedger || [];
-                this.recipeCoverage = result.recipeCoverage || [];
+            .subscribe({
+                next: (result) => {
+                    this.mappings = result.mappings || [];
+                    this.lowStock = result.lowStock || [];
+                    this.adjustments = result.adjustments || [];
+                    this.consumptionLedger = result.consumptionLedger || [];
+                    this.recipeCoverage = result.recipeCoverage || [];
+                },
+                error: (error) => (this.loadError = this.getErrorMessage(error, 'Could not load restaurant inventory. Try refreshing.')),
             });
+    }
+
+    retryLoad(): void {
+        this.loadLookups();
+        this.refresh();
     }
 
     saveMapping(): void {
@@ -343,10 +356,13 @@ export class RestaurantInventoryComponent extends AppComponentBase implements On
         this.inventoryService
             .createOrEditSupplierItemMapping(new CreateOrEditRestaurantSupplierItemMappingDto(this.mappingForm))
             .pipe(finalize(() => (this.saving = false)))
-            .subscribe(() => {
-                this.notify.success(this.l('SavedSuccessfully'));
-                this.mappingForm = this.createEmptyMappingForm();
-                this.refresh();
+            .subscribe({
+                next: () => {
+                    this.notify.success(this.l('SavedSuccessfully'));
+                    this.mappingForm = this.createEmptyMappingForm();
+                    this.refresh();
+                },
+                error: (error) => this.notify.error(this.getErrorMessage(error, 'Supplier mapping could not be saved. Your entries are still here.')),
             });
     }
 
@@ -359,9 +375,12 @@ export class RestaurantInventoryComponent extends AppComponentBase implements On
     }
 
     deleteMapping(mapping: RestaurantSupplierItemMappingDto): void {
-        this.inventoryService.deleteSupplierItemMapping(mapping.id).subscribe(() => {
-            this.notify.success(this.l('SuccessfullyDeleted'));
-            this.refresh();
+        this.inventoryService.deleteSupplierItemMapping(mapping.id).subscribe({
+            next: () => {
+                this.notify.success(this.l('SuccessfullyDeleted'));
+                this.refresh();
+            },
+            error: (error) => this.notify.error(this.getErrorMessage(error, 'Supplier mapping could not be deleted.')),
         });
     }
 
@@ -384,10 +403,13 @@ export class RestaurantInventoryComponent extends AppComponentBase implements On
                 }),
             )
             .pipe(finalize(() => (this.saving = false)))
-            .subscribe((result) => {
-                const count = result?.purchaseOrderIds?.length || 0;
-                this.notify.success(count ? `${count} draft purchase order(s) created` : 'No purchase orders required');
-                this.refresh();
+            .subscribe({
+                next: (result) => {
+                    const count = result?.purchaseOrderIds?.length || 0;
+                    this.notify.success(count ? `${count} draft purchase order(s) created` : 'No purchase orders required');
+                    this.refresh();
+                },
+                error: (error) => this.notify.error(this.getErrorMessage(error, 'Draft purchase orders could not be created.')),
             });
     }
 
@@ -433,14 +455,17 @@ export class RestaurantInventoryComponent extends AppComponentBase implements On
         this.inventoryService
             .createStockAdjustment(this.toStockAdjustmentDto(form))
             .pipe(finalize(() => (this.saving = false)))
-            .subscribe(() => {
-                this.notify.success(this.l('SavedSuccessfully'));
-                if (form.adjustmentType === 3) {
-                    this.wastageForm = this.createEmptyAdjustmentForm(3);
-                } else {
-                    this.adjustmentForm = this.createEmptyAdjustmentForm(form.adjustmentType);
-                }
-                this.refresh();
+            .subscribe({
+                next: () => {
+                    this.notify.success(this.l('SavedSuccessfully'));
+                    if (form.adjustmentType === 3) {
+                        this.wastageForm = this.createEmptyAdjustmentForm(3);
+                    } else {
+                        this.adjustmentForm = this.createEmptyAdjustmentForm(form.adjustmentType);
+                    }
+                    this.refresh();
+                },
+                error: (error) => this.notify.error(this.getErrorMessage(error, 'Stock adjustment could not be saved. Your entries are still here.')),
             });
     }
 
@@ -464,6 +489,10 @@ export class RestaurantInventoryComponent extends AppComponentBase implements On
 
     setTab(tab: RestaurantInventoryTab): void {
         this.activeTab = tab;
+    }
+
+    private getErrorMessage(error: any, fallback: string): string {
+        return error?.error?.error?.message || error?.error?.message || error?.message || fallback;
     }
 
     private createEmptyMappingForm(): RestaurantSupplierItemMappingForm {

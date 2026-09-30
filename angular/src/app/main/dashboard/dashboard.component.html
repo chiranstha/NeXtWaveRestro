@@ -156,7 +156,7 @@
                     <div class="card-header align-items-center d-flex justify-content-between">
                         <div class="dashboard-report-heading"><span class="dashboard-report-icon"><i class="fa fa-utensils" aria-hidden="true"></i></span><div><h3>{{ 'Top Selling Items' | localize }}</h3><p>{{ 'Your most popular menu items' | localize }}</p></div></div>
                     </div>
-                    <div class="card-body p-0 dashboard-table-scroll">
+                    <div class="card-body p-2 p-sm-3 dashboard-table-scroll">
                         @if (topItems.length) {
                             <table class="restaurant-table restaurant-compact-table table table-sm table-row-bordered align-middle mb-0 w-100">
                                 <tbody>
@@ -186,7 +186,7 @@
                     <div class="card-header align-items-center d-flex justify-content-between">
                         <div class="dashboard-report-heading"><span class="dashboard-report-icon"><i class="fa fa-table-cells-large" aria-hidden="true"></i></span><div><h3>{{ 'Table Sales' | localize }}</h3><p>{{ 'Sales across your dining floor' | localize }}</p></div></div>
                     </div>
-                    <div class="card-body p-0 dashboard-table-scroll">
+                    <div class="card-body p-2 p-sm-3 dashboard-table-scroll">
                         @if (topTables.length) {
                             <table class="restaurant-table restaurant-compact-table table table-sm table-row-bordered align-middle mb-0 w-100">
                                 <tbody>
@@ -213,7 +213,7 @@
                     <div class="card-header align-items-center d-flex justify-content-between">
                         <div class="dashboard-report-heading"><span class="dashboard-report-icon"><i class="fa fa-user-group" aria-hidden="true"></i></span><div><h3>{{ 'Waiter Performance' | localize }}</h3><p>{{ 'Orders and sales by team member' | localize }}</p></div></div>
                     </div>
-                    <div class="card-body p-0 dashboard-table-scroll">
+                    <div class="card-body p-2 p-sm-3 dashboard-table-scroll">
                         @if (topWaiters.length) {
                             <table class="restaurant-table restaurant-compact-table table table-sm table-row-bordered align-middle mb-0 w-100">
                                 <tbody>
@@ -270,7 +270,7 @@
                     <div class="card-header align-items-center d-flex justify-content-between">
                         <div class="dashboard-report-heading"><span class="dashboard-report-icon"><i class="fa fa-boxes-stacked" aria-hidden="true"></i></span><div><h3>{{ 'Low Stock Alerts' | localize }}</h3><p>{{ 'Prioritize your next restock' | localize }}</p></div></div><span class="dashboard-stock-badge">{{ lowStock.length }} {{ 'items need attention' | localize }}</span>
                     </div>
-                    <div class="card-body p-0 dashboard-table-scroll">
+                    <div class="card-body p-2 p-sm-3 dashboard-table-scroll">
                         @if (urgentLowStock.length) {
                             <table class="restaurant-table restaurant-compact-table dashboard-low-stock-table table table-sm table-row-bordered align-middle mb-0 w-100">
                                 <thead class="align-middle text-uppercase">
@@ -311,7 +311,7 @@
                     <div class="card-header align-items-center d-flex justify-content-between">
                         <div class="dashboard-report-heading"><span class="dashboard-report-icon"><i class="fa fa-users" aria-hidden="true"></i></span><div><h3>{{ 'Payroll & Attendance' | localize }}</h3><p>{{ 'Your team, hours and attendance' | localize }}</p></div></div>
                     </div>
-                    <div class="card-body p-0 dashboard-table-scroll">
+                    <div class="card-body p-2 p-sm-3 dashboard-table-scroll">
                         @if (payrollReport.attendance.length) {
                             <table class="restaurant-table restaurant-compact-table table table-sm table-row-bordered align-middle mb-0 w-100">
                                 <thead><tr><th>{{ 'Status' | localize }}</th><th class="text-end">{{ 'Records' | localize }}</th><th class="text-end">{{ 'Regular Hours' | localize }}</th><th class="text-end">{{ 'Overtime' | localize }}</th></tr></thead>

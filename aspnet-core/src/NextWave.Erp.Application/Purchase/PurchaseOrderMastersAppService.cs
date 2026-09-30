@@ -177,7 +177,7 @@ namespace NextWave.Erp.Purchase
             return output;
         }
 
-        [AbpAuthorize(AppPermissions.PagesPurchaseOrderMastersEdit)]
+        [AbpAuthorize(AppPermissions.PagesPurchaseOrderMastersEdit, AppPermissions.PagesPurchaseMastersCreate)]
         public async Task<GetPurchaseOrderMasterForEditOutput> GetPurchaseOrderMasterForEdit(EntityDto<Guid> input)
         {
             var purchaseOrderMaster = (await purchaseOrderMasterRepository.GetAll().Where(x => x.Id == input.Id).Include(x => x.AccountLedgerFk).ToListAsync()).FirstOrDefault();

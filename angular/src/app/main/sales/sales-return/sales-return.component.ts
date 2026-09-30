@@ -91,7 +91,6 @@ export class SalesReturnComponent extends AppComponentBase implements OnInit, On
     filterChange() {
 
         this.loadPage(this.currentPage);
-        this._proxy.fixedSalesReturn().subscribe();
     }
 
 

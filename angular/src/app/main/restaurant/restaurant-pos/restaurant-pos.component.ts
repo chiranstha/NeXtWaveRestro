@@ -35,6 +35,7 @@ import {
     RestaurantOrderItemModifierDto,
     RestaurantOrderItemStatus,
     RestaurantMenuServiceProxy,
+    RestaurantOrderMutationDto,
     RestaurantOrderServiceProxy,
     RestaurantOrderType,
     RestaurantSetupServiceProxy,
@@ -43,6 +44,7 @@ import {
     RestaurantTicketDto,
     RestaurantTicketPurpose,
     RestaurantTicketStatus,
+    RestaurantBillTenderDto,
     FinalizeRestaurantBillResultDto,
     ReprintRestaurantTicketDto,
     PaymentMethod,
@@ -1029,12 +1031,13 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
 
         this.saving = true;
         const request = new ApplyRestaurantOrderDiscountDto({
-                    orderId: this.selectedOrder.id,
-                    discountAmount: Number(this.operationForm.discountAmount || 0),
-                    approvalPin: undefined,
-                    approvalNote: undefined,
-                    expectedOrderVersion: this.selectedOrder.rowVersion,
-                });
+            orderId: this.selectedOrder.id,
+            discountAmount: Number(this.operationForm.discountAmount || 0),
+            approvalPin: undefined,
+            approvalNote: undefined,
+            clientRequestId: undefined,
+            expectedOrderVersion: this.selectedOrder.rowVersion,
+        });
         request.clientRequestId = this.getMutationRequestId('discount', request);
         this.restaurantOrderService
             .applyOrderDiscount(request)
@@ -1053,10 +1056,11 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
 
         this.saving = true;
         const request = new TransferRestaurantTableDto({
-                    orderId: this.selectedOrder.id,
-                    newTableId: this.operationForm.transferTableId,
-                    expectedOrderVersion: this.selectedOrder.rowVersion,
-                });
+            orderId: this.selectedOrder.id,
+            newTableId: this.operationForm.transferTableId,
+            clientRequestId: undefined,
+            expectedOrderVersion: this.selectedOrder.rowVersion,
+        });
         request.clientRequestId = this.getMutationRequestId('transfer', request);
         this.restaurantOrderService
             .transferTable(request)
@@ -1097,11 +1101,12 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
 
         this.saving = true;
         const request = new SplitRestaurantOrderDto({
-                    sourceOrderId: this.selectedOrder.id,
-                    newTableId: this.operationForm.splitTableId || undefined,
-                    orderItemIds: this.operationForm.splitItemIds,
-                    expectedOrderVersion: this.selectedOrder.rowVersion,
-                });
+            sourceOrderId: this.selectedOrder.id,
+            newTableId: this.operationForm.splitTableId || undefined,
+            orderItemIds: this.operationForm.splitItemIds,
+            clientRequestId: undefined,
+            expectedOrderVersion: this.selectedOrder.rowVersion,
+        });
         request.clientRequestId = this.getMutationRequestId('split', request);
         this.restaurantOrderService
             .splitOrder(request)
@@ -1121,10 +1126,11 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
 
         this.saving = true;
         const request = new MergeRestaurantOrdersDto({
-                    targetOrderId: this.selectedOrder.id,
-                    sourceOrderIds: this.operationForm.mergeSourceOrderIds,
-                    expectedOrderVersions: this.getMergeOrderVersions(),
-                });
+            targetOrderId: this.selectedOrder.id,
+            sourceOrderIds: this.operationForm.mergeSourceOrderIds,
+            clientRequestId: undefined,
+            expectedOrderVersions: this.getMergeOrderVersions(),
+        });
         request.clientRequestId = this.getMutationRequestId('merge', request);
         this.restaurantOrderService
             .mergeOrders(request)
@@ -1423,11 +1429,11 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
             this.selectedOrder = latest;
             const version = latest.rowVersion || '';
             const signature = JSON.stringify({ orderId: id, expectedOrderVersion: version });
-            const request = {
+            const request = new RestaurantOrderMutationDto({
                 orderId: id,
                 expectedOrderVersion: version,
                 clientRequestId: this.getStableRequestId(`restaurant-kitchen-send:${id}`, signature),
-            };
+            });
             this.restaurantOrderService
                 .sendToKitchen(request)
                 .pipe(finalize(() => (this.saving = false)))
@@ -1460,12 +1466,13 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         }
 
         const request = new VoidRestaurantOrderItemDto({
-                    orderItemId: line.id,
-                    reason: reason || '',
-                    approvalPin: undefined,
-                    approvalNote: undefined,
-                    expectedOrderVersion: this.selectedOrder?.rowVersion,
-                });
+            orderItemId: line.id,
+            reason: reason || '',
+            approvalPin: undefined,
+            approvalNote: undefined,
+            clientRequestId: undefined,
+            expectedOrderVersion: this.selectedOrder?.rowVersion,
+        });
         request.clientRequestId = this.getMutationRequestId('void-item', request);
         this.restaurantOrderService
             .voidOrderItem(request)
@@ -1577,8 +1584,9 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
             isPrint: this.billForm.isPrint,
             confirmNegativeStock,
             cashShiftId: this.cashShift?.id,
+            clientRequestId: undefined,
             expectedOrderVersion: this.selectedOrder.rowVersion,
-            tenders: this.billTenders.map((tender) => ({
+            tenders: this.billTenders.map((tender) => new RestaurantBillTenderDto({
                 paymentMethod: tender.paymentMethod,
                 paymentLedgerId: tender.paymentLedgerId || undefined,
                 amount: Number(tender.amount || 0),
@@ -1807,8 +1815,15 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
 
     private handleOrderConflict(error: any): void {
         this.saving = false;
-        const details = [error?.details, error?.error?.details, error?.error?.error?.details, error?.message]
-            .filter(Boolean).join(' ');
+        const response = this.parseApiErrorResponse(error?.response);
+        const responseError = response?.error || response?.result?.error || response;
+        const details = [
+            error?.details,
+            error?.error?.details,
+            error?.error?.error?.details,
+            responseError?.details,
+            response?.details,
+        ].filter(Boolean).map((value) => typeof value === 'string' ? value : JSON.stringify(value)).join(' ');
         if (details.includes('Restaurant.OrderConflict') || details.toLowerCase().includes('changed on another device')) {
             this.orderDirty = true;
             this.persistLocalDraft();
@@ -1819,7 +1834,30 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
             this.notify.warn('This order changed on another device. Your local draft is preserved. Reload the latest order before manually reapplying your changes.');
             return;
         }
-        this.notify.error(error?.message || 'The order change could not be saved. Your local draft remains available.');
+
+        if (this.orderDirty) {
+            this.persistLocalDraft();
+        }
+        const apiMessage = [
+            responseError?.message,
+            response?.message,
+            error?.error?.error?.message,
+            error?.error?.message,
+            error?.message,
+        ].find((message) => !!message && message !== 'An unexpected server error occurred.');
+        this.notify.error(apiMessage || 'The order change could not be saved. Your local draft remains available.');
+    }
+
+    private parseApiErrorResponse(response: unknown): any {
+        if (typeof response !== 'string') {
+            return response;
+        }
+
+        try {
+            return JSON.parse(response);
+        } catch {
+            return null;
+        }
     }
 
     private resolveOrderMutationError(error: any, operationType: string, clientRequestId?: string, onRecovered?: () => void): void {
@@ -1857,12 +1895,13 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         this.saving = true;
         this.restaurantOrderService.getOrderForPos(orderId).subscribe((latest) => {
             const request = new CancelRestaurantTicketDto({
-                    ticketId: ticket.id,
-                    reason,
-                    approvalPin: undefined,
-                    approvalNote: undefined,
-                    expectedOrderVersion: latest.rowVersion,
-                });
+                ticketId: ticket.id,
+                reason,
+                approvalPin: undefined,
+                approvalNote: undefined,
+                clientRequestId: undefined,
+                expectedOrderVersion: latest.rowVersion,
+            });
             request.clientRequestId = this.getMutationRequestId('cancel-ticket', request);
             this.restaurantOrderService
                 .cancelTicket(request)

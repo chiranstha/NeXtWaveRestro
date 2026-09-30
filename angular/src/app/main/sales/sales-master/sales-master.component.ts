@@ -542,7 +542,6 @@ export class SalesMasterComponent extends AppComponentBase implements OnInit, On
     filterChange() {
 
         this.loadPage(this.currentPage);
-        this._proxy.fixedSales().subscribe();
     }
 
 

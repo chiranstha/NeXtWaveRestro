@@ -82643,7 +82643,8 @@ export enum PaymentMethod {
     Credit = 2,
     Card_Swipe = 3,
     NA = 4,
-    LC = 5,
+    LC = 4,
+    QR = 5,
 }
 
 export enum PaymentOptions {
@@ -104116,7 +104117,8 @@ export enum PaymentMethod2 {
     Credit = 2,
     Card_Swipe = 3,
     NA = 4,
-    LC = 5,
+    LC = 4,
+    QR = 5,
 }
 
 export enum PaymentMethod3 {
@@ -104125,7 +104127,8 @@ export enum PaymentMethod3 {
     Credit = 2,
     Card_Swipe = 3,
     NA = 4,
-    LC = 5,
+    LC = 4,
+    QR = 5,
 }
 
 export enum PaymentMethod4 {
@@ -104134,7 +104137,8 @@ export enum PaymentMethod4 {
     Credit = 2,
     Card_Swipe = 3,
     NA = 4,
-    LC = 5,
+    LC = 4,
+    QR = 5,
 }
 
 export enum PaymentMethod5 {
@@ -104143,7 +104147,8 @@ export enum PaymentMethod5 {
     Credit = 2,
     Card_Swipe = 3,
     NA = 4,
-    LC = 5,
+    LC = 4,
+    QR = 5,
 }
 
 export enum PaymentMethod6 {
@@ -104152,7 +104157,8 @@ export enum PaymentMethod6 {
     Credit = 2,
     Card_Swipe = 3,
     NA = 4,
-    LC = 5,
+    LC = 4,
+    QR = 5,
 }
 
 export enum SalesType2 {

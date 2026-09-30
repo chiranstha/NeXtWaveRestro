@@ -8,6 +8,7 @@ import {
     PurchaseMasterAccountLedgerTableDto,
     PurchaseMastersServiceProxy,
     PurchaseMasterTaxTableDto,
+    PurchaseOrderMastersServiceProxy,
     TenantSettingsEditDto,
     TenantSettingsServiceProxy,
     UniversalDropdownDto,
@@ -152,6 +153,7 @@ export class AddPurchaseInvoiceComponent extends AppComponentBase implements OnI
         private router: Router,
         private modalService: BsModalService,
         private _purchaseMasterServiceProxy: PurchaseMastersServiceProxy,
+        private _purchaseOrderMastersServiceProxy: PurchaseOrderMastersServiceProxy,
         private _location: Location,
         private _tenantSettingsService: TenantSettingsServiceProxy,
         // private _selectService: AgainstModeService
@@ -189,6 +191,10 @@ export class AddPurchaseInvoiceComponent extends AppComponentBase implements OnI
             this.form.get('dateMiti').setValue(this.today);
         }
         this.fetchAll();
+        const purchaseOrderId = this.route.snapshot.queryParamMap.get('purchaseOrderId');
+        if (purchaseOrderId) {
+            this.prefillFromPurchaseOrder(purchaseOrderId);
+        }
         if (this.id) {
             this.title = 'Edit Purchase Invoice';
             this._purchaseMasterServiceProxy.getPurchaseMasterForEdit(this.id).subscribe((result) => {
@@ -205,6 +211,61 @@ export class AddPurchaseInvoiceComponent extends AppComponentBase implements OnI
             this.allTaxes = result;
         });
         this.watchPurchaseDetailChanges();
+    }
+
+    private async prefillFromPurchaseOrder(purchaseOrderId: string): Promise<void> {
+        try {
+            const [order, units] = await Promise.all([
+                lastValueFrom(this._purchaseOrderMastersServiceProxy.getPurchaseOrderMasterForEdit(purchaseOrderId)),
+                lastValueFrom(this._purchaseMasterServiceProxy.getAllUnitForTableDropdown()),
+            ]);
+            const details = await Promise.all(
+                (order.purchaseOrderDetails || []).map(async (detail) => {
+                    const product = await lastValueFrom(this._purchaseMasterServiceProxy.getProductForView(detail.productId));
+                    const qty = Number(detail.qty) || 0;
+                    const rate = Number(detail.rate) || 0;
+                    const taxRate = Number(product.taxRate) || 0;
+                    const grossAmount = this.roundToTwo(qty * rate);
+                    const taxAmount = this.roundToTwo(grossAmount * taxRate / 100);
+
+                    return {
+                        id: this.emptyGuId,
+                        orderDetailId: detail.id,
+                        productId: detail.productId,
+                        qty,
+                        rate,
+                        unitId: detail.unitId,
+                        unitsList: [{
+                            unitId: detail.unitId,
+                            unitName: units.find((unit) => unit.id === detail.unitId)?.displayName || detail.unitId,
+                        }],
+                        taxId: product.taxId,
+                        taxValue: taxRate,
+                        discount: 0,
+                        discountPercent: 0,
+                        grossAmount,
+                        netAmount: grossAmount,
+                        taxAmount,
+                        amount: this.roundToTwo(grossAmount + taxAmount),
+                    };
+                })
+            );
+
+            this.allUnits = units;
+            this.purchaseDetail.clear();
+            details.forEach((detail) => this.purchaseDetail.push(this.createpurchaseMasterDetails(detail)));
+            if (details.length === 0) {
+                this.addDetailForm();
+            }
+            this.form.patchValue({
+                againstId: 1,
+                orderOrReceiptId: purchaseOrderId,
+                ledgerId: order.ledgerId,
+            });
+            this.totalPriceCalculation();
+        } catch (error) {
+            this.notify.error('Unable to load the purchase order. Please check your access and try again.');
+        }
     }
 
     watchPurchaseDetailChanges() {
@@ -389,7 +450,12 @@ export class AddPurchaseInvoiceComponent extends AppComponentBase implements OnI
             taxId: new FormControl(item.taxId, Validators.required),
             taxValue: [item.taxValue ? item.taxValue : 0],
             rate: new FormControl(item.rate ? item.rate : 0),
-            unitsList: this.fb.array([])
+            unitsList: this.fb.array(
+                (item.unitsList || []).map((unit) => this.fb.group({
+                    unitId: unit.unitId,
+                    unitName: unit.unitName,
+                }))
+            )
         });
     }
 

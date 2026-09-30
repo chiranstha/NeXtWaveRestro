@@ -13,7 +13,7 @@ import {
 import { Router } from '@angular/router';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { AppComponentBase } from '@shared/common/app-component-base';
-import { GetPurchaseOrderMasterForViewDto, PurchaseOrderMastersServiceProxy, ReportingServiceProxy } from '@shared/service-proxies/service-proxies';
+import { GetPurchaseOrderMasterForViewDto, PurchaseOrderMastersServiceProxy, PurchaseStatus, ReportingServiceProxy } from '@shared/service-proxies/service-proxies';
 import { FileDownloadService } from '@shared/utils/file-download.service';
 import { finalize } from 'rxjs';
 //import { ViewPurchaseOrderMasterModalComponent } from './view-purchaseOrderMaster-modal.component';
@@ -129,11 +129,17 @@ export class PurchaseOrderComponent extends AppComponentBase implements OnInit, 
 
         {
             field: 'purchaseStatus',
-            headerName: this.l('Status'),
+            headerName: this.l('Purchase Invoice Status'),
             sortable: true,
             filter: true,
             rowGroup: false,
             enableRowGroup: true,
+            valueFormatter: (params) => Number(params.value) === PurchaseStatus.Complete
+                ? 'Sent to Purchase Invoice'
+                : 'Not sent',
+            cellClass: (params) => Number(params.value) === PurchaseStatus.Complete
+                ? 'purchase-invoice-sent'
+                : 'purchase-invoice-pending',
 
             editable: false,
             flex: 3
@@ -185,6 +191,8 @@ export class PurchaseOrderComponent extends AppComponentBase implements OnInit, 
                 onView: this.onView.bind(this),
                 onEdit: this.onEdit.bind(this),
                 onPrint: this.onPrint.bind(this),
+                onCreatePurchase: this.createPurchaseFromOrder.bind(this),
+                canCreatePurchase: this.isGranted('Pages.PurchaseMasters.Create'),
                 onDelete: this.delete.bind(this),
                 hideDeleteOnGroup: true
             },
@@ -219,6 +227,8 @@ export class PurchaseOrderComponent extends AppComponentBase implements OnInit, 
 
                 if (button.classList.contains('btn-view')) {
                     this.onView(rowIndex);
+                } else if (button.classList.contains('btn-create-purchase')) {
+                    this.createPurchaseFromOrder(rowIndex);
                 } else if (button.classList.contains('btn-edit')) {
                     this.onEdit(rowIndex);
                 } else if (button.classList.contains('btn-print')) {
@@ -238,10 +248,14 @@ export class PurchaseOrderComponent extends AppComponentBase implements OnInit, 
             return '';
         }
         const viewButton = `<button class="btnaction btn-view fa-duotone fa-eye" data-row-index="${params.data.id}"></button>`;
+        const invoiceCreated = Number(params.data.purchaseStatus) === PurchaseStatus.Complete;
+        const createPurchaseButton = params.colDef.cellRendererParams.canCreatePurchase
+            ? `<button class="btnaction btn-create-purchase fa-duotone fa-cart-arrow-down" ${invoiceCreated ? 'disabled' : ''} title="${invoiceCreated ? 'Purchase invoice already created' : 'Create purchase invoice'}" aria-label="${invoiceCreated ? 'Purchase invoice already created' : 'Create purchase invoice from this order'}" data-row-index="${params.data.id}"></button>`
+            : '';
         const printButton = `<button class="btnaction btn-print fa-duotone fa-print" data-row-index="${params.data.id}"></button>`;
         const editButton = `<button class="btnaction btn-edit fa-duotone fa-pen-to-square" data-row-index="${params.data.id}"></button>`;
         const deleteButton = `<button class="btnaction btn-delete fa-duotone fa-trash cursor-pointer " data-row-index="${params.data.id}"></button>`;
-        return `${viewButton} ${printButton} ${editButton} ${deleteButton}`;
+        return `${viewButton} ${createPurchaseButton} ${printButton} ${editButton} ${deleteButton}`;
     }
 
     defaultColDef = {
@@ -323,6 +337,16 @@ export class PurchaseOrderComponent extends AppComponentBase implements OnInit, 
 
     onPrint(id: string) {
         this.router.navigate(['app/main/purchase/pdf/0', id]);
+    }
+
+    createPurchaseFromOrder(id: string) {
+        if (this.isGranted('Pages.PurchaseMasters.Create')) {
+            this.router.navigate(['app/main/purchase/purchaseMasters/add'], {
+                queryParams: { purchaseOrderId: id },
+            });
+        } else {
+            this.notify.error('You are not authorized to perform this action');
+        }
     }
 
     addRoute() {

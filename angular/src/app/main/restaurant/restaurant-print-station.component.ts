@@ -5,6 +5,7 @@ import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef, ICellRendererParams } from 'ag-grid-community';
 import { Subscription, firstValueFrom, interval } from 'rxjs';
 import { RestaurantGuestApiService } from './restaurant-guest-api.service';
+import { RestaurantNepaliDatePipe } from './restaurant-nepali-date.pipe';
 
 interface LocalPrinterRoute {
     name: string;
@@ -17,7 +18,7 @@ interface LocalPrinterRoute {
 @Component({
     selector: 'restaurant-print-station',
     standalone: true,
-    imports: [CommonModule, FormsModule, AgGridAngular],
+    imports: [CommonModule, FormsModule, AgGridAngular, RestaurantNepaliDatePipe],
     templateUrl: './restaurant-print-station.component.html',
     styleUrl: './restaurant-staff.component.scss',
 })

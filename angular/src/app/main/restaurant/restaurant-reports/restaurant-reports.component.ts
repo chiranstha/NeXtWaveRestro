@@ -200,7 +200,6 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
     private restaurantSetupService = inject(RestaurantSetupServiceProxy);
     private restaurantMenuService = inject(RestaurantMenuServiceProxy);
     private reportingServiceProxy = inject(ReportingServiceProxy);
-    private nepaliDateService = inject(NepaliDatepickerService);
     private cdr = inject(ChangeDetectorRef);
 
     constructor() {
@@ -999,7 +998,15 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
         }
 
         try {
-            const date = this.nepaliDateService.ADToBS(dateValue.toISODate()!, 'yyyy-mm-dd');
+            const dateParts = new Intl.DateTimeFormat('en-US-u-ca-nepali', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                timeZone: 'Asia/Kathmandu',
+            }).formatToParts(dateValue.toJSDate());
+            const date = ['year', 'month', 'day']
+                .map((part) => dateParts.find(({ type }) => type === part)?.value)
+                .join('-');
             return `${date}${includeTime ? ` ${dateValue.toFormat('HH:mm')}` : ''} BS`;
         } catch {
             return String(value);

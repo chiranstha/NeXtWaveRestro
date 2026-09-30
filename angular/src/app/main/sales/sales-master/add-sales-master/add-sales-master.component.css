@@ -81,8 +81,11 @@
 .sales-upload-panel .card-upload { margin-top: 10px; }
 .sales-upload-panel .card-upload .table { margin-bottom: 0; border-color: #e8edf4; }
 .sales-upload-panel .card-upload .table th { background: #f8f9fb; color: #758195; font-size: 11px; font-weight: 600; }
-.sales-footer-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; gap: 16px 20px; padding: 0 2px 12px; }
-.sales-footer-fields .sales-description-field { grid-column: span 2; }
+.sales-footer-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2fr); grid-template-areas: "lr performa description" "print . ."; align-items: end; gap: 16px 20px; padding: 0 2px 12px; }
+.sales-footer-fields > .sales-field:nth-child(1) { grid-area: lr; }
+.sales-footer-fields > .sales-field:nth-child(2) { grid-area: performa; }
+.sales-footer-fields .sales-description-field { grid-area: description; }
+.sales-footer-fields .sales-print-toggle { grid-area: print; }
 .sales-footer-fields textarea.form-control { min-height: 58px; }
 .sales-print-toggle { display: flex; align-items: center; gap: 8px; min-height: 39px; padding-left: 8px; color: #344258; font-size: 13px; font-weight: 600; }
 .sales-print-toggle .form-check-input { width: 20px; height: 20px; margin: 0; }
@@ -91,14 +94,13 @@
     .sales-fields-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .sales-details-card { min-height: 460px; }
     .sales-totals-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .sales-footer-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .sales-footer-fields .sales-description-field { grid-column: span 2; }
+    .sales-footer-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: "lr performa" "description description" "print ."; }
 }
 @media (max-width: 650px) {
     .sales-invoice-container { padding-inline: 7px; }
     .sales-fields-card { padding: 14px; }
     .sales-fields-grid, .sales-totals-grid, .sales-footer-fields { grid-template-columns: 1fr; }
-    .sales-footer-fields .sales-description-field { grid-column: auto; }
+    .sales-footer-fields { grid-template-areas: "lr" "performa" "description" "print"; }
     .sales-details-heading { align-items: flex-start; flex-direction: column; padding: 12px 3px; }
     .sales-detail-tools { width: 100%; flex-wrap: wrap; justify-content: flex-start; }
     .sales-barcode { width: min(100%, 320px); }
