@@ -26,6 +26,7 @@ import {
 } from '@shared/service-proxies/service-proxies';
 import { ColDef, ValueFormatterParams, ValueGetterParams } from 'ag-grid-community';
 import { DateTime } from 'luxon';
+import { NepaliDatepickerService } from '@app/shared/common/nepalidatepicker/services/nepali-datepicker-angular.service';
 import { finalize, forkJoin, of } from 'rxjs';
 import {
     RestaurantDailySalesSummaryReportDto,
@@ -199,6 +200,7 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
     private restaurantSetupService = inject(RestaurantSetupServiceProxy);
     private restaurantMenuService = inject(RestaurantMenuServiceProxy);
     private reportingServiceProxy = inject(ReportingServiceProxy);
+    private nepaliDateService = inject(NepaliDatepickerService);
     private cdr = inject(ChangeDetectorRef);
 
     constructor() {
@@ -990,9 +992,18 @@ export class RestaurantReportsComponent extends AppComponentBase implements OnIn
             return '-';
         }
 
-        const dateValue = value instanceof Date ? DateTime.fromJSDate(value) : DateTime.fromISO(String(value));
+        const dateValue = (value instanceof Date ? DateTime.fromJSDate(value) : DateTime.fromISO(String(value), { setZone: true }))
+            .setZone('Asia/Kathmandu');
+        if (!dateValue.isValid) {
+            return String(value);
+        }
 
-        return dateValue.isValid ? dateValue.toFormat(includeTime ? 'yyyy-MM-dd HH:mm' : 'yyyy-MM-dd') : String(value);
+        try {
+            const date = this.nepaliDateService.ADToBS(dateValue.toISODate()!, 'yyyy-mm-dd');
+            return `${date}${includeTime ? ` ${dateValue.toFormat('HH:mm')}` : ''} BS`;
+        } catch {
+            return String(value);
+        }
     }
 
     private formatGridNumber(

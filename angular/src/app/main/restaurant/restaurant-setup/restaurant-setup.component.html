@@ -557,7 +557,7 @@
                                         <i class="fa me-1" [ngClass]="check.isReady ? 'fa-circle-check' : 'fa-circle-exclamation'"></i>{{ check.label }}
                                     </div>
                                     <small class="text-muted">{{ check.details }}</small>
-                                    <small class="text-muted d-block" *ngIf="check.completedAt">Recorded {{ check.completedAt | date:'medium' }} by user {{ check.completedByUserId }}</small>
+                                    <small class="text-muted d-block" *ngIf="check.completedAt">Recorded {{ check.completedAt | restaurantNepaliDate: true }} by user {{ check.completedByUserId }}</small>
                                 </div>
                                 <button *ngIf="check.key === 'TestReceipt' || check.key === 'TestKitchenTicket'" type="button" class="btn btn-sm btn-light-primary" (click)="acknowledgePhysicalCheck(check.key)">
                                     {{ check.isReady ? 'Record test again' : 'Confirm physical test' }}

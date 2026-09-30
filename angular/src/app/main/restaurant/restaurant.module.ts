@@ -28,6 +28,7 @@ import { RestaurantRoutingModule } from './restaurant-routing.module';
 import { RestaurantSetupComponent } from './restaurant-setup/restaurant-setup.component';
 import { RestaurantRefundsComponent } from './restaurant-refunds/restaurant-refunds.component';
 import { RestaurantStylesComponent } from './restaurant-styles.component';
+import { RestaurantNepaliDatePipe } from './restaurant-nepali-date.pipe';
 
 @NgModule({
     imports: [
@@ -47,6 +48,7 @@ import { RestaurantStylesComponent } from './restaurant-styles.component';
         AgGridModule,
         AgChartsSharedModule,
         RestaurantStylesComponent,
+        RestaurantNepaliDatePipe,
         RestaurantRoutingModule,
     ],
     declarations: [

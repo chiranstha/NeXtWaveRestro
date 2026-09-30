@@ -995,6 +995,36 @@ export class RestaurantMenuComponent extends AppComponentBase implements OnInit,
         return value.toFormat('yyyy-LL-dd\'T\'HH:mm');
     }
 
+    get unavailableUntilDate(): string {
+        if (!this.itemForm.unavailableUntil) {
+            return '';
+        }
+        const dateTime = DateTime.fromISO(this.itemForm.unavailableUntil);
+        return dateTime.isValid ? dateTime.toFormat('yyyy-LL-dd') : '';
+    }
+
+    get unavailableUntilTime(): string {
+        if (!this.itemForm.unavailableUntil) {
+            return '';
+        }
+        const dateTime = DateTime.fromISO(this.itemForm.unavailableUntil);
+        return dateTime.isValid ? dateTime.toFormat('HH:mm') : '';
+    }
+
+    setUnavailableUntilDate(date: string): void {
+        if (!date) {
+            this.itemForm.unavailableUntil = '';
+            return;
+        }
+        this.itemForm.unavailableUntil = `${date}T${this.unavailableUntilTime || '00:00'}`;
+    }
+
+    setUnavailableUntilTime(time: string): void {
+        if (this.unavailableUntilDate && time) {
+            this.itemForm.unavailableUntil = `${this.unavailableUntilDate}T${time}`;
+        }
+    }
+
     private toDateTime(value: DateTimeInput): DateTime | undefined {
         if (!value) {
             return undefined;

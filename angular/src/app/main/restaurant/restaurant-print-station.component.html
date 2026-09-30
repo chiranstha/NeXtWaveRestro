@@ -52,7 +52,7 @@
             <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
                 <div>
                     <strong>{{ device.name }}</strong><span class="badge ms-2" [ngClass]="device.isEnabled ? 'bg-light-success text-success' : 'bg-light text-muted'">{{ device.isEnabled ? 'Enabled' : 'Disabled' }}</span>
-                    <div class="small text-muted">{{ device.platform }} · Routes: {{ device.routeNames?.join(', ') || 'None' }} · Last seen {{ device.lastSeenAtUtc | date:'short' }}</div>
+                    <div class="small text-muted">{{ device.platform }} · Routes: {{ device.routeNames?.join(', ') || 'None' }} · Last seen {{ device.lastSeenAtUtc | restaurantNepaliDate: true }}</div>
                 </div>
                 <button class="btn btn-sm" [ngClass]="device.isEnabled ? 'btn-light-danger' : 'btn-light-success'" type="button" (click)="toggleDevice(device)">{{ device.isEnabled ? 'Disable' : 'Enable' }}</button>
             </div>

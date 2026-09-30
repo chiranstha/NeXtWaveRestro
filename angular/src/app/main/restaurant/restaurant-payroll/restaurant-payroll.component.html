@@ -235,8 +235,20 @@
                                 <div class="col-md-6 mb-3"><label class="required form-label">Employee</label><select class="form-select" formControlName="employeeId"><option value="">Choose employee</option><option *ngFor="let employee of employees" [value]="employee.id">{{ employee.name }} ({{ employee.staffCode }})</option></select></div>
                                 <div class="col-md-3 mb-3"><label class="required form-label">Work date (BS)</label><ne-datepicker class="d-block" formControlName="workDate" valueIn="AD" dateIn="AD" [dateFormat]="'yyyy-mm-dd'" language="en" [todayBtn]="true"></ne-datepicker></div>
                                 <div class="col-md-3 mb-3"><label class="required form-label">Status</label><select class="form-select" formControlName="status"><option *ngFor="let item of attendanceStatuses" [ngValue]="item.value">{{ item.label }}</option></select></div>
-                                <div class="col-md-6 mb-3"><label class="form-label">Clock in</label><input type="datetime-local" class="form-control" formControlName="clockIn" /></div>
-                                <div class="col-md-6 mb-3"><label class="form-label">Clock out</label><input type="datetime-local" class="form-control" formControlName="clockOut" /></div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Clock in</label>
+                                    <div class="d-flex gap-2">
+                                        <ne-datepicker class="d-block flex-grow-1" [date]="attendanceClockDate('clockIn')" dateIn="AD" valueIn="AD" [dateFormat]="'yyyy-mm-dd'" language="en" [todayBtn]="true" (dateInAD)="setAttendanceClockDate('clockIn', $event)"></ne-datepicker>
+                                        <input class="form-control w-100px" type="time" [ngModel]="attendanceClockTime('clockIn')" [ngModelOptions]="{ standalone: true }" (ngModelChange)="setAttendanceClockTime('clockIn', $event)" aria-label="Clock in time" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Clock out</label>
+                                    <div class="d-flex gap-2">
+                                        <ne-datepicker class="d-block flex-grow-1" [date]="attendanceClockDate('clockOut')" dateIn="AD" valueIn="AD" [dateFormat]="'yyyy-mm-dd'" language="en" [todayBtn]="true" (dateInAD)="setAttendanceClockDate('clockOut', $event)"></ne-datepicker>
+                                        <input class="form-control w-100px" type="time" [ngModel]="attendanceClockTime('clockOut')" [ngModelOptions]="{ standalone: true }" (ngModelChange)="setAttendanceClockTime('clockOut', $event)" aria-label="Clock out time" />
+                                    </div>
+                                </div>
                                 <div class="col-md-4 mb-3"><label class="form-label">Break (minutes)</label><input type="number" min="0" max="1440" class="form-control" formControlName="breakMinutes" /></div>
                                 <div class="col-md-4 mb-3"><label class="form-label">Regular hours override</label><input type="number" min="0" max="24" step="0.25" class="form-control" formControlName="regularHours" placeholder="Auto" /></div>
                                 <div class="col-md-4 mb-3"><label class="form-label">Overtime hours override</label><input type="number" min="0" max="24" step="0.25" class="form-control" formControlName="overtimeHours" placeholder="Auto" /></div>

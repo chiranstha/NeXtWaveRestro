@@ -78,12 +78,12 @@ public class CreateOrEditRestaurantPayrollEmployeeDto
     public Guid DepartmentId { get; set; }
     public Guid JobRoleId { get; set; }
     public RestaurantEmploymentType EmploymentType { get; set; }
-    [Range(0, double.MaxValue)] public decimal BasicSalary { get; set; }
-    [Range(0, double.MaxValue)] public decimal HourlyRate { get; set; }
-    [Range(0, double.MaxValue)] public decimal OvertimeRate { get; set; }
-    [Range(0, double.MaxValue)] public decimal FixedAllowance { get; set; }
-    [Range(0, double.MaxValue)] public decimal FixedDeduction { get; set; }
-    [Range(0, double.MaxValue)] public decimal ServiceChargeWeight { get; set; } = 1;
+    [Range(typeof(decimal), "0", "79228162514264337593543950335")] public decimal BasicSalary { get; set; }
+    [Range(typeof(decimal), "0", "79228162514264337593543950335")] public decimal HourlyRate { get; set; }
+    [Range(typeof(decimal), "0", "79228162514264337593543950335")] public decimal OvertimeRate { get; set; }
+    [Range(typeof(decimal), "0", "79228162514264337593543950335")] public decimal FixedAllowance { get; set; }
+    [Range(typeof(decimal), "0", "79228162514264337593543950335")] public decimal FixedDeduction { get; set; }
+    [Range(typeof(decimal), "0", "79228162514264337593543950335")] public decimal ServiceChargeWeight { get; set; } = 1;
     [StringLength(100)] public string BankName { get; set; }
     [StringLength(80)] public string BankAccountNumber { get; set; }
     [StringLength(80)] public string PanNumber { get; set; }
@@ -185,7 +185,7 @@ public class RestaurantPayrollAllowanceHistoryDto
 public class AddRestaurantPayrollAllowanceRevisionDto
 {
     public Guid EmployeeId { get; set; }
-    [Range(0, double.MaxValue)] public decimal Amount { get; set; }
+    [Range(typeof(decimal), "0", "79228162514264337593543950335")] public decimal Amount { get; set; }
     public DateTime EffectiveFrom { get; set; }
     [StringLength(10)] public string EffectiveFromMiti { get; set; }
     [Required, StringLength(300)] public string Reason { get; set; }
@@ -255,8 +255,8 @@ public class GenerateRestaurantPayrollRunDto
 {
     public DateTime PeriodStart { get; set; }
     public DateTime PeriodEnd { get; set; }
-    [Range(0, double.MaxValue)] public decimal TipsPool { get; set; }
-    [Range(0, double.MaxValue)] public decimal ServiceChargePool { get; set; }
+    [Range(typeof(decimal), "0", "79228162514264337593543950335")] public decimal TipsPool { get; set; }
+    [Range(typeof(decimal), "0", "79228162514264337593543950335")] public decimal ServiceChargePool { get; set; }
     [StringLength(500)] public string Notes { get; set; }
     public List<RestaurantPayrollAdjustmentDto> Adjustments { get; set; } = new();
 }

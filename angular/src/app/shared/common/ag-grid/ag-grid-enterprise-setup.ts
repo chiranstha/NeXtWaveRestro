@@ -13,7 +13,7 @@ const reportGridDefaults: GridOptions = {
     suppressCellFocus: true,
     suppressColumnMoveAnimation: true,
     suppressColumnVirtualisation: false,
-    suppressContentVisibilityAuto: true,
+    enableContentVisibilityAuto: false,
     suppressRowHoverHighlight: false,
     suppressRowVirtualisation: false,
     suppressScrollOnNewData: true,

@@ -19,41 +19,6 @@
 
     <div [class]="containerClass">
         <div class="restaurant-page overflow-x-hidden gap-5 mw-100 d-grid min-w-0">
-            <div class="restaurant-nav align-items-center bg-white border border-gray-300 d-flex gap-2 overflow-x-auto p-2 rounded-3">
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/pos" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-cash-register"></i>
-                    {{ 'POS' | localize }}
-                </a>
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/setup" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-sliders"></i>
-                    {{ 'Setup' | localize }}
-                </a>
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/menu" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-utensils"></i>
-                    {{ 'Menu' | localize }}
-                </a>
-                <a class="restaurant-nav-link active bg-hover-light bg-light-primary flex-shrink-0 text-gray-600 text-hover-dark text-primary align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/inventory">
-                    <i class="fa fa-boxes-stacked"></i>
-                    {{ 'Inventory' | localize }}
-                </a>
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/channels" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-store"></i>
-                    {{ 'Channels' | localize }}
-                </a>
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/kds" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-tv"></i>
-                    {{ 'KDS' | localize }}
-                </a>
-                <a class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/reports" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-chart-line"></i>
-                    {{ 'Reports' | localize }}
-                </a>
-                <a *ngIf="isGranted('Pages.Restaurant.Payroll')" class="restaurant-nav-link bg-hover-light flex-shrink-0 text-gray-600 text-hover-dark align-items-center d-inline-flex fw-bolder gap-2 min-h-35px px-3 py-2 rounded-2 text-decoration-none text-nowrap" routerLink="/app/main/restaurant/payroll" routerLinkActive="active bg-light-primary text-primary">
-                    <i class="fa fa-money-check-dollar"></i>
-                    {{ 'Payroll' | localize }}
-                </a>
-            </div>
-
             <div class="restaurant-section-tabs align-items-center bg-white border border-gray-300 d-flex flex-nowrap flex-md-wrap gap-2 overflow-x-auto p-2 rounded-3">
                 <button class="nav-link bg-hover-light border-0 fw-bolder min-h-35px px-3 py-2 rounded-2 text-gray-600 text-hover-dark" [class.active]="activeTab === 'reorder'" [class.bg-light-primary]="activeTab === 'reorder'" [class.text-primary]="activeTab === 'reorder'" (click)="setTab('reorder')">
                     <i class="fa fa-arrow-trend-down me-1"></i>
@@ -141,8 +106,8 @@
                     <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-stretch align-items-sm-center d-flex flex-column flex-sm-row justify-content-between">
                         <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Raw Item Consumption' | localize }}</div>
                         <div class="card-toolbar restaurant-actionbar gap-2 align-items-center d-flex flex-wrap min-w-0 w-100 w-sm-auto">
-                            <input class="form-control w-100 w-sm-150px" type="date" [(ngModel)]="consumptionFilter.FromDate" />
-                            <input class="form-control w-100 w-sm-150px" type="date" [(ngModel)]="consumptionFilter.ToDate" />
+                            <ne-datepicker class="d-block w-100 w-sm-150px" [date]="consumptionFilter.FromDate || ''" dateIn="AD" valueIn="AD" [dateFormat]="'yyyy-mm-dd'" language="en" placeholder="From (BS)" (dateInAD)="consumptionFilter.FromDate = $event"></ne-datepicker>
+                            <ne-datepicker class="d-block w-100 w-sm-150px" [date]="consumptionFilter.ToDate || ''" dateIn="AD" valueIn="AD" [dateFormat]="'yyyy-mm-dd'" language="en" placeholder="To (BS)" (dateInAD)="consumptionFilter.ToDate = $event"></ne-datepicker>
                             <ng-select
                                 class="w-100 w-md-250px"
                                 [items]="rawMaterials"
@@ -325,7 +290,7 @@
                             </div>
                             <div class="w-100 w-sm-auto">
                                 <label class="form-label">{{ 'Date Miti' | localize }}</label>
-                                <input class="form-control w-100 w-sm-175px" [(ngModel)]="adjustmentForm.dateMiti" />
+                                <ne-datepicker class="d-block w-100 w-sm-175px" [(ngModel)]="adjustmentForm.dateMiti" dateIn="BS" valueIn="BS" [dateFormat]="'yyyy/mm/dd'" language="en" [todayBtn]="true"></ne-datepicker>
                             </div>
                             <div class="flex-grow-1 w-100 w-sm-auto">
                                 <label class="form-label">{{ 'Description' | localize }}</label>
@@ -366,7 +331,7 @@
                         <div class="restaurant-filterbar align-items-end d-flex flex-wrap gap-3 mb-4">
                             <div class="w-100 w-sm-auto">
                                 <label class="form-label">{{ 'Date Miti' | localize }}</label>
-                                <input class="form-control w-100 w-sm-175px" [(ngModel)]="wastageForm.dateMiti" />
+                                <ne-datepicker class="d-block w-100 w-sm-175px" [(ngModel)]="wastageForm.dateMiti" dateIn="BS" valueIn="BS" [dateFormat]="'yyyy/mm/dd'" language="en" [todayBtn]="true"></ne-datepicker>
                             </div>
                             <div class="flex-grow-1 w-100 w-sm-auto">
                                 <label class="form-label">{{ 'Description' | localize }}</label>
@@ -402,8 +367,8 @@
                 <div class="card-header border-gray-200 gap-2 min-h-40px px-3 py-2 align-items-stretch align-items-sm-center d-flex flex-column flex-sm-row justify-content-between">
                     <div class="card-title fw-bolder text-gray-900 fs-7 lh-sm m-0">{{ 'Recent Stock Adjustments' | localize }}</div>
                     <div class="card-toolbar restaurant-actionbar gap-2 align-items-center d-flex flex-wrap min-w-0 w-100 w-sm-auto">
-                        <input class="form-control w-100 w-sm-150px" type="date" [(ngModel)]="adjustmentFilter.fromDate" />
-                        <input class="form-control w-100 w-sm-150px" type="date" [(ngModel)]="adjustmentFilter.toDate" />
+                        <ne-datepicker class="d-block w-100 w-sm-150px" [date]="adjustmentFilter.fromDate" dateIn="AD" valueIn="AD" [dateFormat]="'yyyy-mm-dd'" language="en" placeholder="From (BS)" (dateInAD)="adjustmentFilter.fromDate = $event"></ne-datepicker>
+                        <ne-datepicker class="d-block w-100 w-sm-150px" [date]="adjustmentFilter.toDate" dateIn="AD" valueIn="AD" [dateFormat]="'yyyy-mm-dd'" language="en" placeholder="To (BS)" (dateInAD)="adjustmentFilter.toDate = $event"></ne-datepicker>
                         <button class="btn btn-sm btn-light-primary w-100 w-sm-auto" [buttonBusy]="loading" (click)="refresh()">
                             <i class="fa fa-filter"></i>
                         </button>

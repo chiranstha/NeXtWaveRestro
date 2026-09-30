@@ -113,10 +113,11 @@
 .purchase-compliance-card h3 i { color: #9aa8bb; font-size: 16px; }
 .compliance-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px; padding: 13px 18px 15px; }
 .compliance-grid > div { min-width: 0; }
-.purchase-footer-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; gap: 16px 20px; padding: 0 2px 16px; }
+.purchase-footer-fields { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: end; gap: 16px 20px; padding: 0 2px 16px; }
 .purchase-footer-fields > div { min-width: 0; }
-.purchase-footer-fields .description-field { grid-column: span 3; }
-.purchase-print { display: flex; align-items: center; gap: 7px; min-height: 39px; padding-left: 8px; font-weight: 500; }
+.purchase-footer-fields .transport-field { grid-column: span 4; }
+.purchase-footer-fields .description-field { grid-column: span 9; }
+.purchase-print { grid-column: span 3; display: flex; align-items: center; gap: 7px; min-height: 39px; padding-left: 8px; font-weight: 500; }
 .purchase-print .form-check-input { width: 20px; height: 20px; margin: 0; }
 .legacy-totals { display: none; }
 
@@ -124,14 +125,18 @@
     .purchase-fields-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .compliance-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .purchase-footer-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .purchase-footer-fields .description-field { grid-column: span 2; }
+    .purchase-footer-fields .transport-field { grid-column: span 1; }
+    .purchase-footer-fields .description-field,
+    .purchase-footer-fields .purchase-print { grid-column: span 1; }
     .purchase-details-card { min-height: 460px; }
 }
 @media (max-width: 650px) {
     .purchase-invoice-container { padding-inline: 7px; }
     .purchase-fields-card { padding: 14px; }
     .purchase-fields-grid, .compliance-grid, .purchase-footer-fields { grid-template-columns: 1fr; }
-    .purchase-footer-fields .description-field { grid-column: auto; }
+    .purchase-footer-fields .transport-field,
+    .purchase-footer-fields .description-field,
+    .purchase-footer-fields .purchase-print { grid-column: 1 / -1; }
     .purchase-details-heading { align-items: flex-start; flex-direction: column; padding: 12px 3px; }
     .purchase-detail-tools { flex-wrap: wrap; }
     .purchase-totals { justify-content: flex-start; overflow-x: auto; }

@@ -462,12 +462,27 @@
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">{{ 'Unavailable Until' | localize }}</label>
-                                <input
-                                    class="form-control"
-                                    type="datetime-local"
-                                    [(ngModel)]="itemForm.unavailableUntil"
-                                    [disabled]="itemForm.isAvailable"
-                                />
+                                <div class="d-flex gap-2">
+                                    <ne-datepicker
+                                        class="d-block flex-grow-1"
+                                        [date]="unavailableUntilDate"
+                                        dateIn="AD"
+                                        valueIn="AD"
+                                        [dateFormat]="'yyyy-mm-dd'"
+                                        language="en"
+                                        [todayBtn]="true"
+                                        [dateReadonly]="itemForm.isAvailable"
+                                        (dateInAD)="setUnavailableUntilDate($event)"
+                                    ></ne-datepicker>
+                                    <input
+                                        class="form-control w-100px"
+                                        type="time"
+                                        [ngModel]="unavailableUntilTime"
+                                        (ngModelChange)="setUnavailableUntilTime($event)"
+                                        [disabled]="itemForm.isAvailable || !unavailableUntilDate"
+                                        aria-label="Unavailable until time"
+                                    />
+                                </div>
                             </div>
                         </div>
                         <div class="restaurant-actionbar gap-2 mb-3 align-items-center d-flex flex-wrap min-w-0">

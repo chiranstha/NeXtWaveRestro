@@ -153,7 +153,9 @@
                             <div class="sales-details-heading">
                                 <h3><i class="fa-duotone fa-receipt"></i>{{ l('Sales Invoice Details') }}</h3>
                                 <div class="sales-detail-tools">
-                                    <div class="sales-stock-qty">{{ productNameSelected }} <span>Qty:</span> <strong [style.color]="productStockQty < 1 ? '#ff0909b5' : '#0a6ed1b0'">{{ productStockQty }}</strong></div>
+                                    <div class="sales-stock-qty" *ngIf="productNameSelected">{{ productNameSelected }} <span>Qty:</span> <strong [style.color]="productStockQty < 1 ? '#ff0909b5' : '#0a6ed1b0'">{{ productStockQty }}</strong></div>
+                                    <label class="sales-barcode"><i class="fa-duotone fa-magnifying-glass" aria-hidden="true"></i><input aria-label="Scan barcode to find a product" placeholder="Scan barcode" type="text" /><button type="button" aria-label="Add barcode"><i class="fa-duotone fa-plus"></i></button><button type="button" aria-label="Scan barcode with camera"><i class="fa-duotone fa-camera"></i></button></label>
+                                    <button (click)="addMoreFrom()" class="btn btn-sm btn-outline-primary" type="button"><i class="fa-duotone fa-list-check"></i> Add Multiple</button>
                                     <button (click)="keyEventsDetail()" [disabled]="salesDetails.invalid" class="btn btn-sm btn-outline-success" type="button"><i class="fa-duotone fa-grid-2-plus"></i> Add</button>
                                 </div>
                             </div>
@@ -164,43 +166,46 @@
                                     >
                                         <thead class="bg-tableHead">
                                             <tr class="text-center">
-                                                <th class="ps-3">S.N.</th>
-                                                <th>PRODUCT NAME</th>
-                                                <th class="min-w-100px">QTY</th>
-                                                <th class="min-w-100px">UNIT</th>
-                                                <th class="min-w-100px">RATE</th>
-                                                <th>GROSS AMT</th>
+                                                <th class="sn-col">S.N.</th>
+                                                <th class="product-col">PRODUCT NAME <i class="fa-duotone fa-cart-shopping" aria-hidden="true"></i></th>
+                                                <th class="qty-col">QTY</th>
+                                                <th class="rate-col">RATE</th>
+                                                <th class="unit-col">UNIT</th>
+                                                <th class="amount-col">GROSS AMT</th>
                                                 <th *ngIf="this.discountPercent">DISCOUNT%</th>
                                                 <th *ngIf="this.discountAmount">DISCOUNT</th>
-                                                <th>NET AMOUNT</th>
-                                                <th>TAX</th>
-                                                <th>TAX AMOUNT</th>
-                                                <th>TOTAL AMT</th>
-                                                <th class="pe-2">REMOVE</th>
+                                                <th class="amount-col">NET AMOUNT</th>
+                                                <th class="tax-col">VAT</th>
+                                                <th class="amount-col">VAT AMOUNT</th>
+                                                <th class="amount-col">TOTAL AMOUNT</th>
+                                                <th class="remove-col">REMOVE</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr *ngFor="let abcd of getDetail(form); let i = index" [formGroupName]="i">
                                                 <!-- S.N. -->
-                                                <td class="sn_css text-center text-left">{{ i + 1 }}</td>
+                                                <td class="sn-col sn_css">{{ i + 1 }}</td>
 
                                                 <!-- Product Selection -->
-                                                <td appPadding>
-                                                    <div class="min-w-250px">
-                                                        <ng-select
-                                                            #productKey
-                                                            (change)="onGetProduct($event.productId, abcd, i)"
-                                                            (keyup)="keyEventProduct($event, i, abcd)"
-                                                            [items]="allProducts"
-                                                            accesskey="p"
-                                                            appendTo="body"
-                                                            bindLabel="name"
-                                                            bindValue="productId"
-                                                            formControlName="productId"
-                                                            id="productId"
-                                                            name="productId"
-                                                            placeholder="Select an item (Alt+P)"
-                                                        ></ng-select>
+                                                <td appPadding class="product-col">
+                                                    <div class="sales-product-select">
+                                                        <div class="sales-product-control">
+                                                            <ng-select
+                                                                #productKey
+                                                                (change)="onGetProduct($event.productId, abcd, i)"
+                                                                (keyup)="keyEventProduct($event, i, abcd)"
+                                                                [items]="allProducts"
+                                                                accesskey="p"
+                                                                appendTo="body"
+                                                                bindLabel="name"
+                                                                bindValue="productId"
+                                                                formControlName="productId"
+                                                                id="productId"
+                                                                name="productId"
+                                                                placeholder="Select an item (Alt+P)"
+                                                            ></ng-select>
+                                                            <button (click)="formDetailRowId = i; changeProduct(true)" aria-label="Add product" class="sales-product-add" title="Add product" type="button"><i class="fa-duotone fa-plus"></i></button>
+                                                        </div>
                                                         <div
                                                             *ngIf="
                                                                 abcd.get('productId').invalid &&
@@ -216,7 +221,7 @@
                                                 </td>
 
                                                 <!-- Quantity -->
-                                                <td appPadding>
+                                                <td appPadding class="qty-col">
                                                     <div class="min-w-100px">
                                                         <input
                                                             #qty
@@ -241,34 +246,8 @@
                                                     </div>
                                                 </td>
 
-                                                <!-- Unit -->
-                                                <td appPadding>
-                                                    <div class="min-w-100px">
-                                                        <ng-select
-                                                            [items]="
-                                                                $safeNavigationMigration(abcd.get('unitsList')?.value)
-                                                            "
-                                                            bindLabel="unitName"
-                                                            bindValue="unitId"
-                                                            formControlName="unitId"
-                                                            id="unitId"
-                                                            name="unitName"
-                                                            placeholder="Select an item"
-                                                        ></ng-select>
-                                                        <div
-                                                            *ngIf="
-                                                                abcd.get('unitId').invalid &&
-                                                                (abcd.get('unitId').dirty || abcd.get('unitId').touched)
-                                                            "
-                                                        >
-                                                            <div class="alert alert-danger alert-height mt-1">
-                                                                <div class="alert-div">Required!</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </td>
                                                 <!-- Rate -->
-                                                <td appPadding>
+                                                <td appPadding class="rate-col">
                                                     <div class="min-w-100px">
                                                         <input
                                                             #rate
@@ -290,8 +269,26 @@
                                                     </div>
                                                 </td>
 
+                                                <!-- Unit -->
+                                                <td appPadding class="unit-col">
+                                                    <div class="min-w-100px">
+                                                        <ng-select
+                                                            [items]="$safeNavigationMigration(abcd.get('unitsList')?.value)"
+                                                            bindLabel="unitName"
+                                                            bindValue="unitId"
+                                                            formControlName="unitId"
+                                                            id="unitId"
+                                                            name="unitName"
+                                                            placeholder="Select an item"
+                                                        ></ng-select>
+                                                        <div *ngIf="abcd.get('unitId').invalid && (abcd.get('unitId').dirty || abcd.get('unitId').touched)">
+                                                            <div class="alert alert-danger alert-height mt-1"><div class="alert-div">Required!</div></div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+
                                                 <!-- Gross Amount -->
-                                                <td appPadding>
+                                                <td appPadding class="amount-col">
                                                     <div class="min-w-100px">
                                                         <input
                                                             [ngClass]="{
@@ -310,7 +307,7 @@
                                                 </td>
 
                                                 <!-- Discount Percent (conditionally displayed) -->
-                                                <td *ngIf="this.discountPercent" appPadding>
+                                                <td *ngIf="this.discountPercent" appPadding class="amount-col">
                                                     <div class="min-w-100px">
                                                         <input
                                                             #disper
@@ -335,7 +332,7 @@
                                                 </td>
 
                                                 <!-- Discount Amount (conditionally displayed) -->
-                                                <td *ngIf="this.discountAmount" appPadding>
+                                                <td *ngIf="this.discountAmount" appPadding class="amount-col">
                                                     <div class="min-w-100px">
                                                         <input
                                                             #disAmt
@@ -358,7 +355,7 @@
                                                 </td>
 
                                                 <!-- Net Amount -->
-                                                <td appPadding>
+                                                <td appPadding class="amount-col">
                                                     <div class="min-w-100px">
                                                         <input
                                                             [ngClass]="{
@@ -377,7 +374,7 @@
                                                 </td>
 
                                                 <!-- Tax -->
-                                                <td appPadding>
+                                                <td appPadding class="tax-col">
                                                     <div class="min-w-100px">
                                                         <ng-select
                                                             #tax
@@ -407,7 +404,7 @@
                                                 </td>
 
                                                 <!-- Tax Amount -->
-                                                <td appPadding>
+                                                <td appPadding class="amount-col">
                                                     <div class="min-w-100px">
                                                         <input
                                                             [ngClass]="{
@@ -426,7 +423,7 @@
                                                 </td>
 
                                                 <!-- Total Amount -->
-                                                <td appPadding>
+                                                <td appPadding class="amount-col">
                                                     <div class="min-w-100px">
                                                         <input
                                                             #total
@@ -449,7 +446,7 @@
                                                 </td>
 
                                                 <!-- Remove Button -->
-                                                <td appPadding class="text-center text-left">
+                                                <td appPadding class="remove-col">
                                                     <div
                                                         (click)="removePurchaseDetailForm(i, form)"
                                                         class="btn btn-sm btn-icon btn-light-danger remove-line-btn"
@@ -463,17 +460,12 @@
                                     </table>
                                 </div>
                             <section class="sales-totals-card" aria-label="Sales invoice summary">
-                                <div class="sales-totals-heading">
-                                    <div><h3>{{ l('Invoice Summary') }}</h3><small><i class="fa-duotone fa-circle-info"></i> {{ l('Press Alt+F12 to recalculate totals') }}</small></div>
-                                    <div class="sales-grand-total"><span>{{ l('Grand Total') }}</span><strong>{{ form.get('grandTotal')?.value || 0 }}</strong></div>
-                                </div>
                                 <div class="sales-totals-grid">
-                                    <div><label class="form-label" for="totalAmount">{{ l('Gross Amount') }}</label><input class="form-control" formControlName="totalAmount" id="totalAmount" readonly type="number" /></div>
-                                    <div><label class="form-label" for="billDiscount">{{ l('Bill Discount') }}</label><input class="form-control" formControlName="billDiscount" id="billDiscount" readonly type="number" /></div>
-                                    <div><label class="form-label" for="subTotalAmount">{{ l('Net Amount') }}</label><input class="form-control" formControlName="subTotalAmount" id="subTotalAmount" readonly type="number" /></div>
-                                    <div><label class="form-label" for="taxableAmount">{{ l('Taxable Amount') }}</label><input class="form-control" formControlName="taxableAmount" id="taxableAmount" readonly type="number" /></div>
-                                    <div><label class="required form-label" for="taxAmount">{{ l('Tax Amount') }}</label><input class="form-control" formControlName="taxAmount" id="taxAmount" readonly type="number" /></div>
-                                    <div><label class="form-label" for="grandTotal">{{ l('Grand Total') }}</label><input class="form-control" formControlName="grandTotal" id="grandTotal" readonly type="number" /></div>
+                                    <div><label class="form-label" for="grandTotal">{{ l('Grand Total') }}</label><strong class="sales-grand-total-value">{{ (form.get('grandTotal')?.value || 0) | number:'1.2-2' }}</strong></div>
+                                    <div><label class="form-label" for="taxAmount">{{ l('VAT Amount') }}</label><strong>{{ form.get('taxAmount')?.value || 0 | number:'1.2-2' }}</strong></div>
+                                    <div><label class="form-label" for="subTotalAmount">{{ l('Net Amount') }}</label><strong>{{ form.get('subTotalAmount')?.value || 0 | number:'1.2-2' }}</strong></div>
+                                    <div><label class="form-label" for="billDiscount">{{ l('Total Discount') }}</label><strong>{{ form.get('billDiscount')?.value || 0 | number:'1.2-2' }}</strong></div>
+                                    <div><label class="form-label" for="totalAmount">{{ l('Gross Amount') }}</label><strong>{{ form.get('totalAmount')?.value || 0 | number:'1.2-2' }}</strong></div>
                                 </div>
                             </section>
                         </section>

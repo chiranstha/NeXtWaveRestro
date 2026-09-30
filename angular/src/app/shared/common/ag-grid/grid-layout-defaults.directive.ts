@@ -19,7 +19,7 @@ const FORCED_SCROLL_OPTIONS: Record<string, boolean> = {
     suppressCellFocus: true,
     suppressColumnMoveAnimation: true,
     suppressColumnVirtualisation: false,
-    suppressContentVisibilityAuto: true,
+    enableContentVisibilityAuto: false,
     suppressRowHoverHighlight: true,
     suppressRowTransform: false,
     suppressScrollOnNewData: true,

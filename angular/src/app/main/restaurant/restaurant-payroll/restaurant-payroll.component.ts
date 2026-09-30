@@ -1099,6 +1099,44 @@ export class RestaurantPayrollComponent extends AppComponentBase implements OnIn
         return local.toISOString().slice(0, 16);
     }
 
+    attendanceClockDate(field: 'clockIn' | 'clockOut'): string {
+        const value = this.attendanceForm?.get(field)?.value as string | undefined;
+        const source = value || (this.attendanceForm?.get('workDate')?.value as string | undefined);
+        if (!source) {
+            return '';
+        }
+        const parsed = DateTime.fromISO(source);
+        return parsed.isValid ? parsed.toFormat('yyyy-LL-dd') : '';
+    }
+
+    attendanceClockTime(field: 'clockIn' | 'clockOut'): string {
+        const value = this.attendanceForm?.get(field)?.value as string | undefined;
+        if (!value) {
+            return '';
+        }
+        const parsed = DateTime.fromISO(value);
+        return parsed.isValid ? parsed.toFormat('HH:mm') : '';
+    }
+
+    setAttendanceClockDate(field: 'clockIn' | 'clockOut', date: string): void {
+        if (!date) {
+            this.attendanceForm.get(field)?.setValue('');
+            return;
+        }
+        this.attendanceForm.get(field)?.setValue(`${date}T${this.attendanceClockTime(field) || '00:00'}`);
+    }
+
+    setAttendanceClockTime(field: 'clockIn' | 'clockOut', time: string): void {
+        if (!time) {
+            this.attendanceForm.get(field)?.setValue('');
+            return;
+        }
+        const date = this.attendanceClockDate(field);
+        if (date) {
+            this.attendanceForm.get(field)?.setValue(`${date}T${time}`);
+        }
+    }
+
     private toServerDateTime(value: string | null | undefined): string | undefined {
         if (!value) {
             return undefined;

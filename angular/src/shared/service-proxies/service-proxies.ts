@@ -16478,6 +16478,63 @@ export class PaymentMastersServiceProxy {
      * @param body (optional) 
      * @return OK
      */
+    createRestaurantRefundPayment(body: CreateOrEditPaymentMasterDto | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/PaymentMasters/CreateRestaurantRefundPayment";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateRestaurantRefundPayment(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateRestaurantRefundPayment(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processCreateRestaurantRefundPayment(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : null as any;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
     createOrEdit(body: CreateOrEditPaymentMasterDto | undefined): Observable<string> {
         let url_ = this.baseUrl + "/api/services/app/PaymentMasters/CreateOrEdit";
         url_ = url_.replace(/[?&]$/, "");
@@ -32962,6 +33019,60 @@ export class RestaurantBillingServiceProxy {
     }
 
     /**
+     * @param clientRequestId (optional) 
+     * @return OK
+     */
+    getBillStatus(clientRequestId: string | null | undefined): Observable<FinalizeRestaurantBillResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantBilling/GetBillStatus?";
+        if (clientRequestId !== undefined && clientRequestId !== null)
+            url_ += "clientRequestId=" + encodeURIComponent("" + clientRequestId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetBillStatus(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetBillStatus(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FinalizeRestaurantBillResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FinalizeRestaurantBillResultDto>;
+        }));
+    }
+
+    protected processGetBillStatus(response: HttpResponseBase): Observable<FinalizeRestaurantBillResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FinalizeRestaurantBillResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param body (optional) 
      * @return OK
      */
@@ -33017,23 +33128,6 @@ export class RestaurantBillingServiceProxy {
         return _observableOf(null as any);
     }
 
-    getBillStatus(clientRequestId: string | undefined): Observable<FinalizeRestaurantBillResultDto | null> {
-        let url_ = this.baseUrl + "/api/services/app/RestaurantBilling/GetBillStatus?";
-        if (clientRequestId !== undefined && clientRequestId !== null)
-            url_ += "clientRequestId=" + encodeURIComponent("" + clientRequestId) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-        const options_: any = { observe: "response", responseType: "blob", headers: new HttpHeaders({ "Accept": "application/json" }) };
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_: any) => {
-            const status = response_.status;
-            const blob = response_ instanceof HttpResponse ? response_.body : undefined;
-            if (status === 200) return blobToText(blob).pipe(_observableMergeMap((text: string) => {
-                const data = text === "" ? null : JSON.parse(text, this.jsonParseReviver);
-                return _observableOf(data ? FinalizeRestaurantBillResultDto.fromJS(data) : null);
-            }));
-            return _observableOf(null);
-        }));
-    }
-
     /**
      * @param body (optional) 
      * @return OK
@@ -33080,6 +33174,240 @@ export class RestaurantBillingServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = FinalizeRestaurantBillResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class RestaurantCashShiftServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param registerName (optional) 
+     * @return OK
+     */
+    getCurrent(registerName: string | null | undefined): Observable<RestaurantCashShiftDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantCashShift/GetCurrent?";
+        if (registerName !== undefined && registerName !== null)
+            url_ += "registerName=" + encodeURIComponent("" + registerName) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCurrent(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCurrent(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantCashShiftDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantCashShiftDto>;
+        }));
+    }
+
+    protected processGetCurrent(response: HttpResponseBase): Observable<RestaurantCashShiftDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantCashShiftDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    open(body: OpenRestaurantCashShiftDto | undefined): Observable<RestaurantCashShiftDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantCashShift/Open";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processOpen(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processOpen(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantCashShiftDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantCashShiftDto>;
+        }));
+    }
+
+    protected processOpen(response: HttpResponseBase): Observable<RestaurantCashShiftDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantCashShiftDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    addMovement(body: MoveRestaurantCashDto | undefined): Observable<RestaurantCashShiftDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantCashShift/AddMovement";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddMovement(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddMovement(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantCashShiftDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantCashShiftDto>;
+        }));
+    }
+
+    protected processAddMovement(response: HttpResponseBase): Observable<RestaurantCashShiftDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantCashShiftDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    close(body: CloseRestaurantCashShiftDto | undefined): Observable<RestaurantCashShiftDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantCashShift/Close";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processClose(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processClose(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantCashShiftDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantCashShiftDto>;
+        }));
+    }
+
+    protected processClose(response: HttpResponseBase): Observable<RestaurantCashShiftDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantCashShiftDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -33896,14 +34224,17 @@ export class RestaurantCustomerOrderingServiceProxy {
 
     /**
      * @param tenantId (optional) 
+     * @param tableToken (optional) 
      * @param categoryId (optional) 
      * @param search (optional) 
      * @return OK
      */
-    getMenu(tenantId: number | null | undefined, categoryId: string | null | undefined, search: string | null | undefined): Observable<RestaurantCustomerMenuDto> {
+    getMenu(tenantId: number | null | undefined, tableToken: string | null | undefined, categoryId: string | null | undefined, search: string | null | undefined): Observable<RestaurantCustomerMenuDto> {
         let url_ = this.baseUrl + "/api/services/app/RestaurantCustomerOrdering/GetMenu?";
         if (tenantId !== undefined && tenantId !== null)
             url_ += "TenantId=" + encodeURIComponent("" + tenantId) + "&";
+        if (tableToken !== undefined && tableToken !== null)
+            url_ += "TableToken=" + encodeURIComponent("" + tableToken) + "&";
         if (categoryId !== undefined && categoryId !== null)
             url_ += "CategoryId=" + encodeURIComponent("" + categoryId) + "&";
         if (search !== undefined && search !== null)
@@ -34068,22 +34399,28 @@ export class RestaurantCustomerOrderingServiceProxy {
 
     /**
      * @param orderId (optional) 
+     * @param statusAccessToken (optional) 
      * @return OK
      */
-    getOrderStatus(input: { orderId: string; statusAccessToken: string }): Observable<RestaurantCustomerOrderStatusDto> {
-        let url_ = this.baseUrl + "/api/services/app/RestaurantCustomerOrdering/GetOrderStatus";
+    getOrderStatus(orderId: string | undefined, statusAccessToken: string | null | undefined): Observable<RestaurantCustomerOrderStatusDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantCustomerOrdering/GetOrderStatus?";
+        if (orderId === null)
+            throw new globalThis.Error("The parameter 'orderId' cannot be null.");
+        else if (orderId !== undefined)
+            url_ += "OrderId=" + encodeURIComponent("" + orderId) + "&";
+        if (statusAccessToken !== undefined && statusAccessToken !== null)
+            url_ += "StatusAccessToken=" + encodeURIComponent("" + statusAccessToken) + "&";
+        url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
-            body: JSON.stringify(input),
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
-                "Content-Type": "application/json",
                 "Accept": "application/json"
             })
         };
 
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
             return this.processGetOrderStatus(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
@@ -34110,6 +34447,901 @@ export class RestaurantCustomerOrderingServiceProxy {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = RestaurantCustomerOrderStatusDto.fromJS(resultData200);
             return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class RestaurantGuestOperationsServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    generateTableQr(body: EntityDtoOfGuid | undefined): Observable<RestaurantTableQrDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantGuestOperations/GenerateTableQr";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGenerateTableQr(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGenerateTableQr(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantTableQrDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantTableQrDto>;
+        }));
+    }
+
+    protected processGenerateTableQr(response: HttpResponseBase): Observable<RestaurantTableQrDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantTableQrDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    revokeTableQr(body: EntityDtoOfGuid | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantGuestOperations/RevokeTableQr";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRevokeTableQr(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRevokeTableQr(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processRevokeTableQr(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getPendingGuestOrders(): Observable<RestaurantGuestOrderQueueDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantGuestOperations/GetPendingGuestOrders";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPendingGuestOrders(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPendingGuestOrders(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantGuestOrderQueueDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantGuestOrderQueueDto[]>;
+        }));
+    }
+
+    protected processGetPendingGuestOrders(response: HttpResponseBase): Observable<RestaurantGuestOrderQueueDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(RestaurantGuestOrderQueueDto.fromJS(item));
+            }
+            else {
+                result200 = null as any;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    reviewGuestOrder(body: ReviewRestaurantGuestOrderDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantGuestOperations/ReviewGuestOrder";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processReviewGuestOrder(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processReviewGuestOrder(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processReviewGuestOrder(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    openTableSession(body: EntityDtoOfGuid | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantGuestOperations/OpenTableSession";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processOpenTableSession(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processOpenTableSession(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processOpenTableSession(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    closeTableSession(body: EntityDtoOfGuid | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantGuestOperations/CloseTableSession";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCloseTableSession(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCloseTableSession(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processCloseTableSession(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param from (optional) 
+     * @param to (optional) 
+     * @return OK
+     */
+    getReservations(from: DateTime | null | undefined, to: DateTime | null | undefined): Observable<RestaurantReservationDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantGuestOperations/GetReservations?";
+        if (from !== undefined && from !== null)
+            url_ += "from=" + encodeURIComponent(from ? "" + from.toString() : "") + "&";
+        if (to !== undefined && to !== null)
+            url_ += "to=" + encodeURIComponent(to ? "" + to.toString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetReservations(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetReservations(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantReservationDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantReservationDto[]>;
+        }));
+    }
+
+    protected processGetReservations(response: HttpResponseBase): Observable<RestaurantReservationDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(RestaurantReservationDto.fromJS(item));
+            }
+            else {
+                result200 = null as any;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    addWalkIn(body: CreateRestaurantWalkInDto | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantGuestOperations/AddWalkIn";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddWalkIn(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddWalkIn(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processAddWalkIn(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : null as any;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    updateReservation(body: UpdateRestaurantReservationDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantGuestOperations/UpdateReservation";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateReservation(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateReservation(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processUpdateReservation(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    claimPrintJob(body: ClaimRestaurantPrintJobDto | undefined): Observable<RestaurantPrintJobDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantGuestOperations/ClaimPrintJob";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processClaimPrintJob(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processClaimPrintJob(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPrintJobDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPrintJobDto>;
+        }));
+    }
+
+    protected processClaimPrintJob(response: HttpResponseBase): Observable<RestaurantPrintJobDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantPrintJobDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    registerPrintDevice(body: RegisterRestaurantPrintDeviceDto | undefined): Observable<RestaurantPrintDeviceDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantGuestOperations/RegisterPrintDevice";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRegisterPrintDevice(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRegisterPrintDevice(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPrintDeviceDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPrintDeviceDto>;
+        }));
+    }
+
+    protected processRegisterPrintDevice(response: HttpResponseBase): Observable<RestaurantPrintDeviceDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantPrintDeviceDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getPrintDevices(): Observable<RestaurantPrintDeviceDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantGuestOperations/GetPrintDevices";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPrintDevices(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPrintDevices(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPrintDeviceDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPrintDeviceDto[]>;
+        }));
+    }
+
+    protected processGetPrintDevices(response: HttpResponseBase): Observable<RestaurantPrintDeviceDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(RestaurantPrintDeviceDto.fromJS(item));
+            }
+            else {
+                result200 = null as any;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    setPrintDeviceEnabled(body: SetRestaurantPrintDeviceEnabledDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantGuestOperations/SetPrintDeviceEnabled";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSetPrintDeviceEnabled(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSetPrintDeviceEnabled(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processSetPrintDeviceEnabled(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getPrintJobs(): Observable<RestaurantPrintJobDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantGuestOperations/GetPrintJobs";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPrintJobs(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPrintJobs(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPrintJobDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPrintJobDto[]>;
+        }));
+    }
+
+    protected processGetPrintJobs(response: HttpResponseBase): Observable<RestaurantPrintJobDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(RestaurantPrintJobDto.fromJS(item));
+            }
+            else {
+                result200 = null as any;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    reportPrintJob(body: ReportRestaurantPrintJobDto | undefined): Observable<RestaurantPrintJobDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantGuestOperations/ReportPrintJob";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processReportPrintJob(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processReportPrintJob(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPrintJobDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPrintJobDto>;
+        }));
+    }
+
+    protected processReportPrintJob(response: HttpResponseBase): Observable<RestaurantPrintJobDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantPrintJobDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    retryPrintJob(body: RetryRestaurantPrintJobDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantGuestOperations/RetryPrintJob";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRetryPrintJob(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRetryPrintJob(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processRetryPrintJob(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -34893,6 +36125,63 @@ export class RestaurantKdsServiceProxy {
     }
 
     /**
+     * @param operationType (optional) 
+     * @param clientRequestId (optional) 
+     * @return OK
+     */
+    getOperationStatus(operationType: string | null | undefined, clientRequestId: string | null | undefined): Observable<RestaurantOperationStatusDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantKds/GetOperationStatus?";
+        if (operationType !== undefined && operationType !== null)
+            url_ += "operationType=" + encodeURIComponent("" + operationType) + "&";
+        if (clientRequestId !== undefined && clientRequestId !== null)
+            url_ += "clientRequestId=" + encodeURIComponent("" + clientRequestId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetOperationStatus(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetOperationStatus(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantOperationStatusDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantOperationStatusDto>;
+        }));
+    }
+
+    protected processGetOperationStatus(response: HttpResponseBase): Observable<RestaurantOperationStatusDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantOperationStatusDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param body (optional) 
      * @return OK
      */
@@ -34996,11 +36285,16 @@ export class RestaurantKdsServiceProxy {
         return _observableOf(null as any);
     }
 
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
     updateTicketItemStatuses(body: BulkUpdateRestaurantTicketItemStatusDto | undefined): Observable<BulkUpdateRestaurantTicketItemStatusResultDto> {
         let url_ = this.baseUrl + "/api/services/app/RestaurantKds/UpdateTicketItemStatuses";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
+
         let options_ : any = {
             body: content_,
             observe: "response",
@@ -35034,12 +36328,14 @@ export class RestaurantKdsServiceProxy {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-                const resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-                return _observableOf(resultData200 ? BulkUpdateRestaurantTicketItemStatusResultDto.fromJS(resultData200) : null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BulkUpdateRestaurantTicketItemStatusResultDto.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
         return _observableOf(null as any);
@@ -36254,6 +37550,63 @@ export class RestaurantOrderServiceProxy {
     }
 
     /**
+     * @param operationType (optional) 
+     * @param clientRequestId (optional) 
+     * @return OK
+     */
+    getOperationStatus(operationType: string | null | undefined, clientRequestId: string | null | undefined): Observable<RestaurantOperationStatusDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantOrder/GetOperationStatus?";
+        if (operationType !== undefined && operationType !== null)
+            url_ += "operationType=" + encodeURIComponent("" + operationType) + "&";
+        if (clientRequestId !== undefined && clientRequestId !== null)
+            url_ += "clientRequestId=" + encodeURIComponent("" + clientRequestId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetOperationStatus(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetOperationStatus(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantOperationStatusDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantOperationStatusDto>;
+        }));
+    }
+
+    protected processGetOperationStatus(response: HttpResponseBase): Observable<RestaurantOperationStatusDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantOperationStatusDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param body (optional) 
      * @return OK
      */
@@ -36366,7 +37719,7 @@ export class RestaurantOrderServiceProxy {
      * @param body (optional) 
      * @return OK
      */
-    sendToKitchen(body: { orderId: string; clientRequestId: string; expectedOrderVersion: string } | undefined): Observable<void> {
+    sendToKitchen(body: RestaurantOrderMutationDto | undefined): Observable<void> {
         let url_ = this.baseUrl + "/api/services/app/RestaurantOrder/SendToKitchen";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -36960,6 +38313,1766 @@ export class RestaurantOrderServiceProxy {
 }
 
 @Injectable()
+export class RestaurantPayrollServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @return OK
+     */
+    getDashboard(): Observable<RestaurantPayrollDashboardDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/GetDashboard";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDashboard(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDashboard(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPayrollDashboardDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPayrollDashboardDto>;
+        }));
+    }
+
+    protected processGetDashboard(response: HttpResponseBase): Observable<RestaurantPayrollDashboardDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantPayrollDashboardDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param includeInactive (optional) 
+     * @return OK
+     */
+    getEmployees(includeInactive: boolean | undefined): Observable<RestaurantPayrollEmployeeDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/GetEmployees?";
+        if (includeInactive === null)
+            throw new globalThis.Error("The parameter 'includeInactive' cannot be null.");
+        else if (includeInactive !== undefined)
+            url_ += "includeInactive=" + encodeURIComponent("" + includeInactive) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEmployees(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEmployees(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPayrollEmployeeDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPayrollEmployeeDto[]>;
+        }));
+    }
+
+    protected processGetEmployees(response: HttpResponseBase): Observable<RestaurantPayrollEmployeeDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(RestaurantPayrollEmployeeDto.fromJS(item));
+            }
+            else {
+                result200 = null as any;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getStaffMasters(): Observable<RestaurantPayrollStaffMastersDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/GetStaffMasters";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetStaffMasters(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetStaffMasters(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPayrollStaffMastersDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPayrollStaffMastersDto>;
+        }));
+    }
+
+    protected processGetStaffMasters(response: HttpResponseBase): Observable<RestaurantPayrollStaffMastersDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantPayrollStaffMastersDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    saveDepartment(body: SaveRestaurantPayrollDepartmentDto | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/SaveDepartment";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSaveDepartment(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSaveDepartment(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processSaveDepartment(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : null as any;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    saveJobRole(body: SaveRestaurantPayrollJobRoleDto | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/SaveJobRole";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSaveJobRole(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSaveJobRole(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processSaveJobRole(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : null as any;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getAvailableUsers(): Observable<RestaurantPayrollUserLookupDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/GetAvailableUsers";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAvailableUsers(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAvailableUsers(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPayrollUserLookupDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPayrollUserLookupDto[]>;
+        }));
+    }
+
+    protected processGetAvailableUsers(response: HttpResponseBase): Observable<RestaurantPayrollUserLookupDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(RestaurantPayrollUserLookupDto.fromJS(item));
+            }
+            else {
+                result200 = null as any;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getStaffAccessOptions(): Observable<RestaurantPayrollStaffAccessOptionsDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/GetStaffAccessOptions";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetStaffAccessOptions(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetStaffAccessOptions(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPayrollStaffAccessOptionsDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPayrollStaffAccessOptionsDto>;
+        }));
+    }
+
+    protected processGetStaffAccessOptions(response: HttpResponseBase): Observable<RestaurantPayrollStaffAccessOptionsDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantPayrollStaffAccessOptionsDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createOrEditEmployee(body: CreateOrEditRestaurantPayrollEmployeeDto | undefined): Observable<RestaurantPayrollEmployeeSaveResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/CreateOrEditEmployee";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrEditEmployee(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrEditEmployee(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPayrollEmployeeSaveResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPayrollEmployeeSaveResultDto>;
+        }));
+    }
+
+    protected processCreateOrEditEmployee(response: HttpResponseBase): Observable<RestaurantPayrollEmployeeSaveResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantPayrollEmployeeSaveResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param employeeId (optional) 
+     * @return OK
+     */
+    getAllowanceHistory(employeeId: string | undefined): Observable<RestaurantPayrollAllowanceHistoryDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/GetAllowanceHistory?";
+        if (employeeId === null)
+            throw new globalThis.Error("The parameter 'employeeId' cannot be null.");
+        else if (employeeId !== undefined)
+            url_ += "employeeId=" + encodeURIComponent("" + employeeId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllowanceHistory(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllowanceHistory(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPayrollAllowanceHistoryDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPayrollAllowanceHistoryDto[]>;
+        }));
+    }
+
+    protected processGetAllowanceHistory(response: HttpResponseBase): Observable<RestaurantPayrollAllowanceHistoryDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(RestaurantPayrollAllowanceHistoryDto.fromJS(item));
+            }
+            else {
+                result200 = null as any;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    addAllowanceRevision(body: AddRestaurantPayrollAllowanceRevisionDto | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/AddAllowanceRevision";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAddAllowanceRevision(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAddAllowanceRevision(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processAddAllowanceRevision(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : null as any;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    resetEmployeeDefaultPassword(body: EntityDtoOfGuid | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/ResetEmployeeDefaultPassword";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processResetEmployeeDefaultPassword(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processResetEmployeeDefaultPassword(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processResetEmployeeDefaultPassword(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    setEmployeePassword(body: ChangeRestaurantPayrollEmployeePasswordDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/SetEmployeePassword";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSetEmployeePassword(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSetEmployeePassword(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processSetEmployeePassword(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param from (optional) 
+     * @param to (optional) 
+     * @param employeeId (optional) 
+     * @return OK
+     */
+    getAttendance(from: DateTime | undefined, to: DateTime | undefined, employeeId: string | null | undefined): Observable<RestaurantPayrollAttendanceDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/GetAttendance?";
+        if (from === null)
+            throw new globalThis.Error("The parameter 'from' cannot be null.");
+        else if (from !== undefined)
+            url_ += "from=" + encodeURIComponent(from ? "" + from.toString() : "") + "&";
+        if (to === null)
+            throw new globalThis.Error("The parameter 'to' cannot be null.");
+        else if (to !== undefined)
+            url_ += "to=" + encodeURIComponent(to ? "" + to.toString() : "") + "&";
+        if (employeeId !== undefined && employeeId !== null)
+            url_ += "employeeId=" + encodeURIComponent("" + employeeId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAttendance(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAttendance(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPayrollAttendanceDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPayrollAttendanceDto[]>;
+        }));
+    }
+
+    protected processGetAttendance(response: HttpResponseBase): Observable<RestaurantPayrollAttendanceDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(RestaurantPayrollAttendanceDto.fromJS(item));
+            }
+            else {
+                result200 = null as any;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    clockIn(body: RestaurantPayrollClockDto | undefined): Observable<RestaurantPayrollAttendanceDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/ClockIn";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processClockIn(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processClockIn(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPayrollAttendanceDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPayrollAttendanceDto>;
+        }));
+    }
+
+    protected processClockIn(response: HttpResponseBase): Observable<RestaurantPayrollAttendanceDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantPayrollAttendanceDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    clockOut(body: RestaurantPayrollClockDto | undefined): Observable<RestaurantPayrollAttendanceDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/ClockOut";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processClockOut(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processClockOut(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPayrollAttendanceDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPayrollAttendanceDto>;
+        }));
+    }
+
+    protected processClockOut(response: HttpResponseBase): Observable<RestaurantPayrollAttendanceDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantPayrollAttendanceDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    saveAttendance(body: SaveRestaurantPayrollAttendanceDto | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/SaveAttendance";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSaveAttendance(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSaveAttendance(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processSaveAttendance(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : null as any;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    generatePayrollRun(body: GenerateRestaurantPayrollRunDto | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/GeneratePayrollRun";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGeneratePayrollRun(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGeneratePayrollRun(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processGeneratePayrollRun(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : null as any;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getPayrollRuns(): Observable<RestaurantPayrollRunDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/GetPayrollRuns";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPayrollRuns(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPayrollRuns(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPayrollRunDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPayrollRunDto[]>;
+        }));
+    }
+
+    protected processGetPayrollRuns(response: HttpResponseBase): Observable<RestaurantPayrollRunDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(RestaurantPayrollRunDto.fromJS(item));
+            }
+            else {
+                result200 = null as any;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return OK
+     */
+    getPayrollRun(id: string | undefined): Observable<RestaurantPayrollRunDetailDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/GetPayrollRun?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPayrollRun(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPayrollRun(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPayrollRunDetailDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPayrollRunDetailDto>;
+        }));
+    }
+
+    protected processGetPayrollRun(response: HttpResponseBase): Observable<RestaurantPayrollRunDetailDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantPayrollRunDetailDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getMyPayslips(): Observable<RestaurantPayrollLineDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/GetMyPayslips";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetMyPayslips(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetMyPayslips(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPayrollLineDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPayrollLineDto[]>;
+        }));
+    }
+
+    protected processGetMyPayslips(response: HttpResponseBase): Observable<RestaurantPayrollLineDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(RestaurantPayrollLineDto.fromJS(item));
+            }
+            else {
+                result200 = null as any;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    approvePayrollRun(body: EntityDtoOfGuid | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/ApprovePayrollRun";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processApprovePayrollRun(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processApprovePayrollRun(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processApprovePayrollRun(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    markPayrollRunPaid(body: EntityDtoOfGuid | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/MarkPayrollRunPaid";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processMarkPayrollRunPaid(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processMarkPayrollRunPaid(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processMarkPayrollRunPaid(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return OK
+     */
+    deleteDraftPayrollRun(id: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantPayroll/DeleteDraftPayrollRun?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteDraftPayrollRun(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteDraftPayrollRun(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDeleteDraftPayrollRun(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class RestaurantRefundServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    create(body: CreateRestaurantRefundDto | undefined): Observable<RestaurantRefundDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantRefund/Create";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantRefundDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantRefundDto>;
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<RestaurantRefundDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantRefundDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    settle(body: SettleRestaurantRefundDto | undefined): Observable<RestaurantRefundDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantRefund/Settle";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSettle(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSettle(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantRefundDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantRefundDto>;
+        }));
+    }
+
+    protected processSettle(response: HttpResponseBase): Observable<RestaurantRefundDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantRefundDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return OK
+     */
+    get(id: string | undefined): Observable<RestaurantRefundDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantRefund/Get?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGet(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantRefundDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantRefundDto>;
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<RestaurantRefundDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantRefundDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param operationType (optional) 
+     * @param clientRequestId (optional) 
+     * @return OK
+     */
+    getOperationStatus(operationType: string | null | undefined, clientRequestId: string | null | undefined): Observable<RestaurantOperationStatusDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantRefund/GetOperationStatus?";
+        if (operationType !== undefined && operationType !== null)
+            url_ += "operationType=" + encodeURIComponent("" + operationType) + "&";
+        if (clientRequestId !== undefined && clientRequestId !== null)
+            url_ += "clientRequestId=" + encodeURIComponent("" + clientRequestId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetOperationStatus(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetOperationStatus(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantOperationStatusDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantOperationStatusDto>;
+        }));
+    }
+
+    protected processGetOperationStatus(response: HttpResponseBase): Observable<RestaurantOperationStatusDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantOperationStatusDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class RestaurantReleaseServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @return OK
+     */
+    getCapabilities(): Observable<RestaurantReleaseCapabilitiesDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantRelease/GetCapabilities";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCapabilities(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCapabilities(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantReleaseCapabilitiesDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantReleaseCapabilitiesDto>;
+        }));
+    }
+
+    protected processGetCapabilities(response: HttpResponseBase): Observable<RestaurantReleaseCapabilitiesDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantReleaseCapabilitiesDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getSetupReadiness(): Observable<RestaurantSetupReadinessDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantRelease/GetSetupReadiness";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSetupReadiness(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSetupReadiness(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantSetupReadinessDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantSetupReadinessDto>;
+        }));
+    }
+
+    protected processGetSetupReadiness(response: HttpResponseBase): Observable<RestaurantSetupReadinessDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantSetupReadinessDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    acknowledgeSetupCheck(body: AcknowledgeRestaurantSetupCheckDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantRelease/AcknowledgeSetupCheck";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAcknowledgeSetupCheck(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAcknowledgeSetupCheck(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processAcknowledgeSetupCheck(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    updateReleaseFeatures(body: RestaurantOperationalSettingsDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantRelease/UpdateReleaseFeatures";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateReleaseFeatures(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateReleaseFeatures(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processUpdateReleaseFeatures(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class RestaurantReorderServiceServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -37159,6 +40272,62 @@ export class RestaurantReportsServiceProxy {
     }
 
     /**
+     * @param businessDate (optional) 
+     * @return OK
+     */
+    getDailyClosing(businessDate: DateTime | undefined): Observable<RestaurantDailyClosingDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantReports/GetDailyClosing?";
+        if (businessDate === null)
+            throw new globalThis.Error("The parameter 'businessDate' cannot be null.");
+        else if (businessDate !== undefined)
+            url_ += "businessDate=" + encodeURIComponent(businessDate ? "" + businessDate.toString() : "") + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDailyClosing(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDailyClosing(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantDailyClosingDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantDailyClosingDto>;
+        }));
+    }
+
+    protected processGetDailyClosing(response: HttpResponseBase): Observable<RestaurantDailyClosingDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantDailyClosingDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param fromDate (optional) 
      * @param toDate (optional) 
      * @param tableId (optional) 
@@ -37214,6 +40383,72 @@ export class RestaurantReportsServiceProxy {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = RestaurantPosSalesSummaryDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param fromDate (optional) 
+     * @param toDate (optional) 
+     * @param tableId (optional) 
+     * @param waiterUserId (optional) 
+     * @param categoryId (optional) 
+     * @return OK
+     */
+    getPayrollReport(fromDate: DateTime | null | undefined, toDate: DateTime | null | undefined, tableId: string | null | undefined, waiterUserId: number | null | undefined, categoryId: string | null | undefined): Observable<RestaurantPayrollReportBundleDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantReports/GetPayrollReport?";
+        if (fromDate !== undefined && fromDate !== null)
+            url_ += "FromDate=" + encodeURIComponent(fromDate ? "" + fromDate.toString() : "") + "&";
+        if (toDate !== undefined && toDate !== null)
+            url_ += "ToDate=" + encodeURIComponent(toDate ? "" + toDate.toString() : "") + "&";
+        if (tableId !== undefined && tableId !== null)
+            url_ += "TableId=" + encodeURIComponent("" + tableId) + "&";
+        if (waiterUserId !== undefined && waiterUserId !== null)
+            url_ += "WaiterUserId=" + encodeURIComponent("" + waiterUserId) + "&";
+        if (categoryId !== undefined && categoryId !== null)
+            url_ += "CategoryId=" + encodeURIComponent("" + categoryId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPayrollReport(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPayrollReport(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPayrollReportBundleDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPayrollReportBundleDto>;
+        }));
+    }
+
+    protected processGetPayrollReport(response: HttpResponseBase): Observable<RestaurantPayrollReportBundleDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantPayrollReportBundleDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -38394,6 +41629,189 @@ export class RestaurantReportsServiceProxy {
 }
 
 @Injectable()
+export class RestaurantReservationPublicServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    requestOtp(body: RequestRestaurantReservationOtpDto | undefined): Observable<RequestRestaurantReservationOtpResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantReservationPublic/RequestOtp";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRequestOtp(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRequestOtp(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RequestRestaurantReservationOtpResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RequestRestaurantReservationOtpResultDto>;
+        }));
+    }
+
+    protected processRequestOtp(response: HttpResponseBase): Observable<RequestRestaurantReservationOtpResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RequestRestaurantReservationOtpResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createReservation(body: CreateRestaurantReservationRequestDto | undefined): Observable<CreateRestaurantReservationResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantReservationPublic/CreateReservation";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateReservation(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateReservation(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<CreateRestaurantReservationResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<CreateRestaurantReservationResultDto>;
+        }));
+    }
+
+    protected processCreateReservation(response: HttpResponseBase): Observable<CreateRestaurantReservationResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CreateRestaurantReservationResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param reservationId (optional) 
+     * @param statusAccessToken (optional) 
+     * @return OK
+     */
+    getStatus(reservationId: string | undefined, statusAccessToken: string | null | undefined): Observable<RestaurantReservationStatusDto> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantReservationPublic/GetStatus?";
+        if (reservationId === null)
+            throw new globalThis.Error("The parameter 'reservationId' cannot be null.");
+        else if (reservationId !== undefined)
+            url_ += "ReservationId=" + encodeURIComponent("" + reservationId) + "&";
+        if (statusAccessToken !== undefined && statusAccessToken !== null)
+            url_ += "StatusAccessToken=" + encodeURIComponent("" + statusAccessToken) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetStatus(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetStatus(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantReservationStatusDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantReservationStatusDto>;
+        }));
+    }
+
+    protected processGetStatus(response: HttpResponseBase): Observable<RestaurantReservationStatusDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = RestaurantReservationStatusDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class RestaurantSetupServiceProxy {
     private http: HttpClient;
     private baseUrl: string;
@@ -38960,6 +42378,116 @@ export class RestaurantSetupServiceProxy {
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = RestaurantOperationalSettingsDto.fromJS(resultData200);
             return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getPrintRoutes(): Observable<RestaurantPrintRouteDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantSetup/GetPrintRoutes";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetPrintRoutes(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetPrintRoutes(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<RestaurantPrintRouteDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<RestaurantPrintRouteDto[]>;
+        }));
+    }
+
+    protected processGetPrintRoutes(response: HttpResponseBase): Observable<RestaurantPrintRouteDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(RestaurantPrintRouteDto.fromJS(item));
+            }
+            else {
+                result200 = null as any;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    savePrintRoutes(body: SaveRestaurantPrintRoutesDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/RestaurantSetup/SavePrintRoutes";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSavePrintRoutes(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSavePrintRoutes(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processSavePrintRoutes(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -42399,147 +45927,6 @@ export class SalesMastersServiceProxy {
     }
 
     /**
-     * @return OK
-     */
-    fixedSales(): Observable<void> {
-        let url_ = this.baseUrl + "/api/services/app/SalesMasters/FixedSales";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processFixedSales(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processFixedSales(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<void>;
-        }));
-    }
-
-    protected processFixedSales(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    postMissingSalesInvoiceLedgerData(): Observable<void> {
-        let url_ = this.baseUrl + "/api/services/app/SalesMasters/PostMissingSalesInvoiceLedgerData";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processPostMissingSalesInvoiceLedgerData(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processPostMissingSalesInvoiceLedgerData(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<void>;
-        }));
-    }
-
-    protected processPostMissingSalesInvoiceLedgerData(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    postMissingSalesInvoiceStockData(): Observable<void> {
-        let url_ = this.baseUrl + "/api/services/app/SalesMasters/PostMissingSalesInvoiceStockData";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-            })
-        };
-
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processPostMissingSalesInvoiceStockData(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processPostMissingSalesInvoiceStockData(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<void>;
-        }));
-    }
-
-    protected processPostMissingSalesInvoiceStockData(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
      * @param id (optional) 
      * @return OK
      */
@@ -42885,6 +46272,63 @@ export class SalesReturnMastersServiceProxy {
     }
 
     protected processCreateOrEdit(response: HttpResponseBase): Observable<string> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : null as any;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createRestaurantRefundReturn(body: CreateOrEditSalesReturnMasterDto | undefined): Observable<string> {
+        let url_ = this.baseUrl + "/api/services/app/SalesReturnMasters/CreateRestaurantRefundReturn";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateRestaurantRefundReturn(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateRestaurantRefundReturn(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<string>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<string>;
+        }));
+    }
+
+    protected processCreateRestaurantRefundReturn(response: HttpResponseBase): Observable<string> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -45302,6 +48746,68 @@ export class StockReportServiceProxy {
             else {
                 result200 = null as any;
             }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param productId (optional) 
+     * @param fromMiti (optional) 
+     * @param toMiti (optional) 
+     * @return OK
+     */
+    getStockDetail(productId: string | undefined, fromMiti: string | null | undefined, toMiti: string | null | undefined): Observable<StockDetailReportDto> {
+        let url_ = this.baseUrl + "/api/services/app/StockReport/GetStockDetail?";
+        if (productId === null)
+            throw new globalThis.Error("The parameter 'productId' cannot be null.");
+        else if (productId !== undefined)
+            url_ += "productId=" + encodeURIComponent("" + productId) + "&";
+        if (fromMiti !== undefined && fromMiti !== null)
+            url_ += "fromMiti=" + encodeURIComponent("" + fromMiti) + "&";
+        if (toMiti !== undefined && toMiti !== null)
+            url_ += "toMiti=" + encodeURIComponent("" + toMiti) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetStockDetail(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetStockDetail(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<StockDetailReportDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<StockDetailReportDto>;
+        }));
+    }
+
+    protected processGetStockDetail(response: HttpResponseBase): Observable<StockDetailReportDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = StockDetailReportDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -54988,6 +58494,46 @@ export interface IAcknowledgeRestaurantChangesDto {
     lastSeq: number;
 }
 
+export class AcknowledgeRestaurantSetupCheckDto implements IAcknowledgeRestaurantSetupCheckDto {
+    checkKey!: RestaurantSetupCheckKey;
+    note!: string | undefined;
+
+    constructor(data?: IAcknowledgeRestaurantSetupCheckDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.checkKey = _data["checkKey"];
+            this.note = _data["note"];
+        }
+    }
+
+    static fromJS(data: any): AcknowledgeRestaurantSetupCheckDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AcknowledgeRestaurantSetupCheckDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["checkKey"] = this.checkKey;
+        data["note"] = this.note;
+        return data;
+    }
+}
+
+export interface IAcknowledgeRestaurantSetupCheckDto {
+    checkKey: RestaurantSetupCheckKey;
+    note: string | undefined;
+}
+
 export class ActivateEmailInput implements IActivateEmailInput {
     userId!: number;
     confirmationCode!: string | undefined;
@@ -55150,6 +58696,58 @@ export class AddNewPageOutput implements IAddNewPageOutput {
 
 export interface IAddNewPageOutput {
     pageId: string | undefined;
+}
+
+export class AddRestaurantPayrollAllowanceRevisionDto implements IAddRestaurantPayrollAllowanceRevisionDto {
+    employeeId!: string;
+    amount!: number;
+    effectiveFrom!: DateTime;
+    effectiveFromMiti!: string | undefined;
+    reason!: string;
+
+    constructor(data?: IAddRestaurantPayrollAllowanceRevisionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.employeeId = _data["employeeId"];
+            this.amount = _data["amount"];
+            this.effectiveFrom = _data["effectiveFrom"] ? DateTime.fromISO(_data["effectiveFrom"].toString()) : undefined as any;
+            this.effectiveFromMiti = _data["effectiveFromMiti"];
+            this.reason = _data["reason"];
+        }
+    }
+
+    static fromJS(data: any): AddRestaurantPayrollAllowanceRevisionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddRestaurantPayrollAllowanceRevisionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["employeeId"] = this.employeeId;
+        data["amount"] = this.amount;
+        data["effectiveFrom"] = this.effectiveFrom ? this.effectiveFrom.toString() : undefined as any;
+        data["effectiveFromMiti"] = this.effectiveFromMiti;
+        data["reason"] = this.reason;
+        return data;
+    }
+}
+
+export interface IAddRestaurantPayrollAllowanceRevisionDto {
+    employeeId: string;
+    amount: number;
+    effectiveFrom: DateTime;
+    effectiveFromMiti: string | undefined;
+    reason: string;
 }
 
 export class AddWidgetInput implements IAddWidgetInput {
@@ -55840,8 +59438,8 @@ export interface IApplyRestaurantOrderDiscountDto {
     discountAmount: number;
     approvalPin: string | undefined;
     approvalNote: string | undefined;
-    clientRequestId?: string | undefined;
-    expectedOrderVersion?: string | undefined;
+    clientRequestId: string | undefined;
+    expectedOrderVersion: string | undefined;
 }
 
 export class AuditLogListDto implements IAuditLogListDto {
@@ -56612,6 +60210,114 @@ export interface IBookReportVoucherTypeDto {
     typeOfVoucher: string | undefined;
 }
 
+export class BulkUpdateRestaurantTicketItemStatusDto implements IBulkUpdateRestaurantTicketItemStatusDto {
+    ticketItemIds!: string[] | undefined;
+    status!: RestaurantOrderItemStatus;
+    clientRequestId!: string | undefined;
+    expectedOrderVersions!: { [key: string]: string; } | undefined;
+
+    constructor(data?: IBulkUpdateRestaurantTicketItemStatusDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["ticketItemIds"])) {
+                this.ticketItemIds = [] as any;
+                for (let item of _data["ticketItemIds"])
+                    this.ticketItemIds!.push(item);
+            }
+            this.status = _data["status"];
+            this.clientRequestId = _data["clientRequestId"];
+            if (_data["expectedOrderVersions"]) {
+                this.expectedOrderVersions = {} as any;
+                for (let key in _data["expectedOrderVersions"]) {
+                    if (_data["expectedOrderVersions"].hasOwnProperty(key))
+                        (this.expectedOrderVersions as any)![key] = _data["expectedOrderVersions"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): BulkUpdateRestaurantTicketItemStatusDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkUpdateRestaurantTicketItemStatusDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.ticketItemIds)) {
+            data["ticketItemIds"] = [];
+            for (let item of this.ticketItemIds)
+                data["ticketItemIds"].push(item);
+        }
+        data["status"] = this.status;
+        data["clientRequestId"] = this.clientRequestId;
+        if (this.expectedOrderVersions) {
+            data["expectedOrderVersions"] = {};
+            for (let key in this.expectedOrderVersions) {
+                if (this.expectedOrderVersions.hasOwnProperty(key))
+                    (data["expectedOrderVersions"] as any)[key] = (this.expectedOrderVersions as any)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IBulkUpdateRestaurantTicketItemStatusDto {
+    ticketItemIds: string[] | undefined;
+    status: RestaurantOrderItemStatus;
+    clientRequestId: string | undefined;
+    expectedOrderVersions: { [key: string]: string; } | undefined;
+}
+
+export class BulkUpdateRestaurantTicketItemStatusResultDto implements IBulkUpdateRestaurantTicketItemStatusResultDto {
+    updatedCount!: number;
+    skippedCount!: number;
+
+    constructor(data?: IBulkUpdateRestaurantTicketItemStatusResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.updatedCount = _data["updatedCount"];
+            this.skippedCount = _data["skippedCount"];
+        }
+    }
+
+    static fromJS(data: any): BulkUpdateRestaurantTicketItemStatusResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new BulkUpdateRestaurantTicketItemStatusResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["updatedCount"] = this.updatedCount;
+        data["skippedCount"] = this.skippedCount;
+        return data;
+    }
+}
+
+export interface IBulkUpdateRestaurantTicketItemStatusResultDto {
+    updatedCount: number;
+    skippedCount: number;
+}
+
 export class CacheDto implements ICacheDto {
     name!: string | undefined;
 
@@ -56740,8 +60446,8 @@ export interface ICancelRestaurantTicketDto {
     reason: string | undefined;
     approvalPin: string | undefined;
     approvalNote: string | undefined;
-    clientRequestId?: string | undefined;
-    expectedOrderVersion?: string | undefined;
+    clientRequestId: string | undefined;
+    expectedOrderVersion: string | undefined;
 }
 
 export class CaptchaSettingsEditDto implements ICaptchaSettingsEditDto {
@@ -56988,6 +60694,50 @@ export interface IChangePasswordInput {
     newPassword: string;
 }
 
+export class ChangeRestaurantPayrollEmployeePasswordDto implements IChangeRestaurantPayrollEmployeePasswordDto {
+    employeeId!: string;
+    password!: string;
+    forceChangeOnNextLogin!: boolean;
+
+    constructor(data?: IChangeRestaurantPayrollEmployeePasswordDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.employeeId = _data["employeeId"];
+            this.password = _data["password"];
+            this.forceChangeOnNextLogin = _data["forceChangeOnNextLogin"];
+        }
+    }
+
+    static fromJS(data: any): ChangeRestaurantPayrollEmployeePasswordDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ChangeRestaurantPayrollEmployeePasswordDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["employeeId"] = this.employeeId;
+        data["password"] = this.password;
+        data["forceChangeOnNextLogin"] = this.forceChangeOnNextLogin;
+        return data;
+    }
+}
+
+export interface IChangeRestaurantPayrollEmployeePasswordDto {
+    employeeId: string;
+    password: string;
+    forceChangeOnNextLogin: boolean;
+}
+
 export class ChangeUserLanguageDto implements IChangeUserLanguageDto {
     languageName!: string;
 
@@ -57152,6 +60902,42 @@ export interface ICheckDatabaseOutput {
     isDatabaseExist: boolean;
 }
 
+export class ClaimRestaurantPrintJobDto implements IClaimRestaurantPrintJobDto {
+    agentId!: string | undefined;
+
+    constructor(data?: IClaimRestaurantPrintJobDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.agentId = _data["agentId"];
+        }
+    }
+
+    static fromJS(data: any): ClaimRestaurantPrintJobDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ClaimRestaurantPrintJobDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["agentId"] = this.agentId;
+        return data;
+    }
+}
+
+export interface IClaimRestaurantPrintJobDto {
+    agentId: string | undefined;
+}
+
 export class CleanValuesInput implements ICleanValuesInput {
     dynamicEntityPropertyId!: number;
     entityId!: string | undefined;
@@ -57190,6 +60976,54 @@ export class CleanValuesInput implements ICleanValuesInput {
 export interface ICleanValuesInput {
     dynamicEntityPropertyId: number;
     entityId: string | undefined;
+}
+
+export class CloseRestaurantCashShiftDto implements ICloseRestaurantCashShiftDto {
+    shiftId!: string;
+    countedCash!: number;
+    note!: string | undefined;
+    managerPin!: string | undefined;
+
+    constructor(data?: ICloseRestaurantCashShiftDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.shiftId = _data["shiftId"];
+            this.countedCash = _data["countedCash"];
+            this.note = _data["note"];
+            this.managerPin = _data["managerPin"];
+        }
+    }
+
+    static fromJS(data: any): CloseRestaurantCashShiftDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CloseRestaurantCashShiftDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["shiftId"] = this.shiftId;
+        data["countedCash"] = this.countedCash;
+        data["note"] = this.note;
+        data["managerPin"] = this.managerPin;
+        return data;
+    }
+}
+
+export interface ICloseRestaurantCashShiftDto {
+    shiftId: string;
+    countedCash: number;
+    note: string | undefined;
+    managerPin: string | undefined;
 }
 
 export class ComboboxItemDto implements IComboboxItemDto {
@@ -59704,7 +63538,7 @@ export interface ICreateOrEditRestaurantOrderDto {
     deviceId: string | undefined;
     source: string | undefined;
     clientRequestId: string | undefined;
-    expectedOrderVersion?: string | undefined;
+    expectedOrderVersion: string | undefined;
     waiterUserId: number | undefined;
     guestCount: number;
     customerName: string | undefined;
@@ -59843,6 +63677,194 @@ export interface ICreateOrEditRestaurantOrderItemModifierDto {
     id: string | undefined;
     modifierId: string;
     qty: number;
+}
+
+export class CreateOrEditRestaurantPayrollEmployeeDto implements ICreateOrEditRestaurantPayrollEmployeeDto {
+    id!: string | undefined;
+    userId!: number | undefined;
+    updateLoginAccess!: boolean;
+    loginMode!: RestaurantEmployeeLoginMode;
+    loginUserName!: string | undefined;
+    loginEmailAddress!: string | undefined;
+    loginPhoneNumber!: string | undefined;
+    restaurantRoleName!: string | undefined;
+    loginIsActive!: boolean;
+    staffCode!: string;
+    name!: string;
+    phoneNumber!: string | undefined;
+    emailAddress!: string | undefined;
+    dateOfBirth!: DateTime | undefined;
+    dateOfBirthMiti!: string | undefined;
+    gender!: string | undefined;
+    bloodGroup!: string | undefined;
+    maritalStatus!: string | undefined;
+    address!: string | undefined;
+    citizenshipNumber!: string | undefined;
+    emergencyContactName!: string | undefined;
+    emergencyContactPhone!: string | undefined;
+    departmentId!: string;
+    jobRoleId!: string;
+    employmentType!: RestaurantEmploymentType;
+    basicSalary!: number;
+    hourlyRate!: number;
+    overtimeRate!: number;
+    fixedAllowance!: number;
+    fixedDeduction!: number;
+    serviceChargeWeight!: number;
+    bankName!: string | undefined;
+    bankAccountNumber!: string | undefined;
+    panNumber!: string | undefined;
+    ssfNumber!: string | undefined;
+    joinedOn!: DateTime;
+    joinedOnMiti!: string | undefined;
+    notes!: string | undefined;
+    isActive!: boolean;
+
+    constructor(data?: ICreateOrEditRestaurantPayrollEmployeeDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.userId = _data["userId"];
+            this.updateLoginAccess = _data["updateLoginAccess"];
+            this.loginMode = _data["loginMode"];
+            this.loginUserName = _data["loginUserName"];
+            this.loginEmailAddress = _data["loginEmailAddress"];
+            this.loginPhoneNumber = _data["loginPhoneNumber"];
+            this.restaurantRoleName = _data["restaurantRoleName"];
+            this.loginIsActive = _data["loginIsActive"];
+            this.staffCode = _data["staffCode"];
+            this.name = _data["name"];
+            this.phoneNumber = _data["phoneNumber"];
+            this.emailAddress = _data["emailAddress"];
+            this.dateOfBirth = _data["dateOfBirth"] ? DateTime.fromISO(_data["dateOfBirth"].toString()) : undefined as any;
+            this.dateOfBirthMiti = _data["dateOfBirthMiti"];
+            this.gender = _data["gender"];
+            this.bloodGroup = _data["bloodGroup"];
+            this.maritalStatus = _data["maritalStatus"];
+            this.address = _data["address"];
+            this.citizenshipNumber = _data["citizenshipNumber"];
+            this.emergencyContactName = _data["emergencyContactName"];
+            this.emergencyContactPhone = _data["emergencyContactPhone"];
+            this.departmentId = _data["departmentId"];
+            this.jobRoleId = _data["jobRoleId"];
+            this.employmentType = _data["employmentType"];
+            this.basicSalary = _data["basicSalary"];
+            this.hourlyRate = _data["hourlyRate"];
+            this.overtimeRate = _data["overtimeRate"];
+            this.fixedAllowance = _data["fixedAllowance"];
+            this.fixedDeduction = _data["fixedDeduction"];
+            this.serviceChargeWeight = _data["serviceChargeWeight"];
+            this.bankName = _data["bankName"];
+            this.bankAccountNumber = _data["bankAccountNumber"];
+            this.panNumber = _data["panNumber"];
+            this.ssfNumber = _data["ssfNumber"];
+            this.joinedOn = _data["joinedOn"] ? DateTime.fromISO(_data["joinedOn"].toString()) : undefined as any;
+            this.joinedOnMiti = _data["joinedOnMiti"];
+            this.notes = _data["notes"];
+            this.isActive = _data["isActive"];
+        }
+    }
+
+    static fromJS(data: any): CreateOrEditRestaurantPayrollEmployeeDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateOrEditRestaurantPayrollEmployeeDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["userId"] = this.userId;
+        data["updateLoginAccess"] = this.updateLoginAccess;
+        data["loginMode"] = this.loginMode;
+        data["loginUserName"] = this.loginUserName;
+        data["loginEmailAddress"] = this.loginEmailAddress;
+        data["loginPhoneNumber"] = this.loginPhoneNumber;
+        data["restaurantRoleName"] = this.restaurantRoleName;
+        data["loginIsActive"] = this.loginIsActive;
+        data["staffCode"] = this.staffCode;
+        data["name"] = this.name;
+        data["phoneNumber"] = this.phoneNumber;
+        data["emailAddress"] = this.emailAddress;
+        data["dateOfBirth"] = this.dateOfBirth ? this.dateOfBirth.toString() : undefined as any;
+        data["dateOfBirthMiti"] = this.dateOfBirthMiti;
+        data["gender"] = this.gender;
+        data["bloodGroup"] = this.bloodGroup;
+        data["maritalStatus"] = this.maritalStatus;
+        data["address"] = this.address;
+        data["citizenshipNumber"] = this.citizenshipNumber;
+        data["emergencyContactName"] = this.emergencyContactName;
+        data["emergencyContactPhone"] = this.emergencyContactPhone;
+        data["departmentId"] = this.departmentId;
+        data["jobRoleId"] = this.jobRoleId;
+        data["employmentType"] = this.employmentType;
+        data["basicSalary"] = this.basicSalary;
+        data["hourlyRate"] = this.hourlyRate;
+        data["overtimeRate"] = this.overtimeRate;
+        data["fixedAllowance"] = this.fixedAllowance;
+        data["fixedDeduction"] = this.fixedDeduction;
+        data["serviceChargeWeight"] = this.serviceChargeWeight;
+        data["bankName"] = this.bankName;
+        data["bankAccountNumber"] = this.bankAccountNumber;
+        data["panNumber"] = this.panNumber;
+        data["ssfNumber"] = this.ssfNumber;
+        data["joinedOn"] = this.joinedOn ? this.joinedOn.toString() : undefined as any;
+        data["joinedOnMiti"] = this.joinedOnMiti;
+        data["notes"] = this.notes;
+        data["isActive"] = this.isActive;
+        return data;
+    }
+}
+
+export interface ICreateOrEditRestaurantPayrollEmployeeDto {
+    id: string | undefined;
+    userId: number | undefined;
+    updateLoginAccess: boolean;
+    loginMode: RestaurantEmployeeLoginMode;
+    loginUserName: string | undefined;
+    loginEmailAddress: string | undefined;
+    loginPhoneNumber: string | undefined;
+    restaurantRoleName: string | undefined;
+    loginIsActive: boolean;
+    staffCode: string;
+    name: string;
+    phoneNumber: string | undefined;
+    emailAddress: string | undefined;
+    dateOfBirth: DateTime | undefined;
+    dateOfBirthMiti: string | undefined;
+    gender: string | undefined;
+    bloodGroup: string | undefined;
+    maritalStatus: string | undefined;
+    address: string | undefined;
+    citizenshipNumber: string | undefined;
+    emergencyContactName: string | undefined;
+    emergencyContactPhone: string | undefined;
+    departmentId: string;
+    jobRoleId: string;
+    employmentType: RestaurantEmploymentType;
+    basicSalary: number;
+    hourlyRate: number;
+    overtimeRate: number;
+    fixedAllowance: number;
+    fixedDeduction: number;
+    serviceChargeWeight: number;
+    bankName: string | undefined;
+    bankAccountNumber: string | undefined;
+    panNumber: string | undefined;
+    ssfNumber: string | undefined;
+    joinedOn: DateTime;
+    joinedOnMiti: string | undefined;
+    notes: string | undefined;
+    isActive: boolean;
 }
 
 export class CreateOrEditRestaurantStationDto implements ICreateOrEditRestaurantStationDto {
@@ -60054,6 +64076,9 @@ export class CreateOrEditSalesMasterDto implements ICreateOrEditSalesMasterDto {
     subTotalAmount!: number;
     paymentMethod!: PaymentMethod;
     paymentMethodLedgerId!: string | undefined;
+    paymentAllocations!: SalesPaymentAllocationDto[] | undefined;
+    restaurantTipAmount!: number;
+    restaurantTipLedgerId!: string | undefined;
     vatRefundAmount!: number | undefined;
     lrNo!: string | undefined;
     piNumber!: string | undefined;
@@ -60098,6 +64123,13 @@ export class CreateOrEditSalesMasterDto implements ICreateOrEditSalesMasterDto {
             this.subTotalAmount = _data["subTotalAmount"];
             this.paymentMethod = _data["paymentMethod"];
             this.paymentMethodLedgerId = _data["paymentMethodLedgerId"];
+            if (Array.isArray(_data["paymentAllocations"])) {
+                this.paymentAllocations = [] as any;
+                for (let item of _data["paymentAllocations"])
+                    this.paymentAllocations!.push(SalesPaymentAllocationDto.fromJS(item));
+            }
+            this.restaurantTipAmount = _data["restaurantTipAmount"];
+            this.restaurantTipLedgerId = _data["restaurantTipLedgerId"];
             this.vatRefundAmount = _data["vatRefundAmount"];
             this.lrNo = _data["lrNo"];
             this.piNumber = _data["piNumber"];
@@ -60150,6 +64182,13 @@ export class CreateOrEditSalesMasterDto implements ICreateOrEditSalesMasterDto {
         data["subTotalAmount"] = this.subTotalAmount;
         data["paymentMethod"] = this.paymentMethod;
         data["paymentMethodLedgerId"] = this.paymentMethodLedgerId;
+        if (Array.isArray(this.paymentAllocations)) {
+            data["paymentAllocations"] = [];
+            for (let item of this.paymentAllocations)
+                data["paymentAllocations"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["restaurantTipAmount"] = this.restaurantTipAmount;
+        data["restaurantTipLedgerId"] = this.restaurantTipLedgerId;
         data["vatRefundAmount"] = this.vatRefundAmount;
         data["lrNo"] = this.lrNo;
         data["piNumber"] = this.piNumber;
@@ -60195,6 +64234,9 @@ export interface ICreateOrEditSalesMasterDto {
     subTotalAmount: number;
     paymentMethod: PaymentMethod;
     paymentMethodLedgerId: string | undefined;
+    paymentAllocations: SalesPaymentAllocationDto[] | undefined;
+    restaurantTipAmount: number;
+    restaurantTipLedgerId: string | undefined;
     vatRefundAmount: number | undefined;
     lrNo: string | undefined;
     piNumber: string | undefined;
@@ -60950,6 +64992,7 @@ export interface ICreateReceiptAgainstMasterDto {
 
 export class CreateRestaurantCustomerOrderDto implements ICreateRestaurantCustomerOrderDto {
     tenantId!: number | undefined;
+    tableToken!: string | undefined;
     lines!: RestaurantCustomerOrderLineDto[] | undefined;
     orderType!: RestaurantOrderType;
     tableId!: string | undefined;
@@ -60959,6 +65002,7 @@ export class CreateRestaurantCustomerOrderDto implements ICreateRestaurantCustom
     notes!: string | undefined;
     paymentMode!: RestaurantCustomerPaymentMode;
     clientRequestId!: string | undefined;
+    statusAccessToken!: string | undefined;
 
     constructor(data?: ICreateRestaurantCustomerOrderDto) {
         if (data) {
@@ -60972,6 +65016,7 @@ export class CreateRestaurantCustomerOrderDto implements ICreateRestaurantCustom
     init(_data?: any) {
         if (_data) {
             this.tenantId = _data["tenantId"];
+            this.tableToken = _data["tableToken"];
             if (Array.isArray(_data["lines"])) {
                 this.lines = [] as any;
                 for (let item of _data["lines"])
@@ -60985,6 +65030,7 @@ export class CreateRestaurantCustomerOrderDto implements ICreateRestaurantCustom
             this.notes = _data["notes"];
             this.paymentMode = _data["paymentMode"];
             this.clientRequestId = _data["clientRequestId"];
+            this.statusAccessToken = _data["statusAccessToken"];
         }
     }
 
@@ -60998,6 +65044,7 @@ export class CreateRestaurantCustomerOrderDto implements ICreateRestaurantCustom
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["tenantId"] = this.tenantId;
+        data["tableToken"] = this.tableToken;
         if (Array.isArray(this.lines)) {
             data["lines"] = [];
             for (let item of this.lines)
@@ -61011,12 +65058,14 @@ export class CreateRestaurantCustomerOrderDto implements ICreateRestaurantCustom
         data["notes"] = this.notes;
         data["paymentMode"] = this.paymentMode;
         data["clientRequestId"] = this.clientRequestId;
+        data["statusAccessToken"] = this.statusAccessToken;
         return data;
     }
 }
 
 export interface ICreateRestaurantCustomerOrderDto {
     tenantId: number | undefined;
+    tableToken: string | undefined;
     lines: RestaurantCustomerOrderLineDto[] | undefined;
     orderType: RestaurantOrderType;
     tableId: string | undefined;
@@ -61026,11 +65075,13 @@ export interface ICreateRestaurantCustomerOrderDto {
     notes: string | undefined;
     paymentMode: RestaurantCustomerPaymentMode;
     clientRequestId: string | undefined;
+    statusAccessToken: string | undefined;
 }
 
 export class CreateRestaurantCustomerOrderResultDto implements ICreateRestaurantCustomerOrderResultDto {
     orderId!: string;
     orderNo!: string | undefined;
+    statusAccessToken!: string | undefined;
     status!: RestaurantOrderStatus;
     quote!: RestaurantCustomerQuoteDto;
 
@@ -61047,6 +65098,7 @@ export class CreateRestaurantCustomerOrderResultDto implements ICreateRestaurant
         if (_data) {
             this.orderId = _data["orderId"];
             this.orderNo = _data["orderNo"];
+            this.statusAccessToken = _data["statusAccessToken"];
             this.status = _data["status"];
             this.quote = _data["quote"] ? RestaurantCustomerQuoteDto.fromJS(_data["quote"]) : undefined as any;
         }
@@ -61063,6 +65115,7 @@ export class CreateRestaurantCustomerOrderResultDto implements ICreateRestaurant
         data = typeof data === 'object' ? data : {};
         data["orderId"] = this.orderId;
         data["orderNo"] = this.orderNo;
+        data["statusAccessToken"] = this.statusAccessToken;
         data["status"] = this.status;
         data["quote"] = this.quote ? this.quote.toJSON() : undefined as any;
         return data;
@@ -61072,8 +65125,253 @@ export class CreateRestaurantCustomerOrderResultDto implements ICreateRestaurant
 export interface ICreateRestaurantCustomerOrderResultDto {
     orderId: string;
     orderNo: string | undefined;
+    statusAccessToken: string | undefined;
     status: RestaurantOrderStatus;
     quote: RestaurantCustomerQuoteDto;
+}
+
+export class CreateRestaurantRefundDto implements ICreateRestaurantRefundDto {
+    salesMasterId!: string;
+    clientRequestId!: string | undefined;
+    reason!: string | undefined;
+    managerPin!: string | undefined;
+    tipRefundAmount!: number;
+    lines!: CreateRestaurantRefundLineDto[] | undefined;
+
+    constructor(data?: ICreateRestaurantRefundDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.salesMasterId = _data["salesMasterId"];
+            this.clientRequestId = _data["clientRequestId"];
+            this.reason = _data["reason"];
+            this.managerPin = _data["managerPin"];
+            this.tipRefundAmount = _data["tipRefundAmount"];
+            if (Array.isArray(_data["lines"])) {
+                this.lines = [] as any;
+                for (let item of _data["lines"])
+                    this.lines!.push(CreateRestaurantRefundLineDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CreateRestaurantRefundDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateRestaurantRefundDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["salesMasterId"] = this.salesMasterId;
+        data["clientRequestId"] = this.clientRequestId;
+        data["reason"] = this.reason;
+        data["managerPin"] = this.managerPin;
+        data["tipRefundAmount"] = this.tipRefundAmount;
+        if (Array.isArray(this.lines)) {
+            data["lines"] = [];
+            for (let item of this.lines)
+                data["lines"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface ICreateRestaurantRefundDto {
+    salesMasterId: string;
+    clientRequestId: string | undefined;
+    reason: string | undefined;
+    managerPin: string | undefined;
+    tipRefundAmount: number;
+    lines: CreateRestaurantRefundLineDto[] | undefined;
+}
+
+export class CreateRestaurantRefundLineDto implements ICreateRestaurantRefundLineDto {
+    salesDetailId!: string;
+    quantity!: number;
+    restockQuantity!: number;
+    returnedUnopenedPackagedItem!: boolean;
+
+    constructor(data?: ICreateRestaurantRefundLineDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.salesDetailId = _data["salesDetailId"];
+            this.quantity = _data["quantity"];
+            this.restockQuantity = _data["restockQuantity"];
+            this.returnedUnopenedPackagedItem = _data["returnedUnopenedPackagedItem"];
+        }
+    }
+
+    static fromJS(data: any): CreateRestaurantRefundLineDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateRestaurantRefundLineDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["salesDetailId"] = this.salesDetailId;
+        data["quantity"] = this.quantity;
+        data["restockQuantity"] = this.restockQuantity;
+        data["returnedUnopenedPackagedItem"] = this.returnedUnopenedPackagedItem;
+        return data;
+    }
+}
+
+export interface ICreateRestaurantRefundLineDto {
+    salesDetailId: string;
+    quantity: number;
+    restockQuantity: number;
+    returnedUnopenedPackagedItem: boolean;
+}
+
+export class CreateRestaurantReservationRequestDto implements ICreateRestaurantReservationRequestDto {
+    tenantId!: number | undefined;
+    tenancyName!: string | undefined;
+    challengeId!: string | undefined;
+    verificationCode!: string | undefined;
+    guestName!: string | undefined;
+    phoneNumber!: string | undefined;
+    notes!: string | undefined;
+    partySize!: number;
+    startsAt!: DateTime;
+    durationMinutes!: number;
+    statusAccessToken!: string | undefined;
+
+    constructor(data?: ICreateRestaurantReservationRequestDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tenantId = _data["tenantId"];
+            this.tenancyName = _data["tenancyName"];
+            this.challengeId = _data["challengeId"];
+            this.verificationCode = _data["verificationCode"];
+            this.guestName = _data["guestName"];
+            this.phoneNumber = _data["phoneNumber"];
+            this.notes = _data["notes"];
+            this.partySize = _data["partySize"];
+            this.startsAt = _data["startsAt"] ? DateTime.fromISO(_data["startsAt"].toString()) : undefined as any;
+            this.durationMinutes = _data["durationMinutes"];
+            this.statusAccessToken = _data["statusAccessToken"];
+        }
+    }
+
+    static fromJS(data: any): CreateRestaurantReservationRequestDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateRestaurantReservationRequestDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["tenantId"] = this.tenantId;
+        data["tenancyName"] = this.tenancyName;
+        data["challengeId"] = this.challengeId;
+        data["verificationCode"] = this.verificationCode;
+        data["guestName"] = this.guestName;
+        data["phoneNumber"] = this.phoneNumber;
+        data["notes"] = this.notes;
+        data["partySize"] = this.partySize;
+        data["startsAt"] = this.startsAt ? this.startsAt.toString() : undefined as any;
+        data["durationMinutes"] = this.durationMinutes;
+        data["statusAccessToken"] = this.statusAccessToken;
+        return data;
+    }
+}
+
+export interface ICreateRestaurantReservationRequestDto {
+    tenantId: number | undefined;
+    tenancyName: string | undefined;
+    challengeId: string | undefined;
+    verificationCode: string | undefined;
+    guestName: string | undefined;
+    phoneNumber: string | undefined;
+    notes: string | undefined;
+    partySize: number;
+    startsAt: DateTime;
+    durationMinutes: number;
+    statusAccessToken: string | undefined;
+}
+
+export class CreateRestaurantReservationResultDto implements ICreateRestaurantReservationResultDto {
+    id!: string;
+    statusAccessToken!: string | undefined;
+    status!: RestaurantReservationStatus;
+    startsAt!: DateTime;
+    endsAt!: DateTime;
+    error!: string | undefined;
+
+    constructor(data?: ICreateRestaurantReservationResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.statusAccessToken = _data["statusAccessToken"];
+            this.status = _data["status"];
+            this.startsAt = _data["startsAt"] ? DateTime.fromISO(_data["startsAt"].toString()) : undefined as any;
+            this.endsAt = _data["endsAt"] ? DateTime.fromISO(_data["endsAt"].toString()) : undefined as any;
+            this.error = _data["error"];
+        }
+    }
+
+    static fromJS(data: any): CreateRestaurantReservationResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateRestaurantReservationResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["statusAccessToken"] = this.statusAccessToken;
+        data["status"] = this.status;
+        data["startsAt"] = this.startsAt ? this.startsAt.toString() : undefined as any;
+        data["endsAt"] = this.endsAt ? this.endsAt.toString() : undefined as any;
+        data["error"] = this.error;
+        return data;
+    }
+}
+
+export interface ICreateRestaurantReservationResultDto {
+    id: string;
+    statusAccessToken: string | undefined;
+    status: RestaurantReservationStatus;
+    startsAt: DateTime;
+    endsAt: DateTime;
+    error: string | undefined;
 }
 
 export class CreateRestaurantStockAdjustmentDto implements ICreateRestaurantStockAdjustmentDto {
@@ -61186,6 +65484,54 @@ export interface ICreateRestaurantStockAdjustmentLineDto {
     countedQty: number | undefined;
     rate: number;
     reason: string | undefined;
+}
+
+export class CreateRestaurantWalkInDto implements ICreateRestaurantWalkInDto {
+    guestName!: string | undefined;
+    phoneNumber!: string | undefined;
+    notes!: string | undefined;
+    partySize!: number;
+
+    constructor(data?: ICreateRestaurantWalkInDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.guestName = _data["guestName"];
+            this.phoneNumber = _data["phoneNumber"];
+            this.notes = _data["notes"];
+            this.partySize = _data["partySize"];
+        }
+    }
+
+    static fromJS(data: any): CreateRestaurantWalkInDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateRestaurantWalkInDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["guestName"] = this.guestName;
+        data["phoneNumber"] = this.phoneNumber;
+        data["notes"] = this.notes;
+        data["partySize"] = this.partySize;
+        return data;
+    }
+}
+
+export interface ICreateRestaurantWalkInDto {
+    guestName: string | undefined;
+    phoneNumber: string | undefined;
+    notes: string | undefined;
+    partySize: number;
 }
 
 export class CreateTenantInput implements ICreateTenantInput {
@@ -63381,7 +67727,7 @@ export class FinalizeRestaurantBillDto implements IFinalizeRestaurantBillDto {
     cashShiftId!: string | undefined;
     clientRequestId!: string | undefined;
     expectedOrderVersion!: string | undefined;
-    tenders!: any[] | undefined;
+    tenders!: RestaurantBillTenderDto[] | undefined;
     billLines!: FinalizeRestaurantBillLineDto[] | undefined;
 
     constructor(data?: IFinalizeRestaurantBillDto) {
@@ -63412,7 +67758,11 @@ export class FinalizeRestaurantBillDto implements IFinalizeRestaurantBillDto {
             this.cashShiftId = _data["cashShiftId"];
             this.clientRequestId = _data["clientRequestId"];
             this.expectedOrderVersion = _data["expectedOrderVersion"];
-            this.tenders = _data["tenders"];
+            if (Array.isArray(_data["tenders"])) {
+                this.tenders = [] as any;
+                for (let item of _data["tenders"])
+                    this.tenders!.push(RestaurantBillTenderDto.fromJS(item));
+            }
             if (Array.isArray(_data["billLines"])) {
                 this.billLines = [] as any;
                 for (let item of _data["billLines"])
@@ -63447,7 +67797,11 @@ export class FinalizeRestaurantBillDto implements IFinalizeRestaurantBillDto {
         data["cashShiftId"] = this.cashShiftId;
         data["clientRequestId"] = this.clientRequestId;
         data["expectedOrderVersion"] = this.expectedOrderVersion;
-        data["tenders"] = this.tenders;
+        if (Array.isArray(this.tenders)) {
+            data["tenders"] = [];
+            for (let item of this.tenders)
+                data["tenders"].push(item ? item.toJSON() : undefined as any);
+        }
         if (Array.isArray(this.billLines)) {
             data["billLines"] = [];
             for (let item of this.billLines)
@@ -63472,10 +67826,10 @@ export interface IFinalizeRestaurantBillDto {
     confirmNegativeStock: boolean;
     tipAmount: number | undefined;
     customerPaidAmount: number | undefined;
-    cashShiftId?: string | undefined;
-    clientRequestId?: string | undefined;
-    expectedOrderVersion?: string | undefined;
-    tenders?: any[] | undefined;
+    cashShiftId: string | undefined;
+    clientRequestId: string | undefined;
+    expectedOrderVersion: string | undefined;
+    tenders: RestaurantBillTenderDto[] | undefined;
     billLines: FinalizeRestaurantBillLineDto[] | undefined;
 }
 
@@ -64496,6 +68850,70 @@ export class GenerateGoogleAuthenticatorKeyOutput implements IGenerateGoogleAuth
 export interface IGenerateGoogleAuthenticatorKeyOutput {
     qrCodeSetupImageUrl: string | undefined;
     googleAuthenticatorKey: string | undefined;
+}
+
+export class GenerateRestaurantPayrollRunDto implements IGenerateRestaurantPayrollRunDto {
+    periodStart!: DateTime;
+    periodEnd!: DateTime;
+    tipsPool!: number;
+    serviceChargePool!: number;
+    notes!: string | undefined;
+    adjustments!: RestaurantPayrollAdjustmentDto[] | undefined;
+
+    constructor(data?: IGenerateRestaurantPayrollRunDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.periodStart = _data["periodStart"] ? DateTime.fromISO(_data["periodStart"].toString()) : undefined as any;
+            this.periodEnd = _data["periodEnd"] ? DateTime.fromISO(_data["periodEnd"].toString()) : undefined as any;
+            this.tipsPool = _data["tipsPool"];
+            this.serviceChargePool = _data["serviceChargePool"];
+            this.notes = _data["notes"];
+            if (Array.isArray(_data["adjustments"])) {
+                this.adjustments = [] as any;
+                for (let item of _data["adjustments"])
+                    this.adjustments!.push(RestaurantPayrollAdjustmentDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): GenerateRestaurantPayrollRunDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GenerateRestaurantPayrollRunDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["periodStart"] = this.periodStart ? this.periodStart.toString() : undefined as any;
+        data["periodEnd"] = this.periodEnd ? this.periodEnd.toString() : undefined as any;
+        data["tipsPool"] = this.tipsPool;
+        data["serviceChargePool"] = this.serviceChargePool;
+        data["notes"] = this.notes;
+        if (Array.isArray(this.adjustments)) {
+            data["adjustments"] = [];
+            for (let item of this.adjustments)
+                data["adjustments"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IGenerateRestaurantPayrollRunDto {
+    periodStart: DateTime;
+    periodEnd: DateTime;
+    tipsPool: number;
+    serviceChargePool: number;
+    notes: string | undefined;
+    adjustments: RestaurantPayrollAdjustmentDto[] | undefined;
 }
 
 export class GetAccountGroupForEditOutput implements IGetAccountGroupForEditOutput {
@@ -74296,7 +78714,7 @@ export class MergeRestaurantOrdersDto implements IMergeRestaurantOrdersDto {
     targetOrderId!: string;
     sourceOrderIds!: string[] | undefined;
     clientRequestId!: string | undefined;
-    expectedOrderVersions!: { [key: string]: string } | undefined;
+    expectedOrderVersions!: { [key: string]: string; } | undefined;
 
     constructor(data?: IMergeRestaurantOrdersDto) {
         if (data) {
@@ -74310,12 +78728,18 @@ export class MergeRestaurantOrdersDto implements IMergeRestaurantOrdersDto {
     init(_data?: any) {
         if (_data) {
             this.targetOrderId = _data["targetOrderId"];
-            this.clientRequestId = _data["clientRequestId"];
-            this.expectedOrderVersions = _data["expectedOrderVersions"];
             if (Array.isArray(_data["sourceOrderIds"])) {
                 this.sourceOrderIds = [] as any;
                 for (let item of _data["sourceOrderIds"])
                     this.sourceOrderIds!.push(item);
+            }
+            this.clientRequestId = _data["clientRequestId"];
+            if (_data["expectedOrderVersions"]) {
+                this.expectedOrderVersions = {} as any;
+                for (let key in _data["expectedOrderVersions"]) {
+                    if (_data["expectedOrderVersions"].hasOwnProperty(key))
+                        (this.expectedOrderVersions as any)![key] = _data["expectedOrderVersions"][key];
+                }
             }
         }
     }
@@ -74330,12 +78754,18 @@ export class MergeRestaurantOrdersDto implements IMergeRestaurantOrdersDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["targetOrderId"] = this.targetOrderId;
-        data["clientRequestId"] = this.clientRequestId;
-        data["expectedOrderVersions"] = this.expectedOrderVersions;
         if (Array.isArray(this.sourceOrderIds)) {
             data["sourceOrderIds"] = [];
             for (let item of this.sourceOrderIds)
                 data["sourceOrderIds"].push(item);
+        }
+        data["clientRequestId"] = this.clientRequestId;
+        if (this.expectedOrderVersions) {
+            data["expectedOrderVersions"] = {};
+            for (let key in this.expectedOrderVersions) {
+                if (this.expectedOrderVersions.hasOwnProperty(key))
+                    (data["expectedOrderVersions"] as any)[key] = (this.expectedOrderVersions as any)[key];
+            }
         }
         return data;
     }
@@ -74344,8 +78774,8 @@ export class MergeRestaurantOrdersDto implements IMergeRestaurantOrdersDto {
 export interface IMergeRestaurantOrdersDto {
     targetOrderId: string;
     sourceOrderIds: string[] | undefined;
-    clientRequestId?: string | undefined;
-    expectedOrderVersions?: { [key: string]: string } | undefined;
+    clientRequestId: string | undefined;
+    expectedOrderVersions: { [key: string]: string; } | undefined;
 }
 
 export class MicrosoftExternalLoginProviderSettings implements IMicrosoftExternalLoginProviderSettings {
@@ -74606,6 +79036,54 @@ export class MoveOrganizationUnitInput implements IMoveOrganizationUnitInput {
 export interface IMoveOrganizationUnitInput {
     id: number;
     newParentId: number | undefined;
+}
+
+export class MoveRestaurantCashDto implements IMoveRestaurantCashDto {
+    shiftId!: string;
+    isCashIn!: boolean;
+    amount!: number;
+    reason!: string | undefined;
+
+    constructor(data?: IMoveRestaurantCashDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.shiftId = _data["shiftId"];
+            this.isCashIn = _data["isCashIn"];
+            this.amount = _data["amount"];
+            this.reason = _data["reason"];
+        }
+    }
+
+    static fromJS(data: any): MoveRestaurantCashDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new MoveRestaurantCashDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["shiftId"] = this.shiftId;
+        data["isCashIn"] = this.isCashIn;
+        data["amount"] = this.amount;
+        data["reason"] = this.reason;
+        return data;
+    }
+}
+
+export interface IMoveRestaurantCashDto {
+    shiftId: string;
+    isCashIn: boolean;
+    amount: number;
+    reason: string | undefined;
 }
 
 export class MoveTenantsToAnotherEditionDto implements IMoveTenantsToAnotherEditionDto {
@@ -75190,6 +79668,46 @@ export interface IOpenIdConnectExternalLoginProviderSettings {
     loginUrl: string | undefined;
     validateIssuer: boolean;
     responseType: string | undefined;
+}
+
+export class OpenRestaurantCashShiftDto implements IOpenRestaurantCashShiftDto {
+    registerName!: string | undefined;
+    openingCash!: number;
+
+    constructor(data?: IOpenRestaurantCashShiftDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.registerName = _data["registerName"];
+            this.openingCash = _data["openingCash"];
+        }
+    }
+
+    static fromJS(data: any): OpenRestaurantCashShiftDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new OpenRestaurantCashShiftDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["registerName"] = this.registerName;
+        data["openingCash"] = this.openingCash;
+        return data;
+    }
+}
+
+export interface IOpenRestaurantCashShiftDto {
+    registerName: string | undefined;
+    openingCash: number;
 }
 
 export class OpeningStockProductDto implements IOpeningStockProductDto {
@@ -78125,8 +82643,7 @@ export enum PaymentMethod {
     Credit = 2,
     Card_Swipe = 3,
     NA = 4,
-    LC = 4,
-    QR = 5,
+    LC = 5,
 }
 
 export enum PaymentOptions {
@@ -82019,6 +86536,7 @@ export interface IQrLoginAuthenticateModel {
 
 export class QuoteRestaurantCustomerOrderDto implements IQuoteRestaurantCustomerOrderDto {
     tenantId!: number | undefined;
+    tableToken!: string | undefined;
     lines!: RestaurantCustomerOrderLineDto[] | undefined;
 
     constructor(data?: IQuoteRestaurantCustomerOrderDto) {
@@ -82033,6 +86551,7 @@ export class QuoteRestaurantCustomerOrderDto implements IQuoteRestaurantCustomer
     init(_data?: any) {
         if (_data) {
             this.tenantId = _data["tenantId"];
+            this.tableToken = _data["tableToken"];
             if (Array.isArray(_data["lines"])) {
                 this.lines = [] as any;
                 for (let item of _data["lines"])
@@ -82051,6 +86570,7 @@ export class QuoteRestaurantCustomerOrderDto implements IQuoteRestaurantCustomer
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["tenantId"] = this.tenantId;
+        data["tableToken"] = this.tableToken;
         if (Array.isArray(this.lines)) {
             data["lines"] = [];
             for (let item of this.lines)
@@ -82062,6 +86582,7 @@ export class QuoteRestaurantCustomerOrderDto implements IQuoteRestaurantCustomer
 
 export interface IQuoteRestaurantCustomerOrderDto {
     tenantId: number | undefined;
+    tableToken: string | undefined;
     lines: RestaurantCustomerOrderLineDto[] | undefined;
 }
 
@@ -82451,6 +86972,62 @@ export interface IRegisterRestaurantDeviceDto {
     userId: number | undefined;
 }
 
+export class RegisterRestaurantPrintDeviceDto implements IRegisterRestaurantPrintDeviceDto {
+    clientDeviceId!: string | undefined;
+    name!: string | undefined;
+    platform!: string | undefined;
+    routeNames!: string[] | undefined;
+
+    constructor(data?: IRegisterRestaurantPrintDeviceDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.clientDeviceId = _data["clientDeviceId"];
+            this.name = _data["name"];
+            this.platform = _data["platform"];
+            if (Array.isArray(_data["routeNames"])) {
+                this.routeNames = [] as any;
+                for (let item of _data["routeNames"])
+                    this.routeNames!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): RegisterRestaurantPrintDeviceDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RegisterRestaurantPrintDeviceDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["clientDeviceId"] = this.clientDeviceId;
+        data["name"] = this.name;
+        data["platform"] = this.platform;
+        if (Array.isArray(this.routeNames)) {
+            data["routeNames"] = [];
+            for (let item of this.routeNames)
+                data["routeNames"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IRegisterRestaurantPrintDeviceDto {
+    clientDeviceId: string | undefined;
+    name: string | undefined;
+    platform: string | undefined;
+    routeNames: string[] | undefined;
+}
+
 export class RegisterRestaurantPushTokenDto implements IRegisterRestaurantPushTokenDto {
     deviceId!: string;
     platform!: string | undefined;
@@ -82755,6 +87332,66 @@ export interface IRenamePageInput {
     application: string | undefined;
 }
 
+export class ReportRestaurantPrintJobDto implements IReportRestaurantPrintJobDto {
+    id!: string;
+    deliveryId!: string | undefined;
+    leaseToken!: string | undefined;
+    agentId!: string | undefined;
+    agentJobId!: string | undefined;
+    status!: RestaurantPrintJobStatus;
+    error!: string | undefined;
+
+    constructor(data?: IReportRestaurantPrintJobDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.deliveryId = _data["deliveryId"];
+            this.leaseToken = _data["leaseToken"];
+            this.agentId = _data["agentId"];
+            this.agentJobId = _data["agentJobId"];
+            this.status = _data["status"];
+            this.error = _data["error"];
+        }
+    }
+
+    static fromJS(data: any): ReportRestaurantPrintJobDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ReportRestaurantPrintJobDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["deliveryId"] = this.deliveryId;
+        data["leaseToken"] = this.leaseToken;
+        data["agentId"] = this.agentId;
+        data["agentJobId"] = this.agentJobId;
+        data["status"] = this.status;
+        data["error"] = this.error;
+        return data;
+    }
+}
+
+export interface IReportRestaurantPrintJobDto {
+    id: string;
+    deliveryId: string | undefined;
+    leaseToken: string | undefined;
+    agentId: string | undefined;
+    agentJobId: string | undefined;
+    status: RestaurantPrintJobStatus;
+    error: string | undefined;
+}
+
 export class ReprintRestaurantTicketDto implements IReprintRestaurantTicketDto {
     ticketId!: string;
     approvalPin!: string | undefined;
@@ -82799,6 +87436,90 @@ export interface IReprintRestaurantTicketDto {
     approvalNote: string | undefined;
 }
 
+export class RequestRestaurantReservationOtpDto implements IRequestRestaurantReservationOtpDto {
+    tenantId!: number | undefined;
+    tenancyName!: string | undefined;
+    phoneNumber!: string | undefined;
+
+    constructor(data?: IRequestRestaurantReservationOtpDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tenantId = _data["tenantId"];
+            this.tenancyName = _data["tenancyName"];
+            this.phoneNumber = _data["phoneNumber"];
+        }
+    }
+
+    static fromJS(data: any): RequestRestaurantReservationOtpDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RequestRestaurantReservationOtpDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["tenantId"] = this.tenantId;
+        data["tenancyName"] = this.tenancyName;
+        data["phoneNumber"] = this.phoneNumber;
+        return data;
+    }
+}
+
+export interface IRequestRestaurantReservationOtpDto {
+    tenantId: number | undefined;
+    tenancyName: string | undefined;
+    phoneNumber: string | undefined;
+}
+
+export class RequestRestaurantReservationOtpResultDto implements IRequestRestaurantReservationOtpResultDto {
+    challengeId!: string | undefined;
+    expiresAtUtc!: DateTime;
+
+    constructor(data?: IRequestRestaurantReservationOtpResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.challengeId = _data["challengeId"];
+            this.expiresAtUtc = _data["expiresAtUtc"] ? DateTime.fromISO(_data["expiresAtUtc"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): RequestRestaurantReservationOtpResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RequestRestaurantReservationOtpResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["challengeId"] = this.challengeId;
+        data["expiresAtUtc"] = this.expiresAtUtc ? this.expiresAtUtc.toString() : undefined as any;
+        return data;
+    }
+}
+
+export interface IRequestRestaurantReservationOtpResultDto {
+    challengeId: string | undefined;
+    expiresAtUtc: DateTime;
+}
+
 export class ResetPasswordInput implements IResetPasswordInput {
     userId!: number;
     resetCode!: string | undefined;
@@ -82806,6 +87527,7 @@ export class ResetPasswordInput implements IResetPasswordInput {
     password!: string | undefined;
     returnUrl!: string | undefined;
     singleSignIn!: string | undefined;
+    tenantId!: number | undefined;
     c!: string | undefined;
 
     constructor(data?: IResetPasswordInput) {
@@ -82825,6 +87547,7 @@ export class ResetPasswordInput implements IResetPasswordInput {
             this.password = _data["password"];
             this.returnUrl = _data["returnUrl"];
             this.singleSignIn = _data["singleSignIn"];
+            this.tenantId = _data["tenantId"];
             this.c = _data["c"];
         }
     }
@@ -82844,6 +87567,7 @@ export class ResetPasswordInput implements IResetPasswordInput {
         data["password"] = this.password;
         data["returnUrl"] = this.returnUrl;
         data["singleSignIn"] = this.singleSignIn;
+        data["tenantId"] = this.tenantId;
         data["c"] = this.c;
         return data;
     }
@@ -82856,6 +87580,7 @@ export interface IResetPasswordInput {
     password: string | undefined;
     returnUrl: string | undefined;
     singleSignIn: string | undefined;
+    tenantId: number | undefined;
     c: string | undefined;
 }
 
@@ -83265,6 +87990,157 @@ export interface IRestaurantAreaDto {
     description: string | undefined;
     sortOrder: number;
     isActive: boolean;
+}
+
+export enum RestaurantAttendanceStatus {
+    Present = 0,
+    Late = 1,
+    Leave = 2,
+    Absent = 3,
+}
+
+export class RestaurantBillTenderDto implements IRestaurantBillTenderDto {
+    paymentMethod!: PaymentMethod;
+    paymentLedgerId!: string | undefined;
+    amount!: number;
+    receivedAmount!: number;
+    reference!: string | undefined;
+
+    constructor(data?: IRestaurantBillTenderDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.paymentMethod = _data["paymentMethod"];
+            this.paymentLedgerId = _data["paymentLedgerId"];
+            this.amount = _data["amount"];
+            this.receivedAmount = _data["receivedAmount"];
+            this.reference = _data["reference"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantBillTenderDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantBillTenderDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["paymentMethod"] = this.paymentMethod;
+        data["paymentLedgerId"] = this.paymentLedgerId;
+        data["amount"] = this.amount;
+        data["receivedAmount"] = this.receivedAmount;
+        data["reference"] = this.reference;
+        return data;
+    }
+}
+
+export interface IRestaurantBillTenderDto {
+    paymentMethod: PaymentMethod;
+    paymentLedgerId: string | undefined;
+    amount: number;
+    receivedAmount: number;
+    reference: string | undefined;
+}
+
+export class RestaurantCashShiftDto implements IRestaurantCashShiftDto {
+    id!: string;
+    registerName!: string | undefined;
+    openedByUserId!: number;
+    openedAt!: DateTime;
+    openingCash!: number;
+    expectedClosingCash!: number;
+    cashSales!: number;
+    cashIn!: number;
+    cashOut!: number;
+    isClosed!: boolean;
+    closedByUserId!: number | undefined;
+    closedAt!: DateTime | undefined;
+    countedClosingCash!: number | undefined;
+    cashVariance!: number | undefined;
+    closeNote!: string | undefined;
+
+    constructor(data?: IRestaurantCashShiftDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.registerName = _data["registerName"];
+            this.openedByUserId = _data["openedByUserId"];
+            this.openedAt = _data["openedAt"] ? DateTime.fromISO(_data["openedAt"].toString()) : undefined as any;
+            this.openingCash = _data["openingCash"];
+            this.expectedClosingCash = _data["expectedClosingCash"];
+            this.cashSales = _data["cashSales"];
+            this.cashIn = _data["cashIn"];
+            this.cashOut = _data["cashOut"];
+            this.isClosed = _data["isClosed"];
+            this.closedByUserId = _data["closedByUserId"];
+            this.closedAt = _data["closedAt"] ? DateTime.fromISO(_data["closedAt"].toString()) : undefined as any;
+            this.countedClosingCash = _data["countedClosingCash"];
+            this.cashVariance = _data["cashVariance"];
+            this.closeNote = _data["closeNote"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantCashShiftDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantCashShiftDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["registerName"] = this.registerName;
+        data["openedByUserId"] = this.openedByUserId;
+        data["openedAt"] = this.openedAt ? this.openedAt.toString() : undefined as any;
+        data["openingCash"] = this.openingCash;
+        data["expectedClosingCash"] = this.expectedClosingCash;
+        data["cashSales"] = this.cashSales;
+        data["cashIn"] = this.cashIn;
+        data["cashOut"] = this.cashOut;
+        data["isClosed"] = this.isClosed;
+        data["closedByUserId"] = this.closedByUserId;
+        data["closedAt"] = this.closedAt ? this.closedAt.toString() : undefined as any;
+        data["countedClosingCash"] = this.countedClosingCash;
+        data["cashVariance"] = this.cashVariance;
+        data["closeNote"] = this.closeNote;
+        return data;
+    }
+}
+
+export interface IRestaurantCashShiftDto {
+    id: string;
+    registerName: string | undefined;
+    openedByUserId: number;
+    openedAt: DateTime;
+    openingCash: number;
+    expectedClosingCash: number;
+    cashSales: number;
+    cashIn: number;
+    cashOut: number;
+    isClosed: boolean;
+    closedByUserId: number | undefined;
+    closedAt: DateTime | undefined;
+    countedClosingCash: number | undefined;
+    cashVariance: number | undefined;
+    closeNote: string | undefined;
 }
 
 export class RestaurantChangeDto implements IRestaurantChangeDto {
@@ -83956,6 +88832,8 @@ export class RestaurantCustomerOrderStatusDto implements IRestaurantCustomerOrde
     grandTotal!: number;
     createdAt!: DateTime;
     sentAt!: DateTime | undefined;
+    guestApprovalStatus!: RestaurantGuestOrderApprovalStatus;
+    guestRejectionReason!: string | undefined;
 
     constructor(data?: IRestaurantCustomerOrderStatusDto) {
         if (data) {
@@ -83974,6 +88852,8 @@ export class RestaurantCustomerOrderStatusDto implements IRestaurantCustomerOrde
             this.grandTotal = _data["grandTotal"];
             this.createdAt = _data["createdAt"] ? DateTime.fromISO(_data["createdAt"].toString()) : undefined as any;
             this.sentAt = _data["sentAt"] ? DateTime.fromISO(_data["sentAt"].toString()) : undefined as any;
+            this.guestApprovalStatus = _data["guestApprovalStatus"];
+            this.guestRejectionReason = _data["guestRejectionReason"];
         }
     }
 
@@ -83992,6 +88872,8 @@ export class RestaurantCustomerOrderStatusDto implements IRestaurantCustomerOrde
         data["grandTotal"] = this.grandTotal;
         data["createdAt"] = this.createdAt ? this.createdAt.toString() : undefined as any;
         data["sentAt"] = this.sentAt ? this.sentAt.toString() : undefined as any;
+        data["guestApprovalStatus"] = this.guestApprovalStatus;
+        data["guestRejectionReason"] = this.guestRejectionReason;
         return data;
     }
 }
@@ -84003,6 +88885,8 @@ export interface IRestaurantCustomerOrderStatusDto {
     grandTotal: number;
     createdAt: DateTime;
     sentAt: DateTime | undefined;
+    guestApprovalStatus: RestaurantGuestOrderApprovalStatus;
+    guestRejectionReason: string | undefined;
 }
 
 export enum RestaurantCustomerPaymentMode {
@@ -84142,6 +89026,106 @@ export interface IRestaurantCustomerQuoteLineDto {
     amount: number;
 }
 
+export class RestaurantDailyClosingDto implements IRestaurantDailyClosingDto {
+    businessDate!: DateTime;
+    periodStartUtc!: DateTime;
+    periodEndUtc!: DateTime;
+    sales!: number;
+    collected!: number;
+    unpaidBalance!: number;
+    discounts!: number;
+    voids!: number;
+    wastage!: number;
+    refunds!: number;
+    tips!: number;
+    collectionsByTender!: RestaurantDailyTenderTotalDto[] | undefined;
+    shifts!: RestaurantDailyShiftCloseDto[] | undefined;
+
+    constructor(data?: IRestaurantDailyClosingDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.businessDate = _data["businessDate"] ? DateTime.fromISO(_data["businessDate"].toString()) : undefined as any;
+            this.periodStartUtc = _data["periodStartUtc"] ? DateTime.fromISO(_data["periodStartUtc"].toString()) : undefined as any;
+            this.periodEndUtc = _data["periodEndUtc"] ? DateTime.fromISO(_data["periodEndUtc"].toString()) : undefined as any;
+            this.sales = _data["sales"];
+            this.collected = _data["collected"];
+            this.unpaidBalance = _data["unpaidBalance"];
+            this.discounts = _data["discounts"];
+            this.voids = _data["voids"];
+            this.wastage = _data["wastage"];
+            this.refunds = _data["refunds"];
+            this.tips = _data["tips"];
+            if (Array.isArray(_data["collectionsByTender"])) {
+                this.collectionsByTender = [] as any;
+                for (let item of _data["collectionsByTender"])
+                    this.collectionsByTender!.push(RestaurantDailyTenderTotalDto.fromJS(item));
+            }
+            if (Array.isArray(_data["shifts"])) {
+                this.shifts = [] as any;
+                for (let item of _data["shifts"])
+                    this.shifts!.push(RestaurantDailyShiftCloseDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RestaurantDailyClosingDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantDailyClosingDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["businessDate"] = this.businessDate ? this.businessDate.toString() : undefined as any;
+        data["periodStartUtc"] = this.periodStartUtc ? this.periodStartUtc.toString() : undefined as any;
+        data["periodEndUtc"] = this.periodEndUtc ? this.periodEndUtc.toString() : undefined as any;
+        data["sales"] = this.sales;
+        data["collected"] = this.collected;
+        data["unpaidBalance"] = this.unpaidBalance;
+        data["discounts"] = this.discounts;
+        data["voids"] = this.voids;
+        data["wastage"] = this.wastage;
+        data["refunds"] = this.refunds;
+        data["tips"] = this.tips;
+        if (Array.isArray(this.collectionsByTender)) {
+            data["collectionsByTender"] = [];
+            for (let item of this.collectionsByTender)
+                data["collectionsByTender"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.shifts)) {
+            data["shifts"] = [];
+            for (let item of this.shifts)
+                data["shifts"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IRestaurantDailyClosingDto {
+    businessDate: DateTime;
+    periodStartUtc: DateTime;
+    periodEndUtc: DateTime;
+    sales: number;
+    collected: number;
+    unpaidBalance: number;
+    discounts: number;
+    voids: number;
+    wastage: number;
+    refunds: number;
+    tips: number;
+    collectionsByTender: RestaurantDailyTenderTotalDto[] | undefined;
+    shifts: RestaurantDailyShiftCloseDto[] | undefined;
+}
+
 export class RestaurantDailySalesSummaryReportDto implements IRestaurantDailySalesSummaryReportDto {
     date!: DateTime;
     outletName!: string | undefined;
@@ -84220,6 +89204,118 @@ export interface IRestaurantDailySalesSummaryReportDto {
     netAmount: number;
     grandTotal: number;
     averageBill: number;
+}
+
+export class RestaurantDailyShiftCloseDto implements IRestaurantDailyShiftCloseDto {
+    shiftId!: string;
+    registerName!: string | undefined;
+    cashierUserId!: number;
+    openingCash!: number;
+    cashSales!: number;
+    cashIn!: number;
+    cashOut!: number;
+    expectedCash!: number;
+    countedCash!: number | undefined;
+    difference!: number | undefined;
+
+    constructor(data?: IRestaurantDailyShiftCloseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.shiftId = _data["shiftId"];
+            this.registerName = _data["registerName"];
+            this.cashierUserId = _data["cashierUserId"];
+            this.openingCash = _data["openingCash"];
+            this.cashSales = _data["cashSales"];
+            this.cashIn = _data["cashIn"];
+            this.cashOut = _data["cashOut"];
+            this.expectedCash = _data["expectedCash"];
+            this.countedCash = _data["countedCash"];
+            this.difference = _data["difference"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantDailyShiftCloseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantDailyShiftCloseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["shiftId"] = this.shiftId;
+        data["registerName"] = this.registerName;
+        data["cashierUserId"] = this.cashierUserId;
+        data["openingCash"] = this.openingCash;
+        data["cashSales"] = this.cashSales;
+        data["cashIn"] = this.cashIn;
+        data["cashOut"] = this.cashOut;
+        data["expectedCash"] = this.expectedCash;
+        data["countedCash"] = this.countedCash;
+        data["difference"] = this.difference;
+        return data;
+    }
+}
+
+export interface IRestaurantDailyShiftCloseDto {
+    shiftId: string;
+    registerName: string | undefined;
+    cashierUserId: number;
+    openingCash: number;
+    cashSales: number;
+    cashIn: number;
+    cashOut: number;
+    expectedCash: number;
+    countedCash: number | undefined;
+    difference: number | undefined;
+}
+
+export class RestaurantDailyTenderTotalDto implements IRestaurantDailyTenderTotalDto {
+    paymentMethod!: PaymentMethod;
+    amount!: number;
+
+    constructor(data?: IRestaurantDailyTenderTotalDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.paymentMethod = _data["paymentMethod"];
+            this.amount = _data["amount"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantDailyTenderTotalDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantDailyTenderTotalDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["paymentMethod"] = this.paymentMethod;
+        data["amount"] = this.amount;
+        return data;
+    }
+}
+
+export interface IRestaurantDailyTenderTotalDto {
+    paymentMethod: PaymentMethod;
+    amount: number;
 }
 
 export class RestaurantDeviceDto implements IRestaurantDeviceDto {
@@ -84379,6 +89475,61 @@ export interface IRestaurantDiscountReportDto {
     reason: string | undefined;
 }
 
+export enum RestaurantEmployeeLoginMode {
+    None = 0,
+    LinkExisting = 1,
+    CreateNew = 2,
+}
+
+export enum RestaurantEmploymentType {
+    Monthly = 0,
+    Hourly = 1,
+}
+
+export class RestaurantEnabledPaymentMethodDto implements IRestaurantEnabledPaymentMethodDto {
+    method!: PaymentMethod;
+    enabled!: boolean;
+    ledgerId!: string | undefined;
+
+    constructor(data?: IRestaurantEnabledPaymentMethodDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.method = _data["method"];
+            this.enabled = _data["enabled"];
+            this.ledgerId = _data["ledgerId"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantEnabledPaymentMethodDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantEnabledPaymentMethodDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["method"] = this.method;
+        data["enabled"] = this.enabled;
+        data["ledgerId"] = this.ledgerId;
+        return data;
+    }
+}
+
+export interface IRestaurantEnabledPaymentMethodDto {
+    method: PaymentMethod;
+    enabled: boolean;
+    ledgerId: string | undefined;
+}
+
 export enum RestaurantExternalOrderStatus {
     Received = 0,
     Accepted = 1,
@@ -84461,6 +89612,80 @@ export interface IRestaurantFoodCostingReportDto {
     wastageCostAmount: number;
     marginAmount: number;
     foodCostPercent: number;
+}
+
+export enum RestaurantGuestOrderApprovalStatus {
+    Pending = 0,
+    Approved = 1,
+    Rejected = 2,
+}
+
+export class RestaurantGuestOrderQueueDto implements IRestaurantGuestOrderQueueDto {
+    orderId!: string;
+    orderNo!: string | undefined;
+    tableId!: string;
+    tableName!: string | undefined;
+    createdAt!: DateTime;
+    grandTotal!: number;
+    lines!: RestaurantCustomerQuoteLineDto[] | undefined;
+
+    constructor(data?: IRestaurantGuestOrderQueueDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.orderId = _data["orderId"];
+            this.orderNo = _data["orderNo"];
+            this.tableId = _data["tableId"];
+            this.tableName = _data["tableName"];
+            this.createdAt = _data["createdAt"] ? DateTime.fromISO(_data["createdAt"].toString()) : undefined as any;
+            this.grandTotal = _data["grandTotal"];
+            if (Array.isArray(_data["lines"])) {
+                this.lines = [] as any;
+                for (let item of _data["lines"])
+                    this.lines!.push(RestaurantCustomerQuoteLineDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RestaurantGuestOrderQueueDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantGuestOrderQueueDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["orderId"] = this.orderId;
+        data["orderNo"] = this.orderNo;
+        data["tableId"] = this.tableId;
+        data["tableName"] = this.tableName;
+        data["createdAt"] = this.createdAt ? this.createdAt.toString() : undefined as any;
+        data["grandTotal"] = this.grandTotal;
+        if (Array.isArray(this.lines)) {
+            data["lines"] = [];
+            for (let item of this.lines)
+                data["lines"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IRestaurantGuestOrderQueueDto {
+    orderId: string;
+    orderNo: string | undefined;
+    tableId: string;
+    tableName: string | undefined;
+    createdAt: DateTime;
+    grandTotal: number;
+    lines: RestaurantCustomerQuoteLineDto[] | undefined;
 }
 
 export class RestaurantItemMarginReportDto implements IRestaurantItemMarginReportDto {
@@ -85439,6 +90664,58 @@ export interface IRestaurantModifierGroupDto {
     modifiers: RestaurantModifierDto[] | undefined;
 }
 
+export class RestaurantOperationStatusDto implements IRestaurantOperationStatusDto {
+    operationType!: string | undefined;
+    clientRequestId!: string | undefined;
+    status!: string | undefined;
+    entityId!: string | undefined;
+    resultJson!: string | undefined;
+
+    constructor(data?: IRestaurantOperationStatusDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.operationType = _data["operationType"];
+            this.clientRequestId = _data["clientRequestId"];
+            this.status = _data["status"];
+            this.entityId = _data["entityId"];
+            this.resultJson = _data["resultJson"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantOperationStatusDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantOperationStatusDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["operationType"] = this.operationType;
+        data["clientRequestId"] = this.clientRequestId;
+        data["status"] = this.status;
+        data["entityId"] = this.entityId;
+        data["resultJson"] = this.resultJson;
+        return data;
+    }
+}
+
+export interface IRestaurantOperationStatusDto {
+    operationType: string | undefined;
+    clientRequestId: string | undefined;
+    status: string | undefined;
+    entityId: string | undefined;
+    resultJson: string | undefined;
+}
+
 export class RestaurantOperationalSettingsDto implements IRestaurantOperationalSettingsDto {
     vatPercent!: number;
     serviceChargePercent!: number;
@@ -85920,6 +91197,50 @@ export enum RestaurantOrderItemStatus {
     Cancelled = 5,
 }
 
+export class RestaurantOrderMutationDto implements IRestaurantOrderMutationDto {
+    orderId!: string;
+    clientRequestId!: string | undefined;
+    expectedOrderVersion!: string | undefined;
+
+    constructor(data?: IRestaurantOrderMutationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.orderId = _data["orderId"];
+            this.clientRequestId = _data["clientRequestId"];
+            this.expectedOrderVersion = _data["expectedOrderVersion"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantOrderMutationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantOrderMutationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["orderId"] = this.orderId;
+        data["clientRequestId"] = this.clientRequestId;
+        data["expectedOrderVersion"] = this.expectedOrderVersion;
+        return data;
+    }
+}
+
+export interface IRestaurantOrderMutationDto {
+    orderId: string;
+    clientRequestId: string | undefined;
+    expectedOrderVersion: string | undefined;
+}
+
 export enum RestaurantOrderStatus {
     Draft = 0,
     SentToKitchen = 1,
@@ -85944,6 +91265,1436 @@ export enum RestaurantPayoutMatchStatus {
     Matched = 1,
     Unmatched = 2,
     Discrepancy = 3,
+}
+
+export class RestaurantPayrollAdjustmentDto implements IRestaurantPayrollAdjustmentDto {
+    employeeId!: string;
+    additionalAllowance!: number;
+    otherDeduction!: number;
+    advanceRecovery!: number;
+    taxDeduction!: number;
+    notes!: string | undefined;
+
+    constructor(data?: IRestaurantPayrollAdjustmentDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.employeeId = _data["employeeId"];
+            this.additionalAllowance = _data["additionalAllowance"];
+            this.otherDeduction = _data["otherDeduction"];
+            this.advanceRecovery = _data["advanceRecovery"];
+            this.taxDeduction = _data["taxDeduction"];
+            this.notes = _data["notes"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollAdjustmentDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollAdjustmentDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["employeeId"] = this.employeeId;
+        data["additionalAllowance"] = this.additionalAllowance;
+        data["otherDeduction"] = this.otherDeduction;
+        data["advanceRecovery"] = this.advanceRecovery;
+        data["taxDeduction"] = this.taxDeduction;
+        data["notes"] = this.notes;
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollAdjustmentDto {
+    employeeId: string;
+    additionalAllowance: number;
+    otherDeduction: number;
+    advanceRecovery: number;
+    taxDeduction: number;
+    notes: string | undefined;
+}
+
+export class RestaurantPayrollAllowanceHistoryDto implements IRestaurantPayrollAllowanceHistoryDto {
+    id!: string;
+    employeeId!: string;
+    amount!: number;
+    effectiveFrom!: DateTime;
+    effectiveFromMiti!: string | undefined;
+    reason!: string | undefined;
+    createdAt!: DateTime;
+    createdByUserId!: number | undefined;
+
+    constructor(data?: IRestaurantPayrollAllowanceHistoryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.employeeId = _data["employeeId"];
+            this.amount = _data["amount"];
+            this.effectiveFrom = _data["effectiveFrom"] ? DateTime.fromISO(_data["effectiveFrom"].toString()) : undefined as any;
+            this.effectiveFromMiti = _data["effectiveFromMiti"];
+            this.reason = _data["reason"];
+            this.createdAt = _data["createdAt"] ? DateTime.fromISO(_data["createdAt"].toString()) : undefined as any;
+            this.createdByUserId = _data["createdByUserId"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollAllowanceHistoryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollAllowanceHistoryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["employeeId"] = this.employeeId;
+        data["amount"] = this.amount;
+        data["effectiveFrom"] = this.effectiveFrom ? this.effectiveFrom.toString() : undefined as any;
+        data["effectiveFromMiti"] = this.effectiveFromMiti;
+        data["reason"] = this.reason;
+        data["createdAt"] = this.createdAt ? this.createdAt.toString() : undefined as any;
+        data["createdByUserId"] = this.createdByUserId;
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollAllowanceHistoryDto {
+    id: string;
+    employeeId: string;
+    amount: number;
+    effectiveFrom: DateTime;
+    effectiveFromMiti: string | undefined;
+    reason: string | undefined;
+    createdAt: DateTime;
+    createdByUserId: number | undefined;
+}
+
+export class RestaurantPayrollAttendanceDto implements IRestaurantPayrollAttendanceDto {
+    id!: string;
+    employeeId!: string;
+    employeeName!: string | undefined;
+    staffCode!: string | undefined;
+    workDate!: DateTime;
+    clockIn!: DateTime | undefined;
+    clockOut!: DateTime | undefined;
+    breakMinutes!: number;
+    regularHours!: number;
+    overtimeHours!: number;
+    status!: RestaurantAttendanceStatus;
+    shiftName!: string | undefined;
+    notes!: string | undefined;
+
+    constructor(data?: IRestaurantPayrollAttendanceDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.employeeId = _data["employeeId"];
+            this.employeeName = _data["employeeName"];
+            this.staffCode = _data["staffCode"];
+            this.workDate = _data["workDate"] ? DateTime.fromISO(_data["workDate"].toString()) : undefined as any;
+            this.clockIn = _data["clockIn"] ? DateTime.fromISO(_data["clockIn"].toString()) : undefined as any;
+            this.clockOut = _data["clockOut"] ? DateTime.fromISO(_data["clockOut"].toString()) : undefined as any;
+            this.breakMinutes = _data["breakMinutes"];
+            this.regularHours = _data["regularHours"];
+            this.overtimeHours = _data["overtimeHours"];
+            this.status = _data["status"];
+            this.shiftName = _data["shiftName"];
+            this.notes = _data["notes"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollAttendanceDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollAttendanceDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["employeeId"] = this.employeeId;
+        data["employeeName"] = this.employeeName;
+        data["staffCode"] = this.staffCode;
+        data["workDate"] = this.workDate ? this.workDate.toString() : undefined as any;
+        data["clockIn"] = this.clockIn ? this.clockIn.toString() : undefined as any;
+        data["clockOut"] = this.clockOut ? this.clockOut.toString() : undefined as any;
+        data["breakMinutes"] = this.breakMinutes;
+        data["regularHours"] = this.regularHours;
+        data["overtimeHours"] = this.overtimeHours;
+        data["status"] = this.status;
+        data["shiftName"] = this.shiftName;
+        data["notes"] = this.notes;
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollAttendanceDto {
+    id: string;
+    employeeId: string;
+    employeeName: string | undefined;
+    staffCode: string | undefined;
+    workDate: DateTime;
+    clockIn: DateTime | undefined;
+    clockOut: DateTime | undefined;
+    breakMinutes: number;
+    regularHours: number;
+    overtimeHours: number;
+    status: RestaurantAttendanceStatus;
+    shiftName: string | undefined;
+    notes: string | undefined;
+}
+
+export class RestaurantPayrollAttendanceStatusReportDto implements IRestaurantPayrollAttendanceStatusReportDto {
+    status!: RestaurantAttendanceStatus;
+    statusName!: string | undefined;
+    recordCount!: number;
+    regularHours!: number;
+    overtimeHours!: number;
+
+    constructor(data?: IRestaurantPayrollAttendanceStatusReportDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.status = _data["status"];
+            this.statusName = _data["statusName"];
+            this.recordCount = _data["recordCount"];
+            this.regularHours = _data["regularHours"];
+            this.overtimeHours = _data["overtimeHours"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollAttendanceStatusReportDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollAttendanceStatusReportDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["status"] = this.status;
+        data["statusName"] = this.statusName;
+        data["recordCount"] = this.recordCount;
+        data["regularHours"] = this.regularHours;
+        data["overtimeHours"] = this.overtimeHours;
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollAttendanceStatusReportDto {
+    status: RestaurantAttendanceStatus;
+    statusName: string | undefined;
+    recordCount: number;
+    regularHours: number;
+    overtimeHours: number;
+}
+
+export class RestaurantPayrollClockDto implements IRestaurantPayrollClockDto {
+    employeeId!: string | undefined;
+    at!: DateTime | undefined;
+    shiftName!: string | undefined;
+    breakMinutes!: number;
+
+    constructor(data?: IRestaurantPayrollClockDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.employeeId = _data["employeeId"];
+            this.at = _data["at"] ? DateTime.fromISO(_data["at"].toString()) : undefined as any;
+            this.shiftName = _data["shiftName"];
+            this.breakMinutes = _data["breakMinutes"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollClockDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollClockDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["employeeId"] = this.employeeId;
+        data["at"] = this.at ? this.at.toString() : undefined as any;
+        data["shiftName"] = this.shiftName;
+        data["breakMinutes"] = this.breakMinutes;
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollClockDto {
+    employeeId: string | undefined;
+    at: DateTime | undefined;
+    shiftName: string | undefined;
+    breakMinutes: number;
+}
+
+export class RestaurantPayrollDashboardDto implements IRestaurantPayrollDashboardDto {
+    activeEmployeeCount!: number;
+    presentToday!: number;
+    openClockIns!: number;
+    currentMonthGross!: number;
+    currentMonthNet!: number;
+    myProfile!: RestaurantPayrollEmployeeDto;
+    myTodayAttendance!: RestaurantPayrollAttendanceDto;
+    recentRuns!: RestaurantPayrollRunDto[] | undefined;
+    myRecentPayslips!: RestaurantPayrollLineDto[] | undefined;
+
+    constructor(data?: IRestaurantPayrollDashboardDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.activeEmployeeCount = _data["activeEmployeeCount"];
+            this.presentToday = _data["presentToday"];
+            this.openClockIns = _data["openClockIns"];
+            this.currentMonthGross = _data["currentMonthGross"];
+            this.currentMonthNet = _data["currentMonthNet"];
+            this.myProfile = _data["myProfile"] ? RestaurantPayrollEmployeeDto.fromJS(_data["myProfile"]) : undefined as any;
+            this.myTodayAttendance = _data["myTodayAttendance"] ? RestaurantPayrollAttendanceDto.fromJS(_data["myTodayAttendance"]) : undefined as any;
+            if (Array.isArray(_data["recentRuns"])) {
+                this.recentRuns = [] as any;
+                for (let item of _data["recentRuns"])
+                    this.recentRuns!.push(RestaurantPayrollRunDto.fromJS(item));
+            }
+            if (Array.isArray(_data["myRecentPayslips"])) {
+                this.myRecentPayslips = [] as any;
+                for (let item of _data["myRecentPayslips"])
+                    this.myRecentPayslips!.push(RestaurantPayrollLineDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollDashboardDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollDashboardDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["activeEmployeeCount"] = this.activeEmployeeCount;
+        data["presentToday"] = this.presentToday;
+        data["openClockIns"] = this.openClockIns;
+        data["currentMonthGross"] = this.currentMonthGross;
+        data["currentMonthNet"] = this.currentMonthNet;
+        data["myProfile"] = this.myProfile ? this.myProfile.toJSON() : undefined as any;
+        data["myTodayAttendance"] = this.myTodayAttendance ? this.myTodayAttendance.toJSON() : undefined as any;
+        if (Array.isArray(this.recentRuns)) {
+            data["recentRuns"] = [];
+            for (let item of this.recentRuns)
+                data["recentRuns"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.myRecentPayslips)) {
+            data["myRecentPayslips"] = [];
+            for (let item of this.myRecentPayslips)
+                data["myRecentPayslips"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollDashboardDto {
+    activeEmployeeCount: number;
+    presentToday: number;
+    openClockIns: number;
+    currentMonthGross: number;
+    currentMonthNet: number;
+    myProfile: RestaurantPayrollEmployeeDto;
+    myTodayAttendance: RestaurantPayrollAttendanceDto;
+    recentRuns: RestaurantPayrollRunDto[] | undefined;
+    myRecentPayslips: RestaurantPayrollLineDto[] | undefined;
+}
+
+export class RestaurantPayrollDepartmentDto implements IRestaurantPayrollDepartmentDto {
+    id!: string;
+    name!: string | undefined;
+    description!: string | undefined;
+    sortOrder!: number;
+    isActive!: boolean;
+
+    constructor(data?: IRestaurantPayrollDepartmentDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.sortOrder = _data["sortOrder"];
+            this.isActive = _data["isActive"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollDepartmentDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollDepartmentDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["sortOrder"] = this.sortOrder;
+        data["isActive"] = this.isActive;
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollDepartmentDto {
+    id: string;
+    name: string | undefined;
+    description: string | undefined;
+    sortOrder: number;
+    isActive: boolean;
+}
+
+export class RestaurantPayrollEmployeeCostReportDto implements IRestaurantPayrollEmployeeCostReportDto {
+    employeeId!: string;
+    employeeName!: string | undefined;
+    staffCode!: string | undefined;
+    jobRole!: string | undefined;
+    workedHours!: number;
+    overtimeHours!: number;
+    basicPay!: number;
+    allowance!: number;
+    tipsAndServiceCharge!: number;
+    grossPay!: number;
+    totalDeduction!: number;
+    netPay!: number;
+
+    constructor(data?: IRestaurantPayrollEmployeeCostReportDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.employeeId = _data["employeeId"];
+            this.employeeName = _data["employeeName"];
+            this.staffCode = _data["staffCode"];
+            this.jobRole = _data["jobRole"];
+            this.workedHours = _data["workedHours"];
+            this.overtimeHours = _data["overtimeHours"];
+            this.basicPay = _data["basicPay"];
+            this.allowance = _data["allowance"];
+            this.tipsAndServiceCharge = _data["tipsAndServiceCharge"];
+            this.grossPay = _data["grossPay"];
+            this.totalDeduction = _data["totalDeduction"];
+            this.netPay = _data["netPay"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollEmployeeCostReportDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollEmployeeCostReportDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["employeeId"] = this.employeeId;
+        data["employeeName"] = this.employeeName;
+        data["staffCode"] = this.staffCode;
+        data["jobRole"] = this.jobRole;
+        data["workedHours"] = this.workedHours;
+        data["overtimeHours"] = this.overtimeHours;
+        data["basicPay"] = this.basicPay;
+        data["allowance"] = this.allowance;
+        data["tipsAndServiceCharge"] = this.tipsAndServiceCharge;
+        data["grossPay"] = this.grossPay;
+        data["totalDeduction"] = this.totalDeduction;
+        data["netPay"] = this.netPay;
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollEmployeeCostReportDto {
+    employeeId: string;
+    employeeName: string | undefined;
+    staffCode: string | undefined;
+    jobRole: string | undefined;
+    workedHours: number;
+    overtimeHours: number;
+    basicPay: number;
+    allowance: number;
+    tipsAndServiceCharge: number;
+    grossPay: number;
+    totalDeduction: number;
+    netPay: number;
+}
+
+export class RestaurantPayrollEmployeeDto implements IRestaurantPayrollEmployeeDto {
+    id!: string;
+    userId!: number | undefined;
+    loginUserName!: string | undefined;
+    loginEmailAddress!: string | undefined;
+    loginPhoneNumber!: string | undefined;
+    restaurantRoleName!: string | undefined;
+    loginIsActive!: boolean | undefined;
+    loginManagedByRestaurant!: boolean;
+    staffCode!: string | undefined;
+    name!: string | undefined;
+    phoneNumber!: string | undefined;
+    emailAddress!: string | undefined;
+    dateOfBirth!: DateTime | undefined;
+    dateOfBirthMiti!: string | undefined;
+    gender!: string | undefined;
+    bloodGroup!: string | undefined;
+    maritalStatus!: string | undefined;
+    address!: string | undefined;
+    citizenshipNumber!: string | undefined;
+    emergencyContactName!: string | undefined;
+    emergencyContactPhone!: string | undefined;
+    departmentId!: string;
+    jobRoleId!: string;
+    jobRole!: string | undefined;
+    department!: string | undefined;
+    employmentType!: RestaurantEmploymentType;
+    basicSalary!: number;
+    hourlyRate!: number;
+    overtimeRate!: number;
+    fixedAllowance!: number;
+    fixedDeduction!: number;
+    serviceChargeWeight!: number;
+    bankName!: string | undefined;
+    bankAccountNumber!: string | undefined;
+    panNumber!: string | undefined;
+    ssfNumber!: string | undefined;
+    joinedOn!: DateTime;
+    joinedOnMiti!: string | undefined;
+    notes!: string | undefined;
+    isActive!: boolean;
+
+    constructor(data?: IRestaurantPayrollEmployeeDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.userId = _data["userId"];
+            this.loginUserName = _data["loginUserName"];
+            this.loginEmailAddress = _data["loginEmailAddress"];
+            this.loginPhoneNumber = _data["loginPhoneNumber"];
+            this.restaurantRoleName = _data["restaurantRoleName"];
+            this.loginIsActive = _data["loginIsActive"];
+            this.loginManagedByRestaurant = _data["loginManagedByRestaurant"];
+            this.staffCode = _data["staffCode"];
+            this.name = _data["name"];
+            this.phoneNumber = _data["phoneNumber"];
+            this.emailAddress = _data["emailAddress"];
+            this.dateOfBirth = _data["dateOfBirth"] ? DateTime.fromISO(_data["dateOfBirth"].toString()) : undefined as any;
+            this.dateOfBirthMiti = _data["dateOfBirthMiti"];
+            this.gender = _data["gender"];
+            this.bloodGroup = _data["bloodGroup"];
+            this.maritalStatus = _data["maritalStatus"];
+            this.address = _data["address"];
+            this.citizenshipNumber = _data["citizenshipNumber"];
+            this.emergencyContactName = _data["emergencyContactName"];
+            this.emergencyContactPhone = _data["emergencyContactPhone"];
+            this.departmentId = _data["departmentId"];
+            this.jobRoleId = _data["jobRoleId"];
+            this.jobRole = _data["jobRole"];
+            this.department = _data["department"];
+            this.employmentType = _data["employmentType"];
+            this.basicSalary = _data["basicSalary"];
+            this.hourlyRate = _data["hourlyRate"];
+            this.overtimeRate = _data["overtimeRate"];
+            this.fixedAllowance = _data["fixedAllowance"];
+            this.fixedDeduction = _data["fixedDeduction"];
+            this.serviceChargeWeight = _data["serviceChargeWeight"];
+            this.bankName = _data["bankName"];
+            this.bankAccountNumber = _data["bankAccountNumber"];
+            this.panNumber = _data["panNumber"];
+            this.ssfNumber = _data["ssfNumber"];
+            this.joinedOn = _data["joinedOn"] ? DateTime.fromISO(_data["joinedOn"].toString()) : undefined as any;
+            this.joinedOnMiti = _data["joinedOnMiti"];
+            this.notes = _data["notes"];
+            this.isActive = _data["isActive"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollEmployeeDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollEmployeeDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["userId"] = this.userId;
+        data["loginUserName"] = this.loginUserName;
+        data["loginEmailAddress"] = this.loginEmailAddress;
+        data["loginPhoneNumber"] = this.loginPhoneNumber;
+        data["restaurantRoleName"] = this.restaurantRoleName;
+        data["loginIsActive"] = this.loginIsActive;
+        data["loginManagedByRestaurant"] = this.loginManagedByRestaurant;
+        data["staffCode"] = this.staffCode;
+        data["name"] = this.name;
+        data["phoneNumber"] = this.phoneNumber;
+        data["emailAddress"] = this.emailAddress;
+        data["dateOfBirth"] = this.dateOfBirth ? this.dateOfBirth.toString() : undefined as any;
+        data["dateOfBirthMiti"] = this.dateOfBirthMiti;
+        data["gender"] = this.gender;
+        data["bloodGroup"] = this.bloodGroup;
+        data["maritalStatus"] = this.maritalStatus;
+        data["address"] = this.address;
+        data["citizenshipNumber"] = this.citizenshipNumber;
+        data["emergencyContactName"] = this.emergencyContactName;
+        data["emergencyContactPhone"] = this.emergencyContactPhone;
+        data["departmentId"] = this.departmentId;
+        data["jobRoleId"] = this.jobRoleId;
+        data["jobRole"] = this.jobRole;
+        data["department"] = this.department;
+        data["employmentType"] = this.employmentType;
+        data["basicSalary"] = this.basicSalary;
+        data["hourlyRate"] = this.hourlyRate;
+        data["overtimeRate"] = this.overtimeRate;
+        data["fixedAllowance"] = this.fixedAllowance;
+        data["fixedDeduction"] = this.fixedDeduction;
+        data["serviceChargeWeight"] = this.serviceChargeWeight;
+        data["bankName"] = this.bankName;
+        data["bankAccountNumber"] = this.bankAccountNumber;
+        data["panNumber"] = this.panNumber;
+        data["ssfNumber"] = this.ssfNumber;
+        data["joinedOn"] = this.joinedOn ? this.joinedOn.toString() : undefined as any;
+        data["joinedOnMiti"] = this.joinedOnMiti;
+        data["notes"] = this.notes;
+        data["isActive"] = this.isActive;
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollEmployeeDto {
+    id: string;
+    userId: number | undefined;
+    loginUserName: string | undefined;
+    loginEmailAddress: string | undefined;
+    loginPhoneNumber: string | undefined;
+    restaurantRoleName: string | undefined;
+    loginIsActive: boolean | undefined;
+    loginManagedByRestaurant: boolean;
+    staffCode: string | undefined;
+    name: string | undefined;
+    phoneNumber: string | undefined;
+    emailAddress: string | undefined;
+    dateOfBirth: DateTime | undefined;
+    dateOfBirthMiti: string | undefined;
+    gender: string | undefined;
+    bloodGroup: string | undefined;
+    maritalStatus: string | undefined;
+    address: string | undefined;
+    citizenshipNumber: string | undefined;
+    emergencyContactName: string | undefined;
+    emergencyContactPhone: string | undefined;
+    departmentId: string;
+    jobRoleId: string;
+    jobRole: string | undefined;
+    department: string | undefined;
+    employmentType: RestaurantEmploymentType;
+    basicSalary: number;
+    hourlyRate: number;
+    overtimeRate: number;
+    fixedAllowance: number;
+    fixedDeduction: number;
+    serviceChargeWeight: number;
+    bankName: string | undefined;
+    bankAccountNumber: string | undefined;
+    panNumber: string | undefined;
+    ssfNumber: string | undefined;
+    joinedOn: DateTime;
+    joinedOnMiti: string | undefined;
+    notes: string | undefined;
+    isActive: boolean;
+}
+
+export class RestaurantPayrollEmployeeSaveResultDto implements IRestaurantPayrollEmployeeSaveResultDto {
+    employeeId!: string;
+    userId!: number | undefined;
+    userName!: string | undefined;
+    temporaryPassword!: string | undefined;
+
+    constructor(data?: IRestaurantPayrollEmployeeSaveResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.employeeId = _data["employeeId"];
+            this.userId = _data["userId"];
+            this.userName = _data["userName"];
+            this.temporaryPassword = _data["temporaryPassword"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollEmployeeSaveResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollEmployeeSaveResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["employeeId"] = this.employeeId;
+        data["userId"] = this.userId;
+        data["userName"] = this.userName;
+        data["temporaryPassword"] = this.temporaryPassword;
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollEmployeeSaveResultDto {
+    employeeId: string;
+    userId: number | undefined;
+    userName: string | undefined;
+    temporaryPassword: string | undefined;
+}
+
+export class RestaurantPayrollJobRoleDto implements IRestaurantPayrollJobRoleDto {
+    id!: string;
+    departmentId!: string;
+    name!: string | undefined;
+    description!: string | undefined;
+    sortOrder!: number;
+    isActive!: boolean;
+
+    constructor(data?: IRestaurantPayrollJobRoleDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.departmentId = _data["departmentId"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.sortOrder = _data["sortOrder"];
+            this.isActive = _data["isActive"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollJobRoleDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollJobRoleDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["departmentId"] = this.departmentId;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["sortOrder"] = this.sortOrder;
+        data["isActive"] = this.isActive;
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollJobRoleDto {
+    id: string;
+    departmentId: string;
+    name: string | undefined;
+    description: string | undefined;
+    sortOrder: number;
+    isActive: boolean;
+}
+
+export class RestaurantPayrollLineDto implements IRestaurantPayrollLineDto {
+    id!: string;
+    employeeId!: string;
+    employeeName!: string | undefined;
+    staffCode!: string | undefined;
+    jobRole!: string | undefined;
+    employmentType!: RestaurantEmploymentType;
+    workedHours!: number;
+    overtimeHours!: number;
+    basicPay!: number;
+    overtimePay!: number;
+    allowance!: number;
+    tipsShare!: number;
+    serviceChargeShare!: number;
+    grossPay!: number;
+    taxDeduction!: number;
+    otherDeduction!: number;
+    advanceRecovery!: number;
+    netPay!: number;
+    notes!: string | undefined;
+    runNumber!: string | undefined;
+    periodStart!: DateTime | undefined;
+    periodEnd!: DateTime | undefined;
+    runStatus!: RestaurantPayrollRunStatus;
+
+    constructor(data?: IRestaurantPayrollLineDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.employeeId = _data["employeeId"];
+            this.employeeName = _data["employeeName"];
+            this.staffCode = _data["staffCode"];
+            this.jobRole = _data["jobRole"];
+            this.employmentType = _data["employmentType"];
+            this.workedHours = _data["workedHours"];
+            this.overtimeHours = _data["overtimeHours"];
+            this.basicPay = _data["basicPay"];
+            this.overtimePay = _data["overtimePay"];
+            this.allowance = _data["allowance"];
+            this.tipsShare = _data["tipsShare"];
+            this.serviceChargeShare = _data["serviceChargeShare"];
+            this.grossPay = _data["grossPay"];
+            this.taxDeduction = _data["taxDeduction"];
+            this.otherDeduction = _data["otherDeduction"];
+            this.advanceRecovery = _data["advanceRecovery"];
+            this.netPay = _data["netPay"];
+            this.notes = _data["notes"];
+            this.runNumber = _data["runNumber"];
+            this.periodStart = _data["periodStart"] ? DateTime.fromISO(_data["periodStart"].toString()) : undefined as any;
+            this.periodEnd = _data["periodEnd"] ? DateTime.fromISO(_data["periodEnd"].toString()) : undefined as any;
+            this.runStatus = _data["runStatus"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollLineDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollLineDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["employeeId"] = this.employeeId;
+        data["employeeName"] = this.employeeName;
+        data["staffCode"] = this.staffCode;
+        data["jobRole"] = this.jobRole;
+        data["employmentType"] = this.employmentType;
+        data["workedHours"] = this.workedHours;
+        data["overtimeHours"] = this.overtimeHours;
+        data["basicPay"] = this.basicPay;
+        data["overtimePay"] = this.overtimePay;
+        data["allowance"] = this.allowance;
+        data["tipsShare"] = this.tipsShare;
+        data["serviceChargeShare"] = this.serviceChargeShare;
+        data["grossPay"] = this.grossPay;
+        data["taxDeduction"] = this.taxDeduction;
+        data["otherDeduction"] = this.otherDeduction;
+        data["advanceRecovery"] = this.advanceRecovery;
+        data["netPay"] = this.netPay;
+        data["notes"] = this.notes;
+        data["runNumber"] = this.runNumber;
+        data["periodStart"] = this.periodStart ? this.periodStart.toString() : undefined as any;
+        data["periodEnd"] = this.periodEnd ? this.periodEnd.toString() : undefined as any;
+        data["runStatus"] = this.runStatus;
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollLineDto {
+    id: string;
+    employeeId: string;
+    employeeName: string | undefined;
+    staffCode: string | undefined;
+    jobRole: string | undefined;
+    employmentType: RestaurantEmploymentType;
+    workedHours: number;
+    overtimeHours: number;
+    basicPay: number;
+    overtimePay: number;
+    allowance: number;
+    tipsShare: number;
+    serviceChargeShare: number;
+    grossPay: number;
+    taxDeduction: number;
+    otherDeduction: number;
+    advanceRecovery: number;
+    netPay: number;
+    notes: string | undefined;
+    runNumber: string | undefined;
+    periodStart: DateTime | undefined;
+    periodEnd: DateTime | undefined;
+    runStatus: RestaurantPayrollRunStatus;
+}
+
+export class RestaurantPayrollReportBundleDto implements IRestaurantPayrollReportBundleDto {
+    summary!: RestaurantPayrollReportSummaryDto;
+    runs!: RestaurantPayrollRunDto[] | undefined;
+    employeeCosts!: RestaurantPayrollEmployeeCostReportDto[] | undefined;
+    attendance!: RestaurantPayrollAttendanceStatusReportDto[] | undefined;
+
+    constructor(data?: IRestaurantPayrollReportBundleDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.summary = _data["summary"] ? RestaurantPayrollReportSummaryDto.fromJS(_data["summary"]) : undefined as any;
+            if (Array.isArray(_data["runs"])) {
+                this.runs = [] as any;
+                for (let item of _data["runs"])
+                    this.runs!.push(RestaurantPayrollRunDto.fromJS(item));
+            }
+            if (Array.isArray(_data["employeeCosts"])) {
+                this.employeeCosts = [] as any;
+                for (let item of _data["employeeCosts"])
+                    this.employeeCosts!.push(RestaurantPayrollEmployeeCostReportDto.fromJS(item));
+            }
+            if (Array.isArray(_data["attendance"])) {
+                this.attendance = [] as any;
+                for (let item of _data["attendance"])
+                    this.attendance!.push(RestaurantPayrollAttendanceStatusReportDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollReportBundleDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollReportBundleDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["summary"] = this.summary ? this.summary.toJSON() : undefined as any;
+        if (Array.isArray(this.runs)) {
+            data["runs"] = [];
+            for (let item of this.runs)
+                data["runs"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.employeeCosts)) {
+            data["employeeCosts"] = [];
+            for (let item of this.employeeCosts)
+                data["employeeCosts"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.attendance)) {
+            data["attendance"] = [];
+            for (let item of this.attendance)
+                data["attendance"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollReportBundleDto {
+    summary: RestaurantPayrollReportSummaryDto;
+    runs: RestaurantPayrollRunDto[] | undefined;
+    employeeCosts: RestaurantPayrollEmployeeCostReportDto[] | undefined;
+    attendance: RestaurantPayrollAttendanceStatusReportDto[] | undefined;
+}
+
+export class RestaurantPayrollReportSummaryDto implements IRestaurantPayrollReportSummaryDto {
+    activeEmployeeCount!: number;
+    payrollRunCount!: number;
+    attendanceRecordCount!: number;
+    totalGross!: number;
+    totalDeduction!: number;
+    totalNet!: number;
+    totalOvertimeHours!: number;
+
+    constructor(data?: IRestaurantPayrollReportSummaryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.activeEmployeeCount = _data["activeEmployeeCount"];
+            this.payrollRunCount = _data["payrollRunCount"];
+            this.attendanceRecordCount = _data["attendanceRecordCount"];
+            this.totalGross = _data["totalGross"];
+            this.totalDeduction = _data["totalDeduction"];
+            this.totalNet = _data["totalNet"];
+            this.totalOvertimeHours = _data["totalOvertimeHours"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollReportSummaryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollReportSummaryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["activeEmployeeCount"] = this.activeEmployeeCount;
+        data["payrollRunCount"] = this.payrollRunCount;
+        data["attendanceRecordCount"] = this.attendanceRecordCount;
+        data["totalGross"] = this.totalGross;
+        data["totalDeduction"] = this.totalDeduction;
+        data["totalNet"] = this.totalNet;
+        data["totalOvertimeHours"] = this.totalOvertimeHours;
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollReportSummaryDto {
+    activeEmployeeCount: number;
+    payrollRunCount: number;
+    attendanceRecordCount: number;
+    totalGross: number;
+    totalDeduction: number;
+    totalNet: number;
+    totalOvertimeHours: number;
+}
+
+export class RestaurantPayrollRunDetailDto implements IRestaurantPayrollRunDetailDto {
+    id!: string;
+    runNumber!: string | undefined;
+    periodStart!: DateTime;
+    periodEnd!: DateTime;
+    status!: RestaurantPayrollRunStatus;
+    tipsPool!: number;
+    serviceChargePool!: number;
+    totalGross!: number;
+    totalDeduction!: number;
+    totalNet!: number;
+    notes!: string | undefined;
+    createdAt!: DateTime;
+    employeeCount!: number;
+    lines!: RestaurantPayrollLineDto[] | undefined;
+
+    constructor(data?: IRestaurantPayrollRunDetailDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.runNumber = _data["runNumber"];
+            this.periodStart = _data["periodStart"] ? DateTime.fromISO(_data["periodStart"].toString()) : undefined as any;
+            this.periodEnd = _data["periodEnd"] ? DateTime.fromISO(_data["periodEnd"].toString()) : undefined as any;
+            this.status = _data["status"];
+            this.tipsPool = _data["tipsPool"];
+            this.serviceChargePool = _data["serviceChargePool"];
+            this.totalGross = _data["totalGross"];
+            this.totalDeduction = _data["totalDeduction"];
+            this.totalNet = _data["totalNet"];
+            this.notes = _data["notes"];
+            this.createdAt = _data["createdAt"] ? DateTime.fromISO(_data["createdAt"].toString()) : undefined as any;
+            this.employeeCount = _data["employeeCount"];
+            if (Array.isArray(_data["lines"])) {
+                this.lines = [] as any;
+                for (let item of _data["lines"])
+                    this.lines!.push(RestaurantPayrollLineDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollRunDetailDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollRunDetailDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["runNumber"] = this.runNumber;
+        data["periodStart"] = this.periodStart ? this.periodStart.toString() : undefined as any;
+        data["periodEnd"] = this.periodEnd ? this.periodEnd.toString() : undefined as any;
+        data["status"] = this.status;
+        data["tipsPool"] = this.tipsPool;
+        data["serviceChargePool"] = this.serviceChargePool;
+        data["totalGross"] = this.totalGross;
+        data["totalDeduction"] = this.totalDeduction;
+        data["totalNet"] = this.totalNet;
+        data["notes"] = this.notes;
+        data["createdAt"] = this.createdAt ? this.createdAt.toString() : undefined as any;
+        data["employeeCount"] = this.employeeCount;
+        if (Array.isArray(this.lines)) {
+            data["lines"] = [];
+            for (let item of this.lines)
+                data["lines"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollRunDetailDto {
+    id: string;
+    runNumber: string | undefined;
+    periodStart: DateTime;
+    periodEnd: DateTime;
+    status: RestaurantPayrollRunStatus;
+    tipsPool: number;
+    serviceChargePool: number;
+    totalGross: number;
+    totalDeduction: number;
+    totalNet: number;
+    notes: string | undefined;
+    createdAt: DateTime;
+    employeeCount: number;
+    lines: RestaurantPayrollLineDto[] | undefined;
+}
+
+export class RestaurantPayrollRunDto implements IRestaurantPayrollRunDto {
+    id!: string;
+    runNumber!: string | undefined;
+    periodStart!: DateTime;
+    periodEnd!: DateTime;
+    status!: RestaurantPayrollRunStatus;
+    tipsPool!: number;
+    serviceChargePool!: number;
+    totalGross!: number;
+    totalDeduction!: number;
+    totalNet!: number;
+    notes!: string | undefined;
+    createdAt!: DateTime;
+    employeeCount!: number;
+
+    constructor(data?: IRestaurantPayrollRunDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.runNumber = _data["runNumber"];
+            this.periodStart = _data["periodStart"] ? DateTime.fromISO(_data["periodStart"].toString()) : undefined as any;
+            this.periodEnd = _data["periodEnd"] ? DateTime.fromISO(_data["periodEnd"].toString()) : undefined as any;
+            this.status = _data["status"];
+            this.tipsPool = _data["tipsPool"];
+            this.serviceChargePool = _data["serviceChargePool"];
+            this.totalGross = _data["totalGross"];
+            this.totalDeduction = _data["totalDeduction"];
+            this.totalNet = _data["totalNet"];
+            this.notes = _data["notes"];
+            this.createdAt = _data["createdAt"] ? DateTime.fromISO(_data["createdAt"].toString()) : undefined as any;
+            this.employeeCount = _data["employeeCount"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollRunDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollRunDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["runNumber"] = this.runNumber;
+        data["periodStart"] = this.periodStart ? this.periodStart.toString() : undefined as any;
+        data["periodEnd"] = this.periodEnd ? this.periodEnd.toString() : undefined as any;
+        data["status"] = this.status;
+        data["tipsPool"] = this.tipsPool;
+        data["serviceChargePool"] = this.serviceChargePool;
+        data["totalGross"] = this.totalGross;
+        data["totalDeduction"] = this.totalDeduction;
+        data["totalNet"] = this.totalNet;
+        data["notes"] = this.notes;
+        data["createdAt"] = this.createdAt ? this.createdAt.toString() : undefined as any;
+        data["employeeCount"] = this.employeeCount;
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollRunDto {
+    id: string;
+    runNumber: string | undefined;
+    periodStart: DateTime;
+    periodEnd: DateTime;
+    status: RestaurantPayrollRunStatus;
+    tipsPool: number;
+    serviceChargePool: number;
+    totalGross: number;
+    totalDeduction: number;
+    totalNet: number;
+    notes: string | undefined;
+    createdAt: DateTime;
+    employeeCount: number;
+}
+
+export enum RestaurantPayrollRunStatus {
+    Draft = 0,
+    Approved = 1,
+    Paid = 2,
+}
+
+export class RestaurantPayrollStaffAccessOptionsDto implements IRestaurantPayrollStaffAccessOptionsDto {
+    roles!: RestaurantRoleOptionDto[] | undefined;
+    availableUsers!: RestaurantPayrollUserLookupDto[] | undefined;
+
+    constructor(data?: IRestaurantPayrollStaffAccessOptionsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["roles"])) {
+                this.roles = [] as any;
+                for (let item of _data["roles"])
+                    this.roles!.push(RestaurantRoleOptionDto.fromJS(item));
+            }
+            if (Array.isArray(_data["availableUsers"])) {
+                this.availableUsers = [] as any;
+                for (let item of _data["availableUsers"])
+                    this.availableUsers!.push(RestaurantPayrollUserLookupDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollStaffAccessOptionsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollStaffAccessOptionsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.roles)) {
+            data["roles"] = [];
+            for (let item of this.roles)
+                data["roles"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.availableUsers)) {
+            data["availableUsers"] = [];
+            for (let item of this.availableUsers)
+                data["availableUsers"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollStaffAccessOptionsDto {
+    roles: RestaurantRoleOptionDto[] | undefined;
+    availableUsers: RestaurantPayrollUserLookupDto[] | undefined;
+}
+
+export class RestaurantPayrollStaffMastersDto implements IRestaurantPayrollStaffMastersDto {
+    departments!: RestaurantPayrollDepartmentDto[] | undefined;
+    jobRoles!: RestaurantPayrollJobRoleDto[] | undefined;
+
+    constructor(data?: IRestaurantPayrollStaffMastersDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["departments"])) {
+                this.departments = [] as any;
+                for (let item of _data["departments"])
+                    this.departments!.push(RestaurantPayrollDepartmentDto.fromJS(item));
+            }
+            if (Array.isArray(_data["jobRoles"])) {
+                this.jobRoles = [] as any;
+                for (let item of _data["jobRoles"])
+                    this.jobRoles!.push(RestaurantPayrollJobRoleDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollStaffMastersDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollStaffMastersDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.departments)) {
+            data["departments"] = [];
+            for (let item of this.departments)
+                data["departments"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.jobRoles)) {
+            data["jobRoles"] = [];
+            for (let item of this.jobRoles)
+                data["jobRoles"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollStaffMastersDto {
+    departments: RestaurantPayrollDepartmentDto[] | undefined;
+    jobRoles: RestaurantPayrollJobRoleDto[] | undefined;
+}
+
+export class RestaurantPayrollUserLookupDto implements IRestaurantPayrollUserLookupDto {
+    id!: number;
+    userName!: string | undefined;
+    name!: string | undefined;
+    emailAddress!: string | undefined;
+    phoneNumber!: string | undefined;
+    restaurantRoleName!: string | undefined;
+    isActive!: boolean;
+
+    constructor(data?: IRestaurantPayrollUserLookupDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.userName = _data["userName"];
+            this.name = _data["name"];
+            this.emailAddress = _data["emailAddress"];
+            this.phoneNumber = _data["phoneNumber"];
+            this.restaurantRoleName = _data["restaurantRoleName"];
+            this.isActive = _data["isActive"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantPayrollUserLookupDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPayrollUserLookupDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["userName"] = this.userName;
+        data["name"] = this.name;
+        data["emailAddress"] = this.emailAddress;
+        data["phoneNumber"] = this.phoneNumber;
+        data["restaurantRoleName"] = this.restaurantRoleName;
+        data["isActive"] = this.isActive;
+        return data;
+    }
+}
+
+export interface IRestaurantPayrollUserLookupDto {
+    id: number;
+    userName: string | undefined;
+    name: string | undefined;
+    emailAddress: string | undefined;
+    phoneNumber: string | undefined;
+    restaurantRoleName: string | undefined;
+    isActive: boolean;
 }
 
 export class RestaurantPosSalesSummaryDto implements IRestaurantPosSalesSummaryDto {
@@ -86004,6 +92755,291 @@ export interface IRestaurantPosSalesSummaryDto {
     netAmount: number;
     grandTotal: number;
     averageBill: number;
+}
+
+export class RestaurantPrintDeliveryDto implements IRestaurantPrintDeliveryDto {
+    id!: string;
+    deviceId!: string;
+    deviceName!: string | undefined;
+    platform!: string | undefined;
+    routeName!: string | undefined;
+    status!: RestaurantPrintJobStatus;
+    attempts!: number;
+    lastError!: string | undefined;
+    printedAtUtc!: DateTime | undefined;
+
+    constructor(data?: IRestaurantPrintDeliveryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.deviceId = _data["deviceId"];
+            this.deviceName = _data["deviceName"];
+            this.platform = _data["platform"];
+            this.routeName = _data["routeName"];
+            this.status = _data["status"];
+            this.attempts = _data["attempts"];
+            this.lastError = _data["lastError"];
+            this.printedAtUtc = _data["printedAtUtc"] ? DateTime.fromISO(_data["printedAtUtc"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): RestaurantPrintDeliveryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPrintDeliveryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["deviceId"] = this.deviceId;
+        data["deviceName"] = this.deviceName;
+        data["platform"] = this.platform;
+        data["routeName"] = this.routeName;
+        data["status"] = this.status;
+        data["attempts"] = this.attempts;
+        data["lastError"] = this.lastError;
+        data["printedAtUtc"] = this.printedAtUtc ? this.printedAtUtc.toString() : undefined as any;
+        return data;
+    }
+}
+
+export interface IRestaurantPrintDeliveryDto {
+    id: string;
+    deviceId: string;
+    deviceName: string | undefined;
+    platform: string | undefined;
+    routeName: string | undefined;
+    status: RestaurantPrintJobStatus;
+    attempts: number;
+    lastError: string | undefined;
+    printedAtUtc: DateTime | undefined;
+}
+
+export class RestaurantPrintDeviceDto implements IRestaurantPrintDeviceDto {
+    id!: string;
+    clientDeviceId!: string | undefined;
+    name!: string | undefined;
+    platform!: string | undefined;
+    isEnabled!: boolean;
+    lastSeenAtUtc!: DateTime;
+    routeNames!: string[] | undefined;
+
+    constructor(data?: IRestaurantPrintDeviceDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.clientDeviceId = _data["clientDeviceId"];
+            this.name = _data["name"];
+            this.platform = _data["platform"];
+            this.isEnabled = _data["isEnabled"];
+            this.lastSeenAtUtc = _data["lastSeenAtUtc"] ? DateTime.fromISO(_data["lastSeenAtUtc"].toString()) : undefined as any;
+            if (Array.isArray(_data["routeNames"])) {
+                this.routeNames = [] as any;
+                for (let item of _data["routeNames"])
+                    this.routeNames!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): RestaurantPrintDeviceDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPrintDeviceDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["clientDeviceId"] = this.clientDeviceId;
+        data["name"] = this.name;
+        data["platform"] = this.platform;
+        data["isEnabled"] = this.isEnabled;
+        data["lastSeenAtUtc"] = this.lastSeenAtUtc ? this.lastSeenAtUtc.toString() : undefined as any;
+        if (Array.isArray(this.routeNames)) {
+            data["routeNames"] = [];
+            for (let item of this.routeNames)
+                data["routeNames"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IRestaurantPrintDeviceDto {
+    id: string;
+    clientDeviceId: string | undefined;
+    name: string | undefined;
+    platform: string | undefined;
+    isEnabled: boolean;
+    lastSeenAtUtc: DateTime;
+    routeNames: string[] | undefined;
+}
+
+export class RestaurantPrintJobDto implements IRestaurantPrintJobDto {
+    id!: string;
+    deliveryId!: string | undefined;
+    leaseToken!: string | undefined;
+    externalJobId!: string | undefined;
+    type!: RestaurantPrintJobType;
+    routeName!: string | undefined;
+    payloadBase64!: string | undefined;
+    agentJobId!: string | undefined;
+    status!: RestaurantPrintJobStatus;
+    lastError!: string | undefined;
+    attempts!: number;
+    reprintReason!: string | undefined;
+    deliveries!: RestaurantPrintDeliveryDto[] | undefined;
+
+    constructor(data?: IRestaurantPrintJobDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.deliveryId = _data["deliveryId"];
+            this.leaseToken = _data["leaseToken"];
+            this.externalJobId = _data["externalJobId"];
+            this.type = _data["type"];
+            this.routeName = _data["routeName"];
+            this.payloadBase64 = _data["payloadBase64"];
+            this.agentJobId = _data["agentJobId"];
+            this.status = _data["status"];
+            this.lastError = _data["lastError"];
+            this.attempts = _data["attempts"];
+            this.reprintReason = _data["reprintReason"];
+            if (Array.isArray(_data["deliveries"])) {
+                this.deliveries = [] as any;
+                for (let item of _data["deliveries"])
+                    this.deliveries!.push(RestaurantPrintDeliveryDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RestaurantPrintJobDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPrintJobDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["deliveryId"] = this.deliveryId;
+        data["leaseToken"] = this.leaseToken;
+        data["externalJobId"] = this.externalJobId;
+        data["type"] = this.type;
+        data["routeName"] = this.routeName;
+        data["payloadBase64"] = this.payloadBase64;
+        data["agentJobId"] = this.agentJobId;
+        data["status"] = this.status;
+        data["lastError"] = this.lastError;
+        data["attempts"] = this.attempts;
+        data["reprintReason"] = this.reprintReason;
+        if (Array.isArray(this.deliveries)) {
+            data["deliveries"] = [];
+            for (let item of this.deliveries)
+                data["deliveries"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IRestaurantPrintJobDto {
+    id: string;
+    deliveryId: string | undefined;
+    leaseToken: string | undefined;
+    externalJobId: string | undefined;
+    type: RestaurantPrintJobType;
+    routeName: string | undefined;
+    payloadBase64: string | undefined;
+    agentJobId: string | undefined;
+    status: RestaurantPrintJobStatus;
+    lastError: string | undefined;
+    attempts: number;
+    reprintReason: string | undefined;
+    deliveries: RestaurantPrintDeliveryDto[] | undefined;
+}
+
+export enum RestaurantPrintJobStatus {
+    Pending = 0,
+    Leased = 1,
+    Printed = 2,
+    Failed = 3,
+    Cancelled = 4,
+}
+
+export enum RestaurantPrintJobType {
+    KitchenTicket = 0,
+    BillReceipt = 1,
+}
+
+export class RestaurantPrintRouteDto implements IRestaurantPrintRouteDto {
+    name!: string | undefined;
+    displayName!: string | undefined;
+    isActive!: boolean;
+
+    constructor(data?: IRestaurantPrintRouteDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.displayName = _data["displayName"];
+            this.isActive = _data["isActive"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantPrintRouteDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantPrintRouteDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["displayName"] = this.displayName;
+        data["isActive"] = this.isActive;
+        return data;
+    }
+}
+
+export interface IRestaurantPrintRouteDto {
+    name: string | undefined;
+    displayName: string | undefined;
+    isActive: boolean;
 }
 
 export class RestaurantRecipeCostDto implements IRestaurantRecipeCostDto {
@@ -86354,6 +93390,469 @@ export interface IRestaurantRecipeLineDto {
     isActive: boolean;
 }
 
+export class RestaurantRefundDto implements IRestaurantRefundDto {
+    id!: string;
+    salesMasterId!: string;
+    salesReturnMasterId!: string | undefined;
+    tipSalesReturnMasterId!: string | undefined;
+    creditNoteSalesReturnMasterId!: string | undefined;
+    status!: string | undefined;
+    reason!: string | undefined;
+    itemRefundAmount!: number;
+    tipRefundAmount!: number;
+    creditNoteAmount!: number;
+    payoutAmount!: number;
+    settledAmount!: number;
+    approvedAt!: DateTime;
+    settledAt!: DateTime | undefined;
+    tenders!: RestaurantRefundTenderDto[] | undefined;
+
+    constructor(data?: IRestaurantRefundDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.salesMasterId = _data["salesMasterId"];
+            this.salesReturnMasterId = _data["salesReturnMasterId"];
+            this.tipSalesReturnMasterId = _data["tipSalesReturnMasterId"];
+            this.creditNoteSalesReturnMasterId = _data["creditNoteSalesReturnMasterId"];
+            this.status = _data["status"];
+            this.reason = _data["reason"];
+            this.itemRefundAmount = _data["itemRefundAmount"];
+            this.tipRefundAmount = _data["tipRefundAmount"];
+            this.creditNoteAmount = _data["creditNoteAmount"];
+            this.payoutAmount = _data["payoutAmount"];
+            this.settledAmount = _data["settledAmount"];
+            this.approvedAt = _data["approvedAt"] ? DateTime.fromISO(_data["approvedAt"].toString()) : undefined as any;
+            this.settledAt = _data["settledAt"] ? DateTime.fromISO(_data["settledAt"].toString()) : undefined as any;
+            if (Array.isArray(_data["tenders"])) {
+                this.tenders = [] as any;
+                for (let item of _data["tenders"])
+                    this.tenders!.push(RestaurantRefundTenderDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RestaurantRefundDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantRefundDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["salesMasterId"] = this.salesMasterId;
+        data["salesReturnMasterId"] = this.salesReturnMasterId;
+        data["tipSalesReturnMasterId"] = this.tipSalesReturnMasterId;
+        data["creditNoteSalesReturnMasterId"] = this.creditNoteSalesReturnMasterId;
+        data["status"] = this.status;
+        data["reason"] = this.reason;
+        data["itemRefundAmount"] = this.itemRefundAmount;
+        data["tipRefundAmount"] = this.tipRefundAmount;
+        data["creditNoteAmount"] = this.creditNoteAmount;
+        data["payoutAmount"] = this.payoutAmount;
+        data["settledAmount"] = this.settledAmount;
+        data["approvedAt"] = this.approvedAt ? this.approvedAt.toString() : undefined as any;
+        data["settledAt"] = this.settledAt ? this.settledAt.toString() : undefined as any;
+        if (Array.isArray(this.tenders)) {
+            data["tenders"] = [];
+            for (let item of this.tenders)
+                data["tenders"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IRestaurantRefundDto {
+    id: string;
+    salesMasterId: string;
+    salesReturnMasterId: string | undefined;
+    tipSalesReturnMasterId: string | undefined;
+    creditNoteSalesReturnMasterId: string | undefined;
+    status: string | undefined;
+    reason: string | undefined;
+    itemRefundAmount: number;
+    tipRefundAmount: number;
+    creditNoteAmount: number;
+    payoutAmount: number;
+    settledAmount: number;
+    approvedAt: DateTime;
+    settledAt: DateTime | undefined;
+    tenders: RestaurantRefundTenderDto[] | undefined;
+}
+
+export class RestaurantRefundPayoutDto implements IRestaurantRefundPayoutDto {
+    refundTenderId!: string;
+    amount!: number;
+    reference!: string | undefined;
+
+    constructor(data?: IRestaurantRefundPayoutDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.refundTenderId = _data["refundTenderId"];
+            this.amount = _data["amount"];
+            this.reference = _data["reference"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantRefundPayoutDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantRefundPayoutDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["refundTenderId"] = this.refundTenderId;
+        data["amount"] = this.amount;
+        data["reference"] = this.reference;
+        return data;
+    }
+}
+
+export interface IRestaurantRefundPayoutDto {
+    refundTenderId: string;
+    amount: number;
+    reference: string | undefined;
+}
+
+export class RestaurantRefundTenderDto implements IRestaurantRefundTenderDto {
+    id!: string;
+    paymentMethod!: PaymentMethod;
+    paymentLedgerId!: string;
+    allocatedAmount!: number;
+    settledAmount!: number;
+
+    constructor(data?: IRestaurantRefundTenderDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.paymentMethod = _data["paymentMethod"];
+            this.paymentLedgerId = _data["paymentLedgerId"];
+            this.allocatedAmount = _data["allocatedAmount"];
+            this.settledAmount = _data["settledAmount"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantRefundTenderDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantRefundTenderDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["paymentMethod"] = this.paymentMethod;
+        data["paymentLedgerId"] = this.paymentLedgerId;
+        data["allocatedAmount"] = this.allocatedAmount;
+        data["settledAmount"] = this.settledAmount;
+        return data;
+    }
+}
+
+export interface IRestaurantRefundTenderDto {
+    id: string;
+    paymentMethod: PaymentMethod;
+    paymentLedgerId: string;
+    allocatedAmount: number;
+    settledAmount: number;
+}
+
+export class RestaurantReleaseCapabilitiesDto implements IRestaurantReleaseCapabilitiesDto {
+    mixedTenderEnabled!: boolean;
+    refundsEnabled!: boolean;
+    orderVersionChecksEnabled!: boolean;
+    androidDraftRecoveryEnabled!: boolean;
+    supportsRefundSettlement!: boolean;
+    supportsOrderVersioning!: boolean;
+    refundPayableLedgerId!: string | undefined;
+    cardLedgerId!: string | undefined;
+    qrLedgerId!: string | undefined;
+    paymentMethods!: RestaurantEnabledPaymentMethodDto[] | undefined;
+
+    constructor(data?: IRestaurantReleaseCapabilitiesDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.mixedTenderEnabled = _data["mixedTenderEnabled"];
+            this.refundsEnabled = _data["refundsEnabled"];
+            this.orderVersionChecksEnabled = _data["orderVersionChecksEnabled"];
+            this.androidDraftRecoveryEnabled = _data["androidDraftRecoveryEnabled"];
+            this.supportsRefundSettlement = _data["supportsRefundSettlement"];
+            this.supportsOrderVersioning = _data["supportsOrderVersioning"];
+            this.refundPayableLedgerId = _data["refundPayableLedgerId"];
+            this.cardLedgerId = _data["cardLedgerId"];
+            this.qrLedgerId = _data["qrLedgerId"];
+            if (Array.isArray(_data["paymentMethods"])) {
+                this.paymentMethods = [] as any;
+                for (let item of _data["paymentMethods"])
+                    this.paymentMethods!.push(RestaurantEnabledPaymentMethodDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RestaurantReleaseCapabilitiesDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantReleaseCapabilitiesDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["mixedTenderEnabled"] = this.mixedTenderEnabled;
+        data["refundsEnabled"] = this.refundsEnabled;
+        data["orderVersionChecksEnabled"] = this.orderVersionChecksEnabled;
+        data["androidDraftRecoveryEnabled"] = this.androidDraftRecoveryEnabled;
+        data["supportsRefundSettlement"] = this.supportsRefundSettlement;
+        data["supportsOrderVersioning"] = this.supportsOrderVersioning;
+        data["refundPayableLedgerId"] = this.refundPayableLedgerId;
+        data["cardLedgerId"] = this.cardLedgerId;
+        data["qrLedgerId"] = this.qrLedgerId;
+        if (Array.isArray(this.paymentMethods)) {
+            data["paymentMethods"] = [];
+            for (let item of this.paymentMethods)
+                data["paymentMethods"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IRestaurantReleaseCapabilitiesDto {
+    mixedTenderEnabled: boolean;
+    refundsEnabled: boolean;
+    orderVersionChecksEnabled: boolean;
+    androidDraftRecoveryEnabled: boolean;
+    supportsRefundSettlement: boolean;
+    supportsOrderVersioning: boolean;
+    refundPayableLedgerId: string | undefined;
+    cardLedgerId: string | undefined;
+    qrLedgerId: string | undefined;
+    paymentMethods: RestaurantEnabledPaymentMethodDto[] | undefined;
+}
+
+export class RestaurantReservationDto implements IRestaurantReservationDto {
+    id!: string;
+    status!: RestaurantReservationStatus;
+    isWalkIn!: boolean;
+    guestName!: string | undefined;
+    phoneNumber!: string | undefined;
+    notes!: string | undefined;
+    partySize!: number;
+    startsAt!: DateTime;
+    endsAt!: DateTime;
+    tableId!: string | undefined;
+    tableName!: string | undefined;
+    createdAt!: DateTime;
+    smsStatus!: string | undefined;
+
+    constructor(data?: IRestaurantReservationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.status = _data["status"];
+            this.isWalkIn = _data["isWalkIn"];
+            this.guestName = _data["guestName"];
+            this.phoneNumber = _data["phoneNumber"];
+            this.notes = _data["notes"];
+            this.partySize = _data["partySize"];
+            this.startsAt = _data["startsAt"] ? DateTime.fromISO(_data["startsAt"].toString()) : undefined as any;
+            this.endsAt = _data["endsAt"] ? DateTime.fromISO(_data["endsAt"].toString()) : undefined as any;
+            this.tableId = _data["tableId"];
+            this.tableName = _data["tableName"];
+            this.createdAt = _data["createdAt"] ? DateTime.fromISO(_data["createdAt"].toString()) : undefined as any;
+            this.smsStatus = _data["smsStatus"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantReservationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantReservationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["status"] = this.status;
+        data["isWalkIn"] = this.isWalkIn;
+        data["guestName"] = this.guestName;
+        data["phoneNumber"] = this.phoneNumber;
+        data["notes"] = this.notes;
+        data["partySize"] = this.partySize;
+        data["startsAt"] = this.startsAt ? this.startsAt.toString() : undefined as any;
+        data["endsAt"] = this.endsAt ? this.endsAt.toString() : undefined as any;
+        data["tableId"] = this.tableId;
+        data["tableName"] = this.tableName;
+        data["createdAt"] = this.createdAt ? this.createdAt.toString() : undefined as any;
+        data["smsStatus"] = this.smsStatus;
+        return data;
+    }
+}
+
+export interface IRestaurantReservationDto {
+    id: string;
+    status: RestaurantReservationStatus;
+    isWalkIn: boolean;
+    guestName: string | undefined;
+    phoneNumber: string | undefined;
+    notes: string | undefined;
+    partySize: number;
+    startsAt: DateTime;
+    endsAt: DateTime;
+    tableId: string | undefined;
+    tableName: string | undefined;
+    createdAt: DateTime;
+    smsStatus: string | undefined;
+}
+
+export enum RestaurantReservationStatus {
+    Requested = 0,
+    Confirmed = 1,
+    Declined = 2,
+    Waitlisted = 3,
+    Seated = 4,
+    Cancelled = 5,
+    Completed = 6,
+    NoShow = 7,
+}
+
+export class RestaurantReservationStatusDto implements IRestaurantReservationStatusDto {
+    id!: string;
+    status!: RestaurantReservationStatus;
+    startsAt!: DateTime;
+    endsAt!: DateTime;
+    tableName!: string | undefined;
+
+    constructor(data?: IRestaurantReservationStatusDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.status = _data["status"];
+            this.startsAt = _data["startsAt"] ? DateTime.fromISO(_data["startsAt"].toString()) : undefined as any;
+            this.endsAt = _data["endsAt"] ? DateTime.fromISO(_data["endsAt"].toString()) : undefined as any;
+            this.tableName = _data["tableName"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantReservationStatusDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantReservationStatusDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["status"] = this.status;
+        data["startsAt"] = this.startsAt ? this.startsAt.toString() : undefined as any;
+        data["endsAt"] = this.endsAt ? this.endsAt.toString() : undefined as any;
+        data["tableName"] = this.tableName;
+        return data;
+    }
+}
+
+export interface IRestaurantReservationStatusDto {
+    id: string;
+    status: RestaurantReservationStatus;
+    startsAt: DateTime;
+    endsAt: DateTime;
+    tableName: string | undefined;
+}
+
+export class RestaurantRoleOptionDto implements IRestaurantRoleOptionDto {
+    name!: string | undefined;
+    displayName!: string | undefined;
+
+    constructor(data?: IRestaurantRoleOptionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.displayName = _data["displayName"];
+        }
+    }
+
+    static fromJS(data: any): RestaurantRoleOptionDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantRoleOptionDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["displayName"] = this.displayName;
+        return data;
+    }
+}
+
+export interface IRestaurantRoleOptionDto {
+    name: string | undefined;
+    displayName: string | undefined;
+}
+
 export class RestaurantSettlementReportDto implements IRestaurantSettlementReportDto {
     paymentMethod!: number;
     paymentMethodName!: string | undefined;
@@ -86432,6 +93931,115 @@ export interface IRestaurantSettlementReportDto {
     tipAmount: number;
     cashReceivedAmount: number;
     changeAmount: number;
+}
+
+export class RestaurantSetupCheckDto implements IRestaurantSetupCheckDto {
+    key!: string | undefined;
+    label!: string | undefined;
+    isReady!: boolean;
+    details!: string | undefined;
+    completedByUserId!: number | undefined;
+    completedAt!: DateTime | undefined;
+
+    constructor(data?: IRestaurantSetupCheckDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.key = _data["key"];
+            this.label = _data["label"];
+            this.isReady = _data["isReady"];
+            this.details = _data["details"];
+            this.completedByUserId = _data["completedByUserId"];
+            this.completedAt = _data["completedAt"] ? DateTime.fromISO(_data["completedAt"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): RestaurantSetupCheckDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantSetupCheckDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["key"] = this.key;
+        data["label"] = this.label;
+        data["isReady"] = this.isReady;
+        data["details"] = this.details;
+        data["completedByUserId"] = this.completedByUserId;
+        data["completedAt"] = this.completedAt ? this.completedAt.toString() : undefined as any;
+        return data;
+    }
+}
+
+export interface IRestaurantSetupCheckDto {
+    key: string | undefined;
+    label: string | undefined;
+    isReady: boolean;
+    details: string | undefined;
+    completedByUserId: number | undefined;
+    completedAt: DateTime | undefined;
+}
+
+export enum RestaurantSetupCheckKey {
+    TestReceipt = 0,
+    TestKitchenTicket = 1,
+}
+
+export class RestaurantSetupReadinessDto implements IRestaurantSetupReadinessDto {
+    isReady!: boolean;
+    checks!: RestaurantSetupCheckDto[] | undefined;
+
+    constructor(data?: IRestaurantSetupReadinessDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.isReady = _data["isReady"];
+            if (Array.isArray(_data["checks"])) {
+                this.checks = [] as any;
+                for (let item of _data["checks"])
+                    this.checks!.push(RestaurantSetupCheckDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): RestaurantSetupReadinessDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantSetupReadinessDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isReady"] = this.isReady;
+        if (Array.isArray(this.checks)) {
+            data["checks"] = [];
+            for (let item of this.checks)
+                data["checks"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IRestaurantSetupReadinessDto {
+    isReady: boolean;
+    checks: RestaurantSetupCheckDto[] | undefined;
 }
 
 export class RestaurantStationDto implements IRestaurantStationDto {
@@ -86826,6 +94434,8 @@ export class RestaurantTableDto implements IRestaurantTableDto {
     isActive!: boolean;
     areaId!: string;
     areaName!: string | undefined;
+    hasQrCode!: boolean;
+    qrTokenUpdatedAt!: DateTime | undefined;
 
     constructor(data?: IRestaurantTableDto) {
         if (data) {
@@ -86847,6 +94457,8 @@ export class RestaurantTableDto implements IRestaurantTableDto {
             this.isActive = _data["isActive"];
             this.areaId = _data["areaId"];
             this.areaName = _data["areaName"];
+            this.hasQrCode = _data["hasQrCode"];
+            this.qrTokenUpdatedAt = _data["qrTokenUpdatedAt"] ? DateTime.fromISO(_data["qrTokenUpdatedAt"].toString()) : undefined as any;
         }
     }
 
@@ -86868,6 +94480,8 @@ export class RestaurantTableDto implements IRestaurantTableDto {
         data["isActive"] = this.isActive;
         data["areaId"] = this.areaId;
         data["areaName"] = this.areaName;
+        data["hasQrCode"] = this.hasQrCode;
+        data["qrTokenUpdatedAt"] = this.qrTokenUpdatedAt ? this.qrTokenUpdatedAt.toString() : undefined as any;
         return data;
     }
 }
@@ -86882,6 +94496,60 @@ export interface IRestaurantTableDto {
     isActive: boolean;
     areaId: string;
     areaName: string | undefined;
+    hasQrCode: boolean;
+    qrTokenUpdatedAt: DateTime | undefined;
+}
+
+export class RestaurantTableQrDto implements IRestaurantTableQrDto {
+    tableId!: string;
+    tableName!: string | undefined;
+    url!: string | undefined;
+    pngBase64!: string | undefined;
+    updatedAt!: DateTime | undefined;
+
+    constructor(data?: IRestaurantTableQrDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tableId = _data["tableId"];
+            this.tableName = _data["tableName"];
+            this.url = _data["url"];
+            this.pngBase64 = _data["pngBase64"];
+            this.updatedAt = _data["updatedAt"] ? DateTime.fromISO(_data["updatedAt"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): RestaurantTableQrDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RestaurantTableQrDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["tableId"] = this.tableId;
+        data["tableName"] = this.tableName;
+        data["url"] = this.url;
+        data["pngBase64"] = this.pngBase64;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toString() : undefined as any;
+        return data;
+    }
+}
+
+export interface IRestaurantTableQrDto {
+    tableId: string;
+    tableName: string | undefined;
+    url: string | undefined;
+    pngBase64: string | undefined;
+    updatedAt: DateTime | undefined;
 }
 
 export class RestaurantTableSalesReportDto implements IRestaurantTableSalesReportDto {
@@ -87611,11 +95279,95 @@ export interface IRestaurantWastageReportDto {
     userName: string | undefined;
 }
 
+export class RetryRestaurantPrintJobDto implements IRetryRestaurantPrintJobDto {
+    jobId!: string;
+    deliveryId!: string | undefined;
+
+    constructor(data?: IRetryRestaurantPrintJobDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.jobId = _data["jobId"];
+            this.deliveryId = _data["deliveryId"];
+        }
+    }
+
+    static fromJS(data: any): RetryRestaurantPrintJobDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new RetryRestaurantPrintJobDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["jobId"] = this.jobId;
+        data["deliveryId"] = this.deliveryId;
+        return data;
+    }
+}
+
+export interface IRetryRestaurantPrintJobDto {
+    jobId: string;
+    deliveryId: string | undefined;
+}
+
 export enum ReturnType {
     PartyWise = 0,
     ProductWise = 1,
     RateDifference = 2,
     NA = 3,
+}
+
+export class ReviewRestaurantGuestOrderDto implements IReviewRestaurantGuestOrderDto {
+    orderId!: string;
+    approve!: boolean;
+    rejectionReason!: string | undefined;
+
+    constructor(data?: IReviewRestaurantGuestOrderDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.orderId = _data["orderId"];
+            this.approve = _data["approve"];
+            this.rejectionReason = _data["rejectionReason"];
+        }
+    }
+
+    static fromJS(data: any): ReviewRestaurantGuestOrderDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ReviewRestaurantGuestOrderDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["orderId"] = this.orderId;
+        data["approve"] = this.approve;
+        data["rejectionReason"] = this.rejectionReason;
+        return data;
+    }
+}
+
+export interface IReviewRestaurantGuestOrderDto {
+    orderId: string;
+    approve: boolean;
+    rejectionReason: string | undefined;
 }
 
 export class RoleEditDto implements IRoleEditDto {
@@ -88144,6 +95896,54 @@ export enum SalesModeType {
     DeliveryNote = 2,
     Quotation = 3,
     ServiceDelivery = 4,
+}
+
+export class SalesPaymentAllocationDto implements ISalesPaymentAllocationDto {
+    paymentMethod!: PaymentMethod;
+    paymentLedgerId!: string | undefined;
+    amount!: number;
+    reference!: string | undefined;
+
+    constructor(data?: ISalesPaymentAllocationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.paymentMethod = _data["paymentMethod"];
+            this.paymentLedgerId = _data["paymentLedgerId"];
+            this.amount = _data["amount"];
+            this.reference = _data["reference"];
+        }
+    }
+
+    static fromJS(data: any): SalesPaymentAllocationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SalesPaymentAllocationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["paymentMethod"] = this.paymentMethod;
+        data["paymentLedgerId"] = this.paymentLedgerId;
+        data["amount"] = this.amount;
+        data["reference"] = this.reference;
+        return data;
+    }
+}
+
+export interface ISalesPaymentAllocationDto {
+    paymentMethod: PaymentMethod;
+    paymentLedgerId: string | undefined;
+    amount: number;
+    reference: string | undefined;
 }
 
 export class SalesProductTableDto implements ISalesProductTableDto {
@@ -88902,6 +96702,234 @@ export interface ISaveRestaurantMenuItemTagsDto {
     tags: RestaurantMenuItemTagDto[] | undefined;
 }
 
+export class SaveRestaurantPayrollAttendanceDto implements ISaveRestaurantPayrollAttendanceDto {
+    id!: string | undefined;
+    employeeId!: string;
+    workDate!: DateTime;
+    clockIn!: DateTime | undefined;
+    clockOut!: DateTime | undefined;
+    breakMinutes!: number;
+    regularHours!: number | undefined;
+    overtimeHours!: number | undefined;
+    status!: RestaurantAttendanceStatus;
+    shiftName!: string | undefined;
+    notes!: string | undefined;
+
+    constructor(data?: ISaveRestaurantPayrollAttendanceDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.employeeId = _data["employeeId"];
+            this.workDate = _data["workDate"] ? DateTime.fromISO(_data["workDate"].toString()) : undefined as any;
+            this.clockIn = _data["clockIn"] ? DateTime.fromISO(_data["clockIn"].toString()) : undefined as any;
+            this.clockOut = _data["clockOut"] ? DateTime.fromISO(_data["clockOut"].toString()) : undefined as any;
+            this.breakMinutes = _data["breakMinutes"];
+            this.regularHours = _data["regularHours"];
+            this.overtimeHours = _data["overtimeHours"];
+            this.status = _data["status"];
+            this.shiftName = _data["shiftName"];
+            this.notes = _data["notes"];
+        }
+    }
+
+    static fromJS(data: any): SaveRestaurantPayrollAttendanceDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SaveRestaurantPayrollAttendanceDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["employeeId"] = this.employeeId;
+        data["workDate"] = this.workDate ? this.workDate.toString() : undefined as any;
+        data["clockIn"] = this.clockIn ? this.clockIn.toString() : undefined as any;
+        data["clockOut"] = this.clockOut ? this.clockOut.toString() : undefined as any;
+        data["breakMinutes"] = this.breakMinutes;
+        data["regularHours"] = this.regularHours;
+        data["overtimeHours"] = this.overtimeHours;
+        data["status"] = this.status;
+        data["shiftName"] = this.shiftName;
+        data["notes"] = this.notes;
+        return data;
+    }
+}
+
+export interface ISaveRestaurantPayrollAttendanceDto {
+    id: string | undefined;
+    employeeId: string;
+    workDate: DateTime;
+    clockIn: DateTime | undefined;
+    clockOut: DateTime | undefined;
+    breakMinutes: number;
+    regularHours: number | undefined;
+    overtimeHours: number | undefined;
+    status: RestaurantAttendanceStatus;
+    shiftName: string | undefined;
+    notes: string | undefined;
+}
+
+export class SaveRestaurantPayrollDepartmentDto implements ISaveRestaurantPayrollDepartmentDto {
+    id!: string | undefined;
+    name!: string;
+    description!: string | undefined;
+    sortOrder!: number;
+    isActive!: boolean;
+
+    constructor(data?: ISaveRestaurantPayrollDepartmentDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.sortOrder = _data["sortOrder"];
+            this.isActive = _data["isActive"];
+        }
+    }
+
+    static fromJS(data: any): SaveRestaurantPayrollDepartmentDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SaveRestaurantPayrollDepartmentDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["sortOrder"] = this.sortOrder;
+        data["isActive"] = this.isActive;
+        return data;
+    }
+}
+
+export interface ISaveRestaurantPayrollDepartmentDto {
+    id: string | undefined;
+    name: string;
+    description: string | undefined;
+    sortOrder: number;
+    isActive: boolean;
+}
+
+export class SaveRestaurantPayrollJobRoleDto implements ISaveRestaurantPayrollJobRoleDto {
+    id!: string | undefined;
+    departmentId!: string;
+    name!: string;
+    description!: string | undefined;
+    sortOrder!: number;
+    isActive!: boolean;
+
+    constructor(data?: ISaveRestaurantPayrollJobRoleDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.departmentId = _data["departmentId"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.sortOrder = _data["sortOrder"];
+            this.isActive = _data["isActive"];
+        }
+    }
+
+    static fromJS(data: any): SaveRestaurantPayrollJobRoleDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SaveRestaurantPayrollJobRoleDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["departmentId"] = this.departmentId;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["sortOrder"] = this.sortOrder;
+        data["isActive"] = this.isActive;
+        return data;
+    }
+}
+
+export interface ISaveRestaurantPayrollJobRoleDto {
+    id: string | undefined;
+    departmentId: string;
+    name: string;
+    description: string | undefined;
+    sortOrder: number;
+    isActive: boolean;
+}
+
+export class SaveRestaurantPrintRoutesDto implements ISaveRestaurantPrintRoutesDto {
+    routes!: RestaurantPrintRouteDto[] | undefined;
+
+    constructor(data?: ISaveRestaurantPrintRoutesDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["routes"])) {
+                this.routes = [] as any;
+                for (let item of _data["routes"])
+                    this.routes!.push(RestaurantPrintRouteDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): SaveRestaurantPrintRoutesDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SaveRestaurantPrintRoutesDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.routes)) {
+            data["routes"] = [];
+            for (let item of this.routes)
+                data["routes"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface ISaveRestaurantPrintRoutesDto {
+    routes: RestaurantPrintRouteDto[] | undefined;
+}
+
 export class SaveRestaurantRecipeDto implements ISaveRestaurantRecipeDto {
     productId!: string;
     lines!: RestaurantRecipeLineDto[] | undefined;
@@ -89442,6 +97470,46 @@ export interface ISetRestaurantMenuItemAvailabilityDto {
     unavailableUntil: DateTime | undefined;
 }
 
+export class SetRestaurantPrintDeviceEnabledDto implements ISetRestaurantPrintDeviceEnabledDto {
+    id!: string;
+    isEnabled!: boolean;
+
+    constructor(data?: ISetRestaurantPrintDeviceEnabledDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isEnabled = _data["isEnabled"];
+        }
+    }
+
+    static fromJS(data: any): SetRestaurantPrintDeviceEnabledDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SetRestaurantPrintDeviceEnabledDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isEnabled"] = this.isEnabled;
+        return data;
+    }
+}
+
+export interface ISetRestaurantPrintDeviceEnabledDto {
+    id: string;
+    isEnabled: boolean;
+}
+
 export class Setting implements ISetting {
     id!: number;
     creationTime!: DateTime;
@@ -89517,6 +97585,66 @@ export enum SettingScopes {
     All = 7,
 }
 
+export class SettleRestaurantRefundDto implements ISettleRestaurantRefundDto {
+    refundId!: string;
+    clientRequestId!: string | undefined;
+    cashShiftId!: string | undefined;
+    managerPin!: string | undefined;
+    payouts!: RestaurantRefundPayoutDto[] | undefined;
+
+    constructor(data?: ISettleRestaurantRefundDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.refundId = _data["refundId"];
+            this.clientRequestId = _data["clientRequestId"];
+            this.cashShiftId = _data["cashShiftId"];
+            this.managerPin = _data["managerPin"];
+            if (Array.isArray(_data["payouts"])) {
+                this.payouts = [] as any;
+                for (let item of _data["payouts"])
+                    this.payouts!.push(RestaurantRefundPayoutDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): SettleRestaurantRefundDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new SettleRestaurantRefundDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["refundId"] = this.refundId;
+        data["clientRequestId"] = this.clientRequestId;
+        data["cashShiftId"] = this.cashShiftId;
+        data["managerPin"] = this.managerPin;
+        if (Array.isArray(this.payouts)) {
+            data["payouts"] = [];
+            for (let item of this.payouts)
+                data["payouts"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface ISettleRestaurantRefundDto {
+    refundId: string;
+    clientRequestId: string | undefined;
+    cashShiftId: string | undefined;
+    managerPin: string | undefined;
+    payouts: RestaurantRefundPayoutDto[] | undefined;
+}
+
 export class SplitRestaurantOrderDto implements ISplitRestaurantOrderDto {
     sourceOrderId!: string;
     newTableId!: string | undefined;
@@ -89537,13 +97665,13 @@ export class SplitRestaurantOrderDto implements ISplitRestaurantOrderDto {
         if (_data) {
             this.sourceOrderId = _data["sourceOrderId"];
             this.newTableId = _data["newTableId"];
-            this.clientRequestId = _data["clientRequestId"];
-            this.expectedOrderVersion = _data["expectedOrderVersion"];
             if (Array.isArray(_data["orderItemIds"])) {
                 this.orderItemIds = [] as any;
                 for (let item of _data["orderItemIds"])
                     this.orderItemIds!.push(item);
             }
+            this.clientRequestId = _data["clientRequestId"];
+            this.expectedOrderVersion = _data["expectedOrderVersion"];
         }
     }
 
@@ -89558,13 +97686,13 @@ export class SplitRestaurantOrderDto implements ISplitRestaurantOrderDto {
         data = typeof data === 'object' ? data : {};
         data["sourceOrderId"] = this.sourceOrderId;
         data["newTableId"] = this.newTableId;
-        data["clientRequestId"] = this.clientRequestId;
-        data["expectedOrderVersion"] = this.expectedOrderVersion;
         if (Array.isArray(this.orderItemIds)) {
             data["orderItemIds"] = [];
             for (let item of this.orderItemIds)
                 data["orderItemIds"].push(item);
         }
+        data["clientRequestId"] = this.clientRequestId;
+        data["expectedOrderVersion"] = this.expectedOrderVersion;
         return data;
     }
 }
@@ -89573,8 +97701,8 @@ export interface ISplitRestaurantOrderDto {
     sourceOrderId: string;
     newTableId: string | undefined;
     orderItemIds: string[] | undefined;
-    clientRequestId?: string | undefined;
-    expectedOrderVersion?: string | undefined;
+    clientRequestId: string | undefined;
+    expectedOrderVersion: string | undefined;
 }
 
 export class StartExtendSubscriptionInput implements IStartExtendSubscriptionInput {
@@ -89915,6 +98043,158 @@ export interface IStockCalculationDtoNew {
     outWardValue: number;
     closingValue: number;
     closingQty: number;
+}
+
+export class StockDetailReportDto implements IStockDetailReportDto {
+    productName!: string | undefined;
+    unitName!: string | undefined;
+    openingQty!: number;
+    openingAmount!: number;
+    rows!: StockDetailReportRowDto[] | undefined;
+
+    constructor(data?: IStockDetailReportDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.productName = _data["productName"];
+            this.unitName = _data["unitName"];
+            this.openingQty = _data["openingQty"];
+            this.openingAmount = _data["openingAmount"];
+            if (Array.isArray(_data["rows"])) {
+                this.rows = [] as any;
+                for (let item of _data["rows"])
+                    this.rows!.push(StockDetailReportRowDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): StockDetailReportDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StockDetailReportDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["productName"] = this.productName;
+        data["unitName"] = this.unitName;
+        data["openingQty"] = this.openingQty;
+        data["openingAmount"] = this.openingAmount;
+        if (Array.isArray(this.rows)) {
+            data["rows"] = [];
+            for (let item of this.rows)
+                data["rows"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IStockDetailReportDto {
+    productName: string | undefined;
+    unitName: string | undefined;
+    openingQty: number;
+    openingAmount: number;
+    rows: StockDetailReportRowDto[] | undefined;
+}
+
+export class StockDetailReportRowDto implements IStockDetailReportRowDto {
+    id!: string;
+    date!: DateTime;
+    dateMiti!: string | undefined;
+    voucherNo!: string | undefined;
+    voucherType!: string | undefined;
+    ledgerName!: string | undefined;
+    unitName!: string | undefined;
+    inwardQty!: number;
+    inwardRate!: number;
+    inwardAmount!: number;
+    outwardQty!: number;
+    outwardRate!: number;
+    outwardAmount!: number;
+    balanceQty!: number;
+    balanceAmount!: number;
+
+    constructor(data?: IStockDetailReportRowDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.date = _data["date"] ? DateTime.fromISO(_data["date"].toString()) : undefined as any;
+            this.dateMiti = _data["dateMiti"];
+            this.voucherNo = _data["voucherNo"];
+            this.voucherType = _data["voucherType"];
+            this.ledgerName = _data["ledgerName"];
+            this.unitName = _data["unitName"];
+            this.inwardQty = _data["inwardQty"];
+            this.inwardRate = _data["inwardRate"];
+            this.inwardAmount = _data["inwardAmount"];
+            this.outwardQty = _data["outwardQty"];
+            this.outwardRate = _data["outwardRate"];
+            this.outwardAmount = _data["outwardAmount"];
+            this.balanceQty = _data["balanceQty"];
+            this.balanceAmount = _data["balanceAmount"];
+        }
+    }
+
+    static fromJS(data: any): StockDetailReportRowDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StockDetailReportRowDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["date"] = this.date ? this.date.toString() : undefined as any;
+        data["dateMiti"] = this.dateMiti;
+        data["voucherNo"] = this.voucherNo;
+        data["voucherType"] = this.voucherType;
+        data["ledgerName"] = this.ledgerName;
+        data["unitName"] = this.unitName;
+        data["inwardQty"] = this.inwardQty;
+        data["inwardRate"] = this.inwardRate;
+        data["inwardAmount"] = this.inwardAmount;
+        data["outwardQty"] = this.outwardQty;
+        data["outwardRate"] = this.outwardRate;
+        data["outwardAmount"] = this.outwardAmount;
+        data["balanceQty"] = this.balanceQty;
+        data["balanceAmount"] = this.balanceAmount;
+        return data;
+    }
+}
+
+export interface IStockDetailReportRowDto {
+    id: string;
+    date: DateTime;
+    dateMiti: string | undefined;
+    voucherNo: string | undefined;
+    voucherType: string | undefined;
+    ledgerName: string | undefined;
+    unitName: string | undefined;
+    inwardQty: number;
+    inwardRate: number;
+    inwardAmount: number;
+    outwardQty: number;
+    outwardRate: number;
+    outwardAmount: number;
+    balanceQty: number;
+    balanceAmount: number;
 }
 
 export class StockMaintainDto implements IStockMaintainDto {
@@ -92373,8 +100653,8 @@ export class TransferRestaurantTableDto implements ITransferRestaurantTableDto {
 export interface ITransferRestaurantTableDto {
     orderId: string;
     newTableId: string;
-    clientRequestId?: string | undefined;
-    expectedOrderVersion?: string | undefined;
+    clientRequestId: string | undefined;
+    expectedOrderVersion: string | undefined;
 }
 
 export class TwitterExternalLoginProviderSettings implements ITwitterExternalLoginProviderSettings {
@@ -93301,6 +101581,54 @@ export interface IUpdateRestaurantAggregatorOrderStatusDto {
     message: string | undefined;
 }
 
+export class UpdateRestaurantReservationDto implements IUpdateRestaurantReservationDto {
+    id!: string;
+    status!: RestaurantReservationStatus;
+    tableId!: string | undefined;
+    endsAt!: DateTime | undefined;
+
+    constructor(data?: IUpdateRestaurantReservationDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.status = _data["status"];
+            this.tableId = _data["tableId"];
+            this.endsAt = _data["endsAt"] ? DateTime.fromISO(_data["endsAt"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): UpdateRestaurantReservationDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateRestaurantReservationDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["status"] = this.status;
+        data["tableId"] = this.tableId;
+        data["endsAt"] = this.endsAt ? this.endsAt.toString() : undefined as any;
+        return data;
+    }
+}
+
+export interface IUpdateRestaurantReservationDto {
+    id: string;
+    status: RestaurantReservationStatus;
+    tableId: string | undefined;
+    endsAt: DateTime | undefined;
+}
+
 export class UpdateRestaurantTicketItemStatusDto implements IUpdateRestaurantTicketItemStatusDto {
     ticketItemId!: string;
     status!: RestaurantOrderItemStatus;
@@ -93349,96 +101677,8 @@ export interface IUpdateRestaurantTicketItemStatusDto {
     ticketItemId: string;
     status: RestaurantOrderItemStatus;
     cancelReason: string | undefined;
-    clientRequestId?: string | undefined;
-    expectedOrderVersion?: string | undefined;
-}
-
-export class BulkUpdateRestaurantTicketItemStatusDto implements IBulkUpdateRestaurantTicketItemStatusDto {
-    ticketItemIds!: string[] | undefined;
-    status!: RestaurantOrderItemStatus;
-    clientRequestId!: string | undefined;
-    expectedOrderVersions!: { [key: string]: string } | undefined;
-
-    constructor(data?: IBulkUpdateRestaurantTicketItemStatusDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.ticketItemIds = _data["ticketItemIds"];
-            this.status = _data["status"];
-            this.clientRequestId = _data["clientRequestId"];
-            this.expectedOrderVersions = _data["expectedOrderVersions"];
-        }
-    }
-
-    static fromJS(data: any): BulkUpdateRestaurantTicketItemStatusDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new BulkUpdateRestaurantTicketItemStatusDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["ticketItemIds"] = this.ticketItemIds;
-        data["status"] = this.status;
-        data["clientRequestId"] = this.clientRequestId;
-        data["expectedOrderVersions"] = this.expectedOrderVersions;
-        return data;
-    }
-}
-
-export interface IBulkUpdateRestaurantTicketItemStatusDto {
-    ticketItemIds: string[] | undefined;
-    status: RestaurantOrderItemStatus;
-    clientRequestId?: string | undefined;
-    expectedOrderVersions?: { [key: string]: string } | undefined;
-}
-
-export class BulkUpdateRestaurantTicketItemStatusResultDto implements IBulkUpdateRestaurantTicketItemStatusResultDto {
-    updatedCount!: number;
-    skippedCount!: number;
-
-    constructor(data?: IBulkUpdateRestaurantTicketItemStatusResultDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.updatedCount = _data["updatedCount"];
-            this.skippedCount = _data["skippedCount"];
-        }
-    }
-
-    static fromJS(data: any): BulkUpdateRestaurantTicketItemStatusResultDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new BulkUpdateRestaurantTicketItemStatusResultDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["updatedCount"] = this.updatedCount;
-        data["skippedCount"] = this.skippedCount;
-        return data;
-    }
-}
-
-export interface IBulkUpdateRestaurantTicketItemStatusResultDto {
-    updatedCount: number;
-    skippedCount: number;
+    clientRequestId: string | undefined;
+    expectedOrderVersion: string | undefined;
 }
 
 export class UpdateRestaurantTicketStatusDto implements IUpdateRestaurantTicketStatusDto {
@@ -93489,8 +101729,8 @@ export interface IUpdateRestaurantTicketStatusDto {
     ticketId: string;
     status: RestaurantTicketStatus;
     cancelReason: string | undefined;
-    clientRequestId?: string | undefined;
-    expectedOrderVersion?: string | undefined;
+    clientRequestId: string | undefined;
+    expectedOrderVersion: string | undefined;
 }
 
 export class UpdateTenantFeaturesInput implements IUpdateTenantFeaturesInput {
@@ -95344,8 +103584,8 @@ export interface IVoidRestaurantOrderItemDto {
     reason: string | undefined;
     approvalPin: string | undefined;
     approvalNote: string | undefined;
-    clientRequestId?: string | undefined;
-    expectedOrderVersion?: string | undefined;
+    clientRequestId: string | undefined;
+    expectedOrderVersion: string | undefined;
 }
 
 export class VoucherDublicateDto implements IVoucherDublicateDto {

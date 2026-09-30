@@ -2072,7 +2072,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
         try {
             const nepaliDate = this.nepaliDateService.engToNepDate(dateTime.day, dateTime.month - 1, dateTime.year);
             const dateText = `${nepaliDate.year}/${this.padDatePart(nepaliDate.month)}/${this.padDatePart(nepaliDate.day)}`;
-            return `${dateText} ${dateTime.toFormat('HH:mm')}`;
+            return `${dateText} ${dateTime.toFormat('HH:mm')} BS`;
         } catch {
             return dateTime.toFormat('yyyy-LL-dd HH:mm');
         }
@@ -3030,7 +3030,7 @@ export class RestaurantPosComponent extends AppComponentBase implements OnInit, 
                                 : ''
                         }
                             <div class="meta-row"><span class="label">Payment</span><span class="value">${this.escapeHtml(receipt.paymentMethod)}</span></div>
-                            <div class="meta-row"><span class="label">Date</span><span class="value">${receipt.printedAt.toFormat('yyyy-LL-dd HH:mm')}</span></div>
+                            <div class="meta-row"><span class="label">Date</span><span class="value">${this.formatNepaliDateTime(receipt.printedAt)}</span></div>
                             <div class="meta-row"><span class="label">Items</span><span class="value">${this.formatQty(itemCount)}</span></div>
                         </section>
                         <table>
