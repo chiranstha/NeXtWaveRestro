@@ -1,0 +1,144 @@
+/* Dashboard styles are scoped because the application uses global view encapsulation. */
+.dashboard-page {
+    --dash-ink: #203344;
+    --dash-muted: #687a88;
+    --dash-line: #e3e9ed;
+    --dash-surface: #fff;
+    --dash-tint: #f4f7f8;
+    --dash-accent: #147d83;
+    color: var(--dash-ink);
+    gap: 12px !important;
+    padding: 14px 4px 24px;
+}
+.dashboard-page h1, .dashboard-page h2, .dashboard-page h3 { color: var(--dash-ink); margin: 0; }
+.dashboard-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 0; min-height: 54px; }
+.dashboard-eyebrow { color: var(--dash-accent); font-size: 9px; letter-spacing: .12em; font-weight: 750; margin-bottom: 3px; }
+.dashboard-header h1 { font-size: clamp(21px, 1.7vw, 26px); font-weight: 750; letter-spacing: -.04em; line-height: 1.15; }
+.dashboard-header p { display: none; }
+.dashboard-header-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.dashboard-updated { display: flex; align-items: center; gap: 6px; color: var(--dash-muted); font-size: 11px; }
+.dashboard-updated strong { font-weight: 600; color: var(--dash-ink); font-variant-numeric: tabular-nums; }
+.dashboard-status-dot { width: 6px; height: 6px; border-radius: 50%; background: #298267; margin-right: 2px; }
+.dashboard-status-dot.is-loading { background: #b88629; }
+.dashboard-status-dot.is-error { background: #c0493e; }
+.dashboard-page button, .dashboard-page a { -webkit-tap-highlight-color: transparent; }
+.dashboard-page button:focus-visible, .dashboard-page a:focus-visible { outline: 3px solid #58b5bd; outline-offset: 3px; }
+.dashboard-page button:disabled { opacity: .55; cursor: wait; }
+.dashboard-icon-button, .dashboard-primary-button, .dashboard-reset-button {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 34px;
+    border-radius: 8px; font-size: 12px; font-weight: 650; padding: 10px 16px; cursor: pointer; transition: background .16s;
+}
+.dashboard-icon-button { background: var(--dash-surface); border: 1px solid var(--dash-line); color: var(--dash-ink); padding: 10px 12px; }
+.dashboard-primary-button { background: var(--dash-accent); border: 1px solid var(--dash-accent); color: #fff; text-decoration: none; white-space: nowrap; }
+.dashboard-primary-button:hover { background: #10656b; color: #fff; }
+.dashboard-page .dashboard-primary-button i { color: inherit; font-size: 12px; }
+.dashboard-reset-button { border: 1px solid var(--dash-line); background: var(--dash-surface); color: var(--dash-muted); }
+.dashboard-reset-button:hover, .dashboard-icon-button:hover { background: var(--dash-tint); }
+.dashboard-error { border: 1px solid #efc9c3; background: #fff3f0; color: #983f33; border-radius: 8px; padding: 14px; }
+.dashboard-page .restaurant-card { background: var(--dash-surface); border: 1px solid var(--dash-line); border-radius: 12px; box-shadow: 0 2px 5px #20334403; overflow: hidden; }
+.dashboard-page .dashboard-filters .card-body { padding: 12px 16px 15px; }
+.dashboard-panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.dashboard-filter-title { display: flex; align-items: center; gap: 10px; }
+.dashboard-filter-title i { color: var(--dash-accent); font-size: 13px; }
+.dashboard-filter-title h2 { font-size: 13px; font-weight: 700; }
+.dashboard-filter-title > span { border-left: 1px solid var(--dash-line); padding-left: 12px; color: var(--dash-muted); font-size: 10px; }
+.dashboard-periods { display: inline-flex; background: var(--dash-tint); padding: 3px; border-radius: 7px; gap: 2px; }
+.dashboard-periods button { background: transparent; border: 0; border-radius: 5px; color: var(--dash-muted); padding: 5px 10px; font-size: 10px; font-weight: 600; cursor: pointer; }
+.dashboard-periods button.active { color: var(--dash-accent); background: var(--dash-surface); box-shadow: 0 1px 4px #20334412; }
+.dashboard-filter-grid { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 9px; }
+.dashboard-filter-field { flex: 1 1 128px; min-width: 0; }
+.dashboard-page .form-label { color: #526572; font-weight: 600; font-size: 10px; margin-bottom: 4px; }
+.dashboard-page .ng-select-container { border-color: var(--dash-line); border-radius: 7px; min-height: 34px; background: var(--dash-surface); font-size: 11px; }
+.dashboard-page .ng-select .ng-placeholder { color: var(--dash-muted); }
+.dashboard-page .restaurant-date-filter input { border: 1px solid var(--dash-line); border-radius: 7px; height: 34px; width: 100%; font-size: 11px; color: var(--dash-ink); background: var(--dash-surface); }
+.dashboard-section-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 1px 0 -5px; }
+.dashboard-section-heading h2 { font-size: 14px; font-weight: 700; letter-spacing: -.02em; }
+.dashboard-section-heading > span { color: var(--dash-muted); font-size: 11px; }
+.dashboard-metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.dashboard-metric-wrap { min-width: 0; }
+.dashboard-metric-card { background: var(--dash-surface); border: 1px solid var(--dash-line); border-radius: 11px; height: 100%; position: relative; }
+.dashboard-primary-metrics .dashboard-metric-card { min-height: 112px; padding: 16px; }
+.dashboard-metric-icon { display: flex; align-items: center; justify-content: center; width: 37px; height: 37px; border-radius: 10px; flex-shrink: 0; }
+.dashboard-page .dashboard-metric-icon i { color: inherit; font-size: 15px; }
+.dashboard-primary-metrics .dashboard-metric-icon { position: absolute; right: 13px; top: 13px; width: 31px; height: 31px; }
+.dashboard-page .restaurant-metric-label { display: block; color: var(--dash-muted); font-size: 10px; font-weight: 700; letter-spacing: .065em; line-height: 1.5; }
+.dashboard-primary-metrics .restaurant-metric-label { padding-right: 38px; }
+.dashboard-metric-value { display: block; font-size: 26px; font-weight: 700; line-height: 1.2; letter-spacing: -.04em; color: var(--dash-ink); margin: 8px 0 4px; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.dashboard-page .restaurant-muted { color: var(--dash-muted); font-size: 11px; line-height: 1.6; }
+.dashboard-primary-metrics .dashboard-metric-wrap:nth-child(2) .dashboard-metric-card { background: #173f43; border-color: #173f43; }
+.dashboard-primary-metrics .dashboard-metric-wrap:nth-child(2) .dashboard-metric-value { color: #fff; }
+.dashboard-primary-metrics .dashboard-metric-wrap:nth-child(2) .restaurant-metric-label,
+.dashboard-primary-metrics .dashboard-metric-wrap:nth-child(2) .restaurant-muted { color: #bdd6d4; }
+.dashboard-primary-metrics .dashboard-metric-wrap:nth-child(2) .dashboard-metric-icon { background: #2c5557 !important; color: #8dd6b6 !important; }
+.dashboard-operation-metrics .dashboard-metric-card { display: flex; align-items: center; gap: 11px; padding: 12px 14px; min-height: 78px; }
+.dashboard-operation-metrics .dashboard-metric-value { font-size: 20px; margin: 2px 0 1px; }
+.dashboard-operation-metrics .restaurant-metric-label { font-size: 9px; letter-spacing: .045em; }
+.dashboard-page .bg-light-primary { color: #267d92 !important; background: #eaf4f8 !important; }
+.dashboard-page .bg-light-success { color: #298565 !important; background: #eaf5ee !important; }
+.dashboard-page .bg-light-warning { color: #b08028 !important; background: #fff5df !important; }
+.dashboard-page .bg-light-danger { color: #bc6755 !important; background: #fcf0ec !important; }
+.dashboard-insights { --bs-gutter-x: 12px; --bs-gutter-y: 12px; }
+.dashboard-insights .card-header { min-height: 60px; padding: 11px 16px; border-bottom: 1px solid var(--dash-line); gap: 10px; }
+.dashboard-report-heading { display: flex; align-items: center; gap: 12px; }
+.dashboard-report-icon { display: inline-flex; align-items: center; justify-content: center; width: 33px; height: 33px; border: 1px solid var(--dash-line); border-radius: 9px; color: var(--dash-muted); flex-shrink: 0; }
+.dashboard-report-icon i { color: inherit; font-size: 13px; }
+.dashboard-report-heading h3 { font-size: 13px; font-weight: 700; }
+.dashboard-report-heading p { font-size: 10px; color: var(--dash-muted); margin: 5px 0 0; }
+.dashboard-empty { min-height: 112px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 14px 16px; text-align: center; }
+.dashboard-empty-icon { width: 30px; height: 30px; border: 1px dashed #cbd7dc; border-radius: 9px; background: var(--dash-tint); display: flex; align-items: center; justify-content: center; margin-bottom: 2px; }
+.dashboard-empty-icon i { color: #81969c; font-size: 17px; }
+.dashboard-empty strong { font-size: 12px; font-weight: 650; color: #526873; }
+.dashboard-empty p { font-size: 11px; color: var(--dash-muted); margin: 0; max-width: 330px; line-height: 1.65; }
+.dashboard-insights .card-body:not(.p-0) { padding: 0 22px; }
+.dashboard-payments { padding: 20px 22px; }
+.dashboard-table-scroll { overflow-x: auto; }
+.dashboard-insights .restaurant-table { min-width: 380px; }
+.dashboard-insights .restaurant-table th { background: var(--dash-tint); color: var(--dash-muted); font-size: 9px; font-weight: 700; letter-spacing: .08em; }
+.dashboard-insights .restaurant-table > :not(caption) > * > * { padding: 9px 16px !important; border-color: var(--dash-line); }
+.dashboard-insights .restaurant-table td { font-size: 12px; color: #516572; font-variant-numeric: tabular-nums; }
+.dashboard-insights .restaurant-table td .fw-bold { color: var(--dash-ink); font-weight: 600 !important; }
+.dashboard-insights .restaurant-table tbody tr:hover { background: var(--dash-tint); }
+.dashboard-insights .dashboard-low-stock-table { min-width: 640px; table-layout: fixed; }
+.dashboard-low-stock-table th:nth-child(1), .dashboard-low-stock-table td:nth-child(1) { width: 33%; }
+.dashboard-low-stock-table th:nth-child(2), .dashboard-low-stock-table td:nth-child(2),
+.dashboard-low-stock-table th:nth-child(3), .dashboard-low-stock-table td:nth-child(3) { width: 17%; white-space: nowrap; }
+.dashboard-low-stock-table th:nth-child(4), .dashboard-low-stock-table td:nth-child(4) { width: 33%; overflow-wrap: anywhere; }
+.dashboard-stock-badge { color: #ae642d; background: #fff4df; border-radius: 5px; font-size: 10px; font-weight: 600; padding: 5px 9px; }
+.dashboard-stock-quantity { display: inline-block; font-weight: 600; }
+.dashboard-stock-quantity.is-negative { color: #bb5043; background: #fcf0ed; padding: 3px 8px; border-radius: 5px; }
+@media (min-width: 1600px) { .dashboard-primary-metrics .dashboard-metric-card { min-height: 118px; } }
+@media (max-width: 1199px) {
+    .dashboard-header { align-items: flex-start; }
+    .dashboard-header-actions { justify-content: flex-end; }
+    .dashboard-updated { width: 100%; justify-content: flex-end; }
+    .dashboard-filter-field { flex-basis: 180px; }
+    .dashboard-operation-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .dashboard-primary-metrics .dashboard-metric-card { padding: 18px; }
+    .dashboard-primary-metrics .dashboard-metric-icon { width: 29px; height: 29px; right: 12px; top: 13px; }
+    .dashboard-metric-value { font-size: 26px; }
+}
+@media (max-width: 767px) {
+    .dashboard-page { padding-top: 18px; }
+    .dashboard-header { flex-direction: column; gap: 15px; }
+    .dashboard-header-actions { width: 100%; justify-content: flex-start; }
+    .dashboard-updated { width: auto; margin-right: auto; }
+    .dashboard-panel-heading { flex-wrap: wrap; }
+    .dashboard-filter-field { flex: 1 1 40%; }
+    .dashboard-filter-grid > button { flex: 1; }
+    .dashboard-primary-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .dashboard-page .dashboard-filters .card-body { padding: 12px; }
+    .dashboard-section-heading > span { display: none; }
+    .dashboard-operation-metrics .dashboard-metric-card { padding: 13px; gap: 9px; }
+    .dashboard-operation-metrics .dashboard-metric-icon { width: 28px; height: 32px; }
+    .dashboard-insights .card-header { padding: 16px; }
+}
+@media (max-width: 399px) {
+    .dashboard-operation-metrics { grid-template-columns: 1fr; }
+    .dashboard-filter-title > span { display: none; }
+    .dashboard-primary-metrics .dashboard-metric-icon { display: none; }
+    .dashboard-primary-metrics .restaurant-metric-label { padding: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .dashboard-page *, .dashboard-page *::before { transition: none !important; animation: none !important; } }
+[data-bs-theme="dark"] .dashboard-page {
+    --dash-ink: #e1e8ee; --dash-muted: #a3b3bf; --dash-line: #33434d; --dash-surface: #202e37; --dash-tint: #263740;
+}

@@ -10,9 +10,9 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
-import { SubHeaderComponent } from '../../shared/common/sub-header/sub-header.component';
 import { LocalizePipe } from '@shared/common/pipes/localize.pipe';
 import {
     GetUserDropdownDto,
@@ -61,6 +61,7 @@ interface DashboardMetric {
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
     templateUrl: './dashboard.component.html',
+    styleUrl: './dashboard.component.css',
     encapsulation: ViewEncapsulation.None,
     animations: [appModuleAnimation],
     imports: [
@@ -68,7 +69,7 @@ interface DashboardMetric {
         FormsModule,
         NgSelectModule,
         NepaliDatepickerModule,
-        SubHeaderComponent,
+        RouterLink,
         LocalizePipe,
         RestaurantStylesComponent,
     ],
@@ -84,6 +85,7 @@ export class DashboardComponent extends AppComponentBase implements OnInit, OnDe
     private readonly cdr = inject(ChangeDetectorRef);
 
     loading = false;
+    loadError = false;
     filter: RestaurantDashboardFilter = this.createDefaultFilter();
     summary = new RestaurantPosSalesSummaryDto();
     itemSales: RestaurantItemSalesReportDto[] = [];
@@ -144,7 +146,11 @@ export class DashboardComponent extends AppComponentBase implements OnInit, OnDe
     }
 
     refresh(): void {
+        if (this.loading) {
+            return;
+        }
         this.loading = true;
+        this.loadError = false;
         this.cdr.markForCheck();
 
         const fromDate = this.toDateTime(this.filter.fromDate);
@@ -168,7 +174,7 @@ export class DashboardComponent extends AppComponentBase implements OnInit, OnDe
                 : of(this.emptyPayrollReport()),
         })
             .pipe(finalize(() => this.finishLoading()))
-            .subscribe((result) => {
+            .subscribe({ next: (result) => {
                 this.summary = result.summary || new RestaurantPosSalesSummaryDto();
                 this.itemSales = result.itemSales || [];
                 this.tableSales = result.tableSales || [];
@@ -181,7 +187,24 @@ export class DashboardComponent extends AppComponentBase implements OnInit, OnDe
                 this.payrollReport = result.payrollReport || this.emptyPayrollReport();
                 this.lastRefreshedAt = DateTime.local();
                 this.cdr.markForCheck();
-            });
+            }, error: () => {
+                this.loadError = true;
+                this.cdr.markForCheck();
+            } });
+    }
+
+    setDateRange(range: 'today' | 'week' | 'thirtyDays'): void {
+        const today = DateTime.local();
+        const start = today.minus({ days: range === 'week' ? 6 : range === 'thirtyDays' ? 29 : 0 });
+        this.filter.fromDate = start.toISODate() || '';
+        this.filter.toDate = today.toISODate() || '';
+        this.refresh();
+    }
+
+    isDateRange(range: 'today' | 'week' | 'thirtyDays'): boolean {
+        const today = DateTime.local();
+        const start = today.minus({ days: range === 'week' ? 6 : range === 'thirtyDays' ? 29 : 0 });
+        return this.filter.fromDate === start.toISODate() && this.filter.toDate === today.toISODate();
     }
 
     clearFilters(): void {
@@ -203,7 +226,7 @@ export class DashboardComponent extends AppComponentBase implements OnInit, OnDe
                 value: this.formatInteger(this.summary?.orderCount),
                 accent: 'primary',
                 icon: 'fa-receipt',
-                subText: this.l('Today'),
+                subText: this.l('Selected period'),
             },
             {
                 label: this.l('Sales'),

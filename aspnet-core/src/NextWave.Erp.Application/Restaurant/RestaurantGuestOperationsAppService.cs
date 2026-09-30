@@ -29,6 +29,10 @@ namespace NextWave.Erp.Restaurant
         IRepository<RestaurantReservation, Guid> reservationRepository,
         IRepository<RestaurantSmsOutbox, Guid> smsOutboxRepository,
         IRepository<RestaurantPrintJob, Guid> printJobRepository,
+        IRepository<RestaurantPrintDevice, Guid> printDeviceRepository,
+        IRepository<RestaurantPrintDeviceRoute, Guid> printDeviceRouteRepository,
+        IRepository<RestaurantPrintRoute, Guid> printRouteRepository,
+        IRepository<RestaurantPrintDelivery, Guid> printDeliveryRepository,
         IRepository<RestaurantTicket, Guid> ticketRepository,
         IRestaurantOrderAppService orderAppService,
         IUnitOfWorkManager unitOfWorkManager,
@@ -325,8 +329,9 @@ namespace NextWave.Erp.Restaurant
         [AbpAuthorize(AppPermissions.PagesRestaurantPrinterSetup)]
         public async Task<RestaurantPrintJobDto> ClaimPrintJob(ClaimRestaurantPrintJobDto input)
         {
-            if (string.IsNullOrWhiteSpace(input?.AgentId) || input.AgentId.Length > 120)
-                throw new UserFriendlyException("Print station identity is required");
+            var clientDeviceId = input?.AgentId?.Trim();
+            if (string.IsNullOrWhiteSpace(clientDeviceId) || clientDeviceId.Length > 120)
+                throw new UserFriendlyException("Print device identity is required");
             using var uow = unitOfWorkManager.Begin(new UnitOfWorkOptions
             {
                 IsTransactional = true,
@@ -334,99 +339,305 @@ namespace NextWave.Erp.Restaurant
                 Scope = TransactionScopeOption.RequiresNew
             });
             var now = DateTime.UtcNow;
-            var job = await printJobRepository.GetAll()
-                .Where(x => x.TenantId == AbpSession.TenantId &&
-                            (x.Status == RestaurantPrintJobStatus.Pending ||
-                             (x.Status == RestaurantPrintJobStatus.Leased && x.LeaseUntilUtc < now)))
-                .OrderBy(x => x.CreatedAtUtc).FirstOrDefaultAsync();
-            if (job == null)
+            var tenantId = AbpSession.GetTenantId();
+            var device = await printDeviceRepository.FirstOrDefaultAsync(x =>
+                x.TenantId == tenantId && x.ClientDeviceId == clientDeviceId);
+            if (device == null || !device.IsEnabled)
             {
                 await uow.CompleteAsync();
                 return null;
             }
+            device.LastSeenAtUtc = now;
+            await printDeviceRepository.UpdateAsync(device);
+
+            var delivery = await printDeliveryRepository.GetAll()
+                .Where(x => x.TenantId == tenantId && x.DeviceId == device.Id &&
+                    (x.Status == RestaurantPrintJobStatus.Pending ||
+                     (x.Status == RestaurantPrintJobStatus.Leased && x.LeaseUntilUtc < now)))
+                .OrderBy(x => x.CreatedAtUtc).FirstOrDefaultAsync();
+            if (delivery == null)
+            {
+                await uow.CompleteAsync();
+                return null;
+            }
+            var job = await printJobRepository.FirstOrDefaultAsync(x => x.Id == delivery.PrintJobId && x.TenantId == tenantId);
+            if (job == null)
+            {
+                delivery.Status = RestaurantPrintJobStatus.Failed;
+                delivery.LastError = "The print job could not be found.";
+                await printDeliveryRepository.UpdateAsync(delivery);
+                await uow.CompleteAsync();
+                return null;
+            }
+
+            delivery.Status = RestaurantPrintJobStatus.Leased;
+            delivery.LeaseOwner = clientDeviceId;
+            delivery.LeaseToken = Guid.NewGuid();
+            delivery.LeaseUntilUtc = now.AddMinutes(5);
+            delivery.Attempts++;
             job.Status = RestaurantPrintJobStatus.Leased;
-            job.LeaseOwner = input.AgentId.Trim();
-            job.LeaseUntilUtc = now.AddMinutes(5);
+            job.LeaseOwner = clientDeviceId;
+            job.LeaseUntilUtc = delivery.LeaseUntilUtc;
             job.Attempts++;
+            await printDeliveryRepository.UpdateAsync(delivery);
             await printJobRepository.UpdateAsync(job);
             await uow.CompleteAsync();
-            return MapPrintJob(job);
+            var result = MapPrintJob(job);
+            result.DeliveryId = delivery.Id;
+            result.LeaseToken = delivery.LeaseToken;
+            return result;
+        }
+
+        [AbpAuthorize(AppPermissions.PagesRestaurantPrinterSetup)]
+        public async Task<RestaurantPrintDeviceDto> RegisterPrintDevice(RegisterRestaurantPrintDeviceDto input)
+        {
+            var clientDeviceId = input?.ClientDeviceId?.Trim();
+            var name = input?.Name?.Trim();
+            var platform = input?.Platform?.Trim();
+            if (string.IsNullOrWhiteSpace(clientDeviceId) || clientDeviceId.Length > 120 ||
+                string.IsNullOrWhiteSpace(name) || name.Length > 150 ||
+                platform is not "Windows" and not "Android")
+                throw new UserFriendlyException("A valid device ID, name, and Windows or Android platform are required.");
+
+            var tenantId = AbpSession.GetTenantId();
+            var routeNames = (input.RouteNames ?? new List<string>()).Select(x => x?.Trim())
+                .Where(x => !string.IsNullOrWhiteSpace(x)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            if (routeNames.Any(x => x.Length > 128 || x.Any(c => !char.IsLetterOrDigit(c) && c is not '-' and not '_')))
+                throw new UserFriendlyException("A printer route name is invalid.");
+            var activeRoutes = await printRouteRepository.GetAll()
+                .Where(x => x.TenantId == tenantId && x.IsActive && routeNames.Contains(x.Name))
+                .Select(x => x.Name).ToListAsync();
+            if (activeRoutes.Count != routeNames.Count)
+                throw new UserFriendlyException("Every device route must exist and be active in restaurant printer setup.");
+
+            var device = await printDeviceRepository.FirstOrDefaultAsync(x => x.TenantId == tenantId && x.ClientDeviceId == clientDeviceId);
+            if (device == null)
+            {
+                device = new RestaurantPrintDevice
+                {
+                    TenantId = tenantId,
+                    ClientDeviceId = clientDeviceId,
+                    Name = name,
+                    Platform = platform,
+                    IsEnabled = true,
+                    CreatedAtUtc = DateTime.UtcNow
+                };
+                await printDeviceRepository.InsertAsync(device);
+                await CurrentUnitOfWork.SaveChangesAsync();
+            }
+            else
+            {
+                device.Name = name;
+                device.Platform = platform;
+                device.LastSeenAtUtc = DateTime.UtcNow;
+                await printDeviceRepository.UpdateAsync(device);
+            }
+
+            var existing = await printDeviceRouteRepository.GetAll()
+                .Where(x => x.TenantId == tenantId && x.DeviceId == device.Id).ToListAsync();
+            foreach (var mapping in existing.Where(x => !routeNames.Contains(x.RouteName, StringComparer.OrdinalIgnoreCase)))
+            {
+                await printDeviceRouteRepository.DeleteAsync(mapping);
+                var staleDeliveries = await printDeliveryRepository.GetAll().Where(x => x.TenantId == tenantId &&
+                    x.DeviceId == device.Id && x.RouteName == mapping.RouteName && x.Status == RestaurantPrintJobStatus.Pending).ToListAsync();
+                var staleJobIds = staleDeliveries.Select(x => x.PrintJobId).Distinct().ToList();
+                foreach (var delivery in staleDeliveries)
+                {
+                    delivery.Status = RestaurantPrintJobStatus.Cancelled;
+                    delivery.LastError = "This route was removed from the print device.";
+                    await printDeliveryRepository.UpdateAsync(delivery);
+                }
+                foreach (var staleJobId in staleJobIds)
+                {
+                    var staleJob = await printJobRepository.FirstOrDefaultAsync(x => x.Id == staleJobId && x.TenantId == tenantId);
+                    if (staleJob != null) await UpdatePrintJobRollupAsync(staleJob, tenantId);
+                }
+            }
+            foreach (var routeName in routeNames.Where(x => existing.All(e => !string.Equals(e.RouteName, x, StringComparison.OrdinalIgnoreCase))))
+            {
+                await printDeviceRouteRepository.InsertAsync(new RestaurantPrintDeviceRoute
+                {
+                    TenantId = tenantId,
+                    DeviceId = device.Id,
+                    RouteName = routeName
+                });
+            }
+            await CurrentUnitOfWork.SaveChangesAsync();
+            return new RestaurantPrintDeviceDto
+            {
+                Id = device.Id,
+                ClientDeviceId = device.ClientDeviceId,
+                Name = device.Name,
+                Platform = device.Platform,
+                IsEnabled = device.IsEnabled,
+                LastSeenAtUtc = device.LastSeenAtUtc,
+                RouteNames = routeNames
+            };
+        }
+
+        [AbpAuthorize(AppPermissions.PagesRestaurantPrinterSetup)]
+        public async Task<List<RestaurantPrintDeviceDto>> GetPrintDevices()
+        {
+            var tenantId = AbpSession.GetTenantId();
+            var devices = await printDeviceRepository.GetAll().Where(x => x.TenantId == tenantId)
+                .OrderBy(x => x.Name).ToListAsync();
+            var deviceIds = devices.Select(x => x.Id).ToList();
+            var routes = await printDeviceRouteRepository.GetAll()
+                .Where(x => x.TenantId == tenantId && deviceIds.Contains(x.DeviceId)).ToListAsync();
+            return devices.Select(device => new RestaurantPrintDeviceDto
+            {
+                Id = device.Id,
+                ClientDeviceId = device.ClientDeviceId,
+                Name = device.Name,
+                Platform = device.Platform,
+                IsEnabled = device.IsEnabled,
+                LastSeenAtUtc = device.LastSeenAtUtc,
+                RouteNames = routes.Where(route => route.DeviceId == device.Id).Select(route => route.RouteName).OrderBy(x => x).ToList()
+            }).ToList();
+        }
+
+        [AbpAuthorize(AppPermissions.PagesRestaurantPrinterSetup)]
+        public async Task SetPrintDeviceEnabled(SetRestaurantPrintDeviceEnabledDto input)
+        {
+            var tenantId = AbpSession.GetTenantId();
+            var device = await printDeviceRepository.FirstOrDefaultAsync(x => x.Id == input.Id && x.TenantId == tenantId);
+            if (device == null) throw new UserFriendlyException("Print device not found.");
+            device.IsEnabled = input.IsEnabled;
+            await printDeviceRepository.UpdateAsync(device);
+            if (!device.IsEnabled)
+            {
+                var pending = await printDeliveryRepository.GetAll().Where(x => x.TenantId == tenantId &&
+                    x.DeviceId == device.Id && x.Status == RestaurantPrintJobStatus.Pending).ToListAsync();
+                var jobIds = pending.Select(x => x.PrintJobId).Distinct().ToList();
+                foreach (var delivery in pending)
+                {
+                    delivery.Status = RestaurantPrintJobStatus.Cancelled;
+                    delivery.LastError = "This print device was disabled.";
+                    await printDeliveryRepository.UpdateAsync(delivery);
+                }
+                foreach (var jobId in jobIds)
+                {
+                    var job = await printJobRepository.FirstOrDefaultAsync(x => x.Id == jobId && x.TenantId == tenantId);
+                    if (job != null) await UpdatePrintJobRollupAsync(job, tenantId);
+                }
+            }
         }
 
         [AbpAuthorize(AppPermissions.PagesRestaurantPrinterSetup)]
         public async Task<List<RestaurantPrintJobDto>> GetPrintJobs()
         {
-            return await printJobRepository.GetAll()
+            var tenantId = AbpSession.GetTenantId();
+            var jobs = await printJobRepository.GetAll()
                 .Where(x => x.TenantId == AbpSession.TenantId)
                 .OrderByDescending(x => x.CreatedAtUtc)
-                .Take(100)
-                .Select(x => new RestaurantPrintJobDto
+                .Take(100).ToListAsync();
+            var jobIds = jobs.Select(x => x.Id).ToList();
+            var deliveries = await printDeliveryRepository.GetAll()
+                .Where(x => x.TenantId == tenantId && jobIds.Contains(x.PrintJobId)).ToListAsync();
+            var devices = await printDeviceRepository.GetAll().Where(x => x.TenantId == tenantId).ToDictionaryAsync(x => x.Id);
+            return jobs.Select(job =>
+            {
+                var result = MapPrintJob(job);
+                result.Deliveries = deliveries.Where(x => x.PrintJobId == job.Id).Select(delivery => new RestaurantPrintDeliveryDto
                 {
-                    Id = x.Id,
-                    ExternalJobId = x.ExternalJobId,
-                    Type = x.Type,
-                    RouteName = x.RouteName,
-                    PayloadBase64 = string.Empty,
-                    AgentJobId = x.AgentJobId,
-                    Status = x.Status,
-                    LastError = x.LastError,
-                    Attempts = x.Attempts,
-                    ReprintReason = x.ReprintReason
-                }).ToListAsync();
+                    Id = delivery.Id,
+                    DeviceId = delivery.DeviceId,
+                    DeviceName = devices.TryGetValue(delivery.DeviceId, out var device) ? device.Name : "Unknown device",
+                    Platform = devices.TryGetValue(delivery.DeviceId, out var platformDevice) ? platformDevice.Platform : "Unknown",
+                    RouteName = delivery.RouteName,
+                    Status = delivery.Status,
+                    Attempts = delivery.Attempts,
+                    LastError = delivery.LastError,
+                    PrintedAtUtc = delivery.PrintedAtUtc
+                }).ToList();
+                return result;
+            }).ToList();
         }
 
         [AbpAuthorize(AppPermissions.PagesRestaurantPrinterSetup)]
         public async Task<RestaurantPrintJobDto> ReportPrintJob(ReportRestaurantPrintJobDto input)
         {
-            var job = await printJobRepository.FirstOrDefaultAsync(x => x.Id == input.Id && x.TenantId == AbpSession.TenantId);
-            if (job == null || job.Status != RestaurantPrintJobStatus.Leased || job.LeaseOwner != input.AgentId)
+            var tenantId = AbpSession.GetTenantId();
+            var clientDeviceId = input.AgentId?.Trim();
+            var device = await printDeviceRepository.FirstOrDefaultAsync(x => x.TenantId == tenantId && x.ClientDeviceId == clientDeviceId);
+            var delivery = device == null ? null : input.DeliveryId.HasValue
+                ? await printDeliveryRepository.FirstOrDefaultAsync(x => x.Id == input.DeliveryId && x.TenantId == tenantId)
+                : await printDeliveryRepository.GetAll().FirstOrDefaultAsync(x => x.PrintJobId == input.Id && x.DeviceId == device.Id && x.TenantId == tenantId);
+            var jobId = delivery?.PrintJobId ?? input.Id;
+            var job = await printJobRepository.FirstOrDefaultAsync(x => x.Id == jobId && x.TenantId == tenantId);
+            if (device == null || delivery == null || job == null || delivery.DeviceId != device.Id ||
+                delivery.Status != RestaurantPrintJobStatus.Leased || delivery.LeaseOwner != clientDeviceId ||
+                !input.LeaseToken.HasValue || input.LeaseToken != delivery.LeaseToken)
                 throw new UserFriendlyException("Print job lease is no longer valid");
             if (input.Status is not RestaurantPrintJobStatus.Printed and not RestaurantPrintJobStatus.Failed)
                 throw new UserFriendlyException("Print agent must report Printed or Failed");
-            job.Status = input.Status;
-            job.AgentJobId = input.AgentJobId;
-            job.LastError = input.Error?.Length > 500 ? input.Error[..500] : input.Error;
-            job.LeaseUntilUtc = null;
-            if (job.Status == RestaurantPrintJobStatus.Printed)
+            delivery.Status = input.Status;
+            delivery.AgentJobId = input.AgentJobId;
+            delivery.LastError = input.Error?.Length > 500 ? input.Error[..500] : input.Error;
+            delivery.LeaseOwner = null;
+            delivery.LeaseUntilUtc = null;
+            delivery.LeaseToken = null;
+            if (delivery.Status == RestaurantPrintJobStatus.Printed)
             {
-                job.PrintedAtUtc = DateTime.UtcNow;
-                if (job.TicketId.HasValue)
-                {
-                    var ticket = await ticketRepository.FirstOrDefaultAsync(job.TicketId.Value);
-                    if (ticket != null)
-                    {
-                        ticket.LastPrintConfirmedAt = DateTime.Now;
-                        ticket.PrintedAt ??= DateTime.Now;
-                        ticket.LastPrintedAt = DateTime.Now;
-                        await ticketRepository.UpdateAsync(ticket);
-                    }
-                }
+                delivery.PrintedAtUtc = DateTime.UtcNow;
             }
-            await printJobRepository.UpdateAsync(job);
-            return MapPrintJob(job);
+            await printDeliveryRepository.UpdateAsync(delivery);
+            await UpdatePrintJobRollupAsync(job, tenantId);
+            var result = MapPrintJob(job);
+            result.DeliveryId = delivery.Id;
+            return result;
         }
 
         [AbpAuthorize(AppPermissions.PagesRestaurantPrinterSetup)]
         public async Task RetryPrintJob(RetryRestaurantPrintJobDto input)
         {
-            var job = await printJobRepository.FirstOrDefaultAsync(x => x.Id == input.JobId && x.TenantId == AbpSession.TenantId);
-            if (job == null || job.Status != RestaurantPrintJobStatus.Failed)
+            var tenantId = AbpSession.GetTenantId();
+            var job = await printJobRepository.FirstOrDefaultAsync(x => x.Id == input.JobId && x.TenantId == tenantId);
+            if (job == null)
                 throw new UserFriendlyException("Failed print job not found");
-            if (job.StationId.HasValue)
+
+            if (input.DeliveryId.HasValue)
             {
-                var station = await stationRepository.FirstOrDefaultAsync(x => x.Id == job.StationId.Value && x.TenantId == AbpSession.TenantId);
-                if (!string.IsNullOrWhiteSpace(station?.PrintRouteName)) job.RouteName = station.PrintRouteName.Trim();
+                var delivery = await printDeliveryRepository.FirstOrDefaultAsync(x => x.Id == input.DeliveryId &&
+                    x.PrintJobId == job.Id && x.TenantId == tenantId);
+                var device = delivery == null ? null : await printDeviceRepository.FirstOrDefaultAsync(x => x.Id == delivery.DeviceId && x.TenantId == tenantId);
+                if (delivery == null || delivery.Status != RestaurantPrintJobStatus.Failed)
+                    throw new UserFriendlyException("Failed device delivery not found");
+                if (device == null || !device.IsEnabled)
+                    throw new UserFriendlyException("Enable the print device before retrying its delivery.");
+                delivery.Status = RestaurantPrintJobStatus.Pending;
+                delivery.LastError = null;
+                delivery.AgentJobId = null;
+                delivery.LeaseOwner = null;
+                delivery.LeaseToken = null;
+                delivery.LeaseUntilUtc = null;
+                await printDeliveryRepository.UpdateAsync(delivery);
+                await UpdatePrintJobRollupAsync(job, tenantId);
             }
-            else if (job.Type == RestaurantPrintJobType.BillReceipt)
+            else
             {
-                var receiptRoute = await SettingManager.GetSettingValueForTenantAsync(
-                    AppSettings.ErpSettings.RestaurantReceiptPrintRouteName, AbpSession.GetTenantId());
-                if (!string.IsNullOrWhiteSpace(receiptRoute)) job.RouteName = receiptRoute.Trim();
+                if (job.Status != RestaurantPrintJobStatus.Failed)
+                    throw new UserFriendlyException("Failed print job not found");
+                var deviceIds = await (from mapping in printDeviceRouteRepository.GetAll()
+                    join device in printDeviceRepository.GetAll() on mapping.DeviceId equals device.Id
+                    join route in printRouteRepository.GetAll() on mapping.RouteName equals route.Name
+                    where mapping.TenantId == tenantId && mapping.RouteName == job.RouteName &&
+                        device.TenantId == tenantId && device.IsEnabled && route.TenantId == tenantId && route.IsActive
+                    select device.Id).Distinct().ToListAsync();
+                if (deviceIds.Count == 0) throw new UserFriendlyException("No enabled print device is configured for this route.");
+                foreach (var deviceId in deviceIds)
+                    await printDeliveryRepository.InsertAsync(new RestaurantPrintDelivery
+                    {
+                        TenantId = tenantId,
+                        PrintJobId = job.Id,
+                        DeviceId = deviceId,
+                        RouteName = job.RouteName,
+                        Status = RestaurantPrintJobStatus.Pending,
+                        CreatedAtUtc = DateTime.UtcNow
+                    });
+                job.Status = RestaurantPrintJobStatus.Pending;
+                job.LastError = null;
             }
-            if (string.IsNullOrWhiteSpace(job.RouteName) || job.RouteName == "unconfigured")
-                throw new UserFriendlyException("Configure a printer route before retrying this job");
-            job.Status = RestaurantPrintJobStatus.Pending;
-            job.LastError = null;
             job.LeaseOwner = null;
             job.LeaseUntilUtc = null;
             await printJobRepository.UpdateAsync(job);
@@ -445,6 +656,50 @@ namespace NextWave.Erp.Restaurant
             Attempts = job.Attempts,
             ReprintReason = job.ReprintReason
         };
+
+        private async Task UpdatePrintJobRollupAsync(RestaurantPrintJob job, int tenantId)
+        {
+            job.LeaseOwner = null;
+            job.LeaseUntilUtc = null;
+            var deliveries = await printDeliveryRepository.GetAll()
+                .Where(x => x.TenantId == tenantId && x.PrintJobId == job.Id).ToListAsync();
+            if (deliveries.Count == 0) return;
+
+            if (deliveries.Any(x => x.Status is RestaurantPrintJobStatus.Pending or RestaurantPrintJobStatus.Leased))
+            {
+                job.Status = deliveries.Any(x => x.Status == RestaurantPrintJobStatus.Leased)
+                    ? RestaurantPrintJobStatus.Leased : RestaurantPrintJobStatus.Pending;
+                job.LastError = LimitPrintError(string.Join("; ", deliveries.Where(x => x.Status == RestaurantPrintJobStatus.Failed)
+                    .Select(x => x.LastError).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct().Take(3)));
+            }
+            else if (deliveries.Any(x => x.Status == RestaurantPrintJobStatus.Failed))
+            {
+                job.Status = RestaurantPrintJobStatus.Failed;
+                job.LastError = LimitPrintError(string.Join("; ", deliveries.Where(x => x.Status == RestaurantPrintJobStatus.Failed)
+                    .Select(x => x.LastError).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct().Take(3)));
+            }
+            else if (deliveries.Any(x => x.Status == RestaurantPrintJobStatus.Printed))
+            {
+                job.Status = RestaurantPrintJobStatus.Printed;
+                job.LastError = null;
+                job.PrintedAtUtc = DateTime.UtcNow;
+                if (job.TicketId.HasValue)
+                {
+                    var ticket = await ticketRepository.FirstOrDefaultAsync(job.TicketId.Value);
+                    if (ticket != null)
+                    {
+                        ticket.LastPrintConfirmedAt = DateTime.Now;
+                        ticket.PrintedAt ??= DateTime.Now;
+                        ticket.LastPrintedAt = DateTime.Now;
+                        await ticketRepository.UpdateAsync(ticket);
+                    }
+                }
+            }
+            else job.Status = RestaurantPrintJobStatus.Cancelled;
+            await printJobRepository.UpdateAsync(job);
+        }
+
+        private static string LimitPrintError(string value) => value?.Length > 500 ? value[..500] : value;
 
         private static string HashToken(string token) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
         private static DateTime SpecifyUtc(DateTime value) => DateTime.SpecifyKind(value, DateTimeKind.Utc);

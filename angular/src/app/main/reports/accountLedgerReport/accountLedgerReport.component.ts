@@ -1,7 +1,7 @@
 // account-ledger-report.component.ts
 import { ChangeDetectionStrategy, Component, Injector, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { ColDef, ColGroupDef, GridApi, GridOptions, GridReadyEvent } from 'ag-grid-community';
 import { AppComponentBase } from '@shared/common/app-component-base';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
@@ -24,7 +24,6 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
     private gridApi!: GridApi;
     myForm: FormGroup;
     filterText = '';
-    advancedFiltersAreShown = false;
     rowData: AccountLedgerReportList[] = [];
     totalRecords = 0;
 
@@ -152,7 +151,6 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
 
     constructor(
         injector: Injector,
-        private _router: Router,
         private _proxy: AccountLedgerReportServiceProxy,
         private _fb: FormBuilder,
         // private _fileDownloadService: FileDownloadService,
@@ -184,6 +182,27 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
         return Number(params.value).toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
+        });
+    }
+
+    getReportTotal(fieldName: keyof AccountLedgerReportList | string): number {
+        const visibleRows: AccountLedgerReportList[] = [];
+        if (this.gridApi) {
+            this.gridApi.forEachNodeAfterFilter((node) => {
+                if (!node.group && node.data) {
+                    visibleRows.push(node.data as AccountLedgerReportList);
+                }
+            });
+        }
+
+        const rows = this.gridApi ? visibleRows : this.rowData;
+        return rows.reduce((total, row) => total + Number((row as any)[fieldName] || 0), 0);
+    }
+
+    formatAmount(value: number): string {
+        return Number(value || 0).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
         });
     }
 
@@ -279,6 +298,8 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
             }
         });
 
+        this.totalRecords = displayedRows.length;
+
         if (!displayedRows.length) {
             this.gridOptions.pinnedBottomRowData = [];
             this.gridApi.setGridOption('pinnedBottomRowData', []);
@@ -305,14 +326,6 @@ export class AccountLedgerReportComponent extends AppComponentBase implements On
             const value = row[fieldName] || 0;
             return sum + (typeof value === 'number' ? value : 0);
         }, 0);
-    }
-
-    onCellDoubleClicked(params) {
-        if (!params?.data?.accountLedgerId || params.node?.rowPinned) {
-            return;
-        }
-        localStorage.setItem('accountledgerwise', JSON.stringify(this.myForm.value));
-        this._router.navigate(['/app/main/reports/account-wise', params.data.accountLedgerId]);
     }
 
     loadreport() {

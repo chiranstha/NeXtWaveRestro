@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
+import 'dart:io' show Platform, Socket;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show setEquals;
@@ -8,6 +9,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:nepali_utils/nepali_utils.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:thermal_printer_plus/thermal_printer.dart' as thermal;
 
 part 'src/config/app_config.dart';
 part 'src/theme/app_colors.dart';
@@ -32,6 +36,7 @@ part 'src/screens/restaurant_setup_screen.dart';
 part 'src/screens/restaurant_reports_screen.dart';
 part 'src/screens/restaurant_payroll_screen.dart';
 part 'src/screens/restaurant_guest_operations_screen.dart';
+part 'src/printing/mobile_print_station.dart';
 part 'src/screens/generic_module_screen.dart';
 part 'src/widgets/erp_widgets.dart';
 part 'src/logic/erp_helpers.dart';

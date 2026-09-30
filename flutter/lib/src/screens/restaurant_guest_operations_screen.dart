@@ -547,6 +547,21 @@ class RestaurantPrintQueueScreen extends StatelessWidget {
           action: '${jobs.length} recent jobs · $failed failed',
           icon: Icons.print_rounded,
         ),
+        if (Platform.isAndroid) ...[
+          const SizedBox(height: 8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: OutlinedButton.icon(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => AndroidPrintStationScreen(controller: controller),
+                ),
+              ),
+              icon: const Icon(Icons.print_outlined),
+              label: const Text('Android printer setup'),
+            ),
+          ),
+        ],
         const SizedBox(height: 12),
         if (jobs.isEmpty)
           const _EmptyState(
@@ -559,14 +574,16 @@ class RestaurantPrintQueueScreen extends StatelessWidget {
             child: Column(
               children: [
                 for (final job in jobs)
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
+                  ExpansionTile(
+                    tilePadding: EdgeInsets.zero,
                     leading: Icon(
-                      job.type == 0 ? Icons.soup_kitchen_rounded : Icons.receipt_long_rounded,
+                      job.type == 0
+                          ? (job.routeName.toLowerCase() == 'bar' ? Icons.local_bar_rounded : Icons.soup_kitchen_rounded)
+                          : Icons.receipt_long_rounded,
                       color: job.status == 3 ? AppColors.red : AppColors.primary,
                     ),
                     title: Text(
-                      '${job.type == 0 ? 'Kitchen ticket' : 'Bill receipt'} · ${job.externalJobId}',
+                      '${job.type == 0 ? (job.routeName.toLowerCase() == 'bar' ? 'Bar ticket' : 'Kitchen ticket') : 'Bill receipt'} · ${job.externalJobId}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -575,9 +592,11 @@ class RestaurantPrintQueueScreen extends StatelessWidget {
                       '${job.reprintReason == null ? '' : '\nReprint reason: ${job.reprintReason}'}'
                       '${job.lastError == null ? '' : '\n${job.lastError}'}',
                     ),
-                    isThreeLine: job.lastError != null || job.reprintReason != null,
-                    trailing: job.status == 3
-                        ? TextButton.icon(
+                    children: [
+                      if (job.deliveries.isEmpty && job.status == 3)
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton.icon(
                             onPressed: controller.busy
                                 ? null
                                 : () async {
@@ -592,9 +611,43 @@ class RestaurantPrintQueueScreen extends StatelessWidget {
                                     }
                                   },
                             icon: const Icon(Icons.replay_rounded),
-                            label: const Text('Retry'),
-                          )
-                        : null,
+                            label: const Text('Retry job'),
+                          ),
+                        ),
+                      for (final delivery in job.deliveries)
+                        ListTile(
+                          dense: true,
+                          contentPadding: const EdgeInsets.only(left: 24, right: 4),
+                          leading: Icon(
+                            delivery.platform == 'Android' ? Icons.phone_android : Icons.desktop_windows,
+                            size: 20,
+                            color: delivery.status == 3 ? AppColors.red : AppColors.primary,
+                          ),
+                          title: Text('${delivery.deviceName} · ${_printJobStatus(delivery.status)}'),
+                          subtitle: Text(
+                            '${delivery.routeName} · ${delivery.attempts} attempts'
+                            '${delivery.lastError == null ? '' : '\n${delivery.lastError}'}',
+                          ),
+                          trailing: delivery.status == 3
+                              ? TextButton(
+                                  onPressed: controller.busy
+                                      ? null
+                                      : () async {
+                                          try {
+                                            await controller.retryPrintDelivery(job, delivery);
+                                          } on ApiException catch (error) {
+                                            if (context.mounted) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(content: Text(error.message)),
+                                              );
+                                            }
+                                          }
+                                        },
+                                  child: const Text('Retry this device'),
+                                )
+                              : null,
+                        ),
+                    ],
                   ),
               ],
             ),

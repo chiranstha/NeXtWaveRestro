@@ -39,9 +39,14 @@ export class RestaurantGuestApiService {
     reportPrintJob(body: unknown): Observable<any> { return this.post('RestaurantGuestOperations', 'ReportPrintJob', body); }
     retryPrintJob(body: unknown): Observable<any> { return this.post('RestaurantGuestOperations', 'RetryPrintJob', body); }
     printJobs(): Observable<any[]> { return this.get('RestaurantGuestOperations', 'GetPrintJobs'); }
+    registerPrintDevice(body: unknown): Observable<any> { return this.post('RestaurantGuestOperations', 'RegisterPrintDevice', body); }
+    printDevices(): Observable<any[]> { return this.get('RestaurantGuestOperations', 'GetPrintDevices'); }
+    setPrintDeviceEnabled(body: unknown): Observable<any> { return this.post('RestaurantGuestOperations', 'SetPrintDeviceEnabled', body); }
     tables(): Observable<any[]> { return this.get('RestaurantSetup', 'GetTables'); }
     operationalSettings(): Observable<any> { return this.get('RestaurantSetup', 'GetOperationalSettings'); }
     restaurantStations(): Observable<any[]> { return this.get('RestaurantSetup', 'GetStations'); }
+    printRoutes(): Observable<any[]> { return this.get('RestaurantSetup', 'GetPrintRoutes'); }
+    savePrintRoutes(body: unknown): Observable<any> { return this.post('RestaurantSetup', 'SavePrintRoutes', body); }
 
     private get<T>(service: string, method: string): Observable<T> {
         return this.http.get<any>(this.url(service, method)).pipe(map((x) => this.unwrap(x)));

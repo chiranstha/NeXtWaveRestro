@@ -1,0 +1,1234 @@
+
+Warning: This is a simple server for use in testing or debugging Angular applications
+locally. It hasn't been reviewed for security issues.
+
+Binding this server to an open connection can result in compromising your application or
+computer. Using a different host than the one passed to the "--host" flag might result in
+websocket connection issues.
+    
+7:44:07 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:44:09 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:44:09 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:44:10 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:44:10 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:44:10 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:44:10 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:44:24 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:44:24 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:46:26 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:46:26 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:46:27 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:46:27 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:46:27 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:46:27 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:46:27 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:46:28 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:46:29 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:47:27 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:47:28 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:47:28 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:47:28 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:47:28 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:47:28 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:47:29 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:47:30 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:47:41 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:47:41 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:51:58 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:51:58 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:51:58 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:51:58 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:51:58 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:51:58 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:51:58 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:51:58 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:51:58 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:51:58 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:51:59 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:51:59 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:52:00 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:56:24 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:56:24 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:56:24 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:56:25 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:56:25 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:56:25 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:56:25 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:56:25 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:56:25 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:56:25 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:56:25 AM [vite] (client) [console.error] Global Error Handler: Error: NG0100: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: '[]'. Current value: '[{"groupName":"","ledgerName":"Total","openingDr":0,"openingCr":0,"debit":0,"credit":0,"balanceDr":0,"balanceCr":0}]'. Expression location: AccountLedgerReportComponent2 component. Find more at https://v22.angular.dev/errors/NG0100
+    at throwErrorIfNoChangesMode (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:2872:8)
+    at bindingUpdated (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:6442:5)
+    at ɵɵproperty (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:11683:6)
+    at AccountLedgerReportComponent2_Template (ng:///AccountLedgerReportComponent2.js:218:82)
+    at executeTemplate (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4213:3)
+    at refreshView (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4757:28)
+    at detectChangesInView (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4855:25)
+    at detectChangesInViewIfAttached (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4841:2)
+    at detectChangesInComponent (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4834:3)
+    at detectChangesInChildComponents (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4870:46)
+7:56:25 AM [vite] (client) [console.error] Client Error: {"message":"NG0100: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: '[]'. Current value: '[{\"groupName\":\"\",\"ledgerName\":\"Total\",\"openingDr\":0,\"openingCr\":0,\"debit\":0,\"credit\":0,\"balanceDr\":0,\"balanceCr\":0}]'. Expression location: AccountLedgerReportComponent2 component. Find more at https://v22.angular.dev/errors/NG0100","stack":"Error: NG0100: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: '[]'. Current value: '[{\"groupName\":\"\",\"ledgerName\":\"Total\",\"openingDr\":0,\"openingCr\":0,\"debit\":0,\"credit\":0,\"balanceDr\":0,\"balanceCr\":0}]'. Expression location: AccountLedgerReportComponent2 component. Find more at https://v22.angular.dev/errors/NG0100\n    at throwErrorIfNoChangesMode (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:2872:8)\n    at bindingUpdated (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:6442:5)\n    at ɵɵproperty (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:11683:6)\n    at AccountLedgerReportComponent2_Template (ng:///AccountLedgerReportComponent2.js:218:82)\n    at executeTemplate (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4213:3)\n    at refreshView (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4757:28)\n    at detectChangesInView (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4855:25)\n    at detectChangesInViewIfAttached (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4841:2)\n    at detectChangesInComponent (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4834:3)\n    at detectChangesInChildComponents (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4870:46)","timestamp":"2026-09-30T02:11:25.880Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36","url":"http://localhost:4200/app/main/reports/account-ledger"}
+7:56:25 AM [vite] (client) [console.warn] User-friendly error message: NG0100: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: '[]'. Current value: '[{"groupName":"","ledgerName":"Total","openingDr":0,"openingCr":0,"debit":0,"credit":0,"balanceDr":0,"balanceCr":0}]'. Expression location: AccountLedgerReportComponent2 component. Find more at https://v22.angular.dev/errors/NG0100
+7:56:25 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:56:26 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:12 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:57:13 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:13 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:13 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:13 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:13 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:57:13 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:13 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:13 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:13 AM [vite] (client) [console.error] Global Error Handler: Error: NG0100: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: '[]'. Current value: '[{"groupName":"","ledgerName":"Total","openingDr":0,"openingCr":0,"debit":0,"credit":0,"balanceDr":0,"balanceCr":0}]'. Expression location: AccountLedgerReportComponent2 component. Find more at https://v22.angular.dev/errors/NG0100
+    at throwErrorIfNoChangesMode (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:2872:8)
+    at bindingUpdated (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:6442:5)
+    at ɵɵproperty (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:11683:6)
+    at AccountLedgerReportComponent2_Template (ng:///AccountLedgerReportComponent2.js:218:82)
+    at executeTemplate (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4213:3)
+    at refreshView (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4757:28)
+    at detectChangesInView (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4855:25)
+    at detectChangesInViewIfAttached (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4841:2)
+    at detectChangesInComponent (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4834:3)
+    at detectChangesInChildComponents (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4870:46)
+7:57:13 AM [vite] (client) [console.error] Client Error: {"message":"NG0100: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: '[]'. Current value: '[{\"groupName\":\"\",\"ledgerName\":\"Total\",\"openingDr\":0,\"openingCr\":0,\"debit\":0,\"credit\":0,\"balanceDr\":0,\"balanceCr\":0}]'. Expression location: AccountLedgerReportComponent2 component. Find more at https://v22.angular.dev/errors/NG0100","stack":"Error: NG0100: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: '[]'. Current value: '[{\"groupName\":\"\",\"ledgerName\":\"Total\",\"openingDr\":0,\"openingCr\":0,\"debit\":0,\"credit\":0,\"balanceDr\":0,\"balanceCr\":0}]'. Expression location: AccountLedgerReportComponent2 component. Find more at https://v22.angular.dev/errors/NG0100\n    at throwErrorIfNoChangesMode (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:2872:8)\n    at bindingUpdated (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:6442:5)\n    at ɵɵproperty (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:11683:6)\n    at AccountLedgerReportComponent2_Template (ng:///AccountLedgerReportComponent2.js:218:82)\n    at executeTemplate (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4213:3)\n    at refreshView (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4757:28)\n    at detectChangesInView (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4855:25)\n    at detectChangesInViewIfAttached (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4841:2)\n    at detectChangesInComponent (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4834:3)\n    at detectChangesInChildComponents (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4870:46)","timestamp":"2026-09-30T02:12:13.870Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36","url":"http://localhost:4200/app/main/reports/account-ledger"}
+7:57:13 AM [vite] (client) [console.warn] User-friendly error message: NG0100: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: '[]'. Current value: '[{"groupName":"","ledgerName":"Total","openingDr":0,"openingCr":0,"debit":0,"credit":0,"balanceDr":0,"balanceCr":0}]'. Expression location: AccountLedgerReportComponent2 component. Find more at https://v22.angular.dev/errors/NG0100
+7:57:14 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:24 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:57:24 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:57:24 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:57:24 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:57:25 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:25 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:25 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:25 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:25 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:25 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:25 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:57:25 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:25 AM [vite] (client) [console.error] Global Error Handler: Error: NG0100: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: '[]'. Current value: '[{"groupName":"","ledgerName":"Total","openingDr":0,"openingCr":0,"debit":0,"credit":0,"balanceDr":0,"balanceCr":0}]'. Expression location: AccountLedgerReportComponent2 component. Find more at https://v22.angular.dev/errors/NG0100
+    at throwErrorIfNoChangesMode (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:2872:8)
+    at bindingUpdated (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:6442:5)
+    at ɵɵproperty (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:11683:6)
+    at AccountLedgerReportComponent2_Template (ng:///AccountLedgerReportComponent2.js:218:82)
+    at executeTemplate (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4213:3)
+    at refreshView (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4757:28)
+    at detectChangesInView (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4855:25)
+    at detectChangesInViewIfAttached (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4841:2)
+    at detectChangesInComponent (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4834:3)
+    at detectChangesInChildComponents (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4870:46)
+7:57:25 AM [vite] (client) [console.error] Client Error: {"message":"NG0100: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: '[]'. Current value: '[{\"groupName\":\"\",\"ledgerName\":\"Total\",\"openingDr\":0,\"openingCr\":0,\"debit\":0,\"credit\":0,\"balanceDr\":0,\"balanceCr\":0}]'. Expression location: AccountLedgerReportComponent2 component. Find more at https://v22.angular.dev/errors/NG0100","stack":"Error: NG0100: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: '[]'. Current value: '[{\"groupName\":\"\",\"ledgerName\":\"Total\",\"openingDr\":0,\"openingCr\":0,\"debit\":0,\"credit\":0,\"balanceDr\":0,\"balanceCr\":0}]'. Expression location: AccountLedgerReportComponent2 component. Find more at https://v22.angular.dev/errors/NG0100\n    at throwErrorIfNoChangesMode (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:2872:8)\n    at bindingUpdated (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:6442:5)\n    at ɵɵproperty (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:11683:6)\n    at AccountLedgerReportComponent2_Template (ng:///AccountLedgerReportComponent2.js:218:82)\n    at executeTemplate (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4213:3)\n    at refreshView (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4757:28)\n    at detectChangesInView (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4855:25)\n    at detectChangesInViewIfAttached (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4841:2)\n    at detectChangesInComponent (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4834:3)\n    at detectChangesInChildComponents (http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/core-B6qxEtln.js?v=f107287e:4870:46)","timestamp":"2026-09-30T02:12:25.878Z","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36","url":"http://localhost:4200/app/main/reports/account-ledger"}
+7:57:25 AM [vite] (client) [console.warn] User-friendly error message: NG0100: ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: '[]'. Current value: '[{"groupName":"","ledgerName":"Total","openingDr":0,"openingCr":0,"debit":0,"credit":0,"balanceDr":0,"balanceCr":0}]'. Expression location: AccountLedgerReportComponent2 component. Find more at https://v22.angular.dev/errors/NG0100
+7:57:26 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:33 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:57:33 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:57:33 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:57:33 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:57:33 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:57:33 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+7:57:33 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:33 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:33 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:33 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:33 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:33 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:34 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:57:34 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+7:58:16 AM [vite] (client) [console.warn] SweetAlert2: The parameter "backdrop" is incompatible with toasts
+7:58:29 AM [vite] (client) [console.warn] SweetAlert2: The parameter "backdrop" is incompatible with toasts
+7:58:41 AM [vite] (client) [console.warn] NG0953: Unexpected emit for destroyed `OutputRef`. The owning directive/component is destroyed.
+8:00:37 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:00:38 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:00:38 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:00:38 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:00:38 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:00:38 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:00:39 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:00:40 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:01:20 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+8:01:20 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:01:21 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:01:21 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:01:21 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:01:21 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:01:21 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:01:22 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:01:22 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:01:41 AM [vite] (client) [console.warn] NG0913: An image with src http://localhost:4200/assets/common/images/applogo.png has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://v22.angular.dev/errors/NG0913. Find more at https://v22.angular.dev/errors/NG0913
+8:01:42 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:01:43 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:01:43 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:01:43 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:01:43 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:01:43 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:01:43 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:01:44 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:02:38 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:26:27 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:26:28 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:26:28 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:26:28 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:26:28 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:26:28 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:26:28 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:26:29 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+8:26:30 AM [vite] (client) [console.error] TypeError: Cannot read properties of undefined (reading 'filter')
+    at ChatBarComponent2.markAllUnreadMessagesOfUserAsRead (http://localhost:4200/chunk-WICNN3NC.js:6654:42)
+    at set isOpen (http://localhost:4200/chunk-WICNN3NC.js:6519:12)
+    at http://localhost:4200/chunk-WICNN3NC.js:6734:19
+    at http://localhost:4200/@fs/C:/Users/chira/Videos/NeXtWaveRestro/angular/.angular/cache/22.1.1/abp-zero-template/vite/deps/localforage.js?v=f107287e:335:7
+    at _ZoneDelegate.invoke (http://localhost:4200/polyfills.js:27477:158)
+    at _ZoneImpl2.run (http://localhost:4200/polyfills.js:27246:35)
+    at http://localhost:4200/polyfills.js:29170:30
+    at _ZoneDelegate.invokeTask (http://localhost:4200/polyfills.js:27503:171)
+    at _ZoneImpl2.runTask (http://localhost:4200/polyfills.js:27284:37)
+    at drainMicroTaskQueueSynchronously (http://localhost:4200/polyfills.js:27666:21)
+▲ [WARNING] Duplicate key "id" in object literal [duplicate-object-key]
+
+    src/app/main/restaurant/restaurant-print-station.component.ts:266:16:
+      266 │                 id: job.id,
+          ╵                 ~~
+
+  The original key "id" is here:
+
+    src/app/main/restaurant/restaurant-print-station.component.ts:264:16:
+      264 │                 id: job.id,
+          ╵                 ~~
+
+
+▲ [WARNING] Duplicate key "deliveryId" in object literal [duplicate-object-key]
+
+    src/app/main/restaurant/restaurant-print-station.component.ts:267:16:
+      267 │                 deliveryId: job.deliveryId,
+          ╵                 ~~~~~~~~~~
+
+  The original key "deliveryId" is here:
+
+    src/app/main/restaurant/restaurant-print-station.component.ts:265:16:
+      265 │                 deliveryId: job.deliveryId,
+          ╵                 ~~~~~~~~~~
+
+
+X [ERROR] TS1117: An object literal cannot have multiple properties with the same name. [plugin angular-compiler]
+
+    src/app/main/restaurant/restaurant-print-station.component.ts:260:16:
+      260 │                 id: job.id,
+          ╵                 ~~
+
+
+X [ERROR] TS1117: An object literal cannot have multiple properties with the same name. [plugin angular-compiler]
+
+    src/app/main/restaurant/restaurant-print-station.component.ts:261:16:
+      261 │                 deliveryId: job.deliveryId,
+          ╵                 ~~~~~~~~~~
+
+
+8:27:33 AM [vite] (client) [Unhandled error] HttpErrorResponse: Http failure response for https://localhost:44305/api/services/app/RestaurantSetup/GetPrintRoutes: 404 OK
+
+8:28:10 AM [vite] (client) [Unhandled error] HttpErrorResponse: Http failure response for https://localhost:44305/api/services/app/RestaurantSetup/GetPrintRoutes: 404 OK
+
+8:30:51 AM [vite] (client) [Unhandled error] HttpErrorResponse: Http failure response for https://localhost:44305/api/services/app/RestaurantSetup/GetPrintRoutes: 404 OK
+
+8:30:56 AM [vite] (client) [Unhandled error] HttpErrorResponse: Http failure response for https://localhost:44305/api/services/app/RestaurantSetup/GetPrintRoutes: 404 OK
+
+8:40:53 AM [vite] (client) [Unhandled error] HttpErrorResponse: Http failure response for https://localhost:44305/api/services/app/RestaurantSetup/GetPrintRoutes: 404 OK
+
+8:40:57 AM [vite] (client) [Unhandled error] HttpErrorResponse: Http failure response for https://localhost:44305/api/services/app/RestaurantSetup/GetPrintRoutes: 404 OK
+
+8:52:07 AM [vite] (client) [Unhandled error] HttpErrorResponse: Http failure response for https://localhost:44305/api/services/app/RestaurantSetup/GetPrintRoutes: 404 OK
+
+8:56:36 AM [vite] (client) [Unhandled error] HttpErrorResponse: Http failure response for https://localhost:44305/api/services/app/RestaurantSetup/GetPrintRoutes: 404 OK
+
+8:56:44 AM [vite] (client) [Unhandled error] HttpErrorResponse: Http failure response for https://localhost:44305/api/services/app/RestaurantSetup/GetPrintRoutes: 404 OK
+
+8:57:31 AM [vite] (client) [Unhandled error] HttpErrorResponse: Http failure response for https://localhost:44305/api/services/app/RestaurantSetup/GetPrintRoutes: 404 OK
+
+8:57:36 AM [vite] (client) [Unhandled error] HttpErrorResponse: Http failure response for https://localhost:44305/api/services/app/RestaurantSetup/GetPrintRoutes: 404 OK
+
+9:03:23 AM [vite] (client) [Unhandled error] HttpErrorResponse: Http failure response for https://localhost:44305/api/services/app/RestaurantSetup/GetPrintRoutes: 404 OK
+
+9:03:25 AM [vite] (client) [Unhandled error] HttpErrorResponse: Http failure response for https://localhost:44305/api/services/app/RestaurantSetup/GetPrintRoutes: 404 OK
+
+9:14:42 AM [vite] (client) [Unhandled error] HttpErrorResponse: Http failure response for https://localhost:44305/api/services/app/RestaurantSetup/GetPrintRoutes: 404 OK
+

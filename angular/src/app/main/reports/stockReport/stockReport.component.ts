@@ -17,6 +17,7 @@ import { appModuleAnimation } from '@shared/animations/routerTransition';
     standalone: false,
     selector: 'appstockreport',
     templateUrl: './stockReport.component.html',
+    styleUrls: ['./stockReport.component.css'],
     animations: [appModuleAnimation],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -24,7 +25,8 @@ export class StockReportComponent extends AppComponentBase implements OnInit, On
     // UI state
     advancedFiltersAreShown = false;
     isPdfShow = false;
-    loading = false;
+    loading = true;
+    reportLoadError = false;
     pdfUrl = '';
     filterText = '';
     title = 'Stock Report';
@@ -162,6 +164,7 @@ export class StockReportComponent extends AppComponentBase implements OnInit, On
         pagination: false,
         pinnedBottomRowData: [],
         suppressHorizontalScroll: false,
+        overlayNoRowsTemplate: '<span class="ag-overlay-no-rows-center">No stock items match these filters.</span>',
         getContextMenuItems: (params) => this.getCustomContextMenuItems(params),
         getRowStyle: (params) => {
             if (params.node.rowPinned === 'bottom') {
@@ -285,8 +288,8 @@ export class StockReportComponent extends AppComponentBase implements OnInit, On
                 this._cdr.markForCheck();
             },
             error: (error) => {
-
-                this.notify.error('Failed to load initial data');
+                this.reportLoadError = true;
+                this.loading = false;
                 console.error('Error loading initial data:', error);
                 this._cdr.markForCheck();
             }
@@ -343,6 +346,7 @@ export class StockReportComponent extends AppComponentBase implements OnInit, On
     getAllData(fromMiti: string, toMiti: string, productGroupId: string, ledgerId: string, isZeroStock = false): void {
         this.tableRows = this.setGridRowData(this.gridApi, []);
         this.setPinnedBottomRows([]);
+        this.reportLoadError = false;
         this.loading = true;
         this._cdr.markForCheck();
 
@@ -358,10 +362,11 @@ export class StockReportComponent extends AppComponentBase implements OnInit, On
                 next: (result) => {
                     this.tableRows = this.setGridRowData(this.gridApi, result);
                     this.calculateTotals();
+                    this.reportLoadError = false;
                     this._cdr.markForCheck();
                 },
                 error: (error) => {
-                    this.notify.error('Failed to load report data');
+                    this.reportLoadError = true;
                     console.error('Error loading report data:', error);
                     this._cdr.markForCheck();
                 }
@@ -467,7 +472,7 @@ export class StockReportComponent extends AppComponentBase implements OnInit, On
 
     // Cell double-click handler
     onCellDoubleClicked(params): void {
-        if (!params.data?.productId) {return;}
+        if (params.colDef?.field !== 'productName' || !params.data?.productId) {return;}
 
         const {productId} = params.data;
         localStorage.setItem(AppConsts.suktasStorage.stockReportForm, JSON.stringify(this.form.value));

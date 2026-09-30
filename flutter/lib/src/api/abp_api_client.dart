@@ -168,4 +168,7 @@ Map<String, dynamic> _map(dynamic value) {
   return value is Map<String, dynamic> ? value : <String, dynamic>{};
 }
 
+Map<String, dynamic>? _nullableMap(dynamic value) =>
+    value is Map<String, dynamic> ? value : null;
+
 List<dynamic> _list(dynamic value) => value is List ? value : const [];

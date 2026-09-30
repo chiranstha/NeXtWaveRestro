@@ -6,15 +6,25 @@ Flutter staff application backed by the existing NextWave ERP restaurant service
 
 - tenant login, two-factor verification, required-password reset, encrypted session storage, and permission-aware navigation;
 - live POS menu, variants/modifiers, dine-in/takeaway/delivery orders, guarded context switching, open-order editing, item voids, table transfer, order split/merge, KOT/BOT history and audited reprints;
+- shared restaurant print routes with independent Windows and Android device deliveries, per-device results, and device-specific retries;
 - full and partial billing by item/quantity, stock validation, manager-PIN discounts, payment/ledger selection, tips, and server-side bill posting;
-- 80 mm customer receipt PDFs after billing, sent to the Android/iOS system print dialog for compatible installed printers;
+- customer receipt PDFs sent to the Android/iOS system print dialog, plus direct Android ESC/POS printing for configured receipt routes;
 - KDS ticket and item progression/cancellation with live polling;
 - menu availability and recipe-cost visibility;
 - low-stock replenishment, draft purchase-order generation, supplier mappings, stock counts/adjustments/wastage, consumption history, and recipe coverage;
 - channel setup/menu publishing, aggregator acceptance/status handling, payout reconciliation, editable area/table/station/operational setup, device sync health, and all 17 restaurant report endpoints;
 - automatic access-token refresh, secure session persistence, Android and iOS runners, and responsive phone/tablet layouts.
 
-Final taxes, charges, inventory consumption, ledger posting, and bill totals are calculated by the backend. Receipt printing uses printers exposed by the device's system print service (such as AirPrint or Android print services). Direct Bluetooth/LAN ESC/POS pairing and KOT station routing remain planned in `../futureplan.md`. The app is online-first; offline sync is intentionally deferred there too.
+Final taxes, charges, inventory consumption, ledger posting, and bill totals are calculated by the backend. The app is online-first; offline sync is intentionally deferred in `../futureplan.md`.
+
+## Multiple print stations
+
+1. In the web app, open **Restaurant → Print station**, pair the Windows Print Agent, and add shared routes such as `kitchen`, `bar`, and `receipt`. Each route can use a Windows printer queue or a TCP/IP printer.
+2. Save the routes, then choose the matching route in Restaurant setup for each kitchen/bar station and for receipts. Menu items continue to use their assigned station.
+3. On Android, open **Print Queue → Android printer setup**. Enable only the shared routes this phone should print. Set a printer IP and port, or pair/select a Bluetooth Classic or BLE printer. Use **Test printer**, save the routes, and start printing.
+4. Android printing runs as an opt-in foreground service with a persistent notification. Stop it from the same setup screen to disable this phone for new jobs. Android may restrict restarting services after reboot or app force-stop.
+
+Each enabled device mapped to a job's route receives its own copy. The queue shows a separate result for every device; retrying a failed copy targets that device. The Windows browser station must remain open while it claims jobs. iPhone uses the shared Windows station workflow in this release. Direct printing is for compatible ESC/POS thermal printers; some BLE printer models may need a printer-specific adapter.
 
 ## Run
 
@@ -26,7 +36,7 @@ C:\Users\suman\flutter\bin\flutter.bat run --dart-define=APP_BASE_URL=https://lo
 
 The server address can also be changed on the login screen. A physical phone cannot use the PC's `localhost`; provide a reachable HTTPS hostname/IP with a certificate trusted by that device. The Android emulator normally reaches the host machine through `10.0.2.2`, but the HTTPS certificate must still be trusted.
 
-The mobile app intentionally keeps final tax/service-charge calculation, stock posting, sales-ledger posting, payment validation, and bill numbering in the existing backend. Offline-first sync, guest QR ordering, direct wallet integrations, and printer/device drivers remain planned in `../futureplan.md`.
+The mobile app intentionally keeps final tax/service-charge calculation, stock posting, sales-ledger posting, payment validation, and bill numbering in the existing backend. Offline-first sync, guest QR ordering, and direct wallet integrations remain planned in `../futureplan.md`.
 
 ## Verify and build
 

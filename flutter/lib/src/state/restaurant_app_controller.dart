@@ -163,6 +163,7 @@ class RestaurantAppController extends ChangeNotifier {
   List<GuestOrderModel> guestOrders = [];
   List<RestaurantReservationRecord> reservations = [];
   List<RestaurantPrintJobRecord> printJobs = [];
+  bool mobilePrinterRunning = false;
 
   String selectedPosContext = 'mode:takeaway';
   String selectedCategory = 'All';
@@ -454,6 +455,13 @@ class RestaurantAppController extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    if (Platform.isAndroid) {
+      try {
+        await stopMobilePrintStation();
+      } catch (_) {
+        await AndroidPrintStationService.stop();
+      }
+    }
     await _sessionStore.clear();
     _detachSession();
     initialized = true;
@@ -2569,6 +2577,89 @@ class RestaurantAppController extends ChangeNotifier {
       noticeMessage = 'Print job added back to the ERP queue.';
     });
   }
+
+  Future<void> retryPrintDelivery(RestaurantPrintJobRecord job, RestaurantPrintDeliveryRecord delivery) async {
+    if (_demoMode) return;
+    await _runBusy(() async {
+      await _api!.retryPrintJob(job.id, deliveryId: delivery.id);
+      printJobs = await _api!.getPrintJobs();
+      noticeMessage = 'Print copy returned to ${delivery.deviceName}.';
+    });
+  }
+
+  Future<List<Map<String, dynamic>>> getSharedPrinterRoutes() async =>
+      _api?.getPrinterRoutes() ?? <Map<String, dynamic>>[];
+
+  Future<List<Map<String, dynamic>>> getRegisteredPrintDevices() async =>
+      _api?.getPrintDevices() ?? <Map<String, dynamic>>[];
+
+  Future<String> getMobilePrintDeviceKey() async {
+    var key = await _sessionStore.readValue('restaurantPrintDeviceKey');
+    if (key != null && key.isNotEmpty) return key;
+    final random = math.Random.secure();
+    key = List.generate(16, (_) => random.nextInt(256).toRadixString(16).padLeft(2, '0')).join();
+    await _sessionStore.writeValue('restaurantPrintDeviceKey', key);
+    return key;
+  }
+
+  Future<Map<String, dynamic>> getMobilePrinterMappings() async {
+    final stored = await _sessionStore.readValue('restaurantPrintRouteMappings');
+    if (stored == null || stored.isEmpty) return <String, dynamic>{};
+    try {
+      final decoded = jsonDecode(stored);
+      return decoded is Map<String, dynamic> ? decoded : <String, dynamic>{};
+    } on FormatException {
+      return <String, dynamic>{};
+    }
+  }
+
+  Future<void> saveMobilePrinterMappings(Map<String, dynamic> mappings) async {
+    await _sessionStore.writeValue('restaurantPrintRouteMappings', jsonEncode(mappings));
+  }
+
+  Future<void> startMobilePrintStation(Map<String, dynamic> mappings) async {
+    if (_demoMode || _api == null || session == null) throw const ApiException('Sign in to configure mobile printing.');
+    final enabledMappings = <String, dynamic>{
+      for (final entry in mappings.entries)
+        if (entry.value is Map && (entry.value as Map)['enabled'] != false) entry.key: entry.value,
+    };
+    final routeNames = enabledMappings.keys.toList();
+    if (routeNames.isEmpty) throw const ApiException('Enable and configure at least one printer route first.');
+    await saveMobilePrinterMappings(mappings);
+    final key = await getMobilePrintDeviceKey();
+    final registered = await _api!.registerPrintDevice(
+      clientDeviceId: key,
+      name: 'Android Print Station',
+      routeNames: routeNames,
+    );
+    final serverId = _string(registered['id']);
+    if (serverId.isEmpty) throw const ApiException('The Android print device could not be registered.');
+    await _sessionStore.writeValue('restaurantPrintServerDeviceId', serverId);
+    await _api!.setPrintDeviceEnabled(id: serverId, isEnabled: true);
+    try {
+      await AndroidPrintStationService.start(deviceId: key, routeMappings: enabledMappings);
+    } catch (_) {
+      await _api!.setPrintDeviceEnabled(id: serverId, isEnabled: false);
+      rethrow;
+    }
+    mobilePrinterRunning = true;
+    notifyListeners();
+  }
+
+  Future<void> stopMobilePrintStation({bool disableServer = true}) async {
+    if (Platform.isAndroid) await AndroidPrintStationService.stop();
+    mobilePrinterRunning = false;
+    if (disableServer && _api != null) {
+      final serverId = await _sessionStore.readValue('restaurantPrintServerDeviceId');
+      if (serverId != null && serverId.isNotEmpty) {
+        await _api!.setPrintDeviceEnabled(id: serverId, isEnabled: false);
+      }
+    }
+    notifyListeners();
+  }
+
+  Future<bool> isMobilePrintStationRunning() async =>
+      Platform.isAndroid && await FlutterForegroundTask.isRunningService;
 
   Future<void> _reloadReservations() async {
     final now = DateTime.now();

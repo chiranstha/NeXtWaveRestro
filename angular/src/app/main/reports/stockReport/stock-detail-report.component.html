@@ -1,0 +1,66 @@
+<div [@routerTransition] class="stock-detail-page">
+    <sub-header [title]="'Stock Detail' | localize" [description]="(report?.productName || 'Product stock movement') + (report?.unitName ? ' · ' + report.unitName : '')">
+        <div role="search" class="stock-detail-search">
+            <i class="fa fa-search" aria-hidden="true"></i>
+            <input class="form-control" type="search" [(ngModel)]="searchText" [ngModelOptions]="{standalone: true}" placeholder="Search this report" aria-label="Search this report" />
+        </div>
+        <div role="actions" class="stock-detail-actions">
+            <button type="button" class="btn btn-sm btn-light" (click)="goBack()"><i class="fa fa-arrow-left"></i> Back</button>
+        </div>
+    </sub-header>
+
+    <main [class]="containerClass + ' stock-detail-content'">
+        <section class="stock-detail-filters card card-bordered">
+            <div class="stock-detail-filter-intro">
+                <div><h2>Report period</h2><p>Review dated inward and outward movements with a running balance.</p></div>
+                <span class="stock-detail-opening"><small>Opening balance</small><strong>{{ formatNumber(report?.openingQty) }} {{ report?.unitName }}</strong></span>
+            </div>
+            <form [formGroup]="form" (ngSubmit)="loadReport()" class="stock-detail-filter-form">
+                <div><label class="form-label" for="stock-detail-from">Date from</label><ne-datepicker [formControl]="form.controls['fromMiti']" [npDatePickerId]="'stock-detail-from'" language="en"></ne-datepicker></div>
+                <div><label class="form-label" for="stock-detail-to">Date to</label><ne-datepicker [formControl]="form.controls['toMiti']" [npDatePickerId]="'stock-detail-to'" language="en"></ne-datepicker></div>
+                <button class="btn btn-primary" type="submit" [disabled]="loading"><i class="fa fa-filter"></i> Apply filters</button>
+            </form>
+        </section>
+
+        <section class="stock-detail-chart card card-bordered" aria-label="Stock movement chart">
+            <header class="stock-detail-section-heading">
+                <div><h2>Stock movement</h2><p>Movement trend for {{ report?.productName || 'this product' }}</p></div>
+                <div class="stock-detail-controls">
+                    <div class="stock-segmented" aria-label="Chart measure">
+                        <button type="button" [class.active]="chartMode === 'quantity'" (click)="setChartMode('quantity')">Quantity</button>
+                        <button type="button" [class.active]="chartMode === 'value'" (click)="setChartMode('value')">Stock value</button>
+                        <button type="button" [class.active]="chartMode === 'movement'" (click)="setChartMode('movement')">Inward vs outward</button>
+                    </div>
+                    <div class="stock-segmented stock-range" aria-label="Chart range">
+                        <button type="button" *ngFor="let range of ['7 Days', '30 Days', '3 Months', 'Custom']" [class.active]="dateRange === range" (click)="setDateRange(range)">{{ range }}</button>
+                    </div>
+                </div>
+            </header>
+            <div *ngIf="chartRows.length; else emptyChart" class="stock-detail-chart-scroll">
+                <svg class="stock-detail-svg" [attr.viewBox]="'0 0 ' + chartWidth + ' 150'" [style.width.px]="chartWidth" role="img" aria-label="Product balance over time">
+                    <line x1="0" [attr.x2]="chartWidth" y1="26" y2="26" class="chart-gridline"></line>
+                    <line x1="0" [attr.x2]="chartWidth" y1="76" y2="76" class="chart-gridline"></line>
+                    <line x1="0" [attr.x2]="chartWidth" y1="126" y2="126" class="chart-gridline"></line>
+                    <ng-container *ngIf="chartMode === 'movement'; else balanceChart">
+                        <g *ngFor="let row of chartRows; let i = index">
+                            <rect class="chart-inward" [attr.x]="chartX(i) - 8" [attr.y]="chartPoint(i, 'inwardQty').y" width="7" [attr.height]="chartPoint(i, 'inwardQty').height" rx="2"></rect>
+                            <rect class="chart-outward" [attr.x]="chartX(i) + 1" [attr.y]="chartPoint(i, 'outwardQty').y" width="7" [attr.height]="chartPoint(i, 'outwardQty').height" rx="2"></rect>
+                        </g>
+                    </ng-container>
+                    <ng-template #balanceChart><path class="chart-area" [attr.d]="chartAreaPath"></path><path class="chart-line" [attr.d]="chartPath"></path></ng-template>
+                </svg>
+                <div class="stock-detail-xaxis" [style.width.px]="chartWidth"><span *ngFor="let row of chartRows">{{ row.dateMiti || (row.date | date:'MMM d') }}</span></div>
+            </div>
+            <ng-template #emptyChart><div class="stock-detail-empty">No stock movement is available for this period.</div></ng-template>
+            <div class="stock-detail-legend"><span><i class="legend-inward"></i>Inward</span><span><i class="legend-outward"></i>Outward</span><span><i class="legend-balance"></i>Balance</span></div>
+        </section>
+
+        <section class="stock-detail-table card card-bordered" aria-label="Stock movement transactions">
+            <div class="stock-detail-table-heading"><div><h2>Stock transactions</h2><p>{{ rows.length }} movements in this period</p></div><strong>Closing: {{ formatNumber(rows.length ? rows[rows.length - 1].balanceQty : report?.openingQty) }} {{ report?.unitName }}</strong></div>
+            <div *ngIf="loadError" class="stock-detail-error" role="alert"><span>Stock detail could not be loaded. Check your connection and try again.</span><button class="btn btn-sm btn-primary" type="button" (click)="loadReport()">Retry</button></div>
+            <div *ngIf="!loadError" class="stock-detail-grid ag-theme-balham">
+                <ag-grid-angular [rowData]="rows" [columnDefs]="columnDefs" [defaultColDef]="defaultColDef" [gridOptions]="gridOptions" [quickFilterText]="searchText" [loading]="loading" [domLayout]="'normal'"></ag-grid-angular>
+            </div>
+        </section>
+    </main>
+</div>

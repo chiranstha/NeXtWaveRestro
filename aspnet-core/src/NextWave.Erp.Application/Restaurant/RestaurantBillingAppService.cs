@@ -34,7 +34,7 @@ namespace NextWave.Erp.Restaurant
         IRepository<RestaurantCashShift, Guid> cashShiftRepository,
         IRepository<RestaurantTable, Guid> tableRepository,
         IRepository<RestaurantTableSession, Guid> tableSessionRepository,
-        IRepository<RestaurantPrintJob, Guid> printJobRepository,
+        RestaurantPrintQueueService printQueueService,
         IRepository<AccountLedger, Guid> accountLedgerRepository,
         IRepository<Product, Guid> productRepository,
         IRepository<Bom, Guid> bomRepository,
@@ -362,18 +362,15 @@ namespace NextWave.Erp.Restaurant
             {
                 var receiptRoute = (await SettingManager.GetSettingValueForTenantAsync(
                     AppSettings.ErpSettings.RestaurantReceiptPrintRouteName, tenantId))?.Trim();
-                await printJobRepository.InsertAsync(new RestaurantPrintJob
+                await printQueueService.QueueAsync(new RestaurantPrintJob
                 {
-                    TenantId = tenantId,
                     ExternalJobId = "RECEIPT-" + billPaymentId.ToString("N"),
                     Type = RestaurantPrintJobType.BillReceipt,
-                    Status = string.IsNullOrWhiteSpace(receiptRoute) ? RestaurantPrintJobStatus.Failed : RestaurantPrintJobStatus.Pending,
                     OrderId = order.Id,
                     RouteName = string.IsNullOrWhiteSpace(receiptRoute) ? "unconfigured" : receiptRoute,
                     Payload = BuildReceiptPayload(order, billableLines, payment, input, billPayment.PaidAt),
-                    LastError = string.IsNullOrWhiteSpace(receiptRoute) ? "No receipt printer route is configured." : null,
                     CreatedAtUtc = DateTime.UtcNow
-                });
+                }, tenantId);
             }
 
             if (isFullyBilled)

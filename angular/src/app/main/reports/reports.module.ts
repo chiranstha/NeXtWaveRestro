@@ -26,6 +26,8 @@ import { LedgerWiseMonthlySalesReportComponent } from './ledgerWiseMonthlySalesR
 import { ProductWiseMonthlySalesReportComponent } from './productWiseMonthlySalesReport/productWiseMonthlySalesReport.component';
 import { BookReportComponent } from './bookReport/bookReport.component';
 import { DaybookReportComponent } from './daybookReport/daybookReport.component';
+import { StockDetailReportComponent } from './stockReport/stock-detail-report.component';
+import { StockDetailReportApiService } from './stockReport/stock-detail-report-api.service';
 
 @NgModule({
     declarations: [
@@ -43,7 +45,8 @@ import { DaybookReportComponent } from './daybookReport/daybookReport.component'
         LedgerWiseMonthlySalesReportComponent,
         ProductWiseMonthlySalesReportComponent,
         BookReportComponent,
-        DaybookReportComponent
+        DaybookReportComponent,
+        StockDetailReportComponent
     ],
     imports: [
         CommonModule,
@@ -60,6 +63,7 @@ import { DaybookReportComponent } from './daybookReport/daybookReport.component'
         NepaliDatepickerModule,
         NgSelectModule,
     ],
+    providers: [StockDetailReportApiService],
     schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA]
 })
 export class ReportsModule { }

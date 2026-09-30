@@ -78,7 +78,15 @@ namespace NextWave.Erp.Common
                 lookup[group.Key] = new UnitConversionLookupDto
                 {
                     MinUnit = minUnit,
-                    AllUnits = units.ToDictionary(uc => uc.UnitId, uc => uc)
+                    AllUnits = units
+                        .GroupBy(uc => uc.UnitId)
+                        .ToDictionary(
+                            unitGroup => unitGroup.Key,
+                            unitGroup => unitGroup
+                                .OrderBy(uc => uc.ConversionRate)
+                                .ThenBy(uc => uc.PrimaryQty)
+                                .ThenBy(uc => uc.Qty)
+                                .First())
                 };
             }
 

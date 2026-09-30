@@ -34,7 +34,7 @@ namespace NextWave.Erp.Restaurant
         IRepository<RestaurantModifier, Guid> modifierRepository,
         IRepository<RestaurantOrderItemModifier, Guid> orderItemModifierRepository,
         IRepository<RestaurantBillLine, Guid> billLineRepository,
-        IRepository<RestaurantPrintJob, Guid> printJobRepository,
+        RestaurantPrintQueueService printQueueService,
         IRepository<RestaurantClientOperation, Guid> operationRepository,
         IRepository<Product, Guid> productRepository,
         IRepository<Unit, Guid> unitRepository,
@@ -415,20 +415,17 @@ namespace NextWave.Erp.Restaurant
                 var ticketItems = group.ToList();
                 var routeName = string.IsNullOrWhiteSpace(station.PrintRouteName) ? "unconfigured" : station.PrintRouteName.Trim();
                 var payload = BuildKitchenTicketPayload(order, ticket, station, ticketItems);
-                await printJobRepository.InsertAsync(new RestaurantPrintJob
+                await printQueueService.QueueAsync(new RestaurantPrintJob
                 {
-                    TenantId = tenantId,
                     ExternalJobId = "KOT-" + ticketId.ToString("N"),
                     Type = RestaurantPrintJobType.KitchenTicket,
-                    Status = string.IsNullOrWhiteSpace(station.PrintRouteName) ? RestaurantPrintJobStatus.Failed : RestaurantPrintJobStatus.Pending,
                     TicketId = ticketId,
                     OrderId = order.Id,
                     StationId = station.Id,
                     RouteName = routeName,
                     Payload = payload,
-                    LastError = string.IsNullOrWhiteSpace(station.PrintRouteName) ? "No print route is configured for this station." : null,
                     CreatedAtUtc = DateTime.UtcNow
-                });
+                }, tenantId);
             }
 
             order.Status = RestaurantOrderStatus.SentToKitchen;
@@ -1334,12 +1331,10 @@ namespace NextWave.Erp.Restaurant
                     })
                 .ToListAsync();
             var routeName = string.IsNullOrWhiteSpace(station.PrintRouteName) ? "unconfigured" : station.PrintRouteName.Trim();
-            await printJobRepository.InsertAsync(new RestaurantPrintJob
+            await printQueueService.QueueAsync(new RestaurantPrintJob
             {
-                TenantId = AbpSession.TenantId,
                 ExternalJobId = $"REPRINT-{ticket.Id:N}-{ticket.PrintCount}",
                 Type = RestaurantPrintJobType.KitchenTicket,
-                Status = string.IsNullOrWhiteSpace(station.PrintRouteName) ? RestaurantPrintJobStatus.Failed : RestaurantPrintJobStatus.Pending,
                 TicketId = ticket.Id,
                 OrderId = order.Id,
                 StationId = station.Id,
@@ -1347,9 +1342,8 @@ namespace NextWave.Erp.Restaurant
                 Payload = BuildKitchenTicketPayload(order, ticket, station, ticketLines),
                 IsDeliberateReprint = true,
                 ReprintReason = reason.Length > 500 ? reason[..500] : reason,
-                LastError = string.IsNullOrWhiteSpace(station.PrintRouteName) ? "No print route is configured for this station." : null,
                 CreatedAtUtc = DateTime.UtcNow
-            });
+            }, AbpSession.GetTenantId());
         }
 
         private static RestaurantTicketType GetTicketType(RestaurantStation station)

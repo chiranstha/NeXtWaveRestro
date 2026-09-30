@@ -22,6 +22,8 @@ namespace NextWave.Erp.Restaurant
         Task<RestaurantDeviceDto> RegisterDevice(RegisterRestaurantDeviceDto input);
         Task<RestaurantOperationalSettingsDto> GetOperationalSettings();
         Task UpdateOperationalSettings(RestaurantOperationalSettingsDto input);
+        Task<List<RestaurantPrintRouteDto>> GetPrintRoutes();
+        Task SavePrintRoutes(SaveRestaurantPrintRoutesDto input);
     }
 
     public interface IRestaurantMenuAppService : IApplicationService
@@ -169,6 +171,9 @@ namespace NextWave.Erp.Restaurant
         Task<Guid> AddWalkIn(CreateRestaurantWalkInDto input);
         Task UpdateReservation(UpdateRestaurantReservationDto input);
         Task<RestaurantPrintJobDto> ClaimPrintJob(ClaimRestaurantPrintJobDto input);
+        Task<RestaurantPrintDeviceDto> RegisterPrintDevice(RegisterRestaurantPrintDeviceDto input);
+        Task<List<RestaurantPrintDeviceDto>> GetPrintDevices();
+        Task SetPrintDeviceEnabled(SetRestaurantPrintDeviceEnabledDto input);
         Task<List<RestaurantPrintJobDto>> GetPrintJobs();
         Task<RestaurantPrintJobDto> ReportPrintJob(ReportRestaurantPrintJobDto input);
         Task RetryPrintJob(RetryRestaurantPrintJobDto input);

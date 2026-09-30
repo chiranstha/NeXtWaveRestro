@@ -15,6 +15,7 @@ import { LedgerWiseMonthlySalesReportComponent } from './ledgerWiseMonthlySalesR
 import { ProductWiseMonthlySalesReportComponent } from './productWiseMonthlySalesReport/productWiseMonthlySalesReport.component';
 import { BookReportComponent } from './bookReport/bookReport.component';
 import { DaybookReportComponent } from './daybookReport/daybookReport.component';
+import { StockDetailReportComponent } from './stockReport/stock-detail-report.component';
 
 const routes: Routes = [
     {
@@ -48,6 +49,11 @@ const routes: Routes = [
             {
                 path: 'stock-report',
                 component: StockReportComponent,
+                data: { permission: 'Pages.StockReport' }
+            },
+            {
+                path: 'product-wise/:id',
+                component: StockDetailReportComponent,
                 data: { permission: 'Pages.StockReport' }
             },
             {

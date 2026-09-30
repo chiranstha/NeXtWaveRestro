@@ -22,6 +22,7 @@ namespace NextWave.Erp.Restaurant
         IRepository<RestaurantTable, Guid> tableRepository,
         IRepository<RestaurantStation, Guid> stationRepository,
         IRepository<RestaurantDevice, Guid> deviceRepository,
+        IRepository<RestaurantPrintRoute, Guid> printRouteRepository,
         IRepository<RestaurantChangeLog, Guid> changeLogRepository,
         IRepository<NextWave.Erp.Accounting.AccountLedger, Guid> accountLedgerRepository)
         : ErpAppServiceBase, IRestaurantSetupAppService
@@ -163,6 +164,9 @@ namespace NextWave.Erp.Restaurant
                 throw new UserFriendlyException("Station name is required");
 
             var tenantId = AbpSession.GetTenantId();
+            var routeName = string.IsNullOrWhiteSpace(input.PrintRouteName) ? null : input.PrintRouteName.Trim();
+            if (routeName != null && !await printRouteRepository.GetAll().AnyAsync(x => x.TenantId == tenantId && x.Name == routeName && x.IsActive))
+                throw new UserFriendlyException("Choose an active printer route from restaurant printer setup.");
             RestaurantStation station;
             if (!input.Id.HasValue || input.Id == Guid.Empty)
             {
@@ -178,7 +182,7 @@ namespace NextWave.Erp.Restaurant
             station.Name = input.Name.Trim();
             station.StationType = input.StationType;
             station.IsActive = input.IsActive;
-            station.PrintRouteName = string.IsNullOrWhiteSpace(input.PrintRouteName) ? null : input.PrintRouteName.Trim();
+            station.PrintRouteName = routeName;
 
             await CurrentUnitOfWork.SaveChangesAsync();
             await RecordSyncChange(RestaurantSyncEntityType.DiningTable, station.Id, new { Entity = "Station", station.Name, station.StationType, station.IsActive });
@@ -296,6 +300,68 @@ namespace NextWave.Erp.Restaurant
             };
         }
 
+        public async Task<List<RestaurantPrintRouteDto>> GetPrintRoutes()
+        {
+            return await printRouteRepository.GetAll()
+                .Where(x => x.TenantId == AbpSession.TenantId && x.IsActive)
+                .OrderBy(x => x.DisplayName)
+                .Select(x => new RestaurantPrintRouteDto
+                {
+                    Name = x.Name,
+                    DisplayName = x.DisplayName,
+                    IsActive = x.IsActive
+                }).ToListAsync();
+        }
+
+        [AbpAuthorize(AppPermissions.PagesRestaurantSetupEdit)]
+        public async Task SavePrintRoutes(SaveRestaurantPrintRoutesDto input)
+        {
+            if (input?.Routes == null) throw new UserFriendlyException("Printer routes are required");
+
+            var tenantId = AbpSession.GetTenantId();
+            var normalized = input.Routes
+                .Where(x => x != null)
+                .Select(x => new RestaurantPrintRouteDto
+                {
+                    Name = x.Name?.Trim(),
+                    DisplayName = string.IsNullOrWhiteSpace(x.DisplayName) ? x.Name?.Trim() : x.DisplayName.Trim(),
+                    IsActive = x.IsActive
+                }).Where(x => !string.IsNullOrWhiteSpace(x.Name))
+                .ToList();
+
+            if (normalized.Any(x => x.Name.Length > 128 || x.DisplayName.Length > 150 ||
+                x.Name.Any(c => !char.IsLetterOrDigit(c) && c is not '-' and not '_')))
+                throw new UserFriendlyException("Route names may contain only letters, numbers, hyphens, and underscores (up to 128 characters).");
+            if (normalized.Select(x => x.Name).Distinct(StringComparer.OrdinalIgnoreCase).Count() != normalized.Count)
+                throw new UserFriendlyException("Printer route names must be unique.");
+
+            var existing = await printRouteRepository.GetAll().Where(x => x.TenantId == tenantId).ToListAsync();
+            foreach (var route in existing)
+            {
+                var replacement = normalized.FirstOrDefault(x => string.Equals(x.Name, route.Name, StringComparison.OrdinalIgnoreCase));
+                if (replacement == null) route.IsActive = false;
+                else
+                {
+                    route.Name = replacement.Name;
+                    route.DisplayName = replacement.DisplayName;
+                    route.IsActive = replacement.IsActive;
+                }
+                await printRouteRepository.UpdateAsync(route);
+            }
+
+            foreach (var route in normalized.Where(x => existing.All(e => !string.Equals(e.Name, x.Name, StringComparison.OrdinalIgnoreCase))))
+            {
+                await printRouteRepository.InsertAsync(new RestaurantPrintRoute
+                {
+                    TenantId = tenantId,
+                    Name = route.Name,
+                    DisplayName = route.DisplayName,
+                    IsActive = route.IsActive,
+                    CreatedAtUtc = DateTime.UtcNow
+                });
+            }
+        }
+
         [AbpAuthorize(AppPermissions.PagesRestaurantSetupEdit)]
         public async Task UpdateOperationalSettings(RestaurantOperationalSettingsDto input)
         {
@@ -305,6 +371,10 @@ namespace NextWave.Erp.Restaurant
             var tenantId = AbpSession.GetTenantId();
             var negativeStockStatus = NormalizeOption(input.NegativeStockStatus, new[] { "Allow", "Warn", "Block" }, "Warn");
             var tableWorkflow = NormalizeOption(input.TableWorkflow, new[] { "TableSession", "PerOrder" }, "TableSession");
+            var receiptPrintRoute = input.ReceiptPrintRouteName?.Trim();
+            if (!string.IsNullOrWhiteSpace(receiptPrintRoute) && !await printRouteRepository.GetAll()
+                .AnyAsync(x => x.TenantId == tenantId && x.Name == receiptPrintRoute && x.IsActive))
+                throw new UserFriendlyException("Choose an active receipt printer route from restaurant printer setup.");
 
             if (input.TipLedgerId.HasValue && await accountLedgerRepository.CountAsync(x =>
                     x.Id == input.TipLedgerId.Value && x.TenantId == tenantId) == 0)

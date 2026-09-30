@@ -1,26 +1,45 @@
 <div [@routerTransition]>
     <restaurant-styles></restaurant-styles>
-    <sub-header [title]="'Restaurant Dashboard' | localize">
-        <div class="align-items-start align-items-sm-center d-inline-flex flex-column flex-sm-row gap-2" role="actions">
-            <span class="fs-8 fw-bold text-gray-600 text-wrap text-sm-nowrap">
-                {{ 'Last refreshed' | localize }}:
-                {{ lastRefreshedAt ? lastRefreshedAt.toFormat('HH:mm:ss') : '-' }}
-            </span>
-            <button class="btn btn-sm btn-light-primary" type="button" [disabled]="loading" (click)="refresh()">
-                <i class="fa fa-rotate" [class.fa-spin]="loading"></i>
-            </button>
-        </div>
-    </sub-header>
-
     <div [class]="containerClass">
-        <div class="restaurant-page mw-100 d-grid gap-3 min-w-0">
-            <div class="card card-custom gutter-b restaurant-card min-w-0">
+        <div class="restaurant-page dashboard-page mw-100 d-grid gap-3 min-w-0">
+            <header class="dashboard-header">
+                <div>
+                    <div class="dashboard-eyebrow">{{ 'RESTAURANT / OVERVIEW' | localize }}</div>
+                    <h1>{{ 'Restaurant dashboard' | localize }}</h1>
+                    <p>{{ 'A clear view of your sales, service and daily operations.' | localize }}</p>
+                </div>
+                <div class="dashboard-header-actions">
+                    <div class="dashboard-updated" aria-live="polite">
+                        <span class="dashboard-status-dot" [class.is-loading]="loading" [class.is-error]="loadError"></span>
+                        {{ (loading ? 'Refreshing' : loadError ? 'Refresh failed' : 'Last updated') | localize }}
+                        @if (!loading && lastRefreshedAt) { <strong>{{ lastRefreshedAt.toFormat('HH:mm') }}</strong> }
+                    </div>
+                    <button class="dashboard-icon-button" type="button" [disabled]="loading" (click)="refresh()" [attr.aria-label]="'Refresh dashboard' | localize">
+                        <i class="fa fa-rotate" [class.fa-spin]="loading" aria-hidden="true"></i>
+                    </button>
+                    @if (isGranted('Pages.Restaurant.Pos')) {
+                        <a class="dashboard-primary-button" routerLink="/app/main/restaurant/pos"><i class="fa fa-plus" aria-hidden="true"></i>{{ 'Open POS' | localize }}</a>
+                    }
+                </div>
+            </header>
+            @if (loadError) {
+                <div class="dashboard-error" role="alert">{{ 'Unable to refresh the overview. Please try again. Previously loaded figures may be out of date.' | localize }}</div>
+            }
+            <div class="card card-custom gutter-b restaurant-card dashboard-filters min-w-0">
                 <div class="card-body">
-                    <div class="restaurant-filterbar row g-3 align-items-end">
-                        <div class="col-12 col-md-6 col-xl-auto">
+                    <div class="dashboard-panel-heading">
+                        <div class="dashboard-filter-title"><i class="fa fa-sliders" aria-hidden="true"></i><h2>{{ 'Overview filters' | localize }}</h2><span>{{ 'Dates in BS' | localize }}</span></div>
+                        <div class="dashboard-periods" role="group" [attr.aria-label]="'Date range' | localize">
+                            <button type="button" [disabled]="loading" [class.active]="isDateRange('today')" [attr.aria-pressed]="isDateRange('today')" (click)="setDateRange('today')">{{ 'Today' | localize }}</button>
+                            <button type="button" [disabled]="loading" [class.active]="isDateRange('week')" [attr.aria-pressed]="isDateRange('week')" (click)="setDateRange('week')">{{ 'Last 7 days' | localize }}</button>
+                            <button type="button" [disabled]="loading" [class.active]="isDateRange('thirtyDays')" [attr.aria-pressed]="isDateRange('thirtyDays')" (click)="setDateRange('thirtyDays')">{{ 'Last 30 days' | localize }}</button>
+                        </div>
+                    </div>
+                    <div class="restaurant-filterbar dashboard-filter-grid">
+                        <div class="dashboard-filter-field">
                             <label class="form-label">{{ 'From Date' | localize }} (BS)</label>
                             <ne-datepicker
-                                class="restaurant-date-filter d-block min-w-xl-175px w-100"
+                                class="restaurant-date-filter d-block w-100"
                                 [date]="filter.fromDate"
                                 [dateFormat]="'yyyy/mm/dd'"
                                 dateIn="AD"
@@ -29,10 +48,10 @@
                                 (dateInAD)="setFilterDate('fromDate', $event)"
                             ></ne-datepicker>
                         </div>
-                        <div class="col-12 col-md-6 col-xl-auto">
+                        <div class="dashboard-filter-field">
                             <label class="form-label">{{ 'To Date' | localize }} (BS)</label>
                             <ne-datepicker
-                                class="restaurant-date-filter d-block min-w-xl-175px w-100"
+                                class="restaurant-date-filter d-block w-100"
                                 [date]="filter.toDate"
                                 [dateFormat]="'yyyy/mm/dd'"
                                 dateIn="AD"
@@ -41,63 +60,70 @@
                                 (dateInAD)="setFilterDate('toDate', $event)"
                             ></ne-datepicker>
                         </div>
-                        <div *ngIf="canUseTableFilter" class="col-12 col-md-6 col-xl-auto">
-                            <label class="form-label">{{ 'Table' | localize }}</label>
+                        <div *ngIf="canUseTableFilter" class="dashboard-filter-field">
+                            <label class="form-label" for="dashboard-table">{{ 'Table' | localize }}</label>
                             <ng-select
-                                class="w-100 w-xl-200px"
+                                class="w-100"
                                 [items]="tables"
                                 bindLabel="name"
                                 bindValue="id"
+                                [placeholder]="'All tables' | localize"
+                                labelForId="dashboard-table"
                                 [(ngModel)]="filter.tableId"
                                 [clearable]="true"
                                 appendTo="body"
                             ></ng-select>
                         </div>
-                        <div class="col-12 col-md-6 col-xl-auto">
-                            <label class="form-label">{{ 'Waiter' | localize }}</label>
+                        <div class="dashboard-filter-field">
+                            <label class="form-label" for="dashboard-waiter">{{ 'Waiter' | localize }}</label>
                             <ng-select
-                                class="w-100 w-xl-200px"
+                                class="w-100"
                                 [items]="waiters"
                                 bindLabel="name"
                                 bindValue="id"
+                                [placeholder]="'All waiters' | localize"
+                                labelForId="dashboard-waiter"
                                 [(ngModel)]="filter.waiterUserId"
                                 [clearable]="true"
                                 appendTo="body"
                             ></ng-select>
                         </div>
-                        <div *ngIf="canUseCategoryFilter" class="col-12 col-md-6 col-xl-auto">
-                            <label class="form-label">{{ 'Category' | localize }}</label>
+                        <div *ngIf="canUseCategoryFilter" class="dashboard-filter-field">
+                            <label class="form-label" for="dashboard-category">{{ 'Category' | localize }}</label>
                             <ng-select
-                                class="w-100 w-xl-200px"
+                                class="w-100"
                                 [items]="categories"
                                 bindLabel="name"
                                 bindValue="id"
+                                [placeholder]="'All categories' | localize"
+                                labelForId="dashboard-category"
                                 [(ngModel)]="filter.categoryId"
                                 [clearable]="true"
                                 appendTo="body"
                             ></ng-select>
                         </div>
-                        <button class="btn btn-primary col-12 col-md-auto" type="button" [disabled]="loading" (click)="refresh()">
+                        <button class="dashboard-primary-button" type="button" [disabled]="loading" (click)="refresh()">
                             <i class="fa fa-filter"></i>
-                            {{ 'Filter' | localize }}
+                            {{ 'Apply' | localize }}
                         </button>
-                        <button class="btn btn-light col-12 col-md-auto" type="button" (click)="clearFilters()">
-                            {{ 'Clear' | localize }}
+                        <button class="dashboard-reset-button" type="button" [disabled]="loading" (click)="clearFilters()">
+                            {{ 'Reset' | localize }}
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
+            <div class="dashboard-section-heading" *ngIf="canViewSalesReports"><h2>{{ 'Sales overview' | localize }}</h2><span>{{ 'Selected period' | localize }}</span></div>
+            <div class="dashboard-metric-grid dashboard-primary-metrics">
                 @for (metric of kpiMetrics; track metric.label) {
-                    <div class="col">
-                    <div class="align-items-center bg-white border border-gray-300 border-start border-4 d-flex gap-3 h-100 min-w-0 p-4 rounded-3" [ngClass]="'border-' + metric.accent">
-                        <div class="align-items-center d-inline-flex flex-shrink-0 h-45px justify-content-center rounded-3 w-45px" [ngClass]="'bg-light-' + metric.accent + ' text-' + metric.accent">
+                    <div class="dashboard-metric-wrap">
+                    <div class="dashboard-metric-card" [ngClass]="'dashboard-accent-' + metric.accent">
+                        <div class="dashboard-metric-icon" [ngClass]="'bg-light-' + metric.accent + ' text-' + metric.accent">
                             <i class="fa" [ngClass]="metric.icon"></i>
                         </div>
                         <div>
                             <span class="restaurant-metric-label d-block text-uppercase">{{ metric.label }}</span>
-                            <strong class="d-block fs-4 fw-bolder lh-sm my-1 text-break text-gray-900">{{ metric.value }}</strong>
+                            <strong class="dashboard-metric-value">{{ metric.value }}</strong>
                             <span class="restaurant-muted">{{ metric.subText }}</span>
                         </div>
                     </div>
@@ -105,16 +131,17 @@
                 }
             </div>
 
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3">
+            <div class="dashboard-section-heading" *ngIf="decisionMetrics.length"><h2>{{ 'Operations at a glance' | localize }}</h2><span>{{ 'Kitchen, inventory & team' | localize }}</span></div>
+            <div class="dashboard-metric-grid dashboard-operation-metrics">
                 @for (metric of decisionMetrics; track metric.label) {
-                    <div class="col">
-                    <div class="align-items-center bg-white border border-gray-300 border-start border-4 d-flex gap-3 h-100 min-w-0 p-4 rounded-3" [ngClass]="'border-' + metric.accent">
-                        <div class="align-items-center d-inline-flex flex-shrink-0 h-45px justify-content-center rounded-3 w-45px" [ngClass]="'bg-light-' + metric.accent + ' text-' + metric.accent">
+                    <div class="dashboard-metric-wrap">
+                    <div class="dashboard-metric-card" [ngClass]="'dashboard-accent-' + metric.accent">
+                        <div class="dashboard-metric-icon" [ngClass]="'bg-light-' + metric.accent + ' text-' + metric.accent">
                             <i class="fa" [ngClass]="metric.icon"></i>
                         </div>
                         <div>
                             <span class="restaurant-metric-label d-block text-uppercase">{{ metric.label }}</span>
-                            <strong class="d-block fs-4 fw-bolder lh-sm my-1 text-break text-gray-900">{{ metric.value }}</strong>
+                            <strong class="dashboard-metric-value">{{ metric.value }}</strong>
                             <span class="restaurant-muted">{{ metric.subText }}</span>
                         </div>
                     </div>
@@ -122,13 +149,14 @@
                 }
             </div>
 
-            <div class="row g-3">
+            <div class="dashboard-section-heading"><h2>{{ 'Performance insights' | localize }}</h2><span>{{ 'A closer look at your restaurant' | localize }}</span></div>
+            <div class="row g-3 dashboard-insights">
                 <div class="col-12 col-lg-6" *ngIf="canViewSalesReports">
                 <div class="card card-custom restaurant-card h-100 min-w-0">
                     <div class="card-header align-items-center d-flex justify-content-between">
-                        <div class="card-title fs-7 lh-sm m-0">{{ 'Top Selling Items' | localize }}</div>
+                        <div class="dashboard-report-heading"><span class="dashboard-report-icon"><i class="fa fa-utensils" aria-hidden="true"></i></span><div><h3>{{ 'Top Selling Items' | localize }}</h3><p>{{ 'Your most popular menu items' | localize }}</p></div></div>
                     </div>
-                    <div class="card-body p-0">
+                    <div class="card-body p-0 dashboard-table-scroll">
                         @if (topItems.length) {
                             <table class="restaurant-table restaurant-compact-table table table-sm table-row-bordered align-middle mb-0 w-100">
                                 <tbody>
@@ -147,7 +175,7 @@
                                 </tbody>
                             </table>
                         } @else {
-                            <div class="restaurant-empty m-5 text-center">{{ 'NoData' | localize }}</div>
+                            <div class="dashboard-empty"><span class="dashboard-empty-icon"><i class="fa fa-utensils" aria-hidden="true"></i></span><strong>{{ 'No item sales yet' | localize }}</strong><p>{{ 'Your best sellers will appear here once orders are recorded.' | localize }}</p></div>
                         }
                     </div>
                 </div>
@@ -156,9 +184,9 @@
                 <div class="col-12 col-lg-6" *ngIf="canViewOperationsReports">
                 <div class="card card-custom restaurant-card h-100 min-w-0">
                     <div class="card-header align-items-center d-flex justify-content-between">
-                        <div class="card-title fs-7 lh-sm m-0">{{ 'Table Sales' | localize }}</div>
+                        <div class="dashboard-report-heading"><span class="dashboard-report-icon"><i class="fa fa-table-cells-large" aria-hidden="true"></i></span><div><h3>{{ 'Table Sales' | localize }}</h3><p>{{ 'Sales across your dining floor' | localize }}</p></div></div>
                     </div>
-                    <div class="card-body p-0">
+                    <div class="card-body p-0 dashboard-table-scroll">
                         @if (topTables.length) {
                             <table class="restaurant-table restaurant-compact-table table table-sm table-row-bordered align-middle mb-0 w-100">
                                 <tbody>
@@ -174,7 +202,7 @@
                                 </tbody>
                             </table>
                         } @else {
-                            <div class="restaurant-empty m-5 text-center">{{ 'NoData' | localize }}</div>
+                            <div class="dashboard-empty"><span class="dashboard-empty-icon"><i class="fa fa-table-cells-large" aria-hidden="true"></i></span><strong>{{ 'No table sales yet' | localize }}</strong><p>{{ 'Table performance will appear for the selected period.' | localize }}</p></div>
                         }
                     </div>
                 </div>
@@ -183,9 +211,9 @@
                 <div class="col-12 col-lg-6" *ngIf="canViewOperationsReports">
                 <div class="card card-custom restaurant-card h-100 min-w-0">
                     <div class="card-header align-items-center d-flex justify-content-between">
-                        <div class="card-title fs-7 lh-sm m-0">{{ 'Waiter Performance' | localize }}</div>
+                        <div class="dashboard-report-heading"><span class="dashboard-report-icon"><i class="fa fa-user-group" aria-hidden="true"></i></span><div><h3>{{ 'Waiter Performance' | localize }}</h3><p>{{ 'Orders and sales by team member' | localize }}</p></div></div>
                     </div>
-                    <div class="card-body p-0">
+                    <div class="card-body p-0 dashboard-table-scroll">
                         @if (topWaiters.length) {
                             <table class="restaurant-table restaurant-compact-table table table-sm table-row-bordered align-middle mb-0 w-100">
                                 <tbody>
@@ -201,7 +229,7 @@
                                 </tbody>
                             </table>
                         } @else {
-                            <div class="restaurant-empty m-5 text-center">{{ 'NoData' | localize }}</div>
+                            <div class="dashboard-empty"><span class="dashboard-empty-icon"><i class="fa fa-user-group" aria-hidden="true"></i></span><strong>{{ 'No service activity yet' | localize }}</strong><p>{{ 'Team performance will appear once orders are assigned.' | localize }}</p></div>
                         }
                     </div>
                 </div>
@@ -210,11 +238,11 @@
                 <div class="col-12 col-lg-6" *ngIf="canViewAuditReports">
                 <div class="card card-custom restaurant-card h-100 min-w-0">
                     <div class="card-header align-items-center d-flex justify-content-between">
-                        <div class="card-title fs-7 lh-sm m-0">{{ 'Payment Mix' | localize }}</div>
+                        <div class="dashboard-report-heading"><span class="dashboard-report-icon"><i class="fa fa-credit-card" aria-hidden="true"></i></span><div><h3>{{ 'Payment Mix' | localize }}</h3><p>{{ 'How your guests are paying' | localize }}</p></div></div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-0">
                         @if (topPayments.length) {
-                            <div class="d-grid gap-3">
+                            <div class="dashboard-payments d-grid gap-3">
                                 @for (payment of topPayments; track payment.paymentMethod) {
                                     <div class="align-items-start align-items-sm-center d-flex flex-column flex-sm-row gap-3 justify-content-between">
                                         <div>
@@ -231,7 +259,7 @@
                                 }
                             </div>
                         } @else {
-                            <div class="restaurant-empty text-center">{{ 'NoData' | localize }}</div>
+                            <div class="dashboard-empty"><span class="dashboard-empty-icon"><i class="fa fa-credit-card" aria-hidden="true"></i></span><strong>{{ 'No payments recorded' | localize }}</strong><p>{{ 'Payment methods will appear when orders are settled.' | localize }}</p></div>
                         }
                     </div>
                 </div>
@@ -240,16 +268,16 @@
                 <div class="col-12" *ngIf="canViewInventoryReports">
                 <div class="card card-custom restaurant-card min-w-0">
                     <div class="card-header align-items-center d-flex justify-content-between">
-                        <div class="card-title fs-7 lh-sm m-0">{{ 'Low Stock Alerts' | localize }}</div>
+                        <div class="dashboard-report-heading"><span class="dashboard-report-icon"><i class="fa fa-boxes-stacked" aria-hidden="true"></i></span><div><h3>{{ 'Low Stock Alerts' | localize }}</h3><p>{{ 'Prioritize your next restock' | localize }}</p></div></div><span class="dashboard-stock-badge">{{ lowStock.length }} {{ 'items need attention' | localize }}</span>
                     </div>
-                    <div class="card-body p-0">
+                    <div class="card-body p-0 dashboard-table-scroll">
                         @if (urgentLowStock.length) {
-                            <table class="restaurant-table restaurant-compact-table table table-sm table-row-bordered align-middle mb-0 w-100">
+                            <table class="restaurant-table restaurant-compact-table dashboard-low-stock-table table table-sm table-row-bordered align-middle mb-0 w-100">
                                 <thead class="align-middle text-uppercase">
                                     <tr>
                                         <th class="align-middle text-uppercase">{{ 'Item' | localize }}</th>
-                                        <th class="align-middle text-uppercase">{{ 'Available' | localize }}</th>
-                                        <th class="align-middle text-uppercase">{{ 'Suggested' | localize }}</th>
+                                        <th class="align-middle text-end text-uppercase">{{ 'Available' | localize }}</th>
+                                        <th class="align-middle text-end text-uppercase">{{ 'Suggested' | localize }}</th>
                                         <th class="align-middle text-uppercase">{{ 'Supplier' | localize }}</th>
                                     </tr>
                                 </thead>
@@ -264,15 +292,15 @@
                                                     </span>
                                                 }
                                             </td>
-                                            <td class="align-middle">{{ formatNumber(item.availableQty, 2) }} {{ item.unitName || '' }}</td>
-                                            <td class="align-middle">{{ formatNumber(item.suggestedQty, 2) }} {{ item.unitName || '' }}</td>
+                                            <td class="align-middle text-end"><span class="dashboard-stock-quantity" [class.is-negative]="item.availableQty < 0">{{ formatNumber(item.availableQty, 2) }} {{ item.unitName || '' }}</span></td>
+                                            <td class="align-middle text-end">{{ formatNumber(item.suggestedQty, 2) }} {{ item.unitName || '' }}</td>
                                             <td class="align-middle">{{ item.supplierName || '-' }}</td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
                         } @else {
-                            <div class="restaurant-empty m-5 text-center">{{ 'NoData' | localize }}</div>
+                            <div class="dashboard-empty"><span class="dashboard-empty-icon"><i class="fa fa-circle-check" aria-hidden="true"></i></span><strong>{{ 'Stock is looking good' | localize }}</strong><p>{{ 'No low stock items were found for this selection.' | localize }}</p></div>
                         }
                     </div>
                 </div>
@@ -281,9 +309,9 @@
                 <div class="col-12" *ngIf="canViewPayrollReports">
                 <div class="card card-custom restaurant-card min-w-0">
                     <div class="card-header align-items-center d-flex justify-content-between">
-                        <div class="card-title fs-7 lh-sm m-0">{{ 'Payroll & Attendance' | localize }}</div>
+                        <div class="dashboard-report-heading"><span class="dashboard-report-icon"><i class="fa fa-users" aria-hidden="true"></i></span><div><h3>{{ 'Payroll & Attendance' | localize }}</h3><p>{{ 'Your team, hours and attendance' | localize }}</p></div></div>
                     </div>
-                    <div class="card-body p-0">
+                    <div class="card-body p-0 dashboard-table-scroll">
                         @if (payrollReport.attendance.length) {
                             <table class="restaurant-table restaurant-compact-table table table-sm table-row-bordered align-middle mb-0 w-100">
                                 <thead><tr><th>{{ 'Status' | localize }}</th><th class="text-end">{{ 'Records' | localize }}</th><th class="text-end">{{ 'Regular Hours' | localize }}</th><th class="text-end">{{ 'Overtime' | localize }}</th></tr></thead>
@@ -294,7 +322,7 @@
                                 </tbody>
                             </table>
                         } @else {
-                            <div class="restaurant-empty m-5 text-center">{{ 'NoData' | localize }}</div>
+                            <div class="dashboard-empty"><span class="dashboard-empty-icon"><i class="fa fa-calendar-check" aria-hidden="true"></i></span><strong>{{ 'No attendance recorded' | localize }}</strong><p>{{ 'Attendance and hours will appear for the selected period.' | localize }}</p></div>
                         }
                     </div>
                 </div>

@@ -526,6 +526,7 @@ class RestaurantPrintJobRecord {
     required this.lastError,
     required this.attempts,
     required this.reprintReason,
+    this.deliveries = const [],
   });
 
   final String id;
@@ -536,6 +537,29 @@ class RestaurantPrintJobRecord {
   final String? lastError;
   final int attempts;
   final String? reprintReason;
+  final List<RestaurantPrintDeliveryRecord> deliveries;
+}
+
+class RestaurantPrintDeliveryRecord {
+  const RestaurantPrintDeliveryRecord({
+    required this.id,
+    required this.deviceId,
+    required this.deviceName,
+    required this.platform,
+    required this.routeName,
+    required this.status,
+    required this.attempts,
+    required this.lastError,
+  });
+
+  final String id;
+  final String deviceId;
+  final String deviceName;
+  final String platform;
+  final String routeName;
+  final int status;
+  final int attempts;
+  final String? lastError;
 }
 
 class RestaurantOrderModel {

@@ -152,6 +152,10 @@ public class ErpDbContext : AbpZeroDbContext<Tenant, Role, User, ErpDbContext>, 
     public virtual DbSet<RestaurantReservation> RestaurantReservations { get; set; }
     public virtual DbSet<RestaurantReservationOtpChallenge> RestaurantReservationOtpChallenges { get; set; }
     public virtual DbSet<RestaurantPrintJob> RestaurantPrintJobs { get; set; }
+    public virtual DbSet<RestaurantPrintRoute> RestaurantPrintRoutes { get; set; }
+    public virtual DbSet<RestaurantPrintDevice> RestaurantPrintDevices { get; set; }
+    public virtual DbSet<RestaurantPrintDeviceRoute> RestaurantPrintDeviceRoutes { get; set; }
+    public virtual DbSet<RestaurantPrintDelivery> RestaurantPrintDeliveries { get; set; }
     public virtual DbSet<RestaurantSmsOutbox> RestaurantSmsOutbox { get; set; }
     public virtual DbSet<RestaurantOrder> RestaurantOrders { get; set; }
     public virtual DbSet<RestaurantOrderItem> RestaurantOrderItems { get; set; }
@@ -295,6 +299,28 @@ public class ErpDbContext : AbpZeroDbContext<Tenant, Role, User, ErpDbContext>, 
                 .HasFilter("[ClientRequestId] IS NOT NULL")
                 .IsUnique();
             b.HasOne(e => e.CashShiftFk).WithMany().HasForeignKey(e => e.CashShiftId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<RestaurantPrintRoute>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.Name }).IsUnique();
+        });
+
+        modelBuilder.Entity<RestaurantPrintDevice>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.ClientDeviceId }).IsUnique();
+        });
+
+        modelBuilder.Entity<RestaurantPrintDeviceRoute>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.DeviceId, e.RouteName }).IsUnique();
+            b.HasIndex(e => new { e.TenantId, e.RouteName });
+        });
+
+        modelBuilder.Entity<RestaurantPrintDelivery>(b =>
+        {
+            b.HasIndex(e => new { e.TenantId, e.PrintJobId, e.DeviceId }).IsUnique();
+            b.HasIndex(e => new { e.TenantId, e.DeviceId, e.Status, e.CreatedAtUtc });
         });
 
         modelBuilder.Entity<RestaurantOrder>(b =>

@@ -11,14 +11,51 @@
             <button class="btn btn-primary" [disabled]="!pairingCode" (click)="pair()">Pair browser</button>
             <button class="btn btn-light" type="button" (click)="openAgentHealth()">Open agent health</button>
         </div>
-        <div class="mt-4" *ngIf="routes.length">
-            <strong>Configured routes</strong>
-            <span class="badge bg-light-success text-success ms-2" *ngFor="let route of routes">{{ route.name }} · {{ route.kind }}</span>
+        <div class="mt-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <strong>Printers on this Windows station</strong>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-light" type="button" (click)="refreshRoutes()">Refresh printers</button>
+                    <button class="btn btn-sm btn-light-primary" type="button" (click)="addRoute()">Add route</button>
+                    <button class="btn btn-sm btn-primary" type="button" [disabled]="!token" (click)="saveRoutes()">Save routes</button>
+                </div>
+            </div>
+            <div class="border rounded p-3 mb-2" *ngFor="let route of routes; let i = index">
+                <div class="row g-2 align-items-end">
+                    <label class="col-md-2">Route name<input class="form-control" [(ngModel)]="route.name" /></label>
+                    <label class="col-md-2">Connection<select class="form-select" [(ngModel)]="route.kind"><option value="WindowsQueue">Windows printer</option><option value="Tcp9100">Network TCP 9100</option></select></label>
+                    <label class="col-md-5" *ngIf="route.kind === 'WindowsQueue'">Windows printer<select class="form-select" [(ngModel)]="route.printerName"><option value="">Select printer</option><option *ngFor="let name of printerNames" [value]="name">{{ name }}</option></select></label>
+                    <ng-container *ngIf="route.kind === 'Tcp9100'">
+                        <label class="col-md-3">Printer IP<input class="form-control" [(ngModel)]="route.host" placeholder="192.168.1.50" /></label>
+                        <label class="col-md-2">Port<input class="form-control" type="number" min="1" max="65535" [(ngModel)]="route.port" /></label>
+                    </ng-container>
+                    <div class="col-md-auto d-flex gap-2">
+                        <button class="btn btn-sm btn-light-success" type="button" [disabled]="!token" (click)="testRoute(route)">Test print</button>
+                        <button class="btn btn-sm btn-light-danger" type="button" (click)="removeRoute(i)">Remove</button>
+                    </div>
+                </div>
+            </div>
+            <div class="text-muted" *ngIf="!routes.length">No local routes yet. Add a route and save it to this station.</div>
+            <small class="text-muted d-block mt-2">Shared route names: <span *ngFor="let route of erpRoutes; let last = last">{{ route.displayName }} ({{ route.name }})<span *ngIf="!last">, </span></span></small>
         </div>
         <div class="d-flex gap-2 mt-4">
             <button *ngIf="!running" class="btn btn-success" [disabled]="!token" (click)="start()"><i class="fa fa-play"></i> Start station</button>
             <button *ngIf="running" class="btn btn-light-danger" (click)="stop()"><i class="fa fa-stop"></i> Stop station</button>
             <span class="text-muted align-self-center">{{ running ? 'Station is active' : 'Station is stopped' }}</span>
+        </div>
+    </section>
+
+    <section class="station-panel">
+        <h2>Print devices</h2>
+        <div *ngIf="!devices.length" class="text-muted">Connect a Windows station or configure an Android phone to register it here.</div>
+        <div class="border rounded p-3 mb-2" *ngFor="let device of devices">
+            <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap">
+                <div>
+                    <strong>{{ device.name }}</strong><span class="badge ms-2" [ngClass]="device.isEnabled ? 'bg-light-success text-success' : 'bg-light text-muted'">{{ device.isEnabled ? 'Enabled' : 'Disabled' }}</span>
+                    <div class="small text-muted">{{ device.platform }} · Routes: {{ device.routeNames?.join(', ') || 'None' }} · Last seen {{ device.lastSeenAtUtc | date:'short' }}</div>
+                </div>
+                <button class="btn btn-sm" [ngClass]="device.isEnabled ? 'btn-light-danger' : 'btn-light-success'" type="button" (click)="toggleDevice(device)">{{ device.isEnabled ? 'Disable' : 'Enable' }}</button>
+            </div>
         </div>
     </section>
 

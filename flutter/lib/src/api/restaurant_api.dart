@@ -1327,14 +1327,81 @@ class RestaurantApi {
         lastError: _nullableString(item['lastError']),
         attempts: _integer(item['attempts']),
         reprintReason: _nullableString(item['reprintReason']),
+        deliveries: _list(item['deliveries']).map((deliveryValue) {
+          final delivery = _map(deliveryValue);
+          return RestaurantPrintDeliveryRecord(
+            id: _string(delivery['id']),
+            deviceId: _string(delivery['deviceId']),
+            deviceName: _string(delivery['deviceName'], fallback: 'Print device'),
+            platform: _string(delivery['platform']),
+            routeName: _string(delivery['routeName']),
+            status: _integer(delivery['status']),
+            attempts: _integer(delivery['attempts']),
+            lastError: _nullableString(delivery['lastError']),
+          );
+        }).toList(),
       );
     }).toList();
   }
 
-  Future<void> retryPrintJob(String jobId) async {
+  Future<void> retryPrintJob(String jobId, {String? deliveryId}) async {
     await client.post(
       '/api/services/app/RestaurantGuestOperations/RetryPrintJob',
-      body: {'jobId': jobId},
+      body: {'jobId': jobId, 'deliveryId': ?deliveryId},
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getPrinterRoutes() async => _list(
+    await client.get('/api/services/app/RestaurantSetup/GetPrintRoutes'),
+  ).map((value) => _map(value)).toList();
+
+  Future<List<Map<String, dynamic>>> getPrintDevices() async => _list(
+    await client.get('/api/services/app/RestaurantGuestOperations/GetPrintDevices'),
+  ).map((value) => _map(value)).toList();
+
+  Future<Map<String, dynamic>> registerPrintDevice({
+    required String clientDeviceId,
+    required String name,
+    required List<String> routeNames,
+  }) async => _map(await client.post(
+    '/api/services/app/RestaurantGuestOperations/RegisterPrintDevice',
+    body: {
+      'clientDeviceId': clientDeviceId,
+      'name': name,
+      'platform': 'Android',
+      'routeNames': routeNames,
+    },
+  ));
+
+  Future<void> setPrintDeviceEnabled({required String id, required bool isEnabled}) async {
+    await client.post(
+      '/api/services/app/RestaurantGuestOperations/SetPrintDeviceEnabled',
+      body: {'id': id, 'isEnabled': isEnabled},
+    );
+  }
+
+  Future<Map<String, dynamic>?> claimPrintJob(String deviceId) async => _nullableMap(await client.post(
+    '/api/services/app/RestaurantGuestOperations/ClaimPrintJob',
+    body: {'agentId': deviceId},
+  ));
+
+  Future<void> reportPrintJob({
+    required String jobId,
+    required String deliveryId,
+    required String deviceId,
+    required bool printed,
+    String? error,
+  }) async {
+    await client.post(
+      '/api/services/app/RestaurantGuestOperations/ReportPrintJob',
+      body: {
+        'id': jobId,
+        'deliveryId': deliveryId,
+        'agentId': deviceId,
+        'agentJobId': 'android-$deliveryId',
+        'status': printed ? 2 : 3,
+        'error': ?error,
+      },
     );
   }
 

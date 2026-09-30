@@ -46,6 +46,7 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
     areas: RestaurantAreaDto[] = [];
     tables: RestaurantTableDto[] = [];
     stations: RestaurantStationDto[] = [];
+    printRoutes: any[] = [];
     devices: RestaurantDeviceDto[] = [];
     tipLedgerOptions: SalesMasterAccountLedgerTableDto[] = [];
     saving = false;
@@ -122,6 +123,10 @@ export class RestaurantSetupComponent extends AppComponentBase implements OnInit
         });
         this.restaurantSetupService.getStations().subscribe((result) => {
             this.stations = result || [];
+            this.cdr.markForCheck();
+        });
+        this.guestApi.printRoutes().subscribe((result) => {
+            this.printRoutes = result || [];
             this.cdr.markForCheck();
         });
         this.restaurantSetupService.getOperationalSettings().subscribe((settings) => {

@@ -292,8 +292,11 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Print Agent route</label>
-                            <input class="form-control" formControlName="printRouteName" placeholder="Example: kitchen or bar" />
-                            <small class="form-text text-muted">Use a route alias configured in Nextwave ERP PrintAgent Tray.</small>
+                            <select class="form-select" formControlName="printRouteName">
+                                <option value="">Choose a printer route</option>
+                                <option *ngFor="let route of printRoutes" [value]="route.name">{{ route.displayName }} · {{ route.name }}</option>
+                            </select>
+                            <small class="form-text text-muted">Route names must also be mapped to a printer on each receiving device.</small>
                         </div>
                         <div class="mb-3">
                             <label class="form-check form-check-sm">
@@ -516,8 +519,11 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Receipt Print Agent route</label>
-                                <input class="form-control" formControlName="receiptPrintRouteName" placeholder="Example: receipt" />
-                                <small class="form-text text-muted">Configure the same route alias in the paired Windows station.</small>
+                                <select class="form-select" formControlName="receiptPrintRouteName">
+                                    <option value="">Choose a printer route</option>
+                                    <option *ngFor="let route of printRoutes" [value]="route.name">{{ route.displayName }} · {{ route.name }}</option>
+                                </select>
+                                <small class="form-text text-muted">Configure this route on each Windows or Android print device.</small>
                             </div>
                         </div>
                         <div class="restaurant-actionbar gap-2 restaurant-actionbar-end align-items-center d-flex flex-wrap justify-content-start justify-content-sm-end min-w-0">

@@ -61,6 +61,69 @@ namespace NextWave.Erp.Reporting.InventoryReport
             return result.Distinct().ToList();
         }
 
+        public async Task<StockDetailReportDto> GetStockDetail(Guid productId, [CanBeNull] string fromMiti, [CanBeNull] string toMiti)
+        {
+            var fromDate = FinancialYear.FromDate;
+            var toDate = FinancialYear.ToDate;
+            if (!string.IsNullOrEmpty(fromMiti)) fromDate = DateConverter.ConvertToEnglish(fromMiti).Date;
+            if (!string.IsNullOrEmpty(toMiti)) toDate = DateConverter.ConvertToEnglish(toMiti).Date;
+
+            var postings = await stockPostingRepository.GetAll().AsNoTracking()
+                .Where(x => x.TenantId == AbpSession.TenantId && x.FinancialYearId == FinancialYearId &&
+                            !x.IsDeleted && x.ProductId == productId && x.Date.Date <= toDate.Date)
+                .Include(x => x.VoucherTypeFk)
+                .Include(x => x.AccountLedgerFk)
+                .Include(x => x.UnitFk)
+                .OrderBy(x => x.Date).ThenBy(x => x.VoucherNumbering).ThenBy(x => x.Id)
+                .ToListAsync();
+
+            var product = await productRepository.GetAll().AsNoTracking()
+                .Where(x => x.Id == productId && x.TenantId == AbpSession.TenantId)
+                .Select(x => new { x.Name })
+                .FirstOrDefaultAsync();
+
+            var openingQty = postings.Where(x => x.Date.Date < fromDate.Date)
+                .Sum(x => x.InWardQty - x.OutWardQty);
+            var openingAmount = postings.Where(x => x.Date.Date < fromDate.Date)
+                .Sum(x => (x.InWardQty - x.OutWardQty) * x.Rate);
+            var balanceQty = openingQty;
+            var balanceAmount = openingAmount;
+            var rows = new List<StockDetailReportRowDto>();
+
+            foreach (var posting in postings.Where(x => x.Date.Date >= fromDate.Date))
+            {
+                balanceQty += posting.InWardQty - posting.OutWardQty;
+                balanceAmount += (posting.InWardQty - posting.OutWardQty) * posting.Rate;
+                rows.Add(new StockDetailReportRowDto
+                {
+                    Id = posting.Id,
+                    Date = posting.Date,
+                    DateMiti = posting.DateMiti,
+                    VoucherNo = posting.VoucherNo,
+                    VoucherType = posting.VoucherTypeFk?.Name,
+                    LedgerName = posting.AccountLedgerFk?.Name,
+                    UnitName = posting.UnitFk?.Name,
+                    InwardQty = posting.InWardQty,
+                    InwardRate = posting.Rate,
+                    InwardAmount = posting.InWardQty * posting.Rate,
+                    OutwardQty = posting.OutWardQty,
+                    OutwardRate = posting.Rate,
+                    OutwardAmount = posting.OutWardQty * posting.Rate,
+                    BalanceQty = balanceQty,
+                    BalanceAmount = balanceAmount
+                });
+            }
+
+            return new StockDetailReportDto
+            {
+                ProductName = product?.Name ?? "Stock Detail",
+                UnitName = rows.FirstOrDefault()?.UnitName ?? postings.FirstOrDefault()?.UnitFk?.Name,
+                OpeningQty = openingQty,
+                OpeningAmount = openingAmount,
+                Rows = rows
+            };
+        }
+
 
         public async Task<List<UniversalDropdownDto>> GetAllLedgers()
         {
