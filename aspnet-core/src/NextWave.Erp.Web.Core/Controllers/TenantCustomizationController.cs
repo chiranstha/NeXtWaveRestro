@@ -1,7 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
 using Abp.AspNetCore.Mvc.Authorization;
 using Abp.AspNetZeroCore.Net;
 using Abp.IO.Extensions;
@@ -13,7 +16,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NextWave.Erp.Authorization;
 using NextWave.Erp.Authorization.Users.Profile.Dto;
-using NextWave.Erp.Graphics;
 using NextWave.Erp.MultiTenancy;
 using NextWave.Erp.Storage;
 using NextWave.Erp.Tenants;
@@ -26,18 +28,15 @@ public class TenantCustomizationController : ErpControllerBase
     private readonly TenantManager _tenantManager;
     private readonly IBinaryObjectManager _binaryObjectManager;
     private readonly IMimeTypeMap _mimeTypeMap;
-    private readonly IImageValidator _imageValidator;
 
     public TenantCustomizationController(
         TenantManager tenantManager,
         IBinaryObjectManager binaryObjectManager,
-        IMimeTypeMap mimeTypeMap,
-        IImageValidator imageValidator)
+        IMimeTypeMap mimeTypeMap)
     {
         _tenantManager = tenantManager;
         _binaryObjectManager = binaryObjectManager;
         _mimeTypeMap = mimeTypeMap;
-        _imageValidator = imageValidator;
     }
 
     [HttpPost]
@@ -142,7 +141,7 @@ public class TenantCustomizationController : ErpControllerBase
 
     private async Task<(Guid id, string contentType)> UploadLogoFileInternal()
     {
-        var logoFile = Request.Form.Files.First();
+        var logoFile = Request.Form.Files.FirstOrDefault();
 
         //Check input
         if (logoFile == null)
@@ -150,7 +149,12 @@ public class TenantCustomizationController : ErpControllerBase
             throw new UserFriendlyException(L("File_Empty_Error"));
         }
 
-        if (logoFile.Length > 102400) //100KB
+        if (!string.Equals(Path.GetExtension(logoFile.FileName), ".svg", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new UserFriendlyException(L("UploadLogo_Info"));
+        }
+
+        if (logoFile.Length > 100 * 1024)
         {
             throw new UserFriendlyException(L("File_SizeLimit_Error"));
         }
@@ -159,12 +163,38 @@ public class TenantCustomizationController : ErpControllerBase
         await using (var stream = logoFile.OpenReadStream())
         {
             fileBytes = stream.GetAllBytes();
-            _imageValidator.ValidateDimensions(fileBytes, 512, 128);
+        }
+
+        if (!IsSvgFile(fileBytes))
+        {
+            throw new UserFriendlyException(L("IncorrectImageFormat"));
         }
 
         var logoObject = new BinaryObject(AbpSession.GetTenantId(), fileBytes, $"Logo {DateTime.UtcNow}");
         await _binaryObjectManager.SaveAsync(logoObject);
-        return (logoObject.Id, logoFile.ContentType);
+        return (logoObject.Id, "image/svg+xml");
+    }
+
+    private static bool IsSvgFile(byte[] fileBytes)
+    {
+        try
+        {
+            using var stream = new MemoryStream(fileBytes);
+            using var reader = XmlReader.Create(stream, new XmlReaderSettings
+            {
+                DtdProcessing = DtdProcessing.Prohibit,
+                XmlResolver = null
+            });
+            var document = XDocument.Load(reader);
+            var root = document.Root;
+            return root is not null
+                && root.Name.LocalName == "svg"
+                && root.Name.NamespaceName == "http://www.w3.org/2000/svg";
+        }
+        catch (XmlException)
+        {
+            return false;
+        }
     }
 
     [HttpPost]

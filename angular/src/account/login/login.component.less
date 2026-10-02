@@ -620,6 +620,32 @@ circle[class="eye-pupil"] {
 .login-btn:active:not(:disabled) { transform: none; }
 .login-btn:disabled { background: #8eaed6; box-shadow: none; cursor: not-allowed; }
 
+.demo-login {
+    display: grid;
+    gap: 8px;
+    margin-top: 14px;
+    text-align: center;
+}
+
+.demo-login-label { color: #8391a3; font-size: 11px; }
+
+.demo-login-btn {
+    min-height: 40px;
+    padding: 8px 16px;
+    border: 1px solid #dfe6ef;
+    border-radius: 10px;
+    background: #fff;
+    color: #3476cc;
+    cursor: pointer;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    transition: border-color .18s, background .18s;
+}
+
+.demo-login-btn:hover:not(:disabled) { border-color: #bdcee5; background: #f0f5fc; }
+.demo-login-btn:disabled { cursor: wait; opacity: .65; }
+
 .login-divider {
     display: flex;
     align-items: center;

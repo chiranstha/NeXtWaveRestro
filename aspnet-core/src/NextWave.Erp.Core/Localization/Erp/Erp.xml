@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <localizationDictionary culture="en">
   <texts>
     <text name="HomePage">Home page</text>
@@ -497,8 +497,8 @@
     <text name="CustomCSS">Custom CSS</text>
     <text name="Upload">Upload</text>
     <text name="Download">Download</text>
-    <text name="UploadLogo_Info">Select a JPG/JPEG/PNG/GIF file with a maximum of 100KB size and 512x128 pixel resolution.</text>
-    <text name="UploadLogoIcon_Info">Select a JPG/JPEG/PNG/GIF file with a maximum of 50KB size and 128x128 pixel resolution.</text>
+    <text name="UploadLogo_Info">Select an SVG file with a maximum size of 100KB.</text>
+    <text name="UploadLogoIcon_Info">Select an SVG file with a maximum size of 100KB.</text>
     <text name="UploadCSS_Info">Select a .css file with a maximum of 1MB size.</text>
     <text name="Browse">Browse</text>
     <text name="Appearance">Appearance</text>

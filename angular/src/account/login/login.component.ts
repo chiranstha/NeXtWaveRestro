@@ -147,6 +147,12 @@ export class LoginComponent extends AppComponentBase implements OnInit, AfterVie
             recaptchaCallback(null);
         }
     }
+    loginWithDemoAccount(): void {
+        this.loginService.authenticateModel.userNameOrEmailAddress = 'demo@gmail.com';
+        this.loginService.authenticateModel.password = 'demo';
+        this.loginService.rememberMe = false;
+        this.login();
+    }
     externalLogin(provider: ExternalLoginProvider) {
         this.loginService.externalAuthenticate(provider);
     }

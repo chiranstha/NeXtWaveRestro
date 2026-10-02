@@ -19,7 +19,6 @@ import {
     SettingScopes,
     TenantSettingsEditDto,
     TenantSettingsServiceProxy,
-    ReportingServiceProxy,
 } from '@shared/service-proxies/service-proxies';
 import { FileUploader, FileUploaderOptions, FileUploadModule } from 'ng2-file-upload';
 import { finalize } from 'rxjs/operators';
@@ -67,7 +66,6 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit,
     private _tokenService = inject(TokenService);
     private _dateTimeService = inject(DateTimeService);
     private _cdr = inject(ChangeDetectorRef);
-    private proxy = inject(ReportingServiceProxy);
     @ViewChild('wsFederationClaimsMappingManager') wsFederationClaimsMappingManager: KeyValueListManagerComponent;
     @ViewChild('openIdConnectClaimsMappingManager') openIdConnectClaimsMappingManager: KeyValueListManagerComponent;
     @ViewChild('emailSmtpSettingsForm') emailSmtpSettingsForm: UntypedFormControl;
@@ -92,7 +90,6 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit,
     activeTabIndex: number = abp.clock?.provider?.supportsMultipleTimezone ? 0 : 1;
     loading = false;
     settings: any = undefined;
-    accountLedgerList: any[] = [];
     darkLogoUploader: FileUploader;
     darkLogoMinimalUploader: FileUploader;
     lightLogoUploader: FileUploader;
@@ -120,16 +117,6 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit,
     LayoutTypeMapping: Record<string, string> = { Default: 'Default' };
     FontFamilyType = ['Default'];
     FontFamilyTypeMapping: Record<string, string> = { Default: 'Default' };
-    MarksheetformatType = ['Default'];
-    MarksheetMapping: Record<string, string> = { Default: 'Default' };
-    AdmitformatType = ['Default'];
-    AdmitCardMapping: Record<string, string> = { Default: 'Default' };
-    receiptformatType = ['Default'];
-    feeReceiptMapping: Record<string, string> = { Default: 'Default' };
-    dueformatType = ['Default'];
-    feeDueMapping: Record<string, string> = { Default: 'Default' };
-    orderType = ['Default'];
-    studentOrderType: Record<string, string> = { Default: 'Default' };
 
     // Add heading templates with icons
     tabHeadings = {
@@ -143,7 +130,6 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit,
         sparrowSms: '<i class="fas fa-sms me-2"></i>Sparrow SMS',
         print: '<i class="fas fa-print me-2"></i>Print',
         invoice: '<i class="fas fa-file-invoice me-2"></i>Invoice',
-        school: '<i class="fas fa-school me-2"></i>School',
         otherSettings: '<i class="fas fa-cogs me-2"></i>Other Settings',
         // Social login tab headings
         facebook: '<i class="fab fa-facebook me-2"></i>Facebook',
@@ -158,7 +144,6 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit,
         this.today = this.nepaliDateService.getCurrentNepaliDate();
         this.testEmailAddress = this.appSession.user.emailAddress;
         this.getSettings();
-        this.getAccountLedgers();
         this.initUploaders();
         this.loadSocialLoginSettings();
     }
@@ -243,37 +228,30 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit,
     private ensureExtendedSettings(): void {
         this.settings.sparrowSms ??= {};
         this.settings.smsTypeSettings ??= {};
-        this.settings.allSettingsBundleDto ??= {};
         this.settings.firebase ??= {};
         this.settings.userManagement ??= {};
-    }
-    getAccountLedgers(): void {
-        this.proxy.getAllAccountLedgers().subscribe((result) => {
-            this.accountLedgerList = result;
-            this._cdr.markForCheck();
-        });
     }
     initUploaders(): void {
         this.darkLogoUploader = this.createUploader('/TenantCustomization/UploadDarkLogo', (result) => {
             this.appSession.tenant.darkLogoFileType = result.fileType;
             this.appSession.tenant.darkLogoId = result.id;
             this.refreshLogo('dark');
-        });
+        }, true);
         this.darkLogoMinimalUploader = this.createUploader('/TenantCustomization/UploadDarkLogoMinimal', (result) => {
             this.appSession.tenant.darkLogoMinimalFileType = result.fileType;
             this.appSession.tenant.darkLogoMinimalId = result.id;
             this.refreshLogo('dark-sm');
-        });
+        }, true);
         this.lightLogoUploader = this.createUploader('/TenantCustomization/UploadLightLogo', (result) => {
             this.appSession.tenant.lightLogoFileType = result.fileType;
             this.appSession.tenant.lightLogoId = result.id;
             this.refreshLogo('light');
-        });
+        }, true);
         this.lightLogoMinimalUploader = this.createUploader('/TenantCustomization/UploadLightLogoMinimal', (result) => {
             this.appSession.tenant.lightLogoMinimalFileType = result.fileType;
             this.appSession.tenant.lightLogoMinimalId = result.id;
             this.refreshLogo('light-sm');
-        });
+        }, true);
         this.customCssUploader = this.createUploader('/TenantCustomization/UploadCustomCss', (result) => {
             this.appSession.tenant.customCssId = result.id;
             const oldTenantCustomCss = document.getElementById('TenantCustomCss');
@@ -292,14 +270,31 @@ export class TenantSettingsComponent extends AppComponentBase implements OnInit,
             document.head.appendChild(tenantCustomCss);
         });
     }
-    createUploader(url: string, success?: (result: any) => void): FileUploader {
+    createUploader(url: string, success?: (result: any) => void, isLogoUploader = false): FileUploader {
         const uploaderOptions: FileUploaderOptions = { url: AppConsts.remoteServiceBaseUrl + url };
         uploaderOptions.authToken = `Bearer ${this._tokenService.getToken()}`;
         uploaderOptions.removeAfterUpload = true;
+        if (isLogoUploader) {
+            uploaderOptions.maxFileSize = 100 * 1024;
+            uploaderOptions.filters = [
+                {
+                    name: 'svgOnly',
+                    fn: (file) => file.name?.toLowerCase().endsWith('.svg') ?? false,
+                },
+            ];
+        }
         const uploader = new FileUploader(uploaderOptions);
         uploader.onAfterAddingFile = (file) => {
             file.withCredentials = false;
         };
+        if (isLogoUploader) {
+            uploader.onWhenAddingFileFailed = (_file, filter) => {
+                this.message.error(
+                    this.l(filter?.name === 'fileSize' ? 'File_SizeLimit_Error' : 'UploadLogo_Info'),
+                );
+                this._cdr.markForCheck();
+            };
+        }
         uploader.onSuccessItem = (item, response, _status) => {
             const ajaxResponse = <IAjaxResponse>JSON.parse(response);
             if (ajaxResponse.success) {

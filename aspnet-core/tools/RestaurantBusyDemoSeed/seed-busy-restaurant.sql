@@ -1,7 +1,7 @@
 /*
     NeXtWave Restro busy-restaurant UX dataset
 
-    Target: tenant 2 (FutureStar) in RestroErp_db.
+    Target: tenant 2 in RestroErp_db.
     The script is deterministic and additive: stable IDs prevent duplicate rows on rerun,
     while records created outside this script are left untouched.
 
@@ -36,7 +36,117 @@ DECLARE @SalesAccountId uniqueidentifier;
 DECLARE @CashAccountId uniqueidentifier;
 DECLARE @CreditorGroupId uniqueidentifier;
 
+IF NOT EXISTS (SELECT 1 FROM AbpTenants WHERE Id = @TenantId AND IsDeleted = 0)
+    THROW 51000, 'Tenant 2 was not found. The busy restaurant seed was not applied.', 1;
+
 SELECT TOP (1) @AdminUserId = Id FROM AbpUsers WHERE TenantId = @TenantId AND UserName = 'admin';
+
+/* Bootstrap the ERP reference rows used by restaurant transactions. */
+INSERT tbl_Unit (Id, Name, FormalName, IsDefault, TenantId)
+SELECT CONVERT(uniqueidentifier, HASHBYTES('MD5', CONCAT(N'NWR-BUSY/UNIT/', seed.Name))),
+       seed.Name, seed.FormalName, seed.IsDefault, @TenantId
+FROM (VALUES (N'Pcs', N'Pieces', 1), (N'Kg', N'Kilogram', 0)) seed(Name, FormalName, IsDefault)
+WHERE NOT EXISTS
+(
+    SELECT 1 FROM tbl_Unit existing
+    WHERE existing.TenantId = @TenantId AND existing.Name = seed.Name
+);
+
+INSERT tbl_AccountGroup (Id, Name, Narration, IsDefault, AffectGrossProfit, Nature, GroupUnder, TenantId)
+SELECT CONVERT(uniqueidentifier, HASHBYTES('MD5', CONCAT(N'NWR-BUSY/ACCOUNT-GROUP/', seed.Name))),
+       seed.Name, seed.Narration, 0, seed.AffectGrossProfit, seed.Nature, NULL, @TenantId
+FROM (VALUES
+    (N'Sales', N'Restaurant sales income', 1, 3),
+    (N'Cash-in Hand', N'Cash held at the restaurant register', 0, 1),
+    (N'Sundry Creditors', N'Restaurant suppliers and trade creditors', 0, 4),
+    (N'Tax Payable', N'Output tax collected from customers', 0, 4)
+) seed(Name, Narration, AffectGrossProfit, Nature)
+WHERE NOT EXISTS
+(
+    SELECT 1 FROM tbl_AccountGroup existing
+    WHERE existing.TenantId = @TenantId AND existing.Name = seed.Name
+);
+
+INSERT tbl_AccountLedger
+    (Id, Name, OpeningBalance, IsDefault, CrOrDr, Narration, Address, Phone, Email, CreditPeriod,
+     CreditLimit, IsBillByBill, Pan, Status, IsDelete, IsCompany, OpeningDate, UserId, CreateUserId,
+     UpdateUserId, ParentId, AccountGroupId, TenantId)
+SELECT CONVERT(uniqueidentifier, HASHBYTES('MD5', CONCAT(N'NWR-BUSY/ACCOUNT-LEDGER/', seed.Name))),
+       seed.Name, 0, 0, seed.CrOrDr, seed.Narration, NULL, NULL, NULL, NULL, NULL, 0, NULL,
+       1, 0, 0, NULL, NULL, @AdminUserId, NULL, NULL, accountGroup.Id, @TenantId
+FROM (VALUES
+    (N'Sales Account', N'Restaurant sales', 1, N'Sales'),
+    (N'Cash', N'Cash on hand', 0, N'Cash-in Hand'),
+    (N'VAT Output', N'Output VAT collected from customers', 1, N'Tax Payable')
+) seed(Name, Narration, CrOrDr, AccountGroupName)
+JOIN tbl_AccountGroup accountGroup
+    ON accountGroup.TenantId = @TenantId AND accountGroup.Name = seed.AccountGroupName
+WHERE NOT EXISTS
+(
+    SELECT 1 FROM tbl_AccountLedger existing
+    WHERE existing.TenantId = @TenantId AND existing.Name = seed.Name
+);
+
+INSERT tbl_Tax (Id, Name, Rate, Description, IsActive, LedgerId, TenantId)
+SELECT CONVERT(uniqueidentifier, HASHBYTES('MD5', CONCAT(N'NWR-BUSY/TAX/', seed.Name))),
+       seed.Name, seed.Rate, seed.Description, 1, ledger.Id, @TenantId
+FROM (VALUES (N'VAT 13%', 13.0, N'Nepal value added tax'), (N'NA', 0.0, N'Not applicable')) seed(Name, Rate, Description)
+JOIN tbl_AccountLedger ledger ON ledger.TenantId = @TenantId AND ledger.Name = N'VAT Output'
+WHERE NOT EXISTS
+(
+    SELECT 1 FROM tbl_Tax existing
+    WHERE existing.TenantId = @TenantId AND existing.Name = seed.Name
+);
+
+INSERT tbl_ProductGroup (Id, Name, GroupUnder, Description, IsDefult, TenantId)
+SELECT CONVERT(uniqueidentifier, HASHBYTES('MD5', N'NWR-BUSY/PRODUCT-GROUP/PRIMARY')),
+       N'PRIMARY', NULL, N'Primary restaurant inventory and menu items', 1, @TenantId
+WHERE NOT EXISTS
+(
+    SELECT 1 FROM tbl_ProductGroup existing
+    WHERE existing.TenantId = @TenantId AND existing.Name = N'PRIMARY'
+);
+
+DECLARE @FinancialYearStart date = DATEFROMPARTS
+(
+    YEAR(@Now) - CASE WHEN MONTH(@Now) < 4 OR (MONTH(@Now) = 4 AND DAY(@Now) < 14) THEN 1 ELSE 0 END,
+    4,
+    14
+);
+IF NOT EXISTS (SELECT 1 FROM tbl_FinancialYear WHERE TenantId = @TenantId)
+BEGIN
+    INSERT tbl_FinancialYear
+        (Id, FromDate, ToDate, FromMiti, ToMiti, Status, IsOldYear, OldFinancialYearId, TenantId, Name)
+    VALUES
+    (
+        CONVERT(uniqueidentifier, HASHBYTES('MD5', CONCAT(N'NWR-BUSY/FINANCIAL-YEAR/', YEAR(@FinancialYearStart)))),
+        @FinancialYearStart,
+        DATEADD(day, -1, DATEADD(year, 1, @FinancialYearStart)),
+        CONCAT(YEAR(@FinancialYearStart) + 57, N'-01-01'),
+        CONCAT(YEAR(@FinancialYearStart) + 58, N'-12-30'),
+        1,
+        0,
+        NULL,
+        @TenantId,
+        CONCAT(YEAR(@FinancialYearStart) + 57, N'/', RIGHT(CONVERT(varchar(4), YEAR(@FinancialYearStart) + 58), 2))
+    );
+END;
+
+INSERT tbl_VoucherType (Id, TenantId, Name, TypeOfVoucher, StartIndex, Description, IsActive, IsDefault)
+SELECT CONVERT(uniqueidentifier, HASHBYTES('MD5', CONCAT(N'NWR-BUSY/VOUCHER-TYPE/', seed.Name))),
+       @TenantId, seed.Name, seed.TypeOfVoucher, seed.StartIndex, seed.Description, 1, 0
+FROM (VALUES
+    (N'SalesForTicket', N'Sales', 1, N'Restaurant point-of-sale billing'),
+    (N'StockJournal', N'Stock Journal', 1, N'Restaurant stock movement'),
+    (N'PhysicalStock', N'Physical Stock', 1, N'Restaurant stock count adjustment'),
+    (N'StockIssue', N'Stock Issue', 1, N'Restaurant recipe consumption')
+) seed(Name, TypeOfVoucher, StartIndex, Description)
+WHERE NOT EXISTS
+(
+    SELECT 1 FROM tbl_VoucherType existing
+    WHERE existing.TenantId = @TenantId AND existing.Name = seed.Name
+);
+
 SELECT TOP (1) @PcsUnitId = Id FROM tbl_Unit WHERE TenantId = @TenantId AND Name = 'Pcs';
 SELECT TOP (1) @KgUnitId = Id FROM tbl_Unit WHERE TenantId = @TenantId AND Name = 'Kg';
 SELECT TOP (1) @VatTaxId = Id FROM tbl_Tax WHERE TenantId = @TenantId AND Rate = 13 AND IsActive = 1;
@@ -1237,6 +1347,618 @@ WHERE NOT EXISTS
     WHERE x.Id=CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PAYOUTLINE/',p.PayoutNo)))
 );
 
+/* Payroll departments, roles, staff, allowance history, attendance, and runs. */
+CREATE TABLE #PayrollDepartmentSeed
+(
+    DepartmentNo int PRIMARY KEY,
+    Id uniqueidentifier NOT NULL,
+    Name nvarchar(80) NOT NULL,
+    Description nvarchar(300) NOT NULL
+);
+
+INSERT #PayrollDepartmentSeed
+SELECT DepartmentNo,
+       CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PAYDEPT/',DepartmentNo))),
+       Name,Description
+FROM (VALUES
+    (1,N'Management',N'Restaurant leadership and floor supervision.'),
+    (2,N'Cash Counter',N'Front desk, cashiering, and payment settlement.'),
+    (3,N'Service',N'Guest service, hosting, and dining room operations.'),
+    (4,N'Kitchen',N'Hot line, tandoor, wok, bakery, and stewarding.'),
+    (5,N'Inventory',N'Receiving, stock control, and supplier coordination.'),
+    (6,N'Payroll',N'Payroll administration and staff records.'),
+    (7,N'Cafe & Bar',N'Coffee, bar, and beverage service.'),
+    (8,N'Finance',N'Bookkeeping, reconciliation, and accounts.')
+) x(DepartmentNo,Name,Description);
+
+INSERT tbl_RestaurantPayrollDepartment (Id,TenantId,Name,Description,SortOrder,IsActive,CreatedAt)
+SELECT s.Id,@TenantId,s.Name,s.Description,s.DepartmentNo,1,@Now
+FROM #PayrollDepartmentSeed s
+WHERE NOT EXISTS (SELECT 1 FROM tbl_RestaurantPayrollDepartment x WHERE x.TenantId=@TenantId AND x.Name=s.Name);
+
+CREATE TABLE #PayrollRoleSeed
+(
+    RoleNo int PRIMARY KEY,
+    DepartmentNo int NOT NULL,
+    Id uniqueidentifier NOT NULL,
+    Name nvarchar(80) NOT NULL,
+    Description nvarchar(300) NOT NULL
+);
+
+INSERT #PayrollRoleSeed
+SELECT RoleNo,DepartmentNo,
+       CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PAYROLE/',RoleNo))),
+       Name,Description
+FROM (VALUES
+    (1,1,N'General Manager',N'Leads restaurant operations and service.'),
+    (2,2,N'Cashier',N'Handles bills, cash shifts, and payment closeout.'),
+    (3,3,N'Waiter',N'Provides table service and coordinates orders.'),
+    (4,4,N'Chef',N'Prepares and expedites kitchen orders.'),
+    (5,5,N'Inventory Controller',N'Receives goods and manages stock.'),
+    (6,6,N'Payroll Officer',N'Maintains attendance and payroll records.'),
+    (7,4,N'Chef de Partie',N'Leads a kitchen section during service.'),
+    (8,7,N'Barista',N'Prepares cafe and beverage orders.'),
+    (9,3,N'Host',N'Welcomes guests and manages reservations.'),
+    (10,4,N'Steward',N'Supports kitchen hygiene and dishwashing.'),
+    (11,8,N'Accountant',N'Reconciles daily sales and settlement records.')
+) x(RoleNo,DepartmentNo,Name,Description);
+
+INSERT tbl_RestaurantPayrollJobRole (Id,TenantId,DepartmentId,Name,Description,SortOrder,IsActive,CreatedAt)
+SELECT s.Id,@TenantId,d.Id,s.Name,s.Description,s.RoleNo,1,@Now
+FROM #PayrollRoleSeed s
+JOIN #PayrollDepartmentSeed d ON d.DepartmentNo=s.DepartmentNo
+WHERE NOT EXISTS
+(
+    SELECT 1 FROM tbl_RestaurantPayrollJobRole x
+    JOIN tbl_RestaurantPayrollDepartment dx ON dx.Id=x.DepartmentId
+    WHERE x.TenantId=@TenantId AND dx.Name=d.Name AND x.Name=s.Name
+);
+
+CREATE TABLE #PayrollEmployeeSeed
+(
+    EmployeeNo int PRIMARY KEY,
+    Id uniqueidentifier NOT NULL,
+    DepartmentNo int NOT NULL,
+    RoleNo int NOT NULL,
+    StaffCode nvarchar(30) NOT NULL,
+    Name nvarchar(150) NOT NULL,
+    PhoneNumber nvarchar(32) NOT NULL,
+    EmploymentType int NOT NULL,
+    BasicSalary decimal(18,2) NOT NULL,
+    HourlyRate decimal(18,2) NOT NULL,
+    OvertimeRate decimal(18,2) NOT NULL,
+    FixedDeduction decimal(18,2) NOT NULL,
+    Allowance decimal(18,2) NOT NULL,
+    ServiceChargeWeight decimal(18,2) NOT NULL
+);
+
+INSERT #PayrollEmployeeSeed
+SELECT EmployeeNo,
+       CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PAYEMP/',StaffCode))),
+       DepartmentNo,RoleNo,StaffCode,Name,PhoneNumber,EmploymentType,BasicSalary,HourlyRate,OvertimeRate,
+       FixedDeduction,Allowance,ServiceChargeWeight
+FROM (VALUES
+    (1,1,1,N'FS-MGR-001',N'FutureStar Manager',N'+977-9800001001',0,45000.00,0.00,350.00,2000.00,1.00,1.50),
+    (2,2,2,N'FS-CASH-001',N'FutureStar Cashier',N'+977-9800001002',0,30000.00,0.00,250.00,1200.00,500.00,1.00),
+    (3,3,3,N'FS-WAIT-001',N'FutureStar Waiter',N'+977-9800001003',0,25000.00,0.00,220.00,800.00,750.00,1.00),
+    (4,4,4,N'FS-KIT-001',N'FutureStar Kitchen',N'+977-9800001004',0,32000.00,0.00,300.00,1000.00,600.00,1.00),
+    (5,5,5,N'FS-INV-001',N'FutureStar Inventory',N'+977-9800001005',0,30000.00,0.00,250.00,900.00,400.00,1.00),
+    (6,6,6,N'FS-PAY-001',N'FutureStar Payroll',N'+977-9800001006',0,35000.00,0.00,275.00,1000.00,500.00,1.00),
+    (7,4,7,N'FS-COOK-002',N'Pasang Sherpa',N'+977-9800001007',0,28000.00,0.00,280.00,700.00,400.00,1.00),
+    (8,3,3,N'FS-WAIT-002',N'Rina Gurung',N'+977-9800001008',0,24000.00,0.00,220.00,500.00,650.00,1.00),
+    (9,7,8,N'FS-BAR-001',N'Nabin Karki',N'+977-9800001009',1,0.00,180.00,240.00,250.00,200.00,0.80),
+    (10,3,9,N'FS-HOST-001',N'Sushma Rai',N'+977-9800001010',0,26000.00,0.00,220.00,500.00,300.00,0.90),
+    (11,4,10,N'FS-DISH-001',N'Milan Thapa',N'+977-9800001011',1,0.00,150.00,210.00,100.00,150.00,0.50),
+    (12,8,11,N'FS-ACCT-001',N'Kabita Shrestha',N'+977-9800001012',0,38000.00,0.00,275.00,1200.00,500.00,0.80)
+) x(EmployeeNo,DepartmentNo,RoleNo,StaffCode,Name,PhoneNumber,EmploymentType,BasicSalary,HourlyRate,OvertimeRate,FixedDeduction,Allowance,ServiceChargeWeight);
+
+INSERT tbl_RestaurantPayrollEmployee
+    (Id,TenantId,UserId,LoginManagedByRestaurant,StaffCode,Name,PhoneNumber,DepartmentId,JobRoleId,
+     EmploymentType,BasicSalary,HourlyRate,OvertimeRate,FixedDeduction,ServiceChargeWeight,JoinedOn,IsActive,CreatedAt)
+SELECT e.Id,@TenantId,NULL,0,e.StaffCode,e.Name,e.PhoneNumber,d.Id,r.Id,e.EmploymentType,
+       e.BasicSalary,e.HourlyRate,e.OvertimeRate,e.FixedDeduction,e.ServiceChargeWeight,
+       DATEADD(day,-(120+e.EmployeeNo*11),CONVERT(date,@Now)),1,@Now
+FROM #PayrollEmployeeSeed e
+JOIN #PayrollDepartmentSeed ds ON ds.DepartmentNo=e.DepartmentNo
+JOIN tbl_RestaurantPayrollDepartment d ON d.TenantId=@TenantId AND d.Name=ds.Name
+JOIN #PayrollRoleSeed rs ON rs.RoleNo=e.RoleNo
+JOIN tbl_RestaurantPayrollJobRole r ON r.TenantId=@TenantId AND r.DepartmentId=d.Id AND r.Name=rs.Name
+WHERE NOT EXISTS
+(
+    SELECT 1 FROM tbl_RestaurantPayrollEmployee x
+    WHERE x.TenantId=@TenantId AND x.StaffCode=e.StaffCode
+);
+
+UPDATE x SET x.DepartmentId=d.Id,x.JobRoleId=r.Id,x.IsActive=1
+FROM tbl_RestaurantPayrollEmployee x
+JOIN #PayrollEmployeeSeed e ON e.StaffCode=x.StaffCode
+JOIN #PayrollDepartmentSeed ds ON ds.DepartmentNo=e.DepartmentNo
+JOIN tbl_RestaurantPayrollDepartment d ON d.TenantId=@TenantId AND d.Name=ds.Name
+JOIN #PayrollRoleSeed rs ON rs.RoleNo=e.RoleNo
+JOIN tbl_RestaurantPayrollJobRole r ON r.TenantId=@TenantId AND r.DepartmentId=d.Id AND r.Name=rs.Name
+WHERE x.TenantId=@TenantId;
+
+INSERT tbl_RestaurantPayrollAllowanceHistory
+    (Id,TenantId,EmployeeId,Amount,EffectiveFrom,EffectiveFromMiti,Reason,CreatedAt,CreatedByUserId)
+SELECT CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PAYALLOW/',e.StaffCode))),@TenantId,p.Id,
+       e.Allowance,DATEADD(day,-90,CONVERT(date,@Now)),N'2083-01-01',N'Monthly restaurant allowance seed',@Now,@AdminUserId
+FROM #PayrollEmployeeSeed e
+JOIN tbl_RestaurantPayrollEmployee p ON p.TenantId=@TenantId AND p.StaffCode=e.StaffCode
+WHERE e.Allowance>0
+  AND NOT EXISTS
+  (
+      SELECT 1 FROM tbl_RestaurantPayrollAllowanceHistory x
+      WHERE x.TenantId=@TenantId AND x.EmployeeId=p.Id
+        AND x.Id=CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PAYALLOW/',e.StaffCode)))
+  );
+
+;WITH DaySeed AS
+(
+    SELECT TOP (60) ROW_NUMBER() OVER (ORDER BY (SELECT NULL))-1 AS DayNo
+    FROM sys.all_objects a CROSS JOIN sys.all_objects b
+), AttendanceSeed AS
+(
+    SELECT e.EmployeeNo,p.Id AS EmployeeId,
+           CONVERT(date,DATEADD(day,d.DayNo-59,CONVERT(date,@Now))) AS WorkDate,
+           CASE WHEN (d.DayNo+e.EmployeeNo)%29=0 THEN 3
+                WHEN (d.DayNo+e.EmployeeNo)%13=0 THEN 1 ELSE 0 END AS Status,
+           CASE WHEN (d.DayNo+e.EmployeeNo)%29=0 THEN 0.00 ELSE CASE WHEN e.EmploymentType=1 THEN 7.50 ELSE 8.00 END END AS RegularHours,
+           CASE WHEN (d.DayNo+e.EmployeeNo)%29=0 THEN 0.00 WHEN (d.DayNo+e.EmployeeNo)%8=0 THEN 1.50 ELSE 0.00 END AS OvertimeHours,
+           CASE WHEN (d.DayNo+e.EmployeeNo)%7=0 THEN N'Opening' WHEN (d.DayNo+e.EmployeeNo)%7=1 THEN N'Closing' ELSE N'Day' END AS ShiftName
+    FROM DaySeed d
+    CROSS JOIN #PayrollEmployeeSeed e
+    JOIN tbl_RestaurantPayrollEmployee p ON p.TenantId=@TenantId AND p.StaffCode=e.StaffCode
+    WHERE d.DayNo%7 NOT IN (0,6)
+)
+INSERT tbl_RestaurantPayrollAttendance
+    (Id,TenantId,EmployeeId,WorkDate,ClockIn,ClockOut,BreakMinutes,RegularHours,OvertimeHours,Status,ShiftName,Notes,CapturedByUserId)
+SELECT CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PAYATT/',e.StaffCode,N'/',CONVERT(char(8),a.WorkDate,112)))),
+       @TenantId,a.EmployeeId,a.WorkDate,
+       CASE WHEN a.Status=3 THEN NULL ELSE DATEADD(minute,CASE WHEN a.Status=1 THEN 15 ELSE 0 END,DATEADD(hour,8,CONVERT(datetime2,a.WorkDate))) END,
+       CASE WHEN a.Status=3 THEN NULL ELSE DATEADD(minute,CASE WHEN a.Status=1 THEN 15 ELSE 0 END,DATEADD(hour,17,CONVERT(datetime2,a.WorkDate))) END,
+       60,a.RegularHours,a.OvertimeHours,a.Status,a.ShiftName,
+       CASE WHEN a.Status=3 THEN N'Scheduled rest day recorded as an absence.' WHEN a.Status=1 THEN N'Late arrival recorded by the shift supervisor.' ELSE NULL END,
+       @AdminUserId
+FROM AttendanceSeed a
+JOIN #PayrollEmployeeSeed e ON e.EmployeeNo=a.EmployeeNo
+WHERE NOT EXISTS
+(
+    SELECT 1 FROM tbl_RestaurantPayrollAttendance x
+    WHERE x.Id=CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PAYATT/',e.StaffCode,N'/',CONVERT(char(8),a.WorkDate,112))))
+);
+
+CREATE TABLE #PayrollRunSeed
+(
+    RunNo int PRIMARY KEY,
+    Id uniqueidentifier NOT NULL,
+    RunNumber nvarchar(40) NOT NULL,
+    PeriodStart date NOT NULL,
+    PeriodEnd date NOT NULL,
+    Status int NOT NULL,
+    TipsPool decimal(18,2) NOT NULL,
+    ServiceChargePool decimal(18,2) NOT NULL
+);
+
+INSERT #PayrollRunSeed
+SELECT RunNo,
+       CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PAYRUN/',RunNo))),
+       CONCAT(N'PAY-',FORMAT(PeriodStart,'yyyyMM'),N'-001'),PeriodStart,PeriodEnd,Status,TipsPool,ServiceChargePool
+FROM (VALUES
+    (1,DATEFROMPARTS(YEAR(DATEADD(month,-1,@Now)),MONTH(DATEADD(month,-1,@Now)),1),EOMONTH(DATEADD(month,-1,@Now)),2,18500.00,32000.00),
+    (2,DATEFROMPARTS(YEAR(@Now),MONTH(@Now),1),CONVERT(date,@Now),0,9200.00,16400.00)
+) x(RunNo,PeriodStart,PeriodEnd,Status,TipsPool,ServiceChargePool);
+
+INSERT tbl_RestaurantPayrollRun
+    (Id,TenantId,RunNumber,PeriodStart,PeriodEnd,Status,TipsPool,ServiceChargePool,TotalGross,TotalDeduction,TotalNet,
+     Notes,CreatedAt,CreatedByUserId,ApprovedAt,ApprovedByUserId,PaidAt,PaidByUserId)
+SELECT r.Id,@TenantId,r.RunNumber,r.PeriodStart,r.PeriodEnd,r.Status,r.TipsPool,r.ServiceChargePool,0,0,0,
+       CASE WHEN r.Status=2 THEN N'Closed payroll period seeded for report and payslip screens.' ELSE N'Current period draft seeded for payroll workflow screens.' END,
+       DATEADD(day,1,CONVERT(datetime2,r.PeriodStart)),@AdminUserId,
+       CASE WHEN r.Status=2 THEN DATEADD(day,1,CONVERT(datetime2,r.PeriodEnd)) END,
+       CASE WHEN r.Status=2 THEN @AdminUserId END,
+       CASE WHEN r.Status=2 THEN DATEADD(day,2,CONVERT(datetime2,r.PeriodEnd)) END,
+       CASE WHEN r.Status=2 THEN @AdminUserId END
+FROM #PayrollRunSeed r
+WHERE NOT EXISTS (SELECT 1 FROM tbl_RestaurantPayrollRun x WHERE x.TenantId=@TenantId AND x.RunNumber=r.RunNumber);
+
+CREATE TABLE #PayrollLineSeed
+(
+    Id uniqueidentifier NOT NULL PRIMARY KEY,
+    RunId uniqueidentifier NOT NULL,
+    EmployeeId uniqueidentifier NOT NULL,
+    EmployeeName nvarchar(150) NOT NULL,
+    StaffCode nvarchar(30) NOT NULL,
+    JobRole nvarchar(80) NOT NULL,
+    EmploymentType int NOT NULL,
+    WorkedHours decimal(18,2) NOT NULL,
+    OvertimeHours decimal(18,2) NOT NULL,
+    BasicPay decimal(18,2) NOT NULL,
+    OvertimePay decimal(18,2) NOT NULL,
+    Allowance decimal(18,2) NOT NULL,
+    TipsShare decimal(18,2) NOT NULL,
+    ServiceChargeShare decimal(18,2) NOT NULL,
+    GrossPay decimal(18,2) NOT NULL,
+    TaxDeduction decimal(18,2) NOT NULL,
+    OtherDeduction decimal(18,2) NOT NULL,
+    AdvanceRecovery decimal(18,2) NOT NULL,
+    NetPay decimal(18,2) NOT NULL
+);
+
+;WITH AttendanceTotals AS
+(
+    SELECT r.RunNo,p.Id EmployeeId,
+           SUM(CASE WHEN a.Status IN (0,1) THEN a.RegularHours ELSE 0 END) WorkedHours,
+           SUM(CASE WHEN a.Status IN (0,1) THEN a.OvertimeHours ELSE 0 END) OvertimeHours
+    FROM #PayrollRunSeed r
+    CROSS JOIN #PayrollEmployeeSeed e
+    JOIN tbl_RestaurantPayrollEmployee p ON p.TenantId=@TenantId AND p.StaffCode=e.StaffCode
+    LEFT JOIN tbl_RestaurantPayrollAttendance a ON a.TenantId=@TenantId AND a.EmployeeId=p.Id
+        AND a.WorkDate>=r.PeriodStart AND a.WorkDate<=r.PeriodEnd
+    GROUP BY r.RunNo,p.Id
+), PayBase AS
+(
+    SELECT r.RunNo,r.Id RunId,r.TipsPool,r.ServiceChargePool,e.*,p.Id EmployeeId,
+           role.Name JobRole,COALESCE(t.WorkedHours,0) WorkedHours,COALESCE(t.OvertimeHours,0) OvertimeHours,
+           SUM(e.ServiceChargeWeight) OVER (PARTITION BY r.RunNo) TotalWeight
+    FROM #PayrollRunSeed r
+    CROSS JOIN #PayrollEmployeeSeed e
+    JOIN tbl_RestaurantPayrollEmployee p ON p.TenantId=@TenantId AND p.StaffCode=e.StaffCode
+    JOIN #PayrollRoleSeed rs ON rs.RoleNo=e.RoleNo
+    JOIN #PayrollDepartmentSeed ds ON ds.DepartmentNo=e.DepartmentNo
+    JOIN tbl_RestaurantPayrollDepartment d ON d.TenantId=@TenantId AND d.Name=ds.Name
+    JOIN tbl_RestaurantPayrollJobRole role ON role.TenantId=@TenantId AND role.DepartmentId=d.Id AND role.Name=rs.Name
+    LEFT JOIN AttendanceTotals t ON t.RunNo=r.RunNo AND t.EmployeeId=p.Id
+), CalculatedPay AS
+(
+    SELECT *,
+           ROUND(CASE WHEN EmploymentType=1 THEN WorkedHours*HourlyRate ELSE BasicSalary END,2) BasicAmount,
+           ROUND(OvertimeHours*OvertimeRate,2) OvertimeAmount,
+           ROUND(CASE WHEN TotalWeight=0 THEN 0 ELSE TipsPool*ServiceChargeWeight/TotalWeight END,2) TipsAmount,
+           ROUND(CASE WHEN TotalWeight=0 THEN 0 ELSE ServiceChargePool*ServiceChargeWeight/TotalWeight END,2) ServiceAmount
+    FROM PayBase
+)
+INSERT #PayrollLineSeed
+SELECT CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PAYLINE/',RunNo,N'/',StaffCode))),RunId,EmployeeId,Name,StaffCode,JobRole,
+       EmploymentType,WorkedHours,OvertimeHours,BasicAmount,OvertimeAmount,Allowance,TipsAmount,ServiceAmount,
+       BasicAmount+OvertimeAmount+Allowance+TipsAmount+ServiceAmount,
+       ROUND((BasicAmount+OvertimeAmount+Allowance+TipsAmount+ServiceAmount)*0.02,2),FixedDeduction,
+       CASE WHEN RunNo=1 AND EmployeeNo%5=0 THEN 500.00 ELSE 0 END,
+       BasicAmount+OvertimeAmount+Allowance+TipsAmount+ServiceAmount
+          -ROUND((BasicAmount+OvertimeAmount+Allowance+TipsAmount+ServiceAmount)*0.02,2)-FixedDeduction
+          -CASE WHEN RunNo=1 AND EmployeeNo%5=0 THEN 500.00 ELSE 0 END
+FROM CalculatedPay;
+
+INSERT tbl_RestaurantPayrollLine
+    (Id,TenantId,PayrollRunId,EmployeeId,EmployeeName,StaffCode,JobRole,EmploymentType,WorkedHours,OvertimeHours,
+     BasicPay,OvertimePay,Allowance,TipsShare,ServiceChargeShare,GrossPay,TaxDeduction,OtherDeduction,AdvanceRecovery,NetPay,Notes)
+SELECT l.Id,@TenantId,l.RunId,l.EmployeeId,l.EmployeeName,l.StaffCode,l.JobRole,l.EmploymentType,l.WorkedHours,l.OvertimeHours,
+       l.BasicPay,l.OvertimePay,l.Allowance,l.TipsShare,l.ServiceChargeShare,l.GrossPay,l.TaxDeduction,l.OtherDeduction,l.AdvanceRecovery,l.NetPay,
+       CASE WHEN l.AdvanceRecovery>0 THEN N'Staff advance recovery included.' ELSE NULL END
+FROM #PayrollLineSeed l
+WHERE NOT EXISTS (SELECT 1 FROM tbl_RestaurantPayrollLine x WHERE x.Id=l.Id);
+
+UPDATE r SET r.TotalGross=x.TotalGross,r.TotalDeduction=x.TotalDeduction,r.TotalNet=x.TotalNet
+FROM tbl_RestaurantPayrollRun r
+CROSS APPLY
+(
+    SELECT SUM(l.GrossPay) TotalGross,SUM(l.TaxDeduction+l.OtherDeduction+l.AdvanceRecovery) TotalDeduction,SUM(l.NetPay) TotalNet
+    FROM #PayrollLineSeed l WHERE l.RunId=r.Id
+) x
+WHERE r.TenantId=@TenantId AND EXISTS (SELECT 1 FROM #PayrollRunSeed s WHERE s.Id=r.Id);
+
+/* Guest reservations and their SMS status history. */
+CREATE TABLE #ReservationSeed
+(
+    ReservationNo int PRIMARY KEY,
+    Id uniqueidentifier NOT NULL,
+    GuestName nvarchar(150) NOT NULL,
+    PhoneNumber nvarchar(50) NOT NULL,
+    Status int NOT NULL,
+    IsWalkIn bit NOT NULL,
+    PartySize int NOT NULL,
+    StartsAt datetime2 NOT NULL,
+    EndsAt datetime2 NOT NULL,
+    TableId uniqueidentifier NULL
+);
+
+;WITH n AS
+(
+    SELECT TOP (64) ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) ReservationNo
+    FROM sys.all_objects a CROSS JOIN sys.all_objects b
+), ReservationDetail AS
+(
+    SELECT n.ReservationNo,
+           CASE WHEN EXISTS
+                (
+                    SELECT 1 FROM tbl_RestaurantReservation existing
+                    WHERE existing.Id=CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/RESERVATION/',n.ReservationNo)))
+                      AND existing.TenantId<>@TenantId
+                )
+                THEN CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/TENANT/',@TenantId,N'/RESERVATION/',n.ReservationNo)))
+                ELSE CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/RESERVATION/',n.ReservationNo))) END Id,
+           c.Name GuestName,c.Phone PhoneNumber,
+           CASE n.ReservationNo%8 WHEN 0 THEN 0 WHEN 1 THEN 1 WHEN 2 THEN 2 WHEN 3 THEN 3 WHEN 4 THEN 4 WHEN 5 THEN 5 WHEN 6 THEN 6 ELSE 7 END Status,
+           CASE WHEN n.ReservationNo%9=0 THEN 1 ELSE 0 END IsWalkIn,
+           DATEADD(hour,17+(n.ReservationNo%6),DATEADD(day,(n.ReservationNo%14)-7,CONVERT(datetime2,CONVERT(date,@Now)))) StartsAt,
+           CASE WHEN n.ReservationNo%8 IN (1,4) THEN t.Id END TableId,
+           CASE WHEN n.ReservationNo%8 IN (1,4) THEN CASE WHEN t.Capacity<2 THEN 2 ELSE CASE WHEN t.Capacity>6 THEN 6 ELSE t.Capacity END END ELSE 2+(n.ReservationNo%7) END PartySize
+    FROM n
+    JOIN #CustomerSeed c ON c.CustomerNo=((n.ReservationNo-1)%40)+1
+    LEFT JOIN #TableSeed t ON t.TableNo=n.ReservationNo
+)
+INSERT #ReservationSeed
+SELECT ReservationNo,Id,GuestName,PhoneNumber,Status,IsWalkIn,PartySize,StartsAt,DATEADD(minute,90,StartsAt),TableId
+FROM ReservationDetail;
+
+INSERT tbl_RestaurantReservation
+    (Id,Status,IsWalkIn,GuestName,PhoneNumber,Notes,PartySize,StartsAtUtc,EndsAtUtc,TableId,GuestStatusTokenHash,CreatedAtUtc,UpdatedAtUtc,TenantId)
+SELECT r.Id,r.Status,r.IsWalkIn,r.GuestName,r.PhoneNumber,
+       CASE r.Status WHEN 3 THEN N'Guest is on the waitlist; notify when a suitable table is available.'
+                     WHEN 7 THEN N'Guest did not arrive within the grace period.' ELSE N'Created by the FutureStar demo dataset.' END,
+       r.PartySize,r.StartsAt,r.EndsAt,r.TableId,
+       CONVERT(varchar(64),HASHBYTES('SHA2_256',CONCAT(N'NWR-BUSY-GUEST/',r.ReservationNo)),2),
+       DATEADD(day,-1,r.StartsAt),CASE WHEN r.Status IN (1,2,4,5,6,7) THEN DATEADD(hour,-2,r.StartsAt) END,@TenantId
+FROM #ReservationSeed r
+WHERE NOT EXISTS (SELECT 1 FROM tbl_RestaurantReservation x WHERE x.Id=r.Id);
+
+INSERT tbl_RestaurantSmsOutbox
+    (Id,PhoneNumber,Message,ReservationId,Status,Attempts,LastError,CreatedAtUtc,SentAtUtc,NextAttemptAtUtc,TenantId)
+SELECT sms.Id,r.PhoneNumber,
+       CONCAT(N'FutureStar reservation update for ',r.GuestName,N'. Reference ',FORMAT(r.ReservationNo,'0000'),N'.'),r.Id,
+       CASE r.ReservationNo%3 WHEN 0 THEN 1 WHEN 1 THEN 2 ELSE 0 END,
+       CASE r.ReservationNo%3 WHEN 0 THEN 1 WHEN 1 THEN 3 ELSE 0 END,
+       CASE WHEN r.ReservationNo%3=1 THEN N'Demo provider timeout; message is available for retry.' END,
+       DATEADD(minute,r.ReservationNo,DATEADD(day,-2,r.StartsAt)),
+       CASE WHEN r.ReservationNo%3=0 THEN DATEADD(minute,5,DATEADD(minute,r.ReservationNo,DATEADD(day,-2,r.StartsAt))) END,
+       CASE WHEN r.ReservationNo%3=2 THEN DATEADD(hour,1,@Now) END,@TenantId
+FROM #ReservationSeed r
+CROSS APPLY
+(
+    SELECT CASE WHEN EXISTS
+    (
+        SELECT 1 FROM tbl_RestaurantSmsOutbox existing
+        WHERE existing.Id=CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/RESSMS/',r.ReservationNo)))
+          AND existing.TenantId<>@TenantId
+    )
+    THEN CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/TENANT/',@TenantId,N'/RESSMS/',r.ReservationNo)))
+    ELSE CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/RESSMS/',r.ReservationNo))) END Id
+) sms
+WHERE r.Status IN (1,2,5,6,7)
+  AND NOT EXISTS
+  (
+      SELECT 1 FROM tbl_RestaurantSmsOutbox x
+      WHERE x.Id=sms.Id
+  );
+
+/* Printer routes, registered devices, route assignments, and a mixed print queue. */
+UPDATE s SET PrintRouteName=CASE x.StationNo WHEN 1 THEN N'KITCHEN-MAIN' WHEN 2 THEN N'TANDOOR'
+                    WHEN 3 THEN N'WOK' WHEN 4 THEN N'PANTRY' WHEN 5 THEN N'BAR' ELSE N'DESSERT' END
+FROM tbl_RestaurantStation s
+JOIN #StationSeed x ON x.Id=s.Id
+WHERE s.TenantId=@TenantId;
+
+CREATE TABLE #PrintRouteSeed (RouteNo int PRIMARY KEY,Id uniqueidentifier NOT NULL,Name nvarchar(128) NOT NULL,DisplayName nvarchar(150) NOT NULL);
+INSERT #PrintRouteSeed
+SELECT RouteNo,CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PRINTROUTE/',RouteNo))),Name,DisplayName
+FROM (VALUES
+    (1,N'KITCHEN-MAIN',N'Main kitchen'),(2,N'TANDOOR',N'Tandoor & grill'),(3,N'WOK',N'Momo & wok'),
+    (4,N'PANTRY',N'Pantry & bakery'),(5,N'BAR',N'Bar & beverages'),(6,N'DESSERT',N'Dessert pass'),
+    (7,N'RECEIPT',N'Front counter receipts')
+) x(RouteNo,Name,DisplayName);
+
+INSERT tbl_RestaurantPrintRoute (Id,Name,DisplayName,IsActive,CreatedAtUtc,TenantId)
+SELECT r.Id,r.Name,r.DisplayName,1,@Now,@TenantId
+FROM #PrintRouteSeed r
+WHERE NOT EXISTS (SELECT 1 FROM tbl_RestaurantPrintRoute x WHERE x.TenantId=@TenantId AND x.Name=r.Name);
+
+CREATE TABLE #PrintDeviceSeed (DeviceNo int PRIMARY KEY,Id uniqueidentifier NOT NULL,ClientDeviceId nvarchar(120) NOT NULL,Name nvarchar(150) NOT NULL,Platform nvarchar(24) NOT NULL);
+INSERT #PrintDeviceSeed
+SELECT DeviceNo,CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PRINTDEVICE/',DeviceNo))),ClientDeviceId,Name,Platform
+FROM (VALUES
+    (1,N'FS-PRINTER-KITCHEN-01',N'Main Kitchen KDS Printer',N'Windows'),
+    (2,N'FS-PRINTER-BAR-01',N'Bar KDS Printer',N'Windows'),
+    (3,N'FS-PRINTER-POS-01',N'Front Counter Receipt Printer',N'Windows'),
+    (4,N'FS-PRINTER-POS-02',N'Rooftop Receipt Printer',N'Android')
+) x(DeviceNo,ClientDeviceId,Name,Platform);
+
+INSERT tbl_RestaurantPrintDevice (Id,ClientDeviceId,Name,Platform,IsEnabled,CreatedAtUtc,LastSeenAtUtc,TenantId)
+SELECT d.Id,d.ClientDeviceId,d.Name,d.Platform,1,DATEADD(day,-45,@Now),DATEADD(minute,-d.DeviceNo*4,@Now),@TenantId
+FROM #PrintDeviceSeed d
+WHERE NOT EXISTS (SELECT 1 FROM tbl_RestaurantPrintDevice x WHERE x.TenantId=@TenantId AND x.ClientDeviceId=d.ClientDeviceId);
+
+CREATE TABLE #PrintDeviceRouteSeed (DeviceNo int NOT NULL,RouteNo int NOT NULL,PRIMARY KEY(DeviceNo,RouteNo));
+INSERT #PrintDeviceRouteSeed VALUES (1,1),(1,2),(1,3),(1,4),(1,6),(2,5),(3,7),(4,7);
+
+INSERT tbl_RestaurantPrintDeviceRoute (Id,DeviceId,RouteName,TenantId)
+SELECT CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PRINTMAP/',m.DeviceNo,N'/',m.RouteNo))),d.Id,r.Name,@TenantId
+FROM #PrintDeviceRouteSeed m
+JOIN #PrintDeviceSeed ds ON ds.DeviceNo=m.DeviceNo
+JOIN tbl_RestaurantPrintDevice d ON d.TenantId=@TenantId AND d.ClientDeviceId=ds.ClientDeviceId
+JOIN #PrintRouteSeed r ON r.RouteNo=m.RouteNo
+WHERE NOT EXISTS
+(
+    SELECT 1 FROM tbl_RestaurantPrintDeviceRoute x
+    WHERE x.TenantId=@TenantId AND x.DeviceId=d.Id AND x.RouteName=r.Name
+);
+
+CREATE TABLE #PrintJobSeed
+(
+    JobNo int PRIMARY KEY,Id uniqueidentifier NOT NULL,ExternalJobId nvarchar(120) NOT NULL,Type int NOT NULL,Status int NOT NULL,
+    TicketId uniqueidentifier NULL,OrderId uniqueidentifier NULL,StationId uniqueidentifier NULL,RouteName nvarchar(128) NOT NULL,
+    CreatedAtUtc datetime2 NOT NULL,PrintedAtUtc datetime2 NULL
+);
+
+INSERT #PrintJobSeed
+SELECT t.TicketNo,CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PRINTJOB/T/',t.TicketNo))),
+       CONCAT(N'FS-PRINT-KOT-',FORMAT(t.TicketNo,'0000')),0,
+       CASE t.TicketNo%10 WHEN 0 THEN 3 WHEN 1 THEN 2 ELSE 0 END,t.Id,t.OrderId,t.StationId,
+       s.PrintRouteName,DATEADD(minute,2,t.SentAt),CASE WHEN t.TicketNo%10=1 THEN DATEADD(minute,4,t.SentAt) END
+FROM #TicketSeed t
+JOIN tbl_RestaurantStation s ON s.Id=t.StationId AND s.TenantId=@TenantId
+WHERE t.TicketNo<=60;
+
+;WITH Billed AS
+(
+    SELECT ROW_NUMBER() OVER (ORDER BY OrderNo) AS ReceiptNo,*
+    FROM #OrderSeed WHERE OrderNo>100 AND OrderNo<=140
+)
+INSERT #PrintJobSeed
+SELECT 60+b.ReceiptNo,CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PRINTJOB/R/',b.ReceiptNo))),
+       CONCAT(N'FS-PRINT-RECEIPT-',FORMAT(b.ReceiptNo,'0000')),1,
+       CASE b.ReceiptNo%10 WHEN 0 THEN 3 WHEN 1 THEN 2 ELSE 0 END,NULL,b.Id,NULL,N'RECEIPT',
+       DATEADD(minute,5,b.BilledAt),CASE WHEN b.ReceiptNo%10=1 THEN DATEADD(minute,7,b.BilledAt) END
+FROM Billed b;
+
+INSERT tbl_RestaurantPrintJob
+    (Id,ExternalJobId,Type,Status,TicketId,OrderId,StationId,RouteName,Payload,LeaseOwner,AgentJobId,ReprintReason,
+     IsDeliberateReprint,LeaseUntilUtc,Attempts,LastError,CreatedAtUtc,PrintedAtUtc,TenantId)
+SELECT j.Id,j.ExternalJobId,j.Type,j.Status,j.TicketId,j.OrderId,j.StationId,j.RouteName,
+       CONVERT(varbinary(max),CONCAT(N'{"job":"',j.ExternalJobId,N'","route":"',j.RouteName,N'"}')),
+       NULL,CASE WHEN j.Status=2 THEN CONCAT(N'FS-AGENT-',FORMAT(j.JobNo,'0000')) END,
+       CASE WHEN j.Status=3 THEN N'Demo paper path unavailable; retry from printer setup.' END,
+       0,NULL,CASE WHEN j.Status=3 THEN 2 WHEN j.Status=2 THEN 1 ELSE 0 END,
+       CASE WHEN j.Status=3 THEN N'Demo print device reported an intermittent paper feed error.' END,
+       j.CreatedAtUtc,j.PrintedAtUtc,@TenantId
+FROM #PrintJobSeed j
+WHERE NOT EXISTS (SELECT 1 FROM tbl_RestaurantPrintJob x WHERE x.Id=j.Id);
+
+INSERT tbl_RestaurantPrintDelivery
+    (Id,PrintJobId,DeviceId,RouteName,Status,LeaseOwner,LeaseToken,AgentJobId,LeaseUntilUtc,Attempts,LastError,CreatedAtUtc,PrintedAtUtc,TenantId)
+SELECT CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PRINTDELIVERY/',j.JobNo,N'/',ds.DeviceNo))),j.Id,pd.Id,j.RouteName,
+       j.Status,NULL,NULL,CASE WHEN j.Status=2 THEN CONCAT(N'FS-AGENT-',FORMAT(j.JobNo,'0000')) END,NULL,
+       CASE WHEN j.Status=3 THEN 2 WHEN j.Status=2 THEN 1 ELSE 0 END,
+       CASE WHEN j.Status=3 THEN N'Demo print device reported an intermittent paper feed error.' END,
+       j.CreatedAtUtc,j.PrintedAtUtc,@TenantId
+FROM #PrintJobSeed j
+JOIN #PrintRouteSeed r ON r.Name=j.RouteName
+JOIN #PrintDeviceRouteSeed map ON map.RouteNo=r.RouteNo
+JOIN #PrintDeviceSeed ds ON ds.DeviceNo=map.DeviceNo
+JOIN tbl_RestaurantPrintDevice pd ON pd.TenantId=@TenantId AND pd.ClientDeviceId=ds.ClientDeviceId
+WHERE NOT EXISTS
+(
+    SELECT 1 FROM tbl_RestaurantPrintDelivery x
+    WHERE x.TenantId=@TenantId AND x.PrintJobId=j.Id AND x.DeviceId=pd.Id
+);
+
+/* Register shifts and reconcile the existing billed POS payments as tenders. */
+CREATE TABLE #CashShiftSeed
+(
+    ShiftNo int PRIMARY KEY,Id uniqueidentifier NOT NULL,RegisterName nvarchar(100) NOT NULL,
+    OpenedAt datetime2 NOT NULL,OpeningCash decimal(18,2) NOT NULL,IsClosed bit NOT NULL
+);
+
+INSERT #CashShiftSeed
+SELECT ShiftNo,CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/CASHSHIFT/',ShiftNo))),
+       CASE WHEN ShiftNo%2=0 THEN N'Rooftop Register' ELSE N'Front Counter Register' END,
+       DATEADD(hour,8,DATEADD(day,-ShiftNo+1,CONVERT(datetime2,CONVERT(date,@Now)))),
+       5000+(ShiftNo%4)*1000,CASE WHEN ShiftNo=1 THEN 0 ELSE 1 END
+FROM (SELECT TOP (14) ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) ShiftNo FROM sys.all_objects) n;
+
+INSERT tbl_RestaurantCashShift
+    (Id,RegisterName,OpenedByUserId,OpenedAt,OpeningCash,IsClosed,ClosedByUserId,ClosedAt,CountedClosingCash,ExpectedClosingCash,CashVariance,CloseNote,TenantId)
+SELECT s.Id,s.RegisterName,@AdminUserId,s.OpenedAt,s.OpeningCash,s.IsClosed,
+       CASE WHEN s.IsClosed=1 THEN @AdminUserId END,
+       CASE WHEN s.IsClosed=1 THEN DATEADD(hour,12,s.OpenedAt) END,
+       CASE WHEN s.IsClosed=1 THEN s.OpeningCash END,
+       CASE WHEN s.IsClosed=1 THEN s.OpeningCash END,
+       CASE WHEN s.IsClosed=1 THEN 0 END,
+       CASE WHEN s.IsClosed=1 THEN N'Closed register seeded for cashier reconciliation.' END,@TenantId
+FROM #CashShiftSeed s
+WHERE NOT EXISTS (SELECT 1 FROM tbl_RestaurantCashShift x WHERE x.Id=s.Id);
+
+;WITH BillSeed AS
+(
+    SELECT ROW_NUMBER() OVER (ORDER BY OrderNo) PaymentNo,OrderNo,
+           CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/BILLPAYMENT/',OrderNo-100))) BillPaymentId,
+           GrandTotal,CASE WHEN OrderNo%4=0 THEN ROUND(GrandTotal*0.05,2) ELSE 0 END TipAmount,
+           CEILING((GrandTotal+CASE WHEN OrderNo%4=0 THEN ROUND(GrandTotal*0.05,2) ELSE 0 END)/100)*100 ReceivedAmount,
+           CEILING((GrandTotal+CASE WHEN OrderNo%4=0 THEN ROUND(GrandTotal*0.05,2) ELSE 0 END)/100)*100
+             -(GrandTotal+CASE WHEN OrderNo%4=0 THEN ROUND(GrandTotal*0.05,2) ELSE 0 END) ChangeAmount
+    FROM #OrderSeed WHERE OrderNo>100
+)
+INSERT tbl_RestaurantBillTender
+    (Id,BillPaymentId,CashShiftId,PaymentMethod,PaymentLedgerId,Amount,ReceivedAmount,ChangeAmount,Reference,TenantId)
+SELECT CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/BILLTENDER/',b.PaymentNo))),b.BillPaymentId,
+       CASE WHEN b.PaymentNo%3=0 THEN NULL ELSE s.Id END,
+       CASE b.PaymentNo%3 WHEN 0 THEN 5 WHEN 1 THEN 0 ELSE 3 END,
+       CASE WHEN b.PaymentNo%3=1 THEN @CashAccountId END,
+       b.GrandTotal+b.TipAmount,b.ReceivedAmount,b.ChangeAmount,
+       CASE b.PaymentNo%3 WHEN 0 THEN CONCAT(N'QR-FS-',FORMAT(b.PaymentNo,'0000'))
+                          WHEN 1 THEN CONCAT(N'CASH-FS-',FORMAT(b.PaymentNo,'0000'))
+                          ELSE CONCAT(N'CARD-FS-',FORMAT(b.PaymentNo,'0000')) END,@TenantId
+FROM BillSeed b
+JOIN #CashShiftSeed s ON s.ShiftNo=((b.PaymentNo-1)%14)+1
+WHERE NOT EXISTS
+(
+    SELECT 1 FROM tbl_RestaurantBillTender x
+    WHERE x.Id=CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/BILLTENDER/',b.PaymentNo)))
+);
+
+INSERT tbl_RestaurantCashMovement (Id,CashShiftId,IsCashIn,Amount,Reason,CreatedByUserId,CreatedAt,TenantId)
+SELECT CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/CASHMOVE/',m.MovementNo))),s.Id,
+       CASE WHEN m.MovementNo%2=0 THEN 1 ELSE 0 END,250+(m.MovementNo%5)*100,
+       CASE WHEN m.MovementNo%2=0 THEN N'Petty cash float replenishment.' ELSE N'Approved kitchen change fund withdrawal.' END,
+       @AdminUserId,DATEADD(hour,11,s.OpenedAt),@TenantId
+FROM (SELECT TOP (28) ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) MovementNo FROM sys.all_objects) m
+JOIN #CashShiftSeed s ON s.ShiftNo=((m.MovementNo-1)%14)+1
+WHERE NOT EXISTS
+(
+    SELECT 1 FROM tbl_RestaurantCashMovement x
+    WHERE x.Id=CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/CASHMOVE/',m.MovementNo)))
+);
+
+UPDATE shift SET
+    ExpectedClosingCash=seed.OpeningCash+COALESCE(tenders.CashSales,0)+COALESCE(moves.CashMovement,0),
+    CashVariance=CASE WHEN seed.ShiftNo%5=0 THEN -100.00 WHEN seed.ShiftNo%7=0 THEN 100.00 ELSE 0.00 END,
+    CountedClosingCash=seed.OpeningCash+COALESCE(tenders.CashSales,0)+COALESCE(moves.CashMovement,0)
+        +CASE WHEN seed.ShiftNo%5=0 THEN -100.00 WHEN seed.ShiftNo%7=0 THEN 100.00 ELSE 0.00 END,
+    CloseNote=CASE WHEN seed.ShiftNo%5=0 OR seed.ShiftNo%7=0 THEN N'Demo count includes a small documented cash variance.' ELSE N'Closed register seeded for cashier reconciliation.' END
+FROM tbl_RestaurantCashShift shift
+JOIN #CashShiftSeed seed ON seed.Id=shift.Id
+OUTER APPLY
+(
+    SELECT SUM(t.Amount) CashSales FROM tbl_RestaurantBillTender t
+    WHERE t.TenantId=@TenantId AND t.CashShiftId=shift.Id AND t.PaymentMethod=0
+) tenders
+OUTER APPLY
+(
+    SELECT SUM(CASE WHEN m.IsCashIn=1 THEN m.Amount ELSE -m.Amount END) CashMovement
+    FROM tbl_RestaurantCashMovement m WHERE m.TenantId=@TenantId AND m.CashShiftId=shift.Id
+) moves
+WHERE shift.TenantId=@TenantId AND seed.IsClosed=1;
+
+/* Device sync history completes the offline operations screens. */
+INSERT tbl_RestaurantPushToken (Id,DeviceId,Platform,Token,IsActive,RegisteredAt,LastSeenAt,TenantId)
+SELECT CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PUSHTOKEN/',ds.DeviceNo))),d.Id,
+       CASE WHEN ds.DeviceNo%2=0 THEN N'android' ELSE N'ios' END,
+       CONCAT(N'demo-fcm-token-tenant2-',FORMAT(ds.DeviceNo,'00')),1,DATEADD(day,-30,@Now),DATEADD(minute,-ds.DeviceNo*5,@Now),@TenantId
+FROM #DeviceSeed ds
+JOIN tbl_RestaurantDevice d ON d.TenantId=@TenantId AND d.DeviceCode=ds.DeviceCode
+WHERE ds.DeviceNo<=6
+  AND NOT EXISTS
+  (
+      SELECT 1 FROM tbl_RestaurantPushToken x
+      WHERE x.Id=CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/PUSHTOKEN/',ds.DeviceNo)))
+  );
+
+INSERT tbl_RestaurantSyncUploadBatch
+    (Id,BatchGuid,DeviceId,Status,ItemCount,ReceivedAt,CompletedAt,ErrorMessage,TenantId)
+SELECT CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/SYNCBATCH/',b.BatchNo))),
+       CONCAT(N'FS-SYNC-',FORMAT(b.BatchNo,'0000')),d.Id,
+       CASE b.BatchNo%12 WHEN 0 THEN 3 WHEN 1 THEN 2 ELSE 1 END,
+       4+(b.BatchNo%18),DATEADD(minute,-b.BatchNo*17,@Now),
+       CASE WHEN b.BatchNo%12 IN (0,1) THEN NULL ELSE DATEADD(minute,-b.BatchNo*17+2,@Now) END,
+       CASE WHEN b.BatchNo%12=0 THEN N'One offline edit references an outdated menu version.'
+            WHEN b.BatchNo%12=1 THEN N'Conflict retained for manager review.' END,@TenantId
+FROM (SELECT TOP (36) ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) BatchNo FROM sys.all_objects) b
+JOIN #DeviceSeed ds ON ds.DeviceNo=((b.BatchNo-1)%12)+1
+JOIN tbl_RestaurantDevice d ON d.TenantId=@TenantId AND d.DeviceCode=ds.DeviceCode
+WHERE NOT EXISTS
+(
+    SELECT 1 FROM tbl_RestaurantSyncUploadBatch x
+    WHERE x.Id=CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/SYNCBATCH/',b.BatchNo)))
+);
+
 COMMIT TRANSACTION;
 
 /* A compact post-run manifest is returned to sqlcmd and CI logs. */
@@ -1254,6 +1976,17 @@ FROM (VALUES
     (N'Channel menu items',        (SELECT COUNT(*) FROM tbl_RestaurantChannelItem WHERE TenantId=@TenantId AND Id IN (SELECT Id FROM #ChannelItemSeed))),
     (N'Aggregator orders',         (SELECT COUNT(*) FROM tbl_RestaurantAggregatorOrder WHERE TenantId=@TenantId AND Id IN (SELECT Id FROM #AggregatorOrderSeed))),
     (N'Aggregator payouts',        (SELECT COUNT(*) FROM tbl_RestaurantAggregatorPayout WHERE TenantId=@TenantId AND Id IN (SELECT Id FROM #PayoutSeed))),
-    (N'Menu sync logs',            (SELECT COUNT(*) FROM tbl_RestaurantMenuSyncLog WHERE TenantId=@TenantId))
+    (N'Menu sync logs',            (SELECT COUNT(*) FROM tbl_RestaurantMenuSyncLog WHERE TenantId=@TenantId)),
+    (N'Payroll employees',         (SELECT COUNT(*) FROM tbl_RestaurantPayrollEmployee WHERE TenantId=@TenantId AND StaffCode IN (SELECT StaffCode FROM #PayrollEmployeeSeed))),
+    (N'Payroll attendance',        (SELECT COUNT(*) FROM tbl_RestaurantPayrollAttendance WHERE TenantId=@TenantId AND EmployeeId IN (SELECT Id FROM tbl_RestaurantPayrollEmployee WHERE TenantId=@TenantId AND StaffCode IN (SELECT StaffCode FROM #PayrollEmployeeSeed)))),
+    (N'Payroll runs',              (SELECT COUNT(*) FROM tbl_RestaurantPayrollRun WHERE TenantId=@TenantId AND Id IN (SELECT Id FROM #PayrollRunSeed))),
+    (N'Payroll lines',             (SELECT COUNT(*) FROM tbl_RestaurantPayrollLine WHERE TenantId=@TenantId AND PayrollRunId IN (SELECT Id FROM #PayrollRunSeed))),
+    (N'Reservations',              (SELECT COUNT(*) FROM tbl_RestaurantReservation WHERE TenantId=@TenantId AND Id IN (SELECT Id FROM #ReservationSeed))),
+    (N'Printer routes',            (SELECT COUNT(*) FROM tbl_RestaurantPrintRoute WHERE TenantId=@TenantId AND Id IN (SELECT Id FROM #PrintRouteSeed))),
+    (N'Print jobs',                (SELECT COUNT(*) FROM tbl_RestaurantPrintJob WHERE TenantId=@TenantId AND Id IN (SELECT Id FROM #PrintJobSeed))),
+    (N'Print deliveries',          (SELECT COUNT(*) FROM tbl_RestaurantPrintDelivery WHERE TenantId=@TenantId AND PrintJobId IN (SELECT Id FROM #PrintJobSeed))),
+    (N'Bill tenders',              (SELECT COUNT(*) FROM tbl_RestaurantBillTender WHERE TenantId=@TenantId AND Id IN (SELECT CONVERT(uniqueidentifier,HASHBYTES('MD5',CONCAT(N'NWR-BUSY/BILLTENDER/',PaymentNo))) FROM (SELECT ROW_NUMBER() OVER (ORDER BY OrderNo) PaymentNo FROM #OrderSeed WHERE OrderNo>100) p))),
+    (N'Cash shifts',               (SELECT COUNT(*) FROM tbl_RestaurantCashShift WHERE TenantId=@TenantId AND Id IN (SELECT Id FROM #CashShiftSeed))),
+    (N'Sync upload batches',       (SELECT COUNT(*) FROM tbl_RestaurantSyncUploadBatch WHERE TenantId=@TenantId))
 ) summary(Dataset,[Rows])
 ORDER BY Dataset;

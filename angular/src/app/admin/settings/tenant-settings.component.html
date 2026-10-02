@@ -56,6 +56,7 @@
                                                                     #darkLogoUploaderFileInput
                                                                     (change)="onUploadDarkLogoInputChange()"
                                                                     [uploader]="darkLogoUploader"
+                                                                    accept=".svg,image/svg+xml"
                                                                     ng2FileSelect
                                                                     type="file"
                                                                 />
@@ -99,6 +100,7 @@
                                                                     #darkLogoMinimalUploaderFileInput
                                                                     (change)="onUploadDarkLogoMinimalInputChange()"
                                                                     [uploader]="darkLogoMinimalUploader"
+                                                                    accept=".svg,image/svg+xml"
                                                                     ng2FileSelect
                                                                     type="file"
                                                                 />
@@ -140,6 +142,7 @@
                                                                     #lightLogoUploaderFileInput
                                                                     (change)="onUploadLightLogoInputChange()"
                                                                     [uploader]="lightLogoUploader"
+                                                                    accept=".svg,image/svg+xml"
                                                                     ng2FileSelect
                                                                     type="file"
                                                                 />
@@ -178,6 +181,7 @@
                                                                     #lightLogoMinimalUploaderFileInput
                                                                     (change)="onUploadLightLogoMinimalInputChange()"
                                                                     [uploader]="lightLogoMinimalUploader"
+                                                                    accept=".svg,image/svg+xml"
                                                                     ng2FileSelect
                                                                     type="file"
                                                                 />
@@ -1664,290 +1668,6 @@
                                         }
                                     </div>
                                     <!-- end::Header -->
-                                </div>
-                            </tab>
-                        }
-                        @if (true) {
-                            <tab [customClass]="'nav-item'" class="p-5">
-                                <ng-template tabHeading>
-                                    <span [innerHTML]="tabHeadings.school"></span>
-                                </ng-template>
-                                <div class="row">
-                                    <!-- negativeCashTransaction -->
-                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                        <div class="mb-4 form-item">
-                                            <label class="form-label">Negative Cash Transaction</label>
-                                            <input
-                                                [(ngModel)]="settings.allSettingsBundleDto.negativeCashTransaction"
-                                                class="form-check-input"
-                                                class="form-control"
-                                                name="NegativeCashTransaction"
-                                                type="text"
-                                            />
-                                        </div>
-                                    </div>
-                                    <!-- defaultStudentPassword -->
-                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                        <div class="mb-4 form-item">
-                                            <label class="form-label">Default Student Password</label>
-                                            <input
-                                                [(ngModel)]="settings.userManagement.defaultStudentPassword"
-                                                class="form-check-input"
-                                                class="form-control"
-                                                name="defaultStudentPassword"
-                                                type="text"
-                                            />
-                                        </div>
-                                    </div>
-                                    <!-- markSheetFormat -->
-                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                        <div class="mb-4 form-item">
-                                            <label class="form-label" for="marksheetId">MarkSheet Format</label>
-                                            <ng-select
-                                                [(ngModel)]="settings.allSettingsBundleDto.markSheetFormat"
-                                                appendTo="body"
-                                                id="markSheetFormat"
-                                                name="markSheetFormat"
-                                                placeholder="Select an item"
-                                            >
-                                                @for (item of MarksheetformatType; track item) {
-                                                    <ng-option [value]="item">
-                                                        {{ MarksheetMapping[item] }}
-                                                    </ng-option>
-                                                }
-                                            </ng-select>
-                                        </div>
-                                    </div>
-                                    <!-- admitCardFormat -->
-                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                        <div class="mb-4 form-item">
-                                            <label class="form-label">AdmitCard Format</label>
-                                            <ng-select
-                                                [(ngModel)]="settings.allSettingsBundleDto.admitCardFormat"
-                                                appendTo="body"
-                                                id="admitCardFormat"
-                                                name="admitCardFormat"
-                                                placeholder="Select an item"
-                                            >
-                                                @for (item of AdmitformatType; track item) {
-                                                    <ng-option [value]="item">
-                                                        {{ AdmitCardMapping[item] }}
-                                                    </ng-option>
-                                                }
-                                            </ng-select>
-                                        </div>
-                                    </div>
-                                    <!-- feeReceiptFormat -->
-                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                        <div class="mb-4 form-item">
-                                            <label class="mb-1" class="form-label">FeeReceipt Format</label>
-                                            <ng-select
-                                                [(ngModel)]="settings.allSettingsBundleDto.feeReceiptFormat"
-                                                appendTo="body"
-                                                id="format"
-                                                placeholder="Select an item"
-                                            >
-                                                @for (item of receiptformatType; track item) {
-                                                    <ng-option [value]="item">
-                                                        {{ feeReceiptMapping[item] }}
-                                                    </ng-option>
-                                                }
-                                            </ng-select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                        <div class="mb-4 form-item">
-                                            <label class="mb-1" class="form-label">FeeDue Format</label>
-                                            <ng-select
-                                                [(ngModel)]="settings.allSettingsBundleDto.feeDueFormat"
-                                                appendTo="body"
-                                                id="format"
-                                                placeholder="Select an item"
-                                            >
-                                                @for (item of dueformatType; track item) {
-                                                    <ng-option [value]="item">
-                                                        {{ feeDueMapping[item] }}
-                                                    </ng-option>
-                                                }
-                                            </ng-select>
-                                        </div>
-                                    </div>
-                                    <!--transation -->
-                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                        <div class="mb-4 form-item">
-                                            <label class="mb-1" class="form-label">Transaction</label>
-                                            <input
-                                                [(ngModel)]="settings.allSettingsBundleDto.transation"
-                                                class="form-control"
-                                                name="Transaction"
-                                                type="text"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                        <div class="mb-4 form-item">
-                                            <label class="mb-1" class="form-label">No of Card Issue</label>
-                                            <input
-                                                [(ngModel)]="settings.allSettingsBundleDto.noOfCardIssue"
-                                                class="form-control"
-                                                name="NoOfCardIssue"
-                                                type="number"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                        <div class="mb-4 form-item">
-                                            <label class="mb-1" class="form-label">No of Day Issue</label>
-                                            <input
-                                                [(ngModel)]="settings.allSettingsBundleDto.noOfDayIssue"
-                                                class="form-control"
-                                                name="NoOfDayIssue"
-                                                type="number"
-                                            />
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                        <div class="mb-4 form-item">
-                                            <label class="mb-1" class="form-label">Student Order Type</label>
-                                            <ng-select
-                                                [(ngModel)]="settings.allSettingsBundleDto.filterType"
-                                                appendTo="body"
-                                                id="orderType"
-                                                placeholder="Select an item"
-                                            >
-                                                @for (item of orderType; track item) {
-                                                    <ng-option [value]="item">
-                                                        {{ studentOrderType[item] }}
-                                                    </ng-option>
-                                                }
-                                            </ng-select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                        <div class="mb-4 form-item">
-                                            <label class="form-check form-check-custom form-check-solid mb-3">
-                                                <input
-                                                    [(ngModel)]="settings.allSettingsBundleDto.payroll"
-                                                    class="form-check-input"
-                                                    class="form-check-input"
-                                                    id="Setting_TickPayroll"
-                                                    name="TickPayroll"
-                                                    type="checkbox"
-                                                />
-                                                <span class="fs-5 form-check-label">
-                                                    {{ 'Payroll' }}
-                                                </span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                        <div class="mb-4 form-item">
-                                            <label class="form-check form-check-custom form-check-solid mb-3">
-                                                <input
-                                                    [(ngModel)]="settings.allSettingsBundleDto.isIrdSoftware"
-                                                    class="form-check-input"
-                                                    class="form-check-input"
-                                                    id="Setting_ird"
-                                                    name="ird"
-                                                    type="checkbox"
-                                                />
-                                                <span class="fs-5 form-check-label">
-                                                    {{ 'IRD ' }}
-                                                </span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                        <div class="mb-4 form-item">
-                                            <label class="form-check form-check-custom form-check-solid mb-3">
-                                                <input
-                                                    [(ngModel)]="settings.allSettingsBundleDto.isTaxEnabled"
-                                                    class="form-check-input"
-                                                    id="Setting_Tax"
-                                                    name="Tax"
-                                                    type="checkbox"
-                                                />
-                                                <span class="fs-5 form-check-label">
-                                                    {{ 'Tax' }}
-                                                </span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                        <div class="mb-4 form-item">
-                                            <label class="form-check form-check-custom form-check-solid mb-3">
-                                                <input
-                                                    [(ngModel)]="settings.allSettingsBundleDto.birthdaySms"
-                                                    class="form-check-input"
-                                                    class="form-check-input"
-                                                    id="Setting_TickbirthdaySms"
-                                                    name="TickbirthdaySms"
-                                                    type="checkbox"
-                                                />
-                                                <span class="fs-5 form-check-label">
-                                                    {{ 'BirthdaySms' }}
-                                                </span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                        <div class="mb-4 form-item">
-                                            <label class="form-check form-check-custom form-check-solid mb-3">
-                                                <input
-                                                    [(ngModel)]="settings.allSettingsBundleDto.isEmailSent"
-                                                    class="form-check-input"
-                                                    class="form-check-input"
-                                                    id="Setting_TickEmailAfterSave"
-                                                    name="TickEmailAfterSave"
-                                                    required="true"
-                                                    type="checkbox"
-                                                />
-                                                <span class="fs-5 form-check-label">
-                                                    {{ 'Send Email' }}
-                                                </span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                                <div class="mb-4 form-item">
-                                                    <label class="form-label">Student Fees Receivable</label>
-                                                    <ng-select
-                                                        [(ngModel)]="settings.allSettingsBundleDto.feesReceivableId"
-                                                        [items]="accountLedgerList"
-                                                        autofocus
-                                                        bindLabel="displayName"
-                                                        bindValue="id"
-                                                    ></ng-select>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                                <div class="mb-4 form-item">
-                                                    <label class="form-label">FeeDiscount</label>
-                                                    <ng-select
-                                                        [(ngModel)]="settings.allSettingsBundleDto.discountLedgerId"
-                                                        [items]="accountLedgerList"
-                                                        autofocus
-                                                        bindLabel="displayName"
-                                                        bindValue="id"
-                                                    ></ng-select>
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-3 col-xl-3 col-md-3 col-xs-12">
-                                                <div class="mb-4 form-item">
-                                                    <label class="form-label">Fee Fine</label>
-                                                    <ng-select
-                                                        [(ngModel)]="settings.allSettingsBundleDto.fineLedgerId"
-                                                        [items]="accountLedgerList"
-                                                        autofocus
-                                                        bindLabel="displayName"
-                                                        bindValue="id"
-                                                    ></ng-select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </tab>
                         }

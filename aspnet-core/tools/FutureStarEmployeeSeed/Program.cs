@@ -33,6 +33,10 @@ await using var context = new ErpDbContext(options);
 var tenant = await context.Tenants.IgnoreQueryFilters()
     .SingleAsync(item => item.TenancyName == "FutureStar" && !item.IsDeleted);
 var tenantId = tenant.Id;
+if (tenantId != 2)
+{
+    throw new InvalidOperationException($"Expected FutureStar to be tenant 2, but found tenant {tenantId}.");
+}
 
 var passwordSetting = await context.Settings.IgnoreQueryFilters().FirstOrDefaultAsync(item =>
     item.TenantId == tenantId &&
@@ -50,17 +54,88 @@ else
 {
     passwordSetting.Value = ErpConsts.DefaultRestaurantEmployeePassword;
 }
+
+var receiptRouteSetting = await context.Settings.IgnoreQueryFilters().FirstOrDefaultAsync(item =>
+    item.TenantId == tenantId &&
+    item.UserId == null &&
+    item.Name == AppSettings.ErpSettings.RestaurantReceiptPrintRouteName);
+if (receiptRouteSetting == null)
+{
+    context.Settings.Add(new Setting(
+        tenantId,
+        null,
+        AppSettings.ErpSettings.RestaurantReceiptPrintRouteName,
+        "RECEIPT"));
+}
+else if (string.IsNullOrWhiteSpace(receiptRouteSetting.Value))
+{
+    receiptRouteSetting.Value = "RECEIPT";
+}
 await context.SaveChangesAsync();
 
 var employeeSeeds = new[]
 {
-    new EmployeeSeed("FS-MGR-001", "FutureStar Manager", "futurestar.manager", StaticRoleNames.Tenants.RestaurantManager, "Management", 45000m),
-    new EmployeeSeed("FS-CASH-001", "FutureStar Cashier", "futurestar.cashier", StaticRoleNames.Tenants.RestaurantCashier, "Cash Counter", 30000m),
-    new EmployeeSeed("FS-WAIT-001", "FutureStar Waiter", "futurestar.waiter", StaticRoleNames.Tenants.RestaurantWaiter, "Service", 25000m),
-    new EmployeeSeed("FS-KIT-001", "FutureStar Kitchen", "futurestar.kitchen", StaticRoleNames.Tenants.RestaurantKitchen, "Kitchen", 32000m),
-    new EmployeeSeed("FS-INV-001", "FutureStar Inventory", "futurestar.inventory", StaticRoleNames.Tenants.RestaurantInventory, "Inventory", 30000m),
-    new EmployeeSeed("FS-PAY-001", "FutureStar Payroll", "futurestar.payroll", StaticRoleNames.Tenants.RestaurantPayroll, "Payroll", 35000m),
+    new EmployeeSeed("FS-MGR-001", "FutureStar Manager", "futurestar.manager", StaticRoleNames.Tenants.RestaurantManager, "Management", "General Manager", 45000m),
+    new EmployeeSeed("FS-CASH-001", "FutureStar Cashier", "futurestar.cashier", StaticRoleNames.Tenants.RestaurantCashier, "Cash Counter", "Cashier", 30000m),
+    new EmployeeSeed("FS-WAIT-001", "FutureStar Waiter", "futurestar.waiter", StaticRoleNames.Tenants.RestaurantWaiter, "Service", "Waiter", 25000m),
+    new EmployeeSeed("FS-KIT-001", "FutureStar Kitchen", "futurestar.kitchen", StaticRoleNames.Tenants.RestaurantKitchen, "Kitchen", "Chef", 32000m),
+    new EmployeeSeed("FS-INV-001", "FutureStar Inventory", "futurestar.inventory", StaticRoleNames.Tenants.RestaurantInventory, "Inventory", "Inventory Controller", 30000m),
+    new EmployeeSeed("FS-PAY-001", "FutureStar Payroll", "futurestar.payroll", StaticRoleNames.Tenants.RestaurantPayroll, "Payroll", "Payroll Officer", 35000m),
 };
+
+var payrollDepartments = new Dictionary<string, RestaurantPayrollDepartment>();
+foreach (var departmentName in employeeSeeds.Select(seed => seed.Department).Distinct())
+{
+    var department = await context.Set<RestaurantPayrollDepartment>().IgnoreQueryFilters()
+        .FirstOrDefaultAsync(item => item.TenantId == tenantId && item.Name == departmentName);
+    if (department == null)
+    {
+        department = new RestaurantPayrollDepartment
+        {
+            Id = Guid.NewGuid(),
+            TenantId = tenantId,
+            Name = departmentName,
+            Description = $"{departmentName} team",
+            SortOrder = payrollDepartments.Count + 1,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+        };
+        context.Set<RestaurantPayrollDepartment>().Add(department);
+    }
+    payrollDepartments[departmentName] = department;
+}
+await context.SaveChangesAsync();
+
+var payrollJobRoles = new Dictionary<(string Department, string Name), RestaurantPayrollJobRole>();
+foreach (var seed in employeeSeeds)
+{
+    var department = payrollDepartments[seed.Department];
+    var key = (seed.Department, seed.JobRoleName);
+    if (payrollJobRoles.ContainsKey(key))
+    {
+        continue;
+    }
+
+    var jobRole = await context.Set<RestaurantPayrollJobRole>().IgnoreQueryFilters()
+        .FirstOrDefaultAsync(item => item.TenantId == tenantId && item.DepartmentId == department.Id && item.Name == seed.JobRoleName);
+    if (jobRole == null)
+    {
+        jobRole = new RestaurantPayrollJobRole
+        {
+            Id = Guid.NewGuid(),
+            TenantId = tenantId,
+            DepartmentId = department.Id,
+            Name = seed.JobRoleName,
+            Description = $"{seed.JobRoleName} role in {seed.Department}",
+            SortOrder = payrollJobRoles.Count + 1,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+        };
+        context.Set<RestaurantPayrollJobRole>().Add(jobRole);
+    }
+    payrollJobRoles[key] = jobRole;
+}
+await context.SaveChangesAsync();
 
 var operatingRoleNames = new[]
 {
@@ -124,6 +199,8 @@ foreach (var seed in employeeSeeds)
 
     var employee = await context.RestaurantPayrollEmployees.IgnoreQueryFilters().FirstOrDefaultAsync(item =>
         item.TenantId == tenantId && item.StaffCode == seed.StaffCode);
+    var department = payrollDepartments[seed.Department];
+    var jobRole = payrollJobRoles[(seed.Department, seed.JobRoleName)];
     if (employee == null)
     {
         employee = new RestaurantPayrollEmployee
@@ -132,8 +209,8 @@ foreach (var seed in employeeSeeds)
             TenantId = tenantId,
             StaffCode = seed.StaffCode,
             Name = seed.Name,
-            JobRole = roles[seed.RoleName].DisplayName,
-            Department = seed.Department,
+            DepartmentId = department.Id,
+            JobRoleId = jobRole.Id,
             EmploymentType = RestaurantEmploymentType.Monthly,
             BasicSalary = seed.BasicSalary,
             OvertimeRate = 250m,
@@ -145,6 +222,8 @@ foreach (var seed in employeeSeeds)
         context.RestaurantPayrollEmployees.Add(employee);
         createdEmployees++;
     }
+    employee.DepartmentId = department.Id;
+    employee.JobRoleId = jobRole.Id;
     employee.UserId = user.Id;
     employee.LoginManagedByRestaurant = true;
     employee.IsActive = true;
@@ -164,4 +243,5 @@ internal sealed record EmployeeSeed(
     string UserName,
     string RoleName,
     string Department,
+    string JobRoleName,
     decimal BasicSalary);

@@ -123,6 +123,19 @@
         </button>
     </form>
 
+    <div class="demo-login">
+        <span class="demo-login-label">Just looking around?</span>
+        <button
+            type="button"
+            class="demo-login-btn"
+            (click)="loginWithDemoAccount()"
+            [disabled]="submitting"
+            [attr.aria-busy]="submitting"
+        >
+            Continue with demo account
+        </button>
+    </div>
+
     @if ((multiTenancySideIsTeanant || !isMultiTenancyEnabled) && loginService.externalLoginProviders.length > 0) {
         <div class="login-divider"><span>{{ 'LoginWith' | localize }}</span></div>
         <div class="login__options">

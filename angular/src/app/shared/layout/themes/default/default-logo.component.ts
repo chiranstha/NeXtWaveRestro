@@ -22,7 +22,8 @@ export class DefaultLogoComponent extends AppComponentBase implements OnInit {
         this.setLogoUrl();
     }
     setLogoUrl(): void {
-        this.defaultLogo = `${AppConsts.appBaseUrl}/assets/common/images/applogo.png`;
-        this.defaultSmallLogo = `${AppConsts.appBaseUrl}/assets/common/images/applogo.png`;
+        const skin = this.skin === 'dark' ? 'dark' : 'light';
+        this.defaultLogo = `${AppConsts.appBaseUrl}/assets/common/images/app-logo-on-${skin}.svg`;
+        this.defaultSmallLogo = `${AppConsts.appBaseUrl}/assets/common/images/app-logo-on-${skin}-sm.svg`;
     }
 }
